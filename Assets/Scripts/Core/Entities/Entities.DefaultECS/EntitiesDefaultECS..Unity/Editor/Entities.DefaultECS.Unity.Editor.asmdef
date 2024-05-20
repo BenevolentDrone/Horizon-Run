@@ -1,0 +1,18 @@
+{
+    "name": "Entities.DefaultECS.Unity.Editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:4078fbd9635323d24903cca3d8fee2a6"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

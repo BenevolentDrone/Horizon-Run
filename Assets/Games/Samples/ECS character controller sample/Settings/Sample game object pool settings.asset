@@ -1,0 +1,49 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c0cecf820d5ed98d3afddb509404154c, type: 3}
+  m_Name: Sample game object pool settings
+  m_EditorClassIdentifier: 
+  PoolID: Game objects pool
+  Elements:
+  - GameObjectAddress: Player view
+    Variants:
+    - Chance: 1
+      Prefab: {fileID: 8953306360588676262, guid: 7c90d7dd0d1d99550a0b2ac302b7181c,
+        type: 3}
+      Initial:
+        Rule: 3
+        Amount: 4
+      Additional:
+        Rule: 3
+        Amount: 4
+  - GameObjectAddress: Joystick view
+    Variants:
+    - Chance: 1
+      Prefab: {fileID: 1230688845738325699, guid: 1363873c6ef8dbcd0a7e4f0b14c5493c,
+        type: 3}
+      Initial:
+        Rule: 3
+        Amount: 1
+      Additional:
+        Rule: 3
+        Amount: 1
+  - GameObjectAddress: Virtual camera view
+    Variants:
+    - Chance: 1
+      Prefab: {fileID: 6746251727759287232, guid: 43224fb35d5c47ee782115263e5ba3f2,
+        type: 3}
+      Initial:
+        Rule: 3
+        Amount: 1
+      Additional:
+        Rule: 3
+        Amount: 1

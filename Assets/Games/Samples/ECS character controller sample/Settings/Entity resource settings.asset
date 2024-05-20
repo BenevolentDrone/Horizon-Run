@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a9a07f1ef06943c3884cfc849ecb164a, type: 3}
+  m_Name: Entity resource settings
+  m_EditorClassIdentifier: 
+  Resources:
+  - ResourceID: Player
+    Variants:
+    - VariantID: Registry entity
+      Priority: 1
+      Resource: {fileID: 11400000, guid: a94fd91c4c7f9a76f8ca9d1a9606e418, type: 2}
+    - VariantID: Simulation entity
+      Priority: 0
+      Resource: {fileID: 11400000, guid: ec950b395dfac5844b0027b5c2a33cd6, type: 2}
+    - VariantID: View entity
+      Priority: 0
+      Resource: {fileID: 11400000, guid: 8ae0cbeada67be68590c23bee780c033, type: 2}
+  - ResourceID: Joystick
+    Variants:
+    - VariantID: View entity
+      Priority: 1
+      Resource: {fileID: 11400000, guid: f73845613746d25a88a5bd63942c85f4, type: 2}
+  - ResourceID: Virtual camera
+    Variants:
+    - VariantID: View entity
+      Priority: 1
+      Resource: {fileID: 11400000, guid: 93619acaa8291f633a34591dcca88e1e, type: 2}

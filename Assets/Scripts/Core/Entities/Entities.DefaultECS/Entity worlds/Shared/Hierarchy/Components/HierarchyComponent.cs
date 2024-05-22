@@ -7,6 +7,6 @@ namespace HereticalSolutions.Entities
 	{
 		public Entity Parent;
 
-		public int ChildrenListID;
+		public ushort ChildrenListHandle;
 	}
 }

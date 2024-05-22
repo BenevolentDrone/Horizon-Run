@@ -28,7 +28,7 @@ namespace HereticalSolutions.Entities
             var parentHierarchyComponent = parent.Get<HierarchyComponent>();
             
             entityListManager.GetOrCreateList(
-                ref parentHierarchyComponent.ChildrenListID,
+                ref parentHierarchyComponent.ChildrenListHandle,
                 out var parentsChildrenList);
             
             ref var childHierarchyComponent = ref child.Get<HierarchyComponent>();
@@ -53,7 +53,7 @@ namespace HereticalSolutions.Entities
             var parentHierarchyComponent = parent.Get<HierarchyComponent>();
 
             if (!entityListManager.TryGetList(
-                parentHierarchyComponent.ChildrenListID,
+                parentHierarchyComponent.ChildrenListHandle,
                 out var parentsChildrenList))
             {
                 return;

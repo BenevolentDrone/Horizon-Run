@@ -44,5 +44,14 @@ namespace HereticalSolutions.Allocations.Factories
             // Generate a random integer and return it
             return new Random().Next();
         }
+
+        public static ushort BuildUshort()
+        {
+            // Generate a random integer and return it
+            return Convert.ToUInt16(
+                new Random().Next(
+                    ushort.MinValue,
+                    ushort.MaxValue));
+        }
     }
 }

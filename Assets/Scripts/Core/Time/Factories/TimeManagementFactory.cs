@@ -49,7 +49,7 @@ namespace HereticalSolutions.Time.Factories
         {
             return new TimerManager(
                 managerID,
-                RepositoriesFactory.BuildDictionaryRepository<int, IPoolElement<TimerWithSubscriptionsContainer>>(),
+                RepositoriesFactory.BuildDictionaryRepository<ushort, IPoolElement<TimerWithSubscriptionsContainer>>(),
                 TimerPoolFactory.BuildRuntimeTimersPool(
                     provider,
                     loggerResolver),

@@ -9,6 +9,6 @@ namespace HereticalSolutions.Pools
 
 		SubscriptionSingleArgGeneric<IRuntimeTimer> PushSubscription { get; }
 
-		int TimerID { get; set; }
+		ushort TimerHandle { get; set; }
 	}
 }

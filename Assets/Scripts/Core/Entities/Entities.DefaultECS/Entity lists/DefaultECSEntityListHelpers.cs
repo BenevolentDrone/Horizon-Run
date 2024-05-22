@@ -8,22 +8,22 @@ namespace HereticalSolutions.Entities
     {
         public static bool TryGetList(
             this DefaultECSEntityListManager entityListManager,
-            int listID,
+            ushort listHandle,
             out List<Entity> entityList)
         {
             entityList = null;
             
-            if (listID == 0)
+            if (listHandle == 0)
             {
                 return false;
             }
             
-            if (!entityListManager.HasList(listID))
+            if (!entityListManager.HasList(listHandle))
             {
                 return false;
             }
             
-            entityList = entityListManager.GetList(listID);
+            entityList = entityListManager.GetList(listHandle);
             
             return true;
         }

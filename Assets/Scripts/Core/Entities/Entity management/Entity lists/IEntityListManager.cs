@@ -1,15 +1,15 @@
 namespace HereticalSolutions.Entities
 {
-	public interface IEntityListManager<TListID, TEntityList>
+	public interface IEntityListManager<TListHandle, TEntityList>
 	{
-		bool HasList(TListID listID);
+		bool HasList(TListHandle listHandle);
 
-		TEntityList GetList(TListID listID);
+		TEntityList GetList(TListHandle listHandle);
 
 		void CreateList(
-			out TListID listID,
+			out TListHandle listHandle,
 			out TEntityList entityList);
 
-		void RemoveList(TListID listID);
+		void RemoveList(TListHandle listHandle);
 	}
 }

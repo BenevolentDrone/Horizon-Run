@@ -2,19 +2,19 @@ namespace HereticalSolutions.Entities
 {
     public static class EntityListHelpers
     {
-        public static void GetOrCreateList<TListID, TEntityList>(
-            this IEntityListManager<TListID, TEntityList> entityListManager,
-            ref TListID listID,
+        public static void GetOrCreateList<TListHandle, TEntityList>(
+            this IEntityListManager<TListHandle, TEntityList> entityListManager,
+            ref TListHandle listHandle,
             out TEntityList entityList)
         {
-            if (entityListManager.HasList(listID))
+            if (entityListManager.HasList(listHandle))
             {
-                entityList = entityListManager.GetList(listID);
+                entityList = entityListManager.GetList(listHandle);
             }
             else
             {
                 entityListManager.CreateList(
-                    out listID,
+                    out listHandle,
                     out entityList);
             }
         }

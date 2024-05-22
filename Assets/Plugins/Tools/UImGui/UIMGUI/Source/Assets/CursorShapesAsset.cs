@@ -6,10 +6,10 @@ namespace UImGui.Assets
 {
 	// TODO: Implement animated cursor.
 	[CreateAssetMenu(menuName = "Dear ImGui/Cursor Shapes")]
-	internal sealed class CursorShapesAsset : ScriptableObject
+	public class CursorShapesAsset : ScriptableObject
 	{
 		[Serializable]
-		internal struct CursorShape
+		public struct CursorShape
 		{
 			public Texture2D Texture;
 			public Vector2 Hotspot;

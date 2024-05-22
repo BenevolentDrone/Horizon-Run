@@ -10,53 +10,53 @@ using DefaultEcs;
 namespace HereticalSolutions.Entities
 {
 	public class DefaultECSEntityListManager
-		: IEntityListManager<int, List<Entity>>
+		: IEntityListManager<ushort, List<Entity>>
 	{
 		private readonly ILogger logger;
 		
-		private int nextIDToAllocate;
+		private ushort nextHandleToAllocate;
 
-		private Queue<int> freeListIDs;
+		private Queue<ushort> freeListHandles;
 
-		private IRepository<int, List<Entity>> entityListRepository;
+		private IRepository<ushort, List<Entity>> entityListRepository;
 
 		public DefaultECSEntityListManager(
-			Queue<int> freeListIDs,
-			IRepository<int, List<Entity>> entityListRepository,
+			Queue<ushort> freeListHandles,
+			IRepository<ushort, List<Entity>> entityListRepository,
 			ILogger logger = null)
 		{
-			this.freeListIDs = freeListIDs;
+			this.freeListHandles = freeListHandles;
 
 			this.entityListRepository = entityListRepository;
 
 			this.logger = logger;
 
-			nextIDToAllocate = 1;
+			nextHandleToAllocate = 1;
 		}
 
-		public bool HasList(int listID)
+		public bool HasList(ushort listHandle)
 		{
-			if (listID == 0)
+			if (listHandle == 0)
 				return false;
-			
-	        /*
+
+			/*
 	            throw new Exception(
 		            logger.TryFormat<DefaultECSEntityListManager>(
-			            $"INVALID LIST ID {listID}"));
+			            $"INVALID LIST ID {listHandle}"));
             */
-            
-			return entityListRepository.Has(listID);
+
+			return entityListRepository.Has(listHandle);
 		}
 
-		public List<Entity> GetList(int listID)
+		public List<Entity> GetList(ushort listHandle)
 		{
-			if (listID == 0)
+			if (listHandle == 0)
 				throw new Exception(
 					logger.TryFormat<DefaultECSEntityListManager>(
-						$"INVALID LIST ID {listID}"));
+						$"INVALID LIST ID {listHandle}"));
 			
 			if (!entityListRepository.TryGet(
-				listID,
+				listHandle,
 				out var entityList))
 			{
 				return null;
@@ -66,48 +66,48 @@ namespace HereticalSolutions.Entities
 		}
 
 		public void CreateList(
-			out int listID,
+			out ushort listHandle,
 			out List<Entity> entityList)
 		{
-			if (freeListIDs.Count > 0)
+			if (freeListHandles.Count > 0)
 			{
-				listID = freeListIDs.Dequeue();
+				listHandle = freeListHandles.Dequeue();
 			}
 			else
 			{
-				listID = nextIDToAllocate++;
+				listHandle = nextHandleToAllocate++;
 			}
 
 			entityList = new List<Entity>();
 
 			entityListRepository.Add(
-				listID,
+				listHandle,
 				entityList);
 			
 			logger?.Log<DefaultECSEntityListManager>(
-				$"CREATED LIST {listID}");
+				$"CREATED LIST {listHandle}");
 		}
 
-		public void RemoveList(int listID)
+		public void RemoveList(ushort listHandle)
 		{
-			if (listID == 0)
+			if (listHandle == 0)
 				return;
-			
+
 			/*
 				throw new Exception(
 					logger.TryFormat<DefaultECSEntityListManager>(
-						$"INVALID LIST ID {listID}"));
+						$"INVALID LIST ID {listHandle}"));
 			*/
-			
-			if (!entityListRepository.TryRemove(listID))
+
+			if (!entityListRepository.TryRemove(listHandle))
 			{
 				return;
 			}
 
-			freeListIDs.Enqueue(listID);
+			freeListHandles.Enqueue(listHandle);
 			
 			logger?.Log<DefaultECSEntityListManager>(
-				$"REMOVED LIST {listID}");
+				$"REMOVED LIST {listHandle}");
 		}
 	}
 }

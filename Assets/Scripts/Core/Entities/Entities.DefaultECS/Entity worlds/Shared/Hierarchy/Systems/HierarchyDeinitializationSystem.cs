@@ -47,14 +47,10 @@ namespace HereticalSolutions.Entities
             var hierarchyComponent = entity.Get<HierarchyComponent>();
             
             var childrenList = entityListManager.GetList(
-                hierarchyComponent.ChildrenListID);
+                hierarchyComponent.ChildrenListHandle);
 
             if (childrenList == null)
             {
-                //throw new Exception(
-                //    logger.TryFormat<HierarchyDeinitializationSystem<TEntityIDComponent, TEntityID>>(
-                //        $"ENTITY LIST {hierarchyComponent.ChildrenListID} NOT FOUND"));
-                
                 return;
             }
             
@@ -96,7 +92,7 @@ namespace HereticalSolutions.Entities
             }
 
             entityListManager.RemoveList(
-                hierarchyComponent.ChildrenListID);
+                hierarchyComponent.ChildrenListHandle);
         }
 
         public void Dispose()

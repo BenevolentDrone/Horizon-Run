@@ -18,7 +18,7 @@ namespace HereticalSolutions.Time
 		private readonly string timerManagerID;
 
 
-		private readonly IRepository<int, IPoolElement<TimerWithSubscriptionsContainer>> timerContainersRepository;
+		private readonly IRepository<ushort, IPoolElement<TimerWithSubscriptionsContainer>> timerContainersRepository;
 
 		private readonly INonAllocDecoratedPool<TimerWithSubscriptionsContainer> timerContainersPool;
 
@@ -26,7 +26,7 @@ namespace HereticalSolutions.Time
 		
 		public TimerManager(
 			string timerManagerID,
-			IRepository<int, IPoolElement<TimerWithSubscriptionsContainer>> timerContainersRepository,
+			IRepository<ushort, IPoolElement<TimerWithSubscriptionsContainer>> timerContainersRepository,
 			INonAllocDecoratedPool<TimerWithSubscriptionsContainer> timerContainersPool,
 			bool renameTimersOnPop = true)
 		{
@@ -44,22 +44,23 @@ namespace HereticalSolutions.Time
 		public string ID { get => timerManagerID;}
 
 		public bool CreateTimer(
-			out int timerID,
+			out ushort timerHandle,
 			out IRuntimeTimer timer)
 		{
-			timerID = -1;
+			timerHandle = 0;
 
 			do
 			{
-				timerID = IDAllocationsFactory.BuildInt();
+				timerHandle = IDAllocationsFactory.BuildUshort();
 			}
-			while (timerContainersRepository.Has(timerID));
+			while (timerHandle == 0
+				|| timerContainersRepository.Has(timerHandle));
 
 
 			var pooledTimerContainer = timerContainersPool.Pop();
 
 			timerContainersRepository.Add(
-				timerID,
+				timerHandle,
 				pooledTimerContainer);
 
 			var timerContainer = pooledTimerContainer.Value;
@@ -78,7 +79,7 @@ namespace HereticalSolutions.Time
 
 				if (renameableTimer != null)
 				{
-					string timerStringID = $"{timerManagerID} timer #{timerID}";
+					string timerStringID = $"{timerManagerID} timer #{timerHandle}";
 
 					renameableTimer.ID = timerStringID;
 				}
@@ -88,11 +89,11 @@ namespace HereticalSolutions.Time
 		}
 
 		public bool TryGetTimer(
-			int timerID,
+			ushort timerHandle,
 			out IRuntimeTimer timer)
 		{
 			var result = timerContainersRepository.TryGet(
-				timerID,
+				timerHandle,
 				out var pooledTimerContainer);
 
 			timer = pooledTimerContainer?.Value.Timer;
@@ -101,10 +102,10 @@ namespace HereticalSolutions.Time
 		}
 
 		public bool TryDestroyTimer(
-			int timerID)
+			ushort timerHandle)
 		{
 			if (!timerContainersRepository.TryGet(
-				timerID,
+				timerHandle,
 				out var pooledTimerContainer))
 			{
 				return false;
@@ -135,7 +136,7 @@ namespace HereticalSolutions.Time
 
 			pooledTimerContainer.Push();
 
-			timerContainersRepository.TryRemove(timerID);
+			timerContainersRepository.TryRemove(timerHandle);
 			
 			
 			return true;

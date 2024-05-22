@@ -1,0 +1,82 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 44c6fe4c0f01f4247bbd59f6ed7746de, type: 3}
+  m_Name: Game object pool settings
+  m_EditorClassIdentifier: 
+  PoolID: Game objects pool
+  Elements:
+  - GameObjectAddress: Virtual camera view
+    Variants:
+    - Chance: 1
+      Prefab: {fileID: 6746251727759287232, guid: 2881c3d23ce784ac897adf9632f7b72a,
+        type: 3}
+      Initial:
+        Rule: 3
+        Amount: 2
+      Additional:
+        Rule: 3
+        Amount: 2
+  - GameObjectAddress: Joystick view
+    Variants:
+    - Chance: 1
+      Prefab: {fileID: 1230688845738325699, guid: 254bfadbe9ce66d379fc2bf6bff6657b,
+        type: 3}
+      Initial:
+        Rule: 3
+        Amount: 2
+      Additional:
+        Rule: 3
+        Amount: 2
+  - GameObjectAddress: WASD controls view
+    Variants:
+    - Chance: 1
+      Prefab: {fileID: 3712791062557506634, guid: 4e8d59d17255db83b8419125dd1ff08d,
+        type: 3}
+      Initial:
+        Rule: 3
+        Amount: 2
+      Additional:
+        Rule: 3
+        Amount: 2
+  - GameObjectAddress: LMB click view
+    Variants:
+    - Chance: 1
+      Prefab: {fileID: 1978036872042216169, guid: 3459cc51d985a9f2b92ef0c1fba63730,
+        type: 3}
+      Initial:
+        Rule: 3
+        Amount: 2
+      Additional:
+        Rule: 3
+        Amount: 2
+  - GameObjectAddress: RMB click view
+    Variants:
+    - Chance: 1
+      Prefab: {fileID: 224543367616488714, guid: 27445303ad36f2746bd4ac1628bc0805,
+        type: 3}
+      Initial:
+        Rule: 3
+        Amount: 2
+      Additional:
+        Rule: 3
+        Amount: 2
+  - GameObjectAddress: Cursor switcher view
+    Variants:
+    - Chance: 1
+      Prefab: {fileID: 299295913343228935, guid: 7ff9d2c906f0f934e825d778a3026b72,
+        type: 3}
+      Initial:
+        Rule: 3
+        Amount: 2
+      Additional:
+        Rule: 3
+        Amount: 2

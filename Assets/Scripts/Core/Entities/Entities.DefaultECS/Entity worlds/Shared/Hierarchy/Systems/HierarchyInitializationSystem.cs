@@ -27,10 +27,10 @@ namespace HereticalSolutions.Entities
             ref var hierarchyComponent = ref entity.Get<HierarchyComponent>();
 
             entityListManager.CreateList(
-                out var entityListID,
+                out var entityListHandle,
                 out var entityList);
 
-            hierarchyComponent.ChildrenListID = entityListID;
+            hierarchyComponent.ChildrenListHandle = entityListHandle;
         }
 
         public void Dispose()

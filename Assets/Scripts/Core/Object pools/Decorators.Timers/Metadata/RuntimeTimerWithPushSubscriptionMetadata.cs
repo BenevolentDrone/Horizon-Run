@@ -22,7 +22,7 @@ namespace HereticalSolutions.Pools
 
             Duration = 0f;
 
-            TimerID = -1;
+            TimerHandle = 0;
         }
 
         #region IContainsRuntimeTimer
@@ -37,7 +37,7 @@ namespace HereticalSolutions.Pools
 
         public SubscriptionSingleArgGeneric<IRuntimeTimer> PushSubscription { get; set; }
 
-        public int TimerID { get; set; }
+        public ushort TimerHandle { get; set; }
 
         #endregion
 

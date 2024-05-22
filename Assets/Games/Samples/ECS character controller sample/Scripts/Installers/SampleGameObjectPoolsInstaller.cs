@@ -8,7 +8,7 @@ using UnityEngine;
 
 using Zenject;
 
-namespace HereticalSolutions.Samples.ECSCharacterControllerSample.Installers
+namespace HereticalSolutions.Samples.ECSCharacterControllerSample.DI
 {
 	public class SampleGameObjectPoolsInstaller : MonoInstaller
 	{

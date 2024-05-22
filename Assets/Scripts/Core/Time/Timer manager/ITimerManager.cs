@@ -5,14 +5,14 @@ namespace HereticalSolutions.Time
 		string ID { get; }
 
 		bool CreateTimer(
-			out int timerID,
+			out ushort timerHandle,
 			out IRuntimeTimer timer);
 
 		bool TryGetTimer(
-			int timerID,
+			ushort timerHandle,
 			out IRuntimeTimer timer);
 
 		bool TryDestroyTimer(
-			int timerID);
+			ushort timerHandle);
 	}
 }

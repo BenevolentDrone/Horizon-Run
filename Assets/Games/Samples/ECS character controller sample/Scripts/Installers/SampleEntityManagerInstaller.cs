@@ -8,7 +8,7 @@ using Zenject;
 
 using HereticalSolutions.Samples.ECSCharacterControllerSample.Factories;
 
-namespace HereticalSolutions.Samples.ECSCharacterControllerSample.Installers
+namespace HereticalSolutions.Samples.ECSCharacterControllerSample.DI
 {
     public class SampleEntityManagerInstaller : MonoInstaller
     {

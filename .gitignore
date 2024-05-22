@@ -73,3 +73,9 @@ crashlytics-build.properties
 
 # SerializedBuildInfo
 *.ahbuildinfo
+
+# DO NOT INCLUDE PAID ASSETS
+Paid/
+
+# DO NOT INCLUDE RUNTIME LOGS
+/[Rr]untime [Ll]ogs/

@@ -63,12 +63,12 @@ namespace HereticalSolutions.Pools.Decorators
 			if (metadataWithPushSubscription != null)
 			{
 				timerManager.CreateTimer(
-					out var timerID,
+					out var timerHandle,
 					out timer);
 
 				metadata.RuntimeTimer = timer;
 
-				metadataWithPushSubscription.TimerID = timerID;
+				metadataWithPushSubscription.TimerHandle = timerHandle;
 
 				timer.OnFinish.Subscribe(
 					metadataWithPushSubscription.PushSubscription);
@@ -119,11 +119,11 @@ namespace HereticalSolutions.Pools.Decorators
 						timer.OnFinish.Unsubscribe(metadataWithPushSubscription.PushSubscription);
 
 					timerManager.TryDestroyTimer(
-						metadataWithPushSubscription.TimerID);
+						metadataWithPushSubscription.TimerHandle);
 
 					metadata.RuntimeTimer = null;
 
-					metadataWithPushSubscription.TimerID = -1;
+					metadataWithPushSubscription.TimerHandle = 0;
 				}
 			}
 		}

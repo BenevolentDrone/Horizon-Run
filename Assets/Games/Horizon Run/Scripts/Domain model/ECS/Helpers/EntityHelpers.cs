@@ -2,8 +2,6 @@ using System;
 
 using HereticalSolutions.Entities;
 
-using UnityEngine;
-
 using DefaultEcs;
 
 namespace HereticalSolutions.HorizonRun
@@ -85,69 +83,6 @@ namespace HereticalSolutions.HorizonRun
             }
 
             return true;
-        }
-
-        public static bool TryGetPosition(
-            Entity entity,
-            out Vector3 position)
-        {
-            position = Vector3.zero;
-            
-            if (entity.Has<PositionComponent>())
-            {
-                position = entity.Get<PositionComponent>().Position;
-
-                return true;
-            }
-
-            if (entity.Has<NestedPositionComponent>())
-            {
-                var nestedPositionComponent = entity.Get<NestedPositionComponent>();
-
-                var positionSourceEntity = nestedPositionComponent.PositionSourceEntity;
-
-                if (!positionSourceEntity.IsAlive
-                    || !positionSourceEntity.Has<PositionComponent>())
-                    return false;
-
-                position = nestedPositionComponent
-                    .PositionSourceEntity
-                    .Get<PositionComponent>()
-                    .Position;
-                
-                if (nestedPositionComponent.LocalPosition.magnitude > MathHelpers.EPSILON
-                    && positionSourceEntity.Has<UniformRotationComponent>())
-                {
-                    var angle = positionSourceEntity.Get<UniformRotationComponent>().Angle;
-
-                    var rotation = Quaternion.Euler(0, angle, 0) 
-                        * Quaternion.LookRotation(nestedPositionComponent.LocalPosition);
-					
-                    position += rotation
-                        * Vector3.forward 
-                        * nestedPositionComponent.LocalPosition.magnitude;
-                }
-                else if (nestedPositionComponent.LocalPosition.magnitude > MathHelpers.EPSILON
-                    && positionSourceEntity.Has<QuaternionComponent>())
-                {
-                    var quaternion = positionSourceEntity.Get<QuaternionComponent>().Quaternion;
-
-                    var rotation = quaternion
-                        * Quaternion.LookRotation(nestedPositionComponent.LocalPosition);
-
-                    position += rotation
-                        * Vector3.forward
-                        * nestedPositionComponent.LocalPosition.magnitude;
-                }
-                else
-                {
-                    position += nestedPositionComponent.LocalPosition;
-                }
-
-                return true;
-            }
-
-            return false;
         }
     }
 }

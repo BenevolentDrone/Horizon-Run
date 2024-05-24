@@ -1,0 +1,62 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8a9896d9d1f70bee18c8aa0c81b4fd5c, type: 3}
+  m_Name: Four wheeled vehicle (simulation)
+  m_EditorClassIdentifier: 
+  EntityJson: "{\n  \"PrototypeID\": \"Four wheeled vehicle\",\n  \"Components\":
+    [\n    {\n      \"$type\": \"HereticalSolutions.Entities.HierarchyComponent,
+    Core\",\n      \"Parent\": {\n        \"IsAlive\": false\n      },\n      \"ChildrenListHandle\":
+    0\n    },\n    {\n      \"$type\": \"HereticalSolutions.HorizonRun.Transform3DComponent,
+    Assembly-CSharp\",\n      \"TRSMatrix\": {\n        \"m00\": 0.0,\n        \"m10\":
+    0.0,\n        \"m20\": 0.0,\n        \"m30\": 0.0,\n        \"m01\": 0.0,\n       
+    \"m11\": 0.0,\n        \"m21\": 0.0,\n        \"m31\": 0.0,\n        \"m02\":
+    0.0,\n        \"m12\": 0.0,\n        \"m22\": 0.0,\n        \"m32\": 0.0,\n       
+    \"m03\": 0.0,\n        \"m13\": 0.0,\n        \"m23\": 0.0,\n        \"m33\":
+    0.0,\n        \"rotation\": {\n          \"x\": -0.159217283,\n          \"y\":
+    -0.384384662,\n          \"z\": -0.384384662,\n          \"w\": 0.8241036,\n         
+    \"eulerAngles\": {\n            \"x\": 326.0875,\n            \"y\": 321.981384,\n           
+    \"z\": 321.981384,\n            \"normalized\": {\n              \"x\": 0.5822276,\n             
+    \"y\": 0.574896157,\n              \"z\": 0.574896157,\n              \"normalized\":
+    {\n                \"x\": 0.5822275,\n                \"y\": 0.5748961,\n               
+    \"z\": 0.5748961,\n                \"magnitude\": 0.99999994,\n               
+    \"sqrMagnitude\": 0.99999994\n              },\n              \"magnitude\":
+    1.00000012,\n              \"sqrMagnitude\": 1.00000012\n            },\n           
+    \"magnitude\": 560.0688,\n            \"sqrMagnitude\": 313677.063\n         
+    }\n        },\n        \"lossyScale\": {\n          \"x\": 0.0,\n          \"y\":
+    0.0,\n          \"z\": 0.0,\n          \"magnitude\": 0.0,\n          \"sqrMagnitude\":
+    0.0\n        },\n        \"isIdentity\": false,\n        \"determinant\": 0.0,\n       
+    \"decomposeProjection\": {\n          \"left\": \"NaN\",\n          \"right\":
+    \"NaN\",\n          \"bottom\": \"NaN\",\n          \"top\": \"NaN\",\n         
+    \"zNear\": 0.0,\n          \"zFar\": 0.0\n        }\n      },\n      \"Dirty\":
+    false\n    },\n    {\n      \"$type\": \"HereticalSolutions.HorizonRun.Position3DComponent,
+    Assembly-CSharp\",\n      \"Position\": {\n        \"x\": 0.0,\n        \"y\":
+    0.0,\n        \"z\": 0.0,\n        \"magnitude\": 0.0,\n        \"sqrMagnitude\":
+    0.0\n      }\n    },\n    {\n      \"$type\": \"HereticalSolutions.HorizonRun.QuaternionComponent,
+    Assembly-CSharp\",\n      \"Quaternion\": {\n        \"x\": 0.0,\n        \"y\":
+    0.0,\n        \"z\": 0.0,\n        \"w\": 1.0,\n        \"eulerAngles\": {\n         
+    \"x\": 0.0,\n          \"y\": 0.0,\n          \"z\": 0.0,\n          \"magnitude\":
+    0.0,\n          \"sqrMagnitude\": 0.0\n        }\n      }\n    },\n    {\n     
+    \"$type\": \"HereticalSolutions.HorizonRun.VehicleComponent, Assembly-CSharp\"\n   
+    },\n    {\n      \"$type\": \"HereticalSolutions.HorizonRun.FourWheeledVehicleComponent,
+    Assembly-CSharp\",\n      \"FrontRightWheel\": \"00000000-0000-0000-0000-000000000000\",\n     
+    \"FrontRightWheelSocketPosition\": {\n        \"x\": 0.0,\n        \"y\": 0.0,\n       
+    \"z\": 0.0,\n        \"magnitude\": 0.0,\n        \"sqrMagnitude\": 0.0\n     
+    },\n      \"RearRightWheel\": \"00000000-0000-0000-0000-000000000000\",\n     
+    \"RearRightWheelSocketPosition\": {\n        \"x\": 0.0,\n        \"y\": 0.0,\n       
+    \"z\": 0.0,\n        \"magnitude\": 0.0,\n        \"sqrMagnitude\": 0.0\n     
+    },\n      \"RearLeftWheel\": \"00000000-0000-0000-0000-000000000000\",\n     
+    \"RearLeftWheelSocketPosition\": {\n        \"x\": 0.0,\n        \"y\": 0.0,\n       
+    \"z\": 0.0,\n        \"magnitude\": 0.0,\n        \"sqrMagnitude\": 0.0\n     
+    },\n      \"FrontLeftWheel\": \"00000000-0000-0000-0000-000000000000\",\n     
+    \"FrontLeftWheelSocketPosition\": {\n        \"x\": 0.0,\n        \"y\": 0.0,\n       
+    \"z\": 0.0,\n        \"magnitude\": 0.0,\n        \"sqrMagnitude\": 0.0\n     
+    }\n    }\n  ]\n}"

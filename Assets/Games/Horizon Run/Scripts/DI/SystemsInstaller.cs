@@ -208,6 +208,7 @@ namespace HereticalSolutions.HorizonRun.DI
 					simulationWorld,
 					viewWorld,
 					simulationUpdateTimerManager,
+					entityListManager,
 					includeViewWorld,
 					loggerResolver)
 				: new PlaceholderSystem();
@@ -218,7 +219,8 @@ namespace HereticalSolutions.HorizonRun.DI
 
 			ISystem<float> fixedUpdateSystems = (includeSimulationWorld)
 				? SystemsFactory.BuildFixedUpdateSystems(
-					simulationWorld)
+					simulationWorld,
+					entityListManager)
 				: new PlaceholderSystem();
 
 			#endregion
@@ -228,6 +230,7 @@ namespace HereticalSolutions.HorizonRun.DI
 			ISystem<float> lateUpdateSystems = (includeViewWorld)
 				? SystemsFactory.BuildLateUpdateSystems(
 					viewWorld,
+					entityManager,
 					eventEntityBuilder,
 					mainRenderCamera,
 					uiManager)

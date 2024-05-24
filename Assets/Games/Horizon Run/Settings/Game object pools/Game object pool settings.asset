@@ -80,3 +80,14 @@ MonoBehaviour:
       Additional:
         Rule: 3
         Amount: 2
+  - GameObjectAddress: Vehicle view
+    Variants:
+    - Chance: 1
+      Prefab: {fileID: 1401794335593268734, guid: 6564af7050b6a31a3af1093bd3a3f683,
+        type: 3}
+      Initial:
+        Rule: 3
+        Amount: 2
+      Additional:
+        Rule: 3
+        Amount: 2

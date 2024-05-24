@@ -13,6 +13,7 @@ namespace HereticalSolutions.HorizonRun
 					.With<UniformSteeringComponent>()
 					.With<Locomotion2DComponent>()
 					.With<Locomotion2DMemoryComponent>()
+					.Without<Transform2DComponent>()
 					.AsSet())
 		{
 		}

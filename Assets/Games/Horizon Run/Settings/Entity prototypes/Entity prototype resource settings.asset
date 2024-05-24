@@ -48,3 +48,25 @@ MonoBehaviour:
     - VariantID: View entity
       Priority: 1
       Resource: {fileID: 11400000, guid: e351380d3fa76e7448d8dcb32b419ffb, type: 2}
+  - ResourceID: Four wheeled vehicle
+    Variants:
+    - VariantID: Registry entity
+      Priority: 1
+      Resource: {fileID: 11400000, guid: 99731a65f8757c7afa21bf01ae14c8a3, type: 2}
+    - VariantID: Simulation entity
+      Priority: 0
+      Resource: {fileID: 11400000, guid: 67ff318804418e1358dced9d4d840afa, type: 2}
+    - VariantID: View entity
+      Priority: 0
+      Resource: {fileID: 11400000, guid: d68937331673a382ebda224430d1b86e, type: 2}
+  - ResourceID: Wheel
+    Variants:
+    - VariantID: Registry entity
+      Priority: 1
+      Resource: {fileID: 11400000, guid: 5712f428a16585b509b6a165a7ec0886, type: 2}
+    - VariantID: Simulation entity
+      Priority: 0
+      Resource: {fileID: 11400000, guid: a3876fc1445351b95af8f3ff947e382c, type: 2}
+    - VariantID: View entity
+      Priority: 0
+      Resource: {fileID: 11400000, guid: c94586ea70793625eb49977a652c0dbb, type: 2}

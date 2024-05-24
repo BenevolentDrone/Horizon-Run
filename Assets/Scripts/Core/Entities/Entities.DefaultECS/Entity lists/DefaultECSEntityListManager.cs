@@ -12,13 +12,13 @@ namespace HereticalSolutions.Entities
 	public class DefaultECSEntityListManager
 		: IEntityListManager<ushort, List<Entity>>
 	{
+		private readonly Queue<ushort> freeListHandles;
+
+		private readonly IRepository<ushort, List<Entity>> entityListRepository;
+
 		private readonly ILogger logger;
 		
 		private ushort nextHandleToAllocate;
-
-		private Queue<ushort> freeListHandles;
-
-		private IRepository<ushort, List<Entity>> entityListRepository;
 
 		public DefaultECSEntityListManager(
 			Queue<ushort> freeListHandles,
@@ -39,12 +39,6 @@ namespace HereticalSolutions.Entities
 			if (listHandle == 0)
 				return false;
 
-			/*
-	            throw new Exception(
-		            logger.TryFormat<DefaultECSEntityListManager>(
-			            $"INVALID LIST ID {listHandle}"));
-            */
-
 			return entityListRepository.Has(listHandle);
 		}
 
@@ -53,7 +47,7 @@ namespace HereticalSolutions.Entities
 			if (listHandle == 0)
 				throw new Exception(
 					logger.TryFormat<DefaultECSEntityListManager>(
-						$"INVALID LIST ID {listHandle}"));
+						$"INVALID LIST HANDLE {listHandle}"));
 			
 			if (!entityListRepository.TryGet(
 				listHandle,
@@ -92,12 +86,6 @@ namespace HereticalSolutions.Entities
 		{
 			if (listHandle == 0)
 				return;
-
-			/*
-				throw new Exception(
-					logger.TryFormat<DefaultECSEntityListManager>(
-						$"INVALID LIST ID {listHandle}"));
-			*/
 
 			if (!entityListRepository.TryRemove(listHandle))
 			{

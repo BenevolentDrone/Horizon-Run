@@ -15,6 +15,7 @@ namespace HereticalSolutions.HorizonRun
 					.With<QuaternionSteeringComponent>()
 					.With<Locomotion3DComponent>()
 					.With<Locomotion3DMemoryComponent>()
+					.Without<Transform3DComponent>()
 					.AsSet())
 		{
 		}

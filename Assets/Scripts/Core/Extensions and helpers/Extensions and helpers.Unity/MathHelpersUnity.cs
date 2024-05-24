@@ -18,6 +18,23 @@ namespace HereticalSolutions
                    + 90f;
         }
 
+        //Courtesy of https://gamedev.stackexchange.com/a/189739
+        public static Vector2 GetWorldPosition(
+            Vector2 origin,
+            Vector2 point,
+            float rotation)
+        {
+            float rotationInRadians = DegreesToRadians(rotation);
+
+            float c = (float)Mathf.Cos(rotationInRadians);
+
+            float s = (float)Mathf.Sin(rotationInRadians);
+
+            return new Vector2(
+                origin.x + c * point.x - s * point.y,
+                origin.y + s * point.x + c * point.y);
+        }
+
         #region Axis vectors
 
         public static Vector3 AxisVector3X(float value)

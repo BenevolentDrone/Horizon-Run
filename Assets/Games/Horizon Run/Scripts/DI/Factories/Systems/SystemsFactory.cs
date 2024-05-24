@@ -83,10 +83,15 @@ namespace HereticalSolutions.HorizonRun.DI
 			ILoggerResolver loggerResolver = null)
 		{
 			return new DefaultECSSequentialEntityInitializationSystem(
-				new PositionPresenterInitializationSystem(
+				// Position presenters initialization
+				new Position2DPresenterInitializationSystem(
 					entityManager,
-					loggerResolver?.GetLogger<PositionPresenterInitializationSystem>()),
+					loggerResolver?.GetLogger<Position2DPresenterInitializationSystem>()),
+				new Position3DPresenterInitializationSystem(
+					entityManager,
+					loggerResolver?.GetLogger<Position3DPresenterInitializationSystem>()),
 
+				// Rotation presenters initialization
 				new UniformRotationPresenterInitializationSystem(
 					entityManager,
 					loggerResolver?.GetLogger<UniformRotationPresenterInitializationSystem>()),
@@ -141,7 +146,8 @@ namespace HereticalSolutions.HorizonRun.DI
 			return new DefaultECSSequentialEntityInitializationSystem(
 
 				// Position
-				new CopyPositionFromGameObjectResolveSystem<HorizonRunSceneEntity>(),
+				new CopyPosition2DFromGameObjectResolveSystem<HorizonRunSceneEntity>(),
+				new CopyPosition3DFromGameObjectResolveSystem<HorizonRunSceneEntity>(),
 
 				// Rotation
 				new CopyUniformRotationFromGameObjectResolveSystem<HorizonRunSceneEntity>(),
@@ -341,7 +347,10 @@ namespace HereticalSolutions.HorizonRun.DI
 					eventWorld,
 					entityManager,
 					authoringPreset),
-				new PlaceEntityOnEntitySpawnedEventSystem(
+				new PlaceEntity2DOnEntitySpawnedEventSystem(
+					eventWorld,
+					entityManager),
+				new PlaceEntity3DOnEntitySpawnedEventSystem(
 					eventWorld,
 					entityManager),
 				new RotateEntityOnEntitySpawnedEventSystem(
@@ -386,6 +395,7 @@ namespace HereticalSolutions.HorizonRun.DI
 			World simulationWorld,
 			World viewWorld,
 			ITimerManager simulationUpdateTimerManager,
+			DefaultECSEntityListManager entityListManager,
 			bool includeViewWorld,
 			ILoggerResolver loggerResolver = null)
 		{
@@ -398,6 +408,7 @@ namespace HereticalSolutions.HorizonRun.DI
 				BuildGameLogicSystems(
 					simulationWorld,
 					simulationUpdateTimerManager,
+					entityListManager,
 					loggerResolver),
 
 				BuildSimulationWorldLifetimeSystems(
@@ -436,6 +447,7 @@ namespace HereticalSolutions.HorizonRun.DI
 		private static ISystem<float> BuildGameLogicSystems(
 			World simulationWorld,
 			ITimerManager simulationUpdateTimerManager,
+			DefaultECSEntityListManager entityListManager,
 			ILoggerResolver loggerResolver = null)
 		{
 			return new SequentialSystem<float>(
@@ -444,7 +456,15 @@ namespace HereticalSolutions.HorizonRun.DI
 				new SensorWithTimerSystem(
 					simulationWorld,
 					simulationUpdateTimerManager,
-					loggerResolver?.GetLogger<SensorWithTimerSystem>()));
+					loggerResolver?.GetLogger<SensorWithTimerSystem>()),
+
+				//Transform updating
+				new Transform2DUpdateSystem(
+					simulationWorld,
+					entityListManager),
+				new Transform3DUpdateSystem(
+					simulationWorld,
+					entityListManager));
 		}
 
 		private static ISystem<float> BuildSimulationWorldLifetimeSystems(
@@ -470,14 +490,19 @@ namespace HereticalSolutions.HorizonRun.DI
 		#region Fixed update systems
 
 		public static ISystem<float> BuildFixedUpdateSystems(
-			World simulationWorld)
+			World simulationWorld,
+			DefaultECSEntityListManager entityListManager)
 		{
 			return new SequentialSystem<float>(
 
 					// Steering
 					new LookTowardsLastLocomotion2DVectorSystem(
 						simulationWorld),
+					new LookTowardsLastLocomotion2DVectorWithTransformSystem(
+						simulationWorld),
 					new LookTowardsLastLocomotion3DVectorSystem(
+						simulationWorld),
+					new LookTowardsLastLocomotion3DVectorWithTransformSystem(
 						simulationWorld),
 
 					// Rotation
@@ -489,12 +514,26 @@ namespace HereticalSolutions.HorizonRun.DI
 					// Locomotion
 					new Locomotion2DSystem(
 						simulationWorld),
+					new Locomotion2DWithTransformSystem(
+						simulationWorld),
 					new Locomotion2DMemorySystem(
 						simulationWorld),
+
 					new Locomotion3DSystem(
 						simulationWorld),
+					new Locomotion3DWithTransformSystem(
+						simulationWorld),
 					new Locomotion3DMemorySystem(
-						simulationWorld));
+						simulationWorld),
+
+
+					//Transform updating
+					new Transform2DUpdateSystem(
+						simulationWorld,
+						entityListManager),
+					new Transform3DUpdateSystem(
+						simulationWorld,
+						entityListManager));
 		}
 
 		#endregion
@@ -503,6 +542,7 @@ namespace HereticalSolutions.HorizonRun.DI
 
 		public static ISystem<float> BuildLateUpdateSystems(
 			World viewWorld,
+			HorizonRunEntityManager entityManager,
 			IEventEntityBuilder<Entity, Guid> eventEntityBuilder,
 			Camera mainRenderCamera,
 			IUIManager uiManager)
@@ -516,6 +556,7 @@ namespace HereticalSolutions.HorizonRun.DI
 
 				BuildViewPresenterSystems(
 					viewWorld,
+					entityManager,
 					eventEntityBuilder),
 
 				BuildViewVisualsSystems(
@@ -548,6 +589,7 @@ namespace HereticalSolutions.HorizonRun.DI
 
 		private static ISystem<float> BuildViewPresenterSystems(
 			World viewWorld,
+			HorizonRunEntityManager entityManager,
 			IEventEntityBuilder<Entity, Guid> eventEntityBuilder)
 		{
 			return new SequentialSystem<float>(
@@ -571,8 +613,12 @@ namespace HereticalSolutions.HorizonRun.DI
 					eventEntityBuilder),
 
 				//Transform view presenters
-				new TransformPositionPresenterSystem(
+				new TransformPosition2DPresenterSystem(
 					viewWorld),
+				new TransformPosition3DPresenterSystem(
+					viewWorld),
+
+				//Rotation view presenters
 				new UniformRotationPresenterSystem(
 					viewWorld),
 				new QuaternionPresenterSystem(
@@ -588,9 +634,17 @@ namespace HereticalSolutions.HorizonRun.DI
 		{
 			return new SequentialSystem<float>(
 
-				//Transform views
-				new TransformPositionViewSystem(
+				//Debug views
+				new DebugDrawLineViewSystem(
 					viewWorld),
+
+				//Transform position views
+				new TransformPosition2DViewSystem(
+					viewWorld),
+				new TransformPosition3DViewSystem(
+					viewWorld),
+
+				//Transform rotation views
 				new TransformUniformRotationViewSystem(
 					viewWorld),
 				new TransformQuaternionViewSystem(

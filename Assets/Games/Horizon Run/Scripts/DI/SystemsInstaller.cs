@@ -175,6 +175,7 @@ namespace HereticalSolutions.HorizonRun.DI
 					IContainsEntityInitializationSystems<IDefaultECSEntityInitializationSystem>;
 
 				SystemsFactory.InitializeSimulationWorldSystemsContainer(
+					simulationWorld,
 					simulationWorldSystemsContainer,
 					entityManager,
 					eventEntityBuilder,

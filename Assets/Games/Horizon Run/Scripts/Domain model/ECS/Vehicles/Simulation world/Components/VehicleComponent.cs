@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace HereticalSolutions.HorizonRun
 {
-	[Component("Simulation world/Vehicle")]
+	[Component("Simulation world/Vehicles")]
 	public struct VehicleComponent
 	{
 	}

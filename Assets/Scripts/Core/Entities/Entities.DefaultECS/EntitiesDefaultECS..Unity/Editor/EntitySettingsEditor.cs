@@ -263,7 +263,12 @@ namespace HereticalSolutions.Entities.Editor
 			if (level == 0)
 				EditorGUILayout.BeginVertical("Box");
 			else
-				EditorGUILayout.BeginVertical("Window");
+			{
+				//EditorGUILayout.BeginVertical("Window");
+				GUILayout.BeginVertical(
+					structType.Name,
+					"Window");
+			}
 
 			EditorGUILayout.BeginHorizontal();
 
@@ -278,7 +283,7 @@ namespace HereticalSolutions.Entities.Editor
 			bool isClientDisabledStruct = structType.GetCustomAttribute<ClientDisabledComponentAttribute>(false) != null;
 			
 			GUIStyle selectedStyle = structNameLabelStyle;
-			
+
 			/*
 			if (isCommandStruct)
 				selectedStyle = commandStructNameLabelStyle;
@@ -286,10 +291,13 @@ namespace HereticalSolutions.Entities.Editor
 			if (isServerAuthoredStruct)
 				selectedStyle = serverAuthoredStructNameLabelStyle;
 			*/
-				
-			EditorGUILayout.LabelField(
-				structType.Name,
-				selectedStyle);
+
+			if (level == 0)
+			{
+				EditorGUILayout.LabelField(
+					structType.Name,
+					selectedStyle);
+			}
 
 			bool modified = false;
 

@@ -5,9 +5,9 @@ using DefaultEcs.System;
 
 namespace HereticalSolutions.HorizonRun
 {
-	public class UniformRotationSystem : AEntitySetSystem<float>
+	public class UniformSteeringSystem : AEntitySetSystem<float>
 	{
-		public UniformRotationSystem(
+		public UniformSteeringSystem(
 			World world)
 			: base(
 				world

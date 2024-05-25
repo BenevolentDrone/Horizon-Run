@@ -97,7 +97,17 @@ namespace HereticalSolutions.HorizonRun.DI
 					loggerResolver?.GetLogger<UniformRotationPresenterInitializationSystem>()),
 				new QuaternionPresenterInitializationSystem(
 					entityManager,
-					loggerResolver?.GetLogger<QuaternionPresenterInitializationSystem>())
+					loggerResolver?.GetLogger<QuaternionPresenterInitializationSystem>()),
+
+				// Suspension presenters initialization
+				new Suspension3DPresenterInitializationSystem(
+					entityManager,
+					loggerResolver?.GetLogger<Suspension3DPresenterInitializationSystem>()),
+
+				// Wheel presenters initialization
+				new Wheel3DPresenterInitializationSystem(
+					entityManager,
+					loggerResolver?.GetLogger<Wheel3DPresenterInitializationSystem>())
 				);
 		}
 
@@ -114,6 +124,7 @@ namespace HereticalSolutions.HorizonRun.DI
 		#region Simulation world systems
 
 		public static void InitializeSimulationWorldSystemsContainer(
+			World worldForOverrides,
 			IContainsEntityInitializationSystems<IDefaultECSEntityInitializationSystem> simulationWorldSystemsContainer,
 			HorizonRunEntityManager entityManager,
 			IEventEntityBuilder<Entity, Guid> eventEntityBuilder,
@@ -127,6 +138,8 @@ namespace HereticalSolutions.HorizonRun.DI
 					entityListManager,
 					loggerResolver),
 				BuildSimulationWorldInitializationSystems(
+					worldForOverrides,
+					entityManager,
 					eventEntityBuilder,
 					entityListManager,
 					simulationUpdateTimerManager,
@@ -161,6 +174,8 @@ namespace HereticalSolutions.HorizonRun.DI
 		}
 
 		public static IDefaultECSEntityInitializationSystem BuildSimulationWorldInitializationSystems(
+			World worldForOverrides,
+			HorizonRunEntityManager entityManager,
 			IEventEntityBuilder<Entity, Guid> eventEntityBuilder,
 			DefaultECSEntityListManager entityListManager,
 			ITimerManager simulationUpdateTimerManager,
@@ -191,7 +206,14 @@ namespace HereticalSolutions.HorizonRun.DI
 					loggerResolver,
 					loggerResolver?.GetLogger<SensorWithTimerInitializationSystem>()),
 				new CreateSensorEntityListInitializationSystem(
-					entityListManager));
+					entityListManager),
+					
+				// Wheels
+				new AttachWheelsInitializationSystem(
+					worldForOverrides,
+					entityManager,
+					entityListManager)
+				);
 		}
 
 		public static IDefaultECSEntityInitializationSystem BuildSimulationWorldDeinitializationSystems(
@@ -452,19 +474,29 @@ namespace HereticalSolutions.HorizonRun.DI
 		{
 			return new SequentialSystem<float>(
 
-				//Sensors
-				new SensorWithTimerSystem(
-					simulationWorld,
-					simulationUpdateTimerManager,
-					loggerResolver?.GetLogger<SensorWithTimerSystem>()),
-
-				//Transform updating
+				// Transform updating
 				new Transform2DUpdateSystem(
 					simulationWorld,
 					entityListManager),
 				new Transform3DUpdateSystem(
 					simulationWorld,
-					entityListManager));
+					entityListManager),
+
+				// Sensors
+				new SensorWithTimerSystem(
+					simulationWorld,
+					simulationUpdateTimerManager,
+					loggerResolver?.GetLogger<SensorWithTimerSystem>())
+
+				//Let's move those higher above so that they get updated at the very start of the frame
+				// Transform updating
+				//new Transform2DUpdateSystem(
+				//	simulationWorld,
+				//	entityListManager),
+				//new Transform3DUpdateSystem(
+				//	simulationWorld,
+				//	entityListManager)
+				);
 		}
 
 		private static ISystem<float> BuildSimulationWorldLifetimeSystems(
@@ -495,7 +527,15 @@ namespace HereticalSolutions.HorizonRun.DI
 		{
 			return new SequentialSystem<float>(
 
-					// Steering
+					//Transform updating
+					new Transform2DUpdateSystem(
+						simulationWorld,
+						entityListManager),
+					new Transform3DUpdateSystem(
+						simulationWorld,
+						entityListManager),
+
+					// Looking
 					new LookTowardsLastLocomotion2DVectorSystem(
 						simulationWorld),
 					new LookTowardsLastLocomotion2DVectorWithTransformSystem(
@@ -505,13 +545,13 @@ namespace HereticalSolutions.HorizonRun.DI
 					new LookTowardsLastLocomotion3DVectorWithTransformSystem(
 						simulationWorld),
 
-					// Rotation
-					new UniformRotationSystem(
+					// Steering
+					new UniformSteeringSystem(
 						simulationWorld),
-					new QuaternionRotationSystem(
+					new QuaternionSteeringSystem(
 						simulationWorld),
 
-					// Locomotion
+					// Locomotion 2D
 					new Locomotion2DSystem(
 						simulationWorld),
 					new Locomotion2DWithTransformSystem(
@@ -519,6 +559,7 @@ namespace HereticalSolutions.HorizonRun.DI
 					new Locomotion2DMemorySystem(
 						simulationWorld),
 
+					// Locomotion 3D
 					new Locomotion3DSystem(
 						simulationWorld),
 					new Locomotion3DWithTransformSystem(
@@ -526,14 +567,34 @@ namespace HereticalSolutions.HorizonRun.DI
 					new Locomotion3DMemorySystem(
 						simulationWorld),
 
+					// Wheels
+					//3 was initial raycast hit count but due to the fucked up Unity's physics module the value
+					//and the fact that the wheel spherecast is now taking place from above of it, the value is increased to 5
+					//TODO: define mask properly
+					new Wheel3DSystem(
+						simulationWorld,
+						new RaycastHit[5],
+						LayerMask.GetMask("Terrain")),
 
-					//Transform updating
-					new Transform2DUpdateSystem(
-						simulationWorld,
-						entityListManager),
-					new Transform3DUpdateSystem(
-						simulationWorld,
-						entityListManager));
+					// Suspension
+					new Suspension3DSystem(
+						simulationWorld),
+
+					// Physics
+					new Gravity3DSystem(
+						simulationWorld),
+					new PhysicsBody3DSystem(
+						simulationWorld)
+
+					//Let's move those higher above so that they get updated at the very start of the frame
+					// Transform updating
+					//new Transform2DUpdateSystem(
+					//	simulationWorld,
+					//	entityListManager),
+					//new Transform3DUpdateSystem(
+					//	simulationWorld,
+					//	entityListManager)
+					);
 		}
 
 		#endregion
@@ -594,13 +655,13 @@ namespace HereticalSolutions.HorizonRun.DI
 		{
 			return new SequentialSystem<float>(
 
-				//Cursor presenters
+				// Cursor presenters
 				//TODO
 				//new CursorSwitcherPresenterSystem(
 				//	viewWorld,
 				//	entityManager),
 
-				//Controls presenters
+				// Controls presenters
 				new JoystickLocomotionPresenterSystem(
 					viewWorld),
 				new WASDControlsLocomotionPresenterSystem(
@@ -612,16 +673,24 @@ namespace HereticalSolutions.HorizonRun.DI
 					viewWorld,
 					eventEntityBuilder),
 
-				//Transform view presenters
+				// Transform view presenters
 				new TransformPosition2DPresenterSystem(
 					viewWorld),
 				new TransformPosition3DPresenterSystem(
 					viewWorld),
 
-				//Rotation view presenters
+				// Rotation view presenters
 				new UniformRotationPresenterSystem(
 					viewWorld),
 				new QuaternionPresenterSystem(
+					viewWorld),
+
+				// Suspension debug presenters
+				new Suspension3DDebugPresenterSystem(
+					viewWorld),
+
+				// Wheel debug presenters
+				new Wheel3DDebugPresenterSystem(
 					viewWorld),
 
 				//Camera presenters
@@ -634,21 +703,30 @@ namespace HereticalSolutions.HorizonRun.DI
 		{
 			return new SequentialSystem<float>(
 
-				//Debug views
+				// Debug views
 				new DebugDrawLineViewSystem(
 					viewWorld),
 
-				//Transform position views
+				// Transform position views
 				new TransformPosition2DViewSystem(
 					viewWorld),
 				new TransformPosition3DViewSystem(
 					viewWorld),
 
-				//Transform rotation views
+				// Transform rotation views
 				new TransformUniformRotationViewSystem(
 					viewWorld),
 				new TransformQuaternionViewSystem(
-					viewWorld));
+					viewWorld),
+					
+				// Suspension debug views
+				new Suspension3DDebugViewSystem(
+					viewWorld),
+					
+				// Wheel debug views
+				new Wheel3DDebugViewSystem(
+					viewWorld)
+				);
 		}
 
 		#endregion

@@ -5,9 +5,9 @@ using UnityEngine;
 
 namespace HereticalSolutions.HorizonRun
 {
-    public class QuaternionRotationSystem : AEntitySetSystem<float>
+    public class QuaternionSteeringSystem : AEntitySetSystem<float>
     {
-        public QuaternionRotationSystem(
+        public QuaternionSteeringSystem(
             World world)
             : base(
                 world

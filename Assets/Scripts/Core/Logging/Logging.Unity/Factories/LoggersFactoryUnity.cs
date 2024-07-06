@@ -1,21 +1,16 @@
-using System;
-using System.Collections.Generic;
-
-using HereticalSolutions.Persistence.Arguments;
-
-using HereticalSolutions.Persistence.IO;
-
-using HereticalSolutions.Persistence.Factories;
-
-using HereticalSolutions.Repositories.Factories;
-
 namespace HereticalSolutions.Logging.Factories
 {
 	public static class LoggersFactoryUnity
 	{
-		public static UnityDebugLogger BuildUnityDebugLogger()
+		public static UnityDebugLogger BuildUnityDebugLogger(
+			bool printLogs = true,
+			bool printWarnings = true,
+			bool printErrors = true)
 		{
-			return new UnityDebugLogger();
+			return new UnityDebugLogger(
+				printLogs,
+				printWarnings,
+				printErrors);
 		}
 	}
 }

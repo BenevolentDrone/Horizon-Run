@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 
 using HereticalSolutions.Persistence.Arguments;
 
@@ -23,6 +24,14 @@ namespace HereticalSolutions.Logging.Factories
         {
             return new ConsoleLogger();
         }
+        
+        public static LoggerWrapperWithSemaphoreSlim BuildLoggerWrapperWithSemaphoreSlim(
+            ILogger innerLogger)
+        {
+            return new LoggerWrapperWithSemaphoreSlim(
+                new SemaphoreSlim(1, 1),
+                innerLogger);
+        }
 
         public static LoggerWrapperWithSourceTypePrefix BuildLoggerWrapperWithSourceTypePrefix(
             ILogger innerLogger)
@@ -35,6 +44,33 @@ namespace HereticalSolutions.Logging.Factories
         {
             return new LoggerWrapperWithLogTypePrefix(innerLogger);
         }
+        
+        public static LoggerWrapperWithThreadIndexPrefix BuildLoggerWrapperWithThreadIndexPrefix(
+            ILogger innerLogger)
+        {
+            return new LoggerWrapperWithThreadIndexPrefix(innerLogger);
+        }
+        
+        public static LoggerWrapperWithTimestampPrefix BuildLoggerWrapperWithTimestampPrefix(
+            bool utc,
+            ILogger innerLogger)
+        {
+            return new LoggerWrapperWithTimestampPrefix(
+                utc,
+                innerLogger);
+        }
+        
+        public static LoggerWrapperWithRecursionPreventionPrefix BuildLoggerWrapperWithRecursionPreventionPrefix(
+            ILogger innerLogger)
+        {
+            return new LoggerWrapperWithRecursionPreventionPrefix(innerLogger);
+        }
+        
+        public static LoggerWrapperWithRecursionPreventionGate BuildLoggerWrapperWithRecursionPreventionGate(
+            ILogger innerLogger)
+        {
+            return new LoggerWrapperWithRecursionPreventionGate(innerLogger);
+        }
 
         public static LoggerWrapperWithFileDump BuildLoggerWrapperWithFileDump(
             string applicationDataFolder,
@@ -42,7 +78,7 @@ namespace HereticalSolutions.Logging.Factories
             ILoggerResolver loggerResolver,
             ILogger innerLogger)
         {
-            var serializationArgument = new TextFileArgument();
+            var serializationArgument = new StreamArgument(); //TextFileArgument();
 
             serializationArgument.Settings = new FilePathSettings
             {

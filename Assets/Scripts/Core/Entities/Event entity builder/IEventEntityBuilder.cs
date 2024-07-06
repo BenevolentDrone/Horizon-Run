@@ -15,26 +15,56 @@ namespace HereticalSolutions.Entities
         IEventEntityBuilder<TEntity, TEntityID> AddressedToEntity(
             TEntity eventEntity,
             TEntityID receiverEntity);
+        
+        IEventEntityBuilder<TEntity, TEntityID> AddressedToEntity(
+            TEntity eventEntity,
+            TEntityID receiverEntity,
+            ushort[] subaddress);
 
         IEventEntityBuilder<TEntity, TEntityID> AddressedToWorldLocalEntity(
             TEntity eventEntity,
             TEntity receiverEntity);
+        
+        IEventEntityBuilder<TEntity, TEntityID> AddressedToWorldLocalEntity(
+            TEntity eventEntity,
+            TEntity receiverEntity,
+            ushort[] subaddress);
 
         IEventEntityBuilder<TEntity, TEntityID> CausedByEntity(
             TEntity eventEntity,
             TEntityID sourceEntity);
+        
+        IEventEntityBuilder<TEntity, TEntityID> CausedByEntity(
+            TEntity eventEntity,
+            TEntityID sourceEntity,
+            ushort[] subaddress);
 
         IEventEntityBuilder<TEntity, TEntityID> CausedByWorldLocalEntity(
             TEntity eventEntity,
             TEntity sourceEntity);
+        
+        IEventEntityBuilder<TEntity, TEntityID> CausedByWorldLocalEntity(
+            TEntity eventEntity,
+            TEntity sourceEntity,
+            ushort[] subaddress);
 
         IEventEntityBuilder<TEntity, TEntityID> TargetedAtEntity(
             TEntity eventEntity,
             TEntityID targetEntity);
+        
+        IEventEntityBuilder<TEntity, TEntityID> TargetedAtEntity(
+            TEntity eventEntity,
+            TEntityID targetEntity,
+            ushort[] subaddress);
 
         IEventEntityBuilder<TEntity, TEntityID> TargetedAtWorldLocalEntity(
             TEntity eventEntity,
             TEntity targetEntity);
+        
+        IEventEntityBuilder<TEntity, TEntityID> TargetedAtWorldLocalEntity(
+            TEntity eventEntity,
+            TEntity targetEntity,
+            ushort[] subaddress);
 
         IEventEntityBuilder<TEntity, TEntityID> TargetedAtPosition(
             TEntity eventEntity,

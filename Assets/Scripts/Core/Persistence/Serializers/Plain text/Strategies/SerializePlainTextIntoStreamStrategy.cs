@@ -7,7 +7,8 @@ using HereticalSolutions.Logging;
 
 namespace HereticalSolutions.Persistence.Serializers
 {
-	public class SerializePlainTextIntoStreamStrategy : IPlainTextSerializationStrategy
+	public class SerializePlainTextIntoStreamStrategy
+		: IPlainTextSerializationStrategy
 	{
 		private readonly ILogger logger;
 
@@ -16,22 +17,62 @@ namespace HereticalSolutions.Persistence.Serializers
 		{
 			this.logger = logger;
 		}
-
-		public bool Serialize(
-			ISerializationArgument argument,
-			string text)
+		
+		public bool StartSerialization(ISerializationArgument argument)
 		{
-			FilePathSettings filePathSettings = ((StreamArgument)argument).Settings;
-
+			StreamArgument streamArgument = (StreamArgument)argument;
+			
+			if (streamArgument.Writer != null)
+				return true;
+            
+			FilePathSettings filePathSettings = streamArgument.Settings;
+            
 			if (!StreamIO.OpenWriteStream(
 				filePathSettings,
 				out StreamWriter streamWriter,
 				logger))
 				return false;
+			
+			streamArgument.Writer = streamWriter;
 
-			streamWriter.Write(text);
+			return true;
+		}
 
-			StreamIO.CloseStream(streamWriter);
+		public bool Serialize(
+			ISerializationArgument argument,
+			string text)
+		{
+			if (!StartSerialization(argument))
+				return false;
+			
+			StreamArgument streamArgument = (StreamArgument)argument;
+			
+			if (streamArgument.Writer == null)
+			{
+				return false;
+			}
+
+			streamArgument.Writer.Write(text);
+
+			if (streamArgument.KeepOpen)
+				return true;
+			
+			if (!FinishSerialization(argument))
+				return false;
+
+			return true;
+		}
+		
+		public bool FinishSerialization(ISerializationArgument argument)
+		{
+			StreamArgument streamArgument = (StreamArgument)argument;
+
+			if (streamArgument.Writer == null)
+				return true;
+			
+			StreamIO.CloseStream(streamArgument.Writer);
+            
+			streamArgument.Writer = null;
 
 			return true;
 		}

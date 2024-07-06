@@ -51,6 +51,23 @@ namespace HereticalSolutions.Entities
 
             return this;
         }
+        
+        public IEventEntityBuilder<Entity, TEntityID> AddressedToEntity(
+            Entity eventEntity,
+            TEntityID receiverEntity,
+            ushort[] subaddress)
+        {
+            eventEntity
+                .Set<EventReceiverEntitySubaddressComponent>(
+                    new EventReceiverEntitySubaddressComponent
+                    {
+                        Subaddress = subaddress
+                    });
+
+            return AddressedToEntity(
+                eventEntity,
+                receiverEntity);
+        }
 
         public IEventEntityBuilder<Entity, TEntityID> AddressedToWorldLocalEntity(
             Entity eventEntity,
@@ -64,6 +81,23 @@ namespace HereticalSolutions.Entities
                     });
 
             return this;
+        }
+        
+        public IEventEntityBuilder<Entity, TEntityID> AddressedToWorldLocalEntity(
+            Entity eventEntity,
+            Entity receiverEntity,
+            ushort[] subaddress)
+        {
+            eventEntity
+                .Set<EventReceiverWorldLocalEntitySubaddressComponent>(
+                    new EventReceiverWorldLocalEntitySubaddressComponent
+                    {
+                        Subaddress = subaddress
+                    });
+
+            return AddressedToWorldLocalEntity(
+                eventEntity,
+                receiverEntity);
         }
 
         public IEventEntityBuilder<Entity, TEntityID> CausedByEntity(
@@ -79,6 +113,23 @@ namespace HereticalSolutions.Entities
 
             return this;
         }
+        
+        public IEventEntityBuilder<Entity, TEntityID> CausedByEntity(
+            Entity eventEntity,
+            TEntityID sourceEntity,
+            ushort[] subaddress)
+        {
+            eventEntity
+                .Set<EventSourceEntitySubaddressComponent>(
+                    new EventSourceEntitySubaddressComponent
+                    {
+                        Subaddress = subaddress
+                    });
+
+            return CausedByEntity(
+                eventEntity,
+                sourceEntity);
+        }
 
         public IEventEntityBuilder<Entity, TEntityID> CausedByWorldLocalEntity(
             Entity eventEntity,
@@ -92,6 +143,23 @@ namespace HereticalSolutions.Entities
                     });
 
             return this;
+        }
+        
+        public IEventEntityBuilder<Entity, TEntityID> CausedByWorldLocalEntity(
+            Entity eventEntity,
+            Entity sourceEntity,
+            ushort[] subaddress)
+        {
+            eventEntity
+                .Set<EventSourceWorldLocalEntitySubaddressComponent>(
+                    new EventSourceWorldLocalEntitySubaddressComponent
+                    {
+                        Subaddress = subaddress
+                    });
+
+            return CausedByWorldLocalEntity(
+                eventEntity,
+                sourceEntity);
         }
 
         public IEventEntityBuilder<Entity, TEntityID> TargetedAtEntity(
@@ -107,6 +175,23 @@ namespace HereticalSolutions.Entities
 
             return this;
         }
+        
+        public IEventEntityBuilder<Entity, TEntityID> TargetedAtEntity(
+            Entity eventEntity,
+            TEntityID targetEntity,
+            ushort[] subaddress)
+        {
+            eventEntity
+                .Set<EventTargetEntitySubaddressComponent>(
+                    new EventTargetEntitySubaddressComponent
+                    {
+                        Subaddress = subaddress
+                    });
+
+            return TargetedAtEntity(
+                eventEntity,
+                targetEntity);
+        }
 
         public IEventEntityBuilder<Entity, TEntityID> TargetedAtWorldLocalEntity(
             Entity eventEntity,
@@ -120,6 +205,23 @@ namespace HereticalSolutions.Entities
                     });
 
             return this;
+        }
+        
+        public IEventEntityBuilder<Entity, TEntityID> TargetedAtWorldLocalEntity(
+            Entity eventEntity,
+            Entity targetEntity,
+            ushort[] subaddress)
+        {
+            eventEntity
+                .Set<EventTargetWorldLocalEntitySubaddressComponent>(
+                    new EventTargetWorldLocalEntitySubaddressComponent
+                    {
+                        Subaddress = subaddress
+                    });
+
+            return TargetedAtWorldLocalEntity(
+                eventEntity,
+                targetEntity);
         }
 
         public IEventEntityBuilder<Entity, TEntityID> TargetedAtPosition(

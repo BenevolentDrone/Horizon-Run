@@ -263,12 +263,7 @@ namespace HereticalSolutions.Entities.Editor
 			if (level == 0)
 				EditorGUILayout.BeginVertical("Box");
 			else
-			{
-				//EditorGUILayout.BeginVertical("Window");
-				GUILayout.BeginVertical(
-					structType.Name,
-					"Window");
-			}
+				EditorGUILayout.BeginVertical("Window");
 
 			EditorGUILayout.BeginHorizontal();
 
@@ -283,7 +278,7 @@ namespace HereticalSolutions.Entities.Editor
 			bool isClientDisabledStruct = structType.GetCustomAttribute<ClientDisabledComponentAttribute>(false) != null;
 			
 			GUIStyle selectedStyle = structNameLabelStyle;
-
+			
 			/*
 			if (isCommandStruct)
 				selectedStyle = commandStructNameLabelStyle;
@@ -291,13 +286,10 @@ namespace HereticalSolutions.Entities.Editor
 			if (isServerAuthoredStruct)
 				selectedStyle = serverAuthoredStructNameLabelStyle;
 			*/
-
-			if (level == 0)
-			{
-				EditorGUILayout.LabelField(
-					structType.Name,
-					selectedStyle);
-			}
+				
+			EditorGUILayout.LabelField(
+				structType.Name,
+				selectedStyle);
 
 			bool modified = false;
 
@@ -810,6 +802,7 @@ namespace HereticalSolutions.Entities.Editor
 				if (GUILayout.Button("Remove", EditorStyles.miniButtonRight))
 				{
 					arrayValue = RemoveElement(arrayValue, i, out dirty);
+					
 					break;
 				}
 
@@ -1056,21 +1049,34 @@ namespace HereticalSolutions.Entities.Editor
 			return newArray;
 		}
 
-		private Array RemoveElement(Array arrayValue, int index, out bool dirty)
+		private Array RemoveElement(
+			Array arrayValue,
+			int index,
+			out bool dirty)
 		{
-			dirty = false;
-			var newArray = Array.CreateInstance(arrayValue.GetType().GetElementType(), arrayValue.Length - 1);
+			//dirty = false;
+			
+			var newArray = Array.CreateInstance(
+				arrayValue
+					.GetType()
+					.GetElementType(),
+				arrayValue.Length - 1);
 
 			for (int i = 0, j = 0; i < arrayValue.Length; i++)
 			{
 				if (i != index)
 				{
-					newArray.SetValue(arrayValue.GetValue(i), j);
+					newArray.SetValue(
+						arrayValue.GetValue(i),
+						j);
+					
 					j++;
 
-					dirty = true;
+					//dirty = true;
 				}
 			}
+			
+			dirty = true;
 
 			return newArray;
 		}

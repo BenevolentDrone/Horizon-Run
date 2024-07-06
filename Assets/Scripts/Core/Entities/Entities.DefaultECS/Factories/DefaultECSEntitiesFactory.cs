@@ -242,12 +242,25 @@ namespace HereticalSolutions.Entities.Factories
 
         #endregion
 
+        #region Subaddress manager
+
+        public static SubaddressManager BuildSubaddressManager(
+            ILogger logger = null)
+        {
+            return new SubaddressManager(
+                RepositoriesFactory.BuildDictionaryOneToOneMap<string, ushort>(),
+                logger);
+        }
+
+        #endregion
+        
         #region Event entity builder
 
         public static DefaultECSEventEntityBuilder<TEntityID> BuildDefaultECSEventEntityBuilder<TEntityID>(
             World world)
         {
-            return new DefaultECSEventEntityBuilder<TEntityID>(world);
+            return new DefaultECSEventEntityBuilder<TEntityID>(
+                world);
         }
 
         #endregion

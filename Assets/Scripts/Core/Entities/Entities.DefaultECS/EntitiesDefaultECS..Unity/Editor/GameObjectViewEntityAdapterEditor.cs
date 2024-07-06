@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
+ using System.Linq;
 using System.Text;
 using System.Reflection;
 
@@ -87,7 +87,7 @@ namespace HereticalSolutions.Entities.Editor
 
 				DrawEntity(
 					registryEntity,
-					"Registry world");
+					"Registry world entity");
 
 				EditorGUILayout.Space();
 
@@ -116,7 +116,7 @@ namespace HereticalSolutions.Entities.Editor
 			{
 				DrawEntity(
 					viewEntityAdapter.ViewEntity,
-					"View world");
+					"View world entity");
 			}
 		}
 
@@ -154,11 +154,11 @@ namespace HereticalSolutions.Entities.Editor
 
 		private void DrawEntity(
 			Entity entity,
-			string worldID)
+			string entityName)
 		{
 			EditorGUILayout.BeginVertical(GUI.skin.box);
 
-			EditorGUILayout.LabelField(worldID);
+			EditorGUILayout.LabelField(entityName);
 
 			EditorGUILayout.Space();
 
@@ -166,17 +166,15 @@ namespace HereticalSolutions.Entities.Editor
 
 			foreach (var component in entitySerializationWrapper.Components)
 			{
-				//EditorGUILayout.BeginVertical("Window");
-				GUILayout.BeginVertical(component.Type.Name, "Window");
+				EditorGUILayout.BeginVertical("Window");
 
-				//EditorGUILayout.LabelField($"{component.Type.Name}");
+				EditorGUILayout.LabelField($"{component.Type.Name}");
 
 				EditorGUILayout.Space();
 
 				ToDetailedString(component.ObjectValue);
 
-				//EditorGUILayout.EndVertical();
-				GUILayout.EndVertical();
+				EditorGUILayout.EndVertical();
 			}
 
 			EditorGUILayout.EndVertical();
@@ -201,8 +199,7 @@ namespace HereticalSolutions.Entities.Editor
 					fieldInfo,
 					value);
 
-				//EditorGUILayout.LabelField(valueString);
-				GUILayout.TextArea(valueString);
+				EditorGUILayout.LabelField(valueString);
 
 				EditorGUILayout.EndHorizontal();
 			}
@@ -216,7 +213,7 @@ namespace HereticalSolutions.Entities.Editor
 				EditorGUILayout.EndHorizontal();
 			}
 		}
-
+			
 		private static string ValueToString(
 			FieldInfo fieldInfo,
 			object value,
@@ -267,10 +264,10 @@ namespace HereticalSolutions.Entities.Editor
 
 				case Matrix4x4 matrix4X4Value:
 					return $"{matrix4X4Value.m00:f4} {matrix4X4Value.m10:f4} {matrix4X4Value.m20:f4} {matrix4X4Value.m30:f4}\n" +
-						   $"{matrix4X4Value.m01:f4} {matrix4X4Value.m11:f4} {matrix4X4Value.m21:f4} {matrix4X4Value.m31:f4}\n" +
-						   $"{matrix4X4Value.m02:f4} {matrix4X4Value.m12:f4} {matrix4X4Value.m22:f4} {matrix4X4Value.m32:f4}\n" +
-						   $"{matrix4X4Value.m03:f4} {matrix4X4Value.m13:f4} {matrix4X4Value.m23:f4} {matrix4X4Value.m33:f4}";
-
+						$"{matrix4X4Value.m01:f4} {matrix4X4Value.m11:f4} {matrix4X4Value.m21:f4} {matrix4X4Value.m31:f4}\n" +
+						$"{matrix4X4Value.m02:f4} {matrix4X4Value.m12:f4} {matrix4X4Value.m22:f4} {matrix4X4Value.m32:f4}\n" +
+						$"{matrix4X4Value.m03:f4} {matrix4X4Value.m13:f4} {matrix4X4Value.m23:f4} {matrix4X4Value.m33:f4}";
+					
 				default:
 
 					if (fieldInfo.FieldType == typeof(string))
@@ -284,17 +281,17 @@ namespace HereticalSolutions.Entities.Editor
 					}
 
 					//Enumerables may have the same problems as arrays
-					//TODO: implement fixed-size buffers instead of arrays
-					//Courtesy of: https://stackoverflow.com/questions/8704161/c-sharp-array-within-a-struct/8704505#8704505
-					//https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/unsafe-code?redirectedfrom=MSDN#fixed-size-buffers
-
+					//TODO: implement fixedsize buffers instead of arrays
+					//Courtesy of: https://stackoverflow.com/questions/8704161/csharparraywithinastruct/8704505#8704505
+					//https://learn.microsoft.com/enus/dotnet/csharp/languagereference/unsafecode?redirectedfrom=MSDN#fixedsizebuffers
+	
 					if (fieldInfo.FieldType.GetInterface(typeof(IEnumerable<>).FullName) != null
 						&& fieldInfo.FieldType.GetElementType() != typeof(Entity))
 					{
 						StringBuilder stringBuilder = new StringBuilder();
-
+						
 						Array arrayValue = value as Array;
-
+						
 						if (arrayValue == null)
 						{
 							return value.ToString();
@@ -304,49 +301,48 @@ namespace HereticalSolutions.Entities.Editor
 						{
 							stringBuilder.Append(
 								ValueToString(
-									fieldInfo,
-									arrayValue.GetValue(i),
-									true));
-
+								fieldInfo,
+								arrayValue.GetValue(i),
+								true));
+							
 							if (i < arrayValue.Length - 1)
 							{
 								stringBuilder.Append("\n");
 							}
 						}
-
+						
 						return stringBuilder.ToString();
 					}
-
+					
 					bool isStruct = fieldInfo.FieldType.IsValueType && !fieldInfo.FieldType.IsPrimitive;
-
+					
 					if (isStruct)
 					{
 						var innerFields = value.GetType().GetFields();
-
+						
 						StringBuilder stringBuilder = new StringBuilder();
-
+						
 						foreach (var innerFieldInfo in innerFields)
 						{
 							var innerValue = innerFieldInfo.GetValue(value);
-
+							
 							string innerValueString = ValueToString(
 								innerFieldInfo,
 								innerValue,
 								true);
-
+							
 							stringBuilder.Append($"{innerFieldInfo.Name}: {innerValueString}");
-
+							
 							stringBuilder.Append("\n");
 						}
-
+						
 						return stringBuilder.ToString();
 					}
-
+					
 					break;
-			}
-
+				}
+				
 			return value.ToString();
 		}
 	}
 }
-

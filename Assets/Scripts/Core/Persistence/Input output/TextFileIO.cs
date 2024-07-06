@@ -38,7 +38,23 @@ namespace HereticalSolutions.Persistence.IO
 
             return true;
         }
+        
+        public static bool Append(
+            FilePathSettings settings,
+            string contents,
+            ILogger logger = null)
+        {
+            string savePath = settings.FullPath;
 
+            EnsureDirectoryExists(
+                savePath,
+                logger);
+
+            File.AppendAllText(savePath, contents);
+
+            return true;
+        }
+        
         public static bool Read(
             FilePathSettings settings,
             out string contents,

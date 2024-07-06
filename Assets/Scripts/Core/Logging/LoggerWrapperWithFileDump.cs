@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 
 using HereticalSolutions.Persistence;
+using HereticalSolutions.Persistence.Arguments;
 
 namespace HereticalSolutions.Logging
 {
@@ -46,7 +47,18 @@ namespace HereticalSolutions.Logging
 		public void Log(
 			string value)
 		{
-			fullLog.Add(value);
+			if (serializationArgument is StreamArgument streamArgument)
+			{
+				streamArgument.KeepOpen = true;
+                
+				serializer.Serialize<string>(
+					serializationArgument,
+					$"{value}\n");
+			}
+			else
+			{
+				fullLog.Add(value);
+			}
 
 			innerLogger.Log(value);
 		}
@@ -54,7 +66,18 @@ namespace HereticalSolutions.Logging
 		public void Log<TSource>(
 			string value)
 		{
-			fullLog.Add(value);
+			if (serializationArgument is StreamArgument streamArgument)
+			{
+				streamArgument.KeepOpen = true;
+				
+				serializer.Serialize<string>(
+					serializationArgument,
+					$"{value}\n");
+			}
+			else
+			{
+				fullLog.Add(value);
+			}
 
 			innerLogger.Log<TSource>(value);
 		}
@@ -63,7 +86,18 @@ namespace HereticalSolutions.Logging
 			Type logSource,
 			string value)
 		{
-			fullLog.Add(value);
+			if (serializationArgument is StreamArgument streamArgument)
+			{
+				streamArgument.KeepOpen = true;
+				
+				serializer.Serialize<string>(
+					serializationArgument,
+					$"{value}\n");
+			}
+			else
+			{
+				fullLog.Add(value);
+			}
 
 			innerLogger.Log(
 				logSource,
@@ -74,7 +108,18 @@ namespace HereticalSolutions.Logging
 			string value,
 			object[] arguments)
 		{
-			fullLog.Add(value);
+			if (serializationArgument is StreamArgument streamArgument)
+			{
+				streamArgument.KeepOpen = true;
+				
+				serializer.Serialize<string>(
+					serializationArgument,
+					$"{value}\n");
+			}
+			else
+			{
+				fullLog.Add(value);
+			}
 
 			innerLogger.Log(
 				value,
@@ -85,7 +130,18 @@ namespace HereticalSolutions.Logging
 			string value,
 			object[] arguments)
 		{
-			fullLog.Add(value);
+			if (serializationArgument is StreamArgument streamArgument)
+			{
+				streamArgument.KeepOpen = true;
+				
+				serializer.Serialize<string>(
+					serializationArgument,
+					$"{value}\n");
+			}
+			else
+			{
+				fullLog.Add(value);
+			}
 
 			innerLogger.Log<TSource>(
 				value,
@@ -97,7 +153,18 @@ namespace HereticalSolutions.Logging
 			string value,
 			object[] arguments)
 		{
-			fullLog.Add(value);
+			if (serializationArgument is StreamArgument streamArgument)
+			{
+				streamArgument.KeepOpen = true;
+				
+				serializer.Serialize<string>(
+					serializationArgument,
+					$"{value}\n");
+			}
+			else
+			{
+				fullLog.Add(value);
+			}
 
 			innerLogger.Log(
 				logSource,
@@ -112,7 +179,18 @@ namespace HereticalSolutions.Logging
 		public void LogWarning(
 			string value)
 		{
-			fullLog.Add(value);
+			if (serializationArgument is StreamArgument streamArgument)
+			{
+				streamArgument.KeepOpen = true;
+				
+				serializer.Serialize<string>(
+					serializationArgument,
+					$"{value}\n");
+			}
+			else
+			{
+				fullLog.Add(value);
+			}
 
 			innerLogger.LogWarning(
 				value);
@@ -121,7 +199,18 @@ namespace HereticalSolutions.Logging
 		public void LogWarning<TSource>(
 			string value)
 		{
-			fullLog.Add(value);
+			if (serializationArgument is StreamArgument streamArgument)
+			{
+				streamArgument.KeepOpen = true;
+				
+				serializer.Serialize<string>(
+					serializationArgument,
+					$"{value}\n");
+			}
+			else
+			{
+				fullLog.Add(value);
+			}
 
 			innerLogger.LogWarning<TSource>(value);
 		}
@@ -130,7 +219,18 @@ namespace HereticalSolutions.Logging
 			Type logSource,
 			string value)
 		{
-			fullLog.Add(value);
+			if (serializationArgument is StreamArgument streamArgument)
+			{
+				streamArgument.KeepOpen = true;
+				
+				serializer.Serialize<string>(
+					serializationArgument,
+					$"{value}\n");
+			}
+			else
+			{
+				fullLog.Add(value);
+			}
 
 			innerLogger.LogWarning(
 				logSource,
@@ -141,7 +241,18 @@ namespace HereticalSolutions.Logging
 			string value,
 			object[] arguments)
 		{
-			fullLog.Add(value);
+			if (serializationArgument is StreamArgument streamArgument)
+			{
+				streamArgument.KeepOpen = true;
+				
+				serializer.Serialize<string>(
+					serializationArgument,
+					$"{value}\n");
+			}
+			else
+			{
+				fullLog.Add(value);
+			}
 
 			innerLogger.LogWarning(
 				value,
@@ -152,7 +263,18 @@ namespace HereticalSolutions.Logging
 			string value,
 			object[] arguments)
 		{
-			fullLog.Add(value);
+			if (serializationArgument is StreamArgument streamArgument)
+			{
+				streamArgument.KeepOpen = true;
+				
+				serializer.Serialize<string>(
+					serializationArgument,
+					$"{value}\n");
+			}
+			else
+			{
+				fullLog.Add(value);
+			}
 
 			innerLogger.LogWarning<TSource>(
 				value,
@@ -164,7 +286,18 @@ namespace HereticalSolutions.Logging
 			string value,
 			object[] arguments)
 		{
-			fullLog.Add(value);
+			if (serializationArgument is StreamArgument streamArgument)
+			{
+				streamArgument.KeepOpen = true;
+				
+				serializer.Serialize<string>(
+					serializationArgument,
+					$"{value}\n");
+			}
+			else
+			{
+				fullLog.Add(value);
+			}
 
 			innerLogger.LogWarning(
 				logSource,
@@ -179,7 +312,18 @@ namespace HereticalSolutions.Logging
 		public void LogError(
 			string value)
 		{
-			fullLog.Add(value);
+			if (serializationArgument is StreamArgument streamArgument)
+			{
+				streamArgument.KeepOpen = true;
+				
+				serializer.Serialize<string>(
+					serializationArgument,
+					$"{value}\n");
+			}
+			else
+			{
+				fullLog.Add(value);
+			}
 
 			innerLogger.LogError(
 				value);
@@ -188,7 +332,18 @@ namespace HereticalSolutions.Logging
 		public void LogError<TSource>(
 			string value)
 		{
-			fullLog.Add(value);
+			if (serializationArgument is StreamArgument streamArgument)
+			{
+				streamArgument.KeepOpen = true;
+				
+				serializer.Serialize<string>(
+					serializationArgument,
+					$"{value}\n");
+			}
+			else
+			{
+				fullLog.Add(value);
+			}
 
 			innerLogger.LogError<TSource>(value);
 		}
@@ -197,7 +352,18 @@ namespace HereticalSolutions.Logging
 			Type logSource,
 			string value)
 		{
-			fullLog.Add(value);
+			if (serializationArgument is StreamArgument streamArgument)
+			{
+				streamArgument.KeepOpen = true;
+				
+				serializer.Serialize<string>(
+					serializationArgument,
+					$"{value}\n");
+			}
+			else
+			{
+				fullLog.Add(value);
+			}
 
 			innerLogger.LogError(
 				logSource,
@@ -208,7 +374,18 @@ namespace HereticalSolutions.Logging
 			string value,
 			object[] arguments)
 		{
-			fullLog.Add(value);
+			if (serializationArgument is StreamArgument streamArgument)
+			{
+				streamArgument.KeepOpen = true;
+				
+				serializer.Serialize<string>(
+					serializationArgument,
+					$"{value}\n");
+			}
+			else
+			{
+				fullLog.Add(value);
+			}
 
 			innerLogger.LogError(
 				value,
@@ -219,7 +396,18 @@ namespace HereticalSolutions.Logging
 			string value,
 			object[] arguments)
 		{
-			fullLog.Add(value);
+			if (serializationArgument is StreamArgument streamArgument)
+			{
+				streamArgument.KeepOpen = true;
+				
+				serializer.Serialize<string>(
+					serializationArgument,
+					$"{value}\n");
+			}
+			else
+			{
+				fullLog.Add(value);
+			}
 
 			innerLogger.LogError<TSource>(
 				value,
@@ -231,7 +419,18 @@ namespace HereticalSolutions.Logging
 			string value,
 			object[] arguments)
 		{
-			fullLog.Add(value);
+			if (serializationArgument is StreamArgument streamArgument)
+			{
+				streamArgument.KeepOpen = true;
+				
+				serializer.Serialize<string>(
+					serializationArgument,
+					$"{value}\n");
+			}
+			else
+			{
+				fullLog.Add(value);
+			}
 
 			innerLogger.LogError(
 				logSource,
@@ -248,7 +447,18 @@ namespace HereticalSolutions.Logging
 		{
 			var result = innerLogger.FormatException(value);
 
-			fullLog.Add(result);
+			if (serializationArgument is StreamArgument streamArgument)
+			{
+				streamArgument.KeepOpen = true;
+				
+				serializer.Serialize<string>(
+					serializationArgument,
+					$"{value}\n");
+			}
+			else
+			{
+				fullLog.Add(value);
+			}
 
 			return result;	
 		}
@@ -258,7 +468,18 @@ namespace HereticalSolutions.Logging
 		{
 			var result = innerLogger.FormatException<TSource>(value);
 
-			fullLog.Add(result);
+			if (serializationArgument is StreamArgument streamArgument)
+			{
+				streamArgument.KeepOpen = true;
+				
+				serializer.Serialize<string>(
+					serializationArgument,
+					$"{value}\n");
+			}
+			else
+			{
+				fullLog.Add(value);
+			}
 
 			return result;
 		}
@@ -271,7 +492,18 @@ namespace HereticalSolutions.Logging
 				logSource,
 				value);
 
-			fullLog.Add(result);
+			if (serializationArgument is StreamArgument streamArgument)
+			{
+				streamArgument.KeepOpen = true;
+				
+				serializer.Serialize<string>(
+					serializationArgument,
+					$"{value}\n");
+			}
+			else
+			{
+				fullLog.Add(value);
+			}
 
 			return result;
 		}
@@ -288,9 +520,20 @@ namespace HereticalSolutions.Logging
 				GetType(),
 				$"DUMPING LOGS TO FILE");
 
-			serializer.Serialize<string[]>(
-				serializationArgument,
-				fullLog.ToArray());
+			if (serializationArgument is StreamArgument streamArgument)
+			{
+				streamArgument.KeepOpen = false;
+				
+				serializer.Serialize<string>(
+					serializationArgument,
+					$"\n");
+			}
+			else
+			{
+				serializer.Serialize<string[]>(
+					serializationArgument,
+					fullLog.ToArray());
+			}
 		}
 
 		#endregion

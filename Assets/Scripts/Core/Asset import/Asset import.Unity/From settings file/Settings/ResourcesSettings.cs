@@ -8,6 +8,8 @@ namespace HereticalSolutions.AssetImport
     [CreateAssetMenu(fileName = "Resources settings", menuName = "Settings/Resources/Resources settings", order = 0)]
     public class ResourcesSettings : ScriptableObject
     {
+        public string ResourcePageName;
+        
         /// <summary>
         /// The settings for the individual resources.
         /// </summary>

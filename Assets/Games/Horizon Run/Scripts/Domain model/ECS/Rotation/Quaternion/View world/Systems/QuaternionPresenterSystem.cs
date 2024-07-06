@@ -41,11 +41,24 @@ namespace HereticalSolutions.HorizonRun
 
             transformQuaternionViewComponent.Quaternion = quaternionComponent.Quaternion;
 
+            /*
             if (Quaternion.Angle(
                 lastQuaternion,
                 transformQuaternionViewComponent.Quaternion)
                 > MathHelpers.EPSILON)
                 transformQuaternionViewComponent.Dirty = true;
+            */
+
+            //Courtesy of https://github.com/Unity-Technologies/UnityCsReference/blob/master/Runtime/Export/Math/Quaternion.cs
+            /*
+            if (Quaternion.Dot(
+                lastQuaternion,
+                quaternionComponent.Quaternion)
+                <= (1f - Quaternion.kEpsilon))
+                transformQuaternionViewComponent.Dirty = true;
+            */
+
+            transformQuaternionViewComponent.Dirty = true;
         }
     }
 }

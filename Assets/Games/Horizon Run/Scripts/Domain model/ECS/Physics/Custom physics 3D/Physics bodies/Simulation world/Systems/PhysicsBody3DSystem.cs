@@ -32,6 +32,11 @@ namespace HereticalSolutions.HorizonRun
 
 			ref var physicsBodyComponent = ref entity.Get<PhysicsBody3DComponent>();
 
+			//DEBUG
+			var worldPosition = TransformHelpers.GetWorldPosition3D(
+				transformComponent.TRSMatrix);
+
+
 			//Courtesy of https://github.com/notgiven688/jitterphysics2/blob/main/src/Jitter2/World.Step.cs
 			/*
 			rigidBody.AngularVelocity *= body.angularDampingMultiplier;
@@ -56,14 +61,143 @@ namespace HereticalSolutions.HorizonRun
 			rigidBody.InverseMass = body.inverseMass;
 			*/
 
+			if (physicsBodyComponent.LinearDragScalar > MathHelpers.EPSILON)
+			{
+				ApplyDampingToLinearVelocity(
+					ref physicsBodyComponent.LinearVelocity,
+					physicsBodyComponent.LinearDragScalar,
+					deltaTime);
+			}
 
-			ApplyDampingToLinearVelocity(
-				ref physicsBodyComponent.LinearVelocity,
-				physicsBodyComponent.LinearDragScalar);
+			if (physicsBodyComponent.AngularDragScalar > MathHelpers.EPSILON)
+			{
+				ApplyDampingToAngularVelocity(
+					ref physicsBodyComponent.AngularVelocity,
+					physicsBodyComponent.AngularDragScalar,
+					deltaTime);
+			}
 
-			//ApplyDampingToAngularVelocity(
-			//	ref physicsBodyComponent.AngularVelocity,
-			//	physicsBodyComponent.AngularDragScalar);
+			/*
+			rigidBody.AngularVelocity += rigidBody.DeltaAngularVelocity;
+
+			rigidBody.Velocity += rigidBody.DeltaVelocity;
+			*/
+
+
+			if (physicsBodyComponent.ConstraintForceThisFrame.magnitude > MathHelpers.EPSILON)
+			{
+				ApplyConstraintForceToPosition(
+					physicsBodyComponent.ConstraintForceThisFrame,
+					ref positionComponent.Position);
+
+				UnityEngine.Debug.DrawLine(
+					worldPosition,
+					worldPosition + physicsBodyComponent.LinearVelocity,
+					Color.yellow);
+
+				var dot = Vector3.Dot(
+					physicsBodyComponent.LinearVelocity,
+					physicsBodyComponent.ConstraintForceThisFrame.normalized);
+
+				if (Mathf.Abs(dot) < physicsBodyComponent.ConstraintForceThisFrame.magnitude)
+				{
+					UnityEngine.Debug.DrawLine(
+						worldPosition,
+						worldPosition + physicsBodyComponent.ConstraintForceThisFrame,
+						Color.red);
+	
+					UnityEngine.Debug.DrawLine(
+						worldPosition,
+						worldPosition + physicsBodyComponent.ConstraintForceThisFrame.normalized * Mathf.Abs(dot),
+						Color.blue);
+				}
+				else
+				{
+					UnityEngine.Debug.DrawLine(
+						worldPosition,
+						worldPosition + physicsBodyComponent.ConstraintForceThisFrame.normalized * Mathf.Abs(dot),
+						Color.blue);
+
+					UnityEngine.Debug.DrawLine(
+						worldPosition,
+						worldPosition + physicsBodyComponent.ConstraintForceThisFrame,
+						Color.red);
+				}
+
+				ApplyConstraintForceToLinearVelocity(
+					physicsBodyComponent.ConstraintForceThisFrame,
+					ref physicsBodyComponent.LinearVelocity);
+
+				physicsBodyComponent.ConstraintForceThisFrame = Vector3.zero;
+			}
+
+			if (physicsBodyComponent.ConstraintTorqueThisFrame.magnitude > MathHelpers.EPSILON)
+			{
+				ApplyConstraintTorqueToRotation(
+					physicsBodyComponent.ConstraintTorqueThisFrame,
+					ref quaternionComponent.Quaternion);
+
+				ApplyConstraintTorqueToAngularVelocity(
+					physicsBodyComponent.ConstraintTorqueThisFrame,
+					ref physicsBodyComponent.AngularVelocity);
+
+				physicsBodyComponent.ConstraintTorqueThisFrame = Vector3.zero;
+			}
+
+			//ApplyPushForceToPosition(
+			//	physicsBodyComponent.PushForceThisFrame,
+			//	ref positionComponent.Position);
+
+			//ApplyPushTorqueToRotation(
+			//	physicsBodyComponent.PushTorqueThisFrame,
+			//	ref quaternionComponent.Quaternion);
+
+			//ApplyPushForceToLinearVelocity(
+			//	physicsBodyComponent.PushForceThisFrame,
+			//	ref physicsBodyComponent.LinearVelocity);
+
+			//ApplyPushTorqueToAngularVelocity(
+			//	physicsBodyComponent.PushTorqueThisFrame,
+			//	ref physicsBodyComponent.AngularVelocity);
+
+			physicsBodyComponent.ConstraintForceThisFrame = Vector3.zero;
+
+			physicsBodyComponent.ConstraintTorqueThisFrame = Vector3.zero;
+
+
+			if (physicsBodyComponent.ForceThisFrame.magnitude > MathHelpers.EPSILON)
+			{
+				ApplyForceToLinearVelocity(
+					physicsBodyComponent.ForceThisFrame,
+					ref physicsBodyComponent.LinearVelocity);
+			}
+
+			if (physicsBodyComponent.TorqueThisFrame.magnitude > MathHelpers.EPSILON)
+			{
+				ApplyTorqueToAngularVelocity(
+					physicsBodyComponent.TorqueThisFrame,
+					ref physicsBodyComponent.AngularVelocity);
+			}
+
+			physicsBodyComponent.ForceThisFrame = Vector3.zero;
+
+			physicsBodyComponent.TorqueThisFrame = Vector3.zero;
+
+			if (physicsBodyComponent.LinearVelocity.magnitude > MathHelpers.EPSILON)
+			{
+				ApplyLinearVelocityToPosition(
+					physicsBodyComponent.LinearVelocity,
+					ref positionComponent.Position,
+					deltaTime);
+			}
+
+			if (physicsBodyComponent.AngularVelocity.magnitude > MathHelpers.EPSILON)
+			{
+				ApplyAngularVelocityToRotation(
+					physicsBodyComponent.AngularVelocity,
+					ref quaternionComponent.Quaternion,
+					deltaTime);
+			}
 
 			//Courtesy of https://github.com/notgiven688/jitterphysics2/blob/main/src/Jitter2/World.Step.cs
 			/*
@@ -100,72 +234,131 @@ namespace HereticalSolutions.HorizonRun
 			rigidBody.Orientation = dorn;
 			*/
 
-			UpdatePosition(
-				ref positionComponent.Position,
-				physicsBodyComponent.LinearVelocity,
-				deltaTime);
+			//var worldPosition = TransformHelpers.GetWorldPosition3D(
+			//	transformComponent.TRSMatrix);
 
-			//UpdateRotation(
-			//	ref quaternionComponent.Quaternion,
-			//	physicsBodyComponent.AngularVelocity,
-			//	deltaTime);
+			UnityEngine.Debug.DrawLine(
+				worldPosition,
+				worldPosition + physicsBodyComponent.LinearVelocity,
+				Color.green);
 
 			transformComponent.Dirty = true;
 		}
 
 		private void ApplyDampingToLinearVelocity(
 			ref Vector3 linearVelocity,
-			float linearDragScalar)
+			float linearDragScalar,
+			float deltaTime)
 		{
-			//float linearVelocityMagnitude = linearVelocity.magnitude;
-//
-			//float dampenedLinearVelocityMagnitude = Mathf.Abs(linearVelocityMagnitude - linearDragScalar);
-//
-			//linearVelocity = linearVelocity.normalized * dampenedLinearVelocityMagnitude;
-
-
-			linearVelocity *= (1f - linearDragScalar);
+			linearVelocity *= (1f - linearDragScalar * deltaTime);
 		}
 
 		private void ApplyDampingToAngularVelocity(
 			ref Vector3 angularVelocity,
-			float angularDragScalar)
+			float angularDragScalar,
+			float deltaTime)
 		{
-			//float angularVelocityMagnitude = angularVelocity.magnitude;
-//
-			//float dampenedAngularVelocityMagnitude = Mathf.Abs(angularVelocityMagnitude - angularDragScalar);
-//
-			//angularVelocity = angularVelocity.normalized * dampenedAngularVelocityMagnitude;
-
-
-			angularVelocity *= (1f - angularDragScalar);
+			angularVelocity *= (1f - angularDragScalar * deltaTime);
 		}
 
-		private void UpdatePosition(
-			ref Vector3 position,
+		private void ApplyConstraintForceToPosition(
+			Vector3 force,
+			ref Vector3 position)
+		{
+			position += force;
+		}
+
+		private void ApplyConstraintTorqueToRotation(
+			Vector3 torque,
+			ref Quaternion rotation)
+		{
+			Vector3 halfAngle = torque * (0.5f);
+
+			float l = halfAngle.magnitude;
+
+			if (l > 0)
+			{
+				halfAngle *= Mathf.Sin(l) / l;
+			}
+
+			Quaternion deltaRotation = new Quaternion(
+				halfAngle.x,
+				halfAngle.y,
+				halfAngle.z,
+				Mathf.Cos(l));
+
+			//Because I got sick of errors like 
+			//"Quaternion To Matrix conversion failed because input Quaternion is invalid {bla bla bla} l={totally not 1}"
+			rotation = (deltaRotation * rotation).normalized;
+		}
+
+		private void ApplyConstraintForceToLinearVelocity(
+			Vector3 force,
+			ref Vector3 linearVelocity)
+		{
+			var dot = Vector3.Dot(
+				linearVelocity,
+				force.normalized);
+
+			linearVelocity += force.normalized * Mathf.Abs(dot);
+		}
+
+		private void ApplyConstraintTorqueToAngularVelocity(
+			Vector3 torque,
+			ref Vector3 angularVelocity)
+		{
+			var dot = Vector3.Dot(
+				angularVelocity,
+				torque.normalized);
+
+			angularVelocity += torque.normalized * Mathf.Abs(dot);
+		}
+
+		private void ApplyForceToLinearVelocity(
+			Vector3 force,
+			ref Vector3 linearVelocity)
+		{
+			linearVelocity += force;
+		}
+
+		private void ApplyTorqueToAngularVelocity(
+			Vector3 torque,
+			ref Vector3 angularVelocity)
+		{
+			angularVelocity += torque;
+		}
+
+		private void ApplyLinearVelocityToPosition(
 			Vector3 velocity,
+			ref Vector3 position,
 			float deltaTime)
 		{
 			position += velocity * deltaTime;
 		}
 
-		private void UpdateRotation(
-			ref Quaternion rotation,
+		private void ApplyAngularVelocityToRotation(
 			Vector3 angularVelocity,
+			ref Quaternion rotation,
 			float deltaTime)
 		{
-			float angleMagnitude = angularVelocity.magnitude;
+			Vector3 halfAngle = angularVelocity * (deltaTime * 0.5f);
 
-			Vector3 axis = angularVelocity
-				* (Mathf.Sin(0.5f * angleMagnitude * deltaTime) / angleMagnitude);
+			float l = halfAngle.magnitude;
+
+			if (l > 0)
+			{
+				halfAngle *= Mathf.Sin(l) / l;
+			}
 
 			Quaternion deltaRotation = new Quaternion(
-				axis.x,
-				axis.y,
-				axis.z,
-				Mathf.Cos(angleMagnitude * deltaTime * 0.5f));
+				halfAngle.x,
+				halfAngle.y,
+				halfAngle.z,
+				Mathf.Cos(l));
 
-			rotation = deltaRotation * rotation;
+			//Because I got sick of errors like 
+			//"Quaternion To Matrix conversion failed because input Quaternion is invalid {bla bla bla} l={totally not 1}"
+			rotation = (deltaRotation * rotation).normalized;
 		}
 	}
 }

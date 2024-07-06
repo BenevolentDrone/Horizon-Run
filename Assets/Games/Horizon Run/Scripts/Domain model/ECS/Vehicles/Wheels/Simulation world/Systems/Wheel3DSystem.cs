@@ -21,10 +21,8 @@ namespace HereticalSolutions.HorizonRun
 				world
 					.GetEntities()
 					.With<Wheel3DComponent>()
-					//.With<Position3DComponent>()
 					.With<PhysicsBody3DComponent>()
 					.With<Transform3DComponent>()
-					.With<QuaternionComponent>()
 					.With<Suspension3DComponent>()
 					.AsSet())
 		{
@@ -41,16 +39,14 @@ namespace HereticalSolutions.HorizonRun
 		{
 			ref var wheelComponent = ref entity.Get<Wheel3DComponent>();
 
-			//ref var positionComponent = ref entity.Get<Position3DComponent>();
-
 			ref var transformComponent = ref entity.Get<Transform3DComponent>();
-
-			var quaternionComponent = entity.Get<QuaternionComponent>();
 
 			ref var suspensionComponent = ref entity.Get<Suspension3DComponent>();
 
 			Vector3 wheelWorldPosition = TransformHelpers.GetWorldPosition3D(
 				transformComponent.TRSMatrix);
+
+			var wheelWorldRotation = transformComponent.TRSMatrix.rotation;
 
 			//FUCK https://gamedev.stackexchange.com/questions/163682/why-is-my-spherecast-returning-an-incorrect-hit-on-mesh-collider
 			//YOU https://forum.unity.com/threads/spherecastall-returns-0-0-0-for-all-raycasthit-points.428302/
@@ -64,9 +60,9 @@ namespace HereticalSolutions.HorizonRun
 			//	castDistance,
 			//	layerMask);
 
-			Vector3 wheelUp = quaternionComponent.Quaternion * Vector3.up;
+			Vector3 wheelUp = wheelWorldRotation * Vector3.up;
 
-			Vector3 wheelRight = quaternionComponent.Quaternion * Vector3.right;
+			Vector3 wheelRight = wheelWorldRotation * Vector3.right;
 
 			var ray = new Ray(
 				wheelWorldPosition + wheelUp * (wheelComponent.Radius * 2f),
@@ -118,7 +114,7 @@ namespace HereticalSolutions.HorizonRun
 					UnityEngine.Debug.DrawLine(
 						contact,
 						contact + raycastHits[i].normal * 0.1f,
-						Color.red);
+						Color.magenta);
 
 					continue;
 				}
@@ -147,14 +143,11 @@ namespace HereticalSolutions.HorizonRun
 
 
 			//Apply forces
-
-			//positionComponent.Position += wheelComponent.Force;
-			//
-			//transformComponent.Dirty = true;
-
 			ref var physicsBodyComponent = ref entity.Get<PhysicsBody3DComponent>();
 
-			physicsBodyComponent.LinearVelocity += wheelComponent.Force;
+			PhysicsHelpers.AddConstraintForce(
+				wheelComponent.Force,
+				ref physicsBodyComponent);
 		}
 	}
 }

@@ -19,12 +19,13 @@ namespace HereticalSolutions.HorizonRun
 		public float TravelLength;
 
 		public float Stiffness;
+
 		public float Damping;
 
 		//Results of suspension calcilations
-		public Vector3 SuspensionForce;
+		public Vector3 SuspensionForceOnJoint;
 
-		public Vector3 SuspensionError;
+		public Vector3 SuspensionConstraintForceOnJoint;
 
 		//Tells which entities receive forces
 		public bool SuspensionAttachmentReceivesForce;

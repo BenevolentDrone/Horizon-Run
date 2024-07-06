@@ -43,9 +43,11 @@ MonoBehaviour:
     0.0\n        }\n      }\n    },\n    {\n      \"$type\": \"HereticalSolutions.HorizonRun.PhysicsBody3DComponent,
     Assembly-CSharp\",\n      \"LinearVelocity\": {\n        \"x\": 0.0,\n       
     \"y\": 0.0,\n        \"z\": 0.0,\n        \"magnitude\": 0.0,\n        \"sqrMagnitude\":
-    0.0\n      },\n      \"AngularVelocity\": {\n        \"x\": 0.0,\n        \"y\":
-    0.0,\n        \"z\": 0.0,\n        \"magnitude\": 0.0,\n        \"sqrMagnitude\":
-    0.0\n      },\n      \"LinearDragScalar\": 0.0,\n      \"AngularDragScalar\":
+    0.0\n      },\n      \"AngularVelocity\": {\n        \"x\": 0.05,\n        \"y\":
+    0.0,\n        \"z\": 0.0,\n        \"normalized\": {\n          \"x\": 1.0,\n         
+    \"y\": 0.0,\n          \"z\": 0.0,\n          \"magnitude\": 1.0,\n         
+    \"sqrMagnitude\": 1.0\n        },\n        \"magnitude\": 0.05,\n        \"sqrMagnitude\":
+    0.00250000018\n      },\n      \"LinearDragScalar\": 0.05,\n      \"AngularDragScalar\":
     0.0\n    },\n    {\n      \"$type\": \"HereticalSolutions.HorizonRun.VehicleComponent,
     Assembly-CSharp\"\n    },\n    {\n      \"$type\": \"HereticalSolutions.HorizonRun.FourWheeledVehicleComponent,
     Assembly-CSharp\",\n      \"FrontRightWheel\": \"00000000-0000-0000-0000-000000000000\",\n     
@@ -73,4 +75,4 @@ MonoBehaviour:
     17.3717365\n      }\n    },\n    {\n      \"$type\": \"HereticalSolutions.HorizonRun.AttachWheelsComponent,
     Assembly-CSharp\",\n      \"WheelPrototypeID\": \"Wheel\",\n      \"DesiredSuspensionRestLength\":
     1.0,\n      \"DesiredSuspensionTravelLength\": 0.3,\n      \"DesiredSuspensionStiffness\":
-    1.1,\n      \"DesiredSuspensionDamping\": 0.1\n    }\n  ]\n}"
+    1.0,\n      \"DesiredSuspensionDamping\": 1.0\n    }\n  ]\n}"

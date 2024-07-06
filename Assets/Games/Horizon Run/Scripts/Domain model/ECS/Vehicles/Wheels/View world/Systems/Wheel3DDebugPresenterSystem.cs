@@ -37,14 +37,17 @@ namespace HereticalSolutions.HorizonRun
 
 			var wheelComponent = targetEntity.Get<Wheel3DComponent>();
 
-			var positionComponent = targetEntity.Get<Position3DComponent>();
+			var transformComponent = targetEntity.Get<Transform3DComponent>();
 
-			var quaternionComponent = targetEntity.Get<QuaternionComponent>();
+			var wheelWorldPosition = TransformHelpers.GetWorldPosition3D(
+							transformComponent.TRSMatrix);
+
+			var wheelWorldRotation = transformComponent.TRSMatrix.rotation;
 
 
-			wheel3DDebugViewComponent.WheelPosition = positionComponent.Position;
+			wheel3DDebugViewComponent.WheelPosition = wheelWorldPosition;
 
-			wheel3DDebugViewComponent.WheelRotation = quaternionComponent.Quaternion;
+			wheel3DDebugViewComponent.WheelRotation = wheelWorldRotation;
 
 			wheel3DDebugViewComponent.WheelRadius = wheelComponent.Radius;
 

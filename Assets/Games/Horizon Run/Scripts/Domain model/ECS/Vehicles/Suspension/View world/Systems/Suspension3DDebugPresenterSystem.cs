@@ -38,7 +38,7 @@ namespace HereticalSolutions.HorizonRun
 
 			var suspensionComponent = targetEntity.Get<Suspension3DComponent>();
 
-			var parentTRSMatrix = TransformHelpers.GetParentTRSMatrix(entity);
+			var parentTRSMatrix = TransformHelpers.GetParentTRSMatrix(targetEntity);
 
 			//Get spring vector
 			Vector3 springAttachmentWorldPosition = TransformHelpers.GetWorldPosition3D(
@@ -51,11 +51,7 @@ namespace HereticalSolutions.HorizonRun
 			Vector3 springVector = springAttachmentWorldPosition - springJointWorldPosition;
 
 			//Get suspension direction rotated
-			Vector3 suspensionDirectionNormalizedRotated = TransformHelpers.GetWorldPosition3D(
-				suspensionComponent.SuspensionDirectionNormalized,
-				Quaternion.identity,
-				Vector3.one,
-				parentTRSMatrix);
+			Vector3 suspensionDirectionNormalizedRotated = parentTRSMatrix.rotation * suspensionComponent.SuspensionDirectionNormalized;
 
 			//Get current spring length
 			float currentSpringLength = Vector3.Dot(
@@ -81,7 +77,7 @@ namespace HereticalSolutions.HorizonRun
 
 			//Calculate the damping force
 			//-1 for an opposite direction
-			float springDampingForceScalar = -1f * suspensionComponent.Damping * springForceScalar;
+			float springDampingForceScalar = -1f * suspensionComponent.Damping * deltaTime * springForceScalar;
 
 			Vector3 springDampingForce = suspensionDirectionNormalizedRotated * springDampingForceScalar;
 
@@ -114,32 +110,56 @@ namespace HereticalSolutions.HorizonRun
 			//Calculate forces
 			Vector3 forceAppliedToSuspensionAttachment = Vector3.zero;
 
+			Vector3 pushForceAppliedToSuspensionAttachment = Vector3.zero;
+
 			Vector3 forceAppliedToSuspensionJoint = Vector3.zero;
+
+			Vector3 pushForceAppliedToSuspensionJoint = Vector3.zero;
+
+			//Longitudal error force pushes either wheel or vehicle so that the suspension length is preserved
+			//Latteral error forces pushes the wheel back to be aligned with the suspension
+			//These two forces should not be multiplied by deltaTime
+			//Minus is used for an opposite direction
 
 			//Dunno. Maybe there's a case like that?
 			if (suspensionComponent.SuspensionAttachmentReceivesForce
 				&& suspensionComponent.SuspensionJointReceivesForce)
 			{
 				//-1 for an opposite direction. The compiler will optimize const values anyway
-				forceAppliedToSuspensionJoint = (-1f * 0.5f) * (springForce + springDampingForce + suspensionLongitudinalError);
+				forceAppliedToSuspensionJoint =
+					(-1f * 0.5f) * (springForce + springDampingForce);
 
-				//minus for an opposite direction
-				forceAppliedToSuspensionAttachment = 0.5f * (springForce + springDampingForce + suspensionLongitudinalError) - suspensionLatteralError;
+				pushForceAppliedToSuspensionJoint =
+					(-1f * 0.5f) * suspensionLongitudinalError;
+
+				forceAppliedToSuspensionAttachment =
+					0.5f * (springForce + springDampingForce);
+
+				pushForceAppliedToSuspensionAttachment =
+					0.5f * suspensionLongitudinalError
+					- suspensionLatteralError;
 			}
 			//Wheel is in the air
 			else if (suspensionComponent.SuspensionAttachmentReceivesForce)
 			{
-				//minus for an opposite direction
-				forceAppliedToSuspensionAttachment = springForce + springDampingForce + suspensionLongitudinalError - suspensionLatteralError;
+				forceAppliedToSuspensionAttachment =
+					springForce + springDampingForce;
+
+				pushForceAppliedToSuspensionAttachment =
+					suspensionLongitudinalError
+					- suspensionLatteralError;
 			}
 			//Wheel is on the ground
 			else if (suspensionComponent.SuspensionJointReceivesForce)
 			{
 				//-1 for an opposite direction
-				forceAppliedToSuspensionJoint = -1f * (springForce + springDampingForce + suspensionLongitudinalError);
+				forceAppliedToSuspensionJoint =
+					-1f * (springForce + springDampingForce);
 
-				//minus for an opposite direction
-				forceAppliedToSuspensionAttachment = -suspensionLatteralError;
+				pushForceAppliedToSuspensionJoint =
+					-1f * suspensionLongitudinalError;
+
+				pushForceAppliedToSuspensionAttachment = -suspensionLatteralError;
 			}
 
 
@@ -160,10 +180,17 @@ namespace HereticalSolutions.HorizonRun
 
 			suspension3DDebugViewComponent.ForceAppliedToJoint = forceAppliedToSuspensionJoint;
 
+			suspension3DDebugViewComponent.PushForceAppliedToJoint = pushForceAppliedToSuspensionJoint;
+
 			suspension3DDebugViewComponent.ForceAppliedToAttachment = forceAppliedToSuspensionAttachment;
 
+			suspension3DDebugViewComponent.PushForceAppliedToAttachment = pushForceAppliedToSuspensionAttachment;
+
+
+			suspension3DDebugViewComponent.SuspensionLongitudalError = suspensionLongitudinalError;
 
 			suspension3DDebugViewComponent.SuspensionLatteralError = suspensionLatteralError;
+
 
 			suspension3DDebugViewComponent.SpringCompressionNormalized = springCompressionNormalized;
 		}

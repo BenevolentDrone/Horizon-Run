@@ -221,6 +221,7 @@ namespace HereticalSolutions.HorizonRun.DI
 			ISystem<float> fixedUpdateSystems = (includeSimulationWorld)
 				? SystemsFactory.BuildFixedUpdateSystems(
 					simulationWorld,
+					entityManager,
 					entityListManager)
 				: new PlaceholderSystem();
 

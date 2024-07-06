@@ -18,22 +18,28 @@ MonoBehaviour:
     \"$type\": \"HereticalSolutions.HorizonRun.Suspension3DDebugViewComponent, Assembly-CSharp\",\n     
     \"SuspensionJointPosition\": {\n        \"x\": 0.0,\n        \"y\": 0.0,\n       
     \"z\": 0.0,\n        \"magnitude\": 0.0,\n        \"sqrMagnitude\": 0.0\n     
-    },\n      \"SuspensionPosition\": {\n        \"x\": 0.0,\n        \"y\": 0.0,\n       
-    \"z\": 0.0,\n        \"magnitude\": 0.0,\n        \"sqrMagnitude\": 0.0\n     
-    },\n      \"SuspensionRestPosition\": {\n        \"x\": 0.0,\n        \"y\":
+    },\n      \"SuspensionAttachmentPosition\": {\n        \"x\": 0.0,\n        \"y\":
     0.0,\n        \"z\": 0.0,\n        \"magnitude\": 0.0,\n        \"sqrMagnitude\":
-    0.0\n      },\n      \"SuspensionForce\": {\n        \"x\": 0.0,\n        \"y\":
-    0.0,\n        \"z\": 0.0,\n        \"magnitude\": 0.0,\n        \"sqrMagnitude\":
-    0.0\n      },\n      \"SuspensionError\": {\n        \"x\": 0.0,\n        \"y\":
-    0.0,\n        \"z\": 0.0,\n        \"magnitude\": 0.0,\n        \"sqrMagnitude\":
-    0.0\n      },\n      \"SpringCompressionNormalized\": 0.0\n    },\n    {\n     
-    \"$type\": \"HereticalSolutions.HorizonRun.Wheel3DPresenterComponent, Assembly-CSharp\",\n     
-    \"TargetEntity\": {\n        \"IsAlive\": false\n      }\n    },\n    {\n     
-    \"$type\": \"HereticalSolutions.HorizonRun.Wheel3DDebugViewComponent, Assembly-CSharp\",\n     
-    \"WheelPosition\": {\n        \"x\": 0.0,\n        \"y\": 0.0,\n        \"z\":
-    0.0,\n        \"magnitude\": 0.0,\n        \"sqrMagnitude\": 0.0\n      },\n     
-    \"WheelRotation\": {\n        \"x\": 0.0,\n        \"y\": 0.0,\n        \"z\":
-    0.0,\n        \"w\": 1.0,\n        \"eulerAngles\": {\n          \"x\": 0.0,\n         
-    \"y\": 0.0,\n          \"z\": 0.0,\n          \"magnitude\": 0.0,\n         
-    \"sqrMagnitude\": 0.0\n        }\n      },\n      \"WheelRadius\": 0.0,\n     
-    \"WheelWidth\": 0.0\n    }\n  ]\n}"
+    0.0\n      },\n      \"SuspensionRestPosition\": {\n        \"x\": 0.0,\n       
+    \"y\": 0.0,\n        \"z\": 0.0,\n        \"magnitude\": 0.0,\n        \"sqrMagnitude\":
+    0.0\n      },\n      \"SuspensionCompressionMinPosition\": {\n        \"x\":
+    0.0,\n        \"y\": 0.0,\n        \"z\": 0.0,\n        \"magnitude\": 0.0,\n       
+    \"sqrMagnitude\": 0.0\n      },\n      \"SuspensionCompressionMaxPosition\":
+    {\n        \"x\": 0.0,\n        \"y\": 0.0,\n        \"z\": 0.0,\n        \"magnitude\":
+    0.0,\n        \"sqrMagnitude\": 0.0\n      },\n      \"ForceAppliedToJoint\":
+    {\n        \"x\": 0.0,\n        \"y\": 0.0,\n        \"z\": 0.0,\n        \"magnitude\":
+    0.0,\n        \"sqrMagnitude\": 0.0\n      },\n      \"ForceAppliedToAttachment\":
+    {\n        \"x\": 0.0,\n        \"y\": 0.0,\n        \"z\": 0.0,\n        \"magnitude\":
+    0.0,\n        \"sqrMagnitude\": 0.0\n      },\n      \"SuspensionLatteralError\":
+    {\n        \"x\": 0.0,\n        \"y\": 0.0,\n        \"z\": 0.0,\n        \"magnitude\":
+    0.0,\n        \"sqrMagnitude\": 0.0\n      },\n      \"SpringCompressionNormalized\":
+    0.0\n    },\n    {\n      \"$type\": \"HereticalSolutions.HorizonRun.Wheel3DPresenterComponent,
+    Assembly-CSharp\",\n      \"TargetEntity\": {\n        \"IsAlive\": false\n     
+    }\n    },\n    {\n      \"$type\": \"HereticalSolutions.HorizonRun.Wheel3DDebugViewComponent,
+    Assembly-CSharp\",\n      \"WheelPosition\": {\n        \"x\": 0.0,\n       
+    \"y\": 0.0,\n        \"z\": 0.0,\n        \"magnitude\": 0.0,\n        \"sqrMagnitude\":
+    0.0\n      },\n      \"WheelRotation\": {\n        \"x\": 0.0,\n        \"y\":
+    0.0,\n        \"z\": 0.0,\n        \"w\": 1.0,\n        \"eulerAngles\": {\n         
+    \"x\": 0.0,\n          \"y\": 0.0,\n          \"z\": 0.0,\n          \"magnitude\":
+    0.0,\n          \"sqrMagnitude\": 0.0\n        }\n      },\n      \"WheelRadius\":
+    0.0,\n      \"WheelWidth\": 0.0\n    }\n  ]\n}"

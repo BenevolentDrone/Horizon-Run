@@ -19,7 +19,13 @@ namespace HereticalSolutions.HorizonRun
 
 		public Vector3 ForceAppliedToJoint;
 
+		public Vector3 PushForceAppliedToJoint;
+
 		public Vector3 ForceAppliedToAttachment;
+
+		public Vector3 PushForceAppliedToAttachment;
+
+		public Vector3 SuspensionLongitudalError;
 
 		public Vector3 SuspensionLatteralError;
 

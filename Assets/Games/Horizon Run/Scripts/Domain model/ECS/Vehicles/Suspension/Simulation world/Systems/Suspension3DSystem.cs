@@ -13,7 +13,6 @@ namespace HereticalSolutions.HorizonRun
 				world
 					.GetEntities()
 					.With<Suspension3DComponent>()
-					//.With<Position3DComponent>()
 					.With<PhysicsBody3DComponent>()
 					.With<Transform3DComponent>()
 					.AsSet())
@@ -25,8 +24,6 @@ namespace HereticalSolutions.HorizonRun
 			in Entity entity)
 		{
 			ref var suspensionComponent = ref entity.Get<Suspension3DComponent>();
-
-			//ref var positionComponent = ref entity.Get<Position3DComponent>();
 
 			var transformComponent = entity.Get<Transform3DComponent>();
 
@@ -43,16 +40,17 @@ namespace HereticalSolutions.HorizonRun
 			Vector3 springVector = springAttachmentWorldPosition - springJointWorldPosition;
 
 			//Get suspension direction rotated
-			Vector3 suspensionDirectionNormalizedRotated = TransformHelpers.GetWorldPosition3D(
-				suspensionComponent.SuspensionDirectionNormalized,
-				Quaternion.identity,
-				Vector3.one,
-				parentTRSMatrix);
+			Vector3 suspensionDirectionNormalizedRotated = parentTRSMatrix.rotation * suspensionComponent.SuspensionDirectionNormalized;
+
+			//Because apparently quaternions are prone to fucking up normalization
+			suspensionDirectionNormalizedRotated.Normalize();
 
 			//Get current spring length
 			float currentSpringLength = Vector3.Dot(
 				springVector,
 				suspensionDirectionNormalizedRotated);
+
+			UnityEngine.Debug.Log($"SPRING VECTOR MAGNITUDE: {springVector.magnitude} CURRENT SPRING LENGTH: {currentSpringLength}");
 
 			//Calculate spring force. Spring force is directed in the direction that allows the spring to be back at rest length again
 			//Positive compression means the spring is too long, negative means it's too short
@@ -73,7 +71,7 @@ namespace HereticalSolutions.HorizonRun
 
 			//Calculate the damping force
 			//-1 for an opposite direction
-			float springDampingForceScalar = -1f * suspensionComponent.Damping * springForceScalar;
+			float springDampingForceScalar = -1f * suspensionComponent.Damping * deltaTime * springForceScalar;
 
 			Vector3 springDampingForce = suspensionDirectionNormalizedRotated * springDampingForceScalar;
 
@@ -96,58 +94,101 @@ namespace HereticalSolutions.HorizonRun
 					* suspensionLongitudinalErrorScalar;
 			}
 
+			UnityEngine.Debug.Log($"LONGITUDAL ERROR: {suspensionLongitudinalErrorScalar}");
+
 			//Calculate suspension latteral error
 			Vector3 expectedSuspensionWorldPosition =
 				springJointWorldPosition
 				+ suspensionDirectionNormalizedRotated * currentSpringLength;
+			
+			/*
+			UnityEngine.Debug.DrawLine(
+				expectedSuspensionWorldPosition + parentTRSMatrix.rotation * Vector3.left,
+				expectedSuspensionWorldPosition + parentTRSMatrix.rotation * Vector3.right,
+				Color.white);
+
+			UnityEngine.Debug.DrawLine(
+				springAttachmentWorldPosition + parentTRSMatrix.rotation * Vector3.left,
+				springAttachmentWorldPosition + parentTRSMatrix.rotation * Vector3.right,
+				Color.green);
+			*/
 
 			Vector3 suspensionLatteralError = springAttachmentWorldPosition - expectedSuspensionWorldPosition;
+
+			UnityEngine.Debug.Log($"LATTERAL ERROR: {suspensionLatteralError}");
 
 			//Calculate forces
 			Vector3 forceAppliedToSuspensionAttachment = Vector3.zero;
 
+			Vector3 constraintForceAppliedToSuspensionAttachment = Vector3.zero;
+
 			Vector3 forceAppliedToSuspensionJoint = Vector3.zero;
+
+			Vector3 constraintForceAppliedToSuspensionJoint = Vector3.zero;
+
+			//Longitudal error force pushes either wheel or vehicle so that the suspension length is preserved
+			//Latteral error forces pushes the wheel back to be aligned with the suspension
+			//These two forces should not be multiplied by deltaTime
+			//Minus is used for an opposite direction
 
 			//Dunno. Maybe there's a case like that?
 			if (suspensionComponent.SuspensionAttachmentReceivesForce
 				&& suspensionComponent.SuspensionJointReceivesForce)
 			{
 				//-1 for an opposite direction. The compiler will optimize const values anyway
-				forceAppliedToSuspensionJoint = (-1f * 0.5f) * (springForce + springDampingForce + suspensionLongitudinalError);
+				forceAppliedToSuspensionJoint =
+					(-1f * 0.5f) * (springForce + springDampingForce);
 
-				//minus for an opposite direction
-				forceAppliedToSuspensionAttachment = 0.5f * (springForce + springDampingForce + suspensionLongitudinalError) - suspensionLatteralError;
+				constraintForceAppliedToSuspensionJoint =
+					(-1f * 0.5f) * suspensionLongitudinalError;
+
+				forceAppliedToSuspensionAttachment =
+					0.5f * (springForce + springDampingForce);
+
+				constraintForceAppliedToSuspensionAttachment =
+					0.5f * suspensionLongitudinalError
+					- suspensionLatteralError;
 			}
 			//Wheel is in the air
 			else if (suspensionComponent.SuspensionAttachmentReceivesForce)
 			{
-				//minus for an opposite direction
-				forceAppliedToSuspensionAttachment = springForce + springDampingForce + suspensionLongitudinalError - suspensionLatteralError;
+				forceAppliedToSuspensionAttachment =
+					springForce + springDampingForce;
+
+				constraintForceAppliedToSuspensionAttachment =
+					suspensionLongitudinalError
+					- suspensionLatteralError;
 			}
 			//Wheel is on the ground
 			else if (suspensionComponent.SuspensionJointReceivesForce)
 			{
 				//-1 for an opposite direction
-				forceAppliedToSuspensionJoint = -1f * (springForce + springDampingForce + suspensionLongitudinalError);
+				forceAppliedToSuspensionJoint =
+					-1f * (springForce + springDampingForce);
 
-				//minus for an opposite direction
-				forceAppliedToSuspensionAttachment = -suspensionLatteralError;
+				constraintForceAppliedToSuspensionJoint =
+					-1f * suspensionLongitudinalError;
+
+				constraintForceAppliedToSuspensionAttachment = -suspensionLatteralError;
 			}
 
-			suspensionComponent.SuspensionForce = forceAppliedToSuspensionJoint;
+			suspensionComponent.SuspensionForceOnJoint = forceAppliedToSuspensionJoint;
 
-			suspensionComponent.SuspensionError = forceAppliedToSuspensionAttachment;
+			suspensionComponent.SuspensionConstraintForceOnJoint = constraintForceAppliedToSuspensionJoint;
 
-
-			//Apply errors
-			
-			//positionComponent.Position += suspensionComponent.SuspensionError;
-			//
-			//transformComponent.Dirty = true;
-
+			//Apply forces
 			ref var physicsBodyComponent = ref entity.Get<PhysicsBody3DComponent>();
 
-			physicsBodyComponent.LinearVelocity += suspensionComponent.SuspensionError;
+			UnityEngine.Debug.Log($"CONSTRAINT FORCE APPLIED TO SUSPENSION ATTACHMENT: {constraintForceAppliedToSuspensionAttachment}");
+
+			PhysicsHelpers.AddConstraintForce(
+				constraintForceAppliedToSuspensionAttachment,
+				ref physicsBodyComponent);
+
+			//PhysicsHelpers.AddForce(
+			//	forceAppliedToSuspensionAttachment,
+			//	deltaTime,
+			//	ref physicsBodyComponent);
 		}
 	}
 }

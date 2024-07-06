@@ -7,7 +7,7 @@ namespace HereticalSolutions.HorizonRun
 {
 	public class Suspension3DDebugViewSystem : AEntitySetSystem<float>
 	{
-		private readonly Vector3 padding = new Vector3(0f, 0f, 0.05f);
+		private readonly Vector3 padding = Vector3.zero; //new Vector3(0f, 0f, 0.05f);
 
 		public Suspension3DDebugViewSystem(
 			World world)
@@ -50,28 +50,34 @@ namespace HereticalSolutions.HorizonRun
 				suspensionColor);
 
 			//Draw suspension longitudal error
-			//Debug.DrawLine(
-			//	suspension3DDebugViewComponent.SuspensionPosition,
-			//	suspension3DDebugViewComponent.SuspensionPosition + suspension3DDebugViewComponent.SuspensionError,
-			//	Color.blue);
+			Debug.DrawLine(
+				suspension3DDebugViewComponent.SuspensionAttachmentPosition - padding,
+				suspension3DDebugViewComponent.SuspensionAttachmentPosition + suspension3DDebugViewComponent.SuspensionLongitudalError - padding,
+				Color.magenta);
 
 			//Draw suspension latteral error
 			Debug.DrawLine(
 				suspension3DDebugViewComponent.SuspensionAttachmentPosition - padding,
-				suspension3DDebugViewComponent.SuspensionAttachmentPosition + suspension3DDebugViewComponent.SuspensionLatteralError - padding,
+				suspension3DDebugViewComponent.SuspensionAttachmentPosition - suspension3DDebugViewComponent.SuspensionLatteralError - padding,
 				Color.red);
 
-			//Draw the force applied to suspension joint
-			Debug.DrawLine(
-				suspension3DDebugViewComponent.SuspensionJointPosition - padding,
-				suspension3DDebugViewComponent.SuspensionJointPosition + suspension3DDebugViewComponent.ForceAppliedToJoint - padding,
-				Color.green);
+			////Draw the force applied to suspension joint
+			//Debug.DrawLine(
+			//	suspension3DDebugViewComponent.SuspensionJointPosition - padding,
+			//	suspension3DDebugViewComponent.SuspensionJointPosition + suspension3DDebugViewComponent.ForceAppliedToJoint - padding,
+			//	Color.green);
 
-			//Draw the force applied to suspension attachment
-			Debug.DrawLine(
-				suspension3DDebugViewComponent.SuspensionAttachmentPosition - padding,
-				suspension3DDebugViewComponent.SuspensionAttachmentPosition + suspension3DDebugViewComponent.ForceAppliedToAttachment - padding,
-				Color.blue);
+			////Draw the force applied to suspension attachment
+			//Debug.DrawLine(
+			//	suspension3DDebugViewComponent.SuspensionAttachmentPosition - padding,
+			//	suspension3DDebugViewComponent.SuspensionAttachmentPosition + suspension3DDebugViewComponent.ForceAppliedToAttachment - padding,
+			//	Color.blue);
+
+			//Draw the push force applied to suspension attachment
+			//Debug.DrawLine(
+			//	suspension3DDebugViewComponent.SuspensionAttachmentPosition - padding * 2f,
+			//	suspension3DDebugViewComponent.SuspensionAttachmentPosition + suspension3DDebugViewComponent.PushForceAppliedToAttachment - padding * 2f,
+			//	Color.blue);
 		}
 	}
 }

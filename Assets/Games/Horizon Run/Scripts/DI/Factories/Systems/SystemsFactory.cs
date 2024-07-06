@@ -523,6 +523,7 @@ namespace HereticalSolutions.HorizonRun.DI
 
 		public static ISystem<float> BuildFixedUpdateSystems(
 			World simulationWorld,
+			HorizonRunEntityManager entityManager,
 			DefaultECSEntityListManager entityListManager)
 		{
 			return new SequentialSystem<float>(
@@ -580,20 +581,16 @@ namespace HereticalSolutions.HorizonRun.DI
 					new Suspension3DSystem(
 						simulationWorld),
 
+					// Vehicle
+					//new CollectForcesFromSuspensionsSystem(
+					//	simulationWorld,
+					//	entityManager),
+
 					// Physics
 					new Gravity3DSystem(
 						simulationWorld),
 					new PhysicsBody3DSystem(
 						simulationWorld)
-
-					//Let's move those higher above so that they get updated at the very start of the frame
-					// Transform updating
-					//new Transform2DUpdateSystem(
-					//	simulationWorld,
-					//	entityListManager),
-					//new Transform3DUpdateSystem(
-					//	simulationWorld,
-					//	entityListManager)
 					);
 		}
 

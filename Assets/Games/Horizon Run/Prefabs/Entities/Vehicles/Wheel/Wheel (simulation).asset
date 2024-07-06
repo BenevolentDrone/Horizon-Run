@@ -45,8 +45,13 @@ MonoBehaviour:
     \"y\": 0.0,\n        \"z\": 0.0,\n        \"magnitude\": 0.0,\n        \"sqrMagnitude\":
     0.0\n      },\n      \"AngularVelocity\": {\n        \"x\": 0.0,\n        \"y\":
     0.0,\n        \"z\": 0.0,\n        \"magnitude\": 0.0,\n        \"sqrMagnitude\":
-    0.0\n      },\n      \"LinearDragScalar\": 0.05,\n      \"AngularDragScalar\":
-    0.0\n    },\n    {\n      \"$type\": \"HereticalSolutions.HorizonRun.Suspension3DComponent,
+    0.0\n      },\n      \"LinearDragScalar\": 10.0,\n      \"AngularDragScalar\":
+    0.05\n    },\n    {\n      \"$type\": \"HereticalSolutions.HorizonRun.Gravity3DComponent,
+    Assembly-CSharp\",\n      \"Gravity\": {\n        \"x\": 0.0,\n        \"y\":
+    -9.8,\n        \"z\": 0.0,\n        \"normalized\": {\n          \"x\": 0.0,\n         
+    \"y\": -1.0,\n          \"z\": 0.0,\n          \"magnitude\": 1.0,\n         
+    \"sqrMagnitude\": 1.0\n        },\n        \"magnitude\": 9.8,\n        \"sqrMagnitude\":
+    96.04\n      },\n      \"Enabled\": true\n    },\n    {\n      \"$type\": \"HereticalSolutions.HorizonRun.Suspension3DComponent,
     Assembly-CSharp\",\n      \"JointPosition\": {\n        \"LocalPosition\": {\n         
     \"x\": 0.0,\n          \"y\": 0.0,\n          \"z\": 0.0,\n          \"magnitude\":
     0.0,\n          \"sqrMagnitude\": 0.0\n        },\n        \"LocalRotation\":

@@ -41,43 +41,80 @@ namespace HereticalSolutions.HorizonRun
 			if (!entity.Has<AttachWheelsComponent>())
 				return;
 
+
+			Vector3 vehiclePosition = Vector3.zero;
+
+			Quaternion vehicleRotation = Quaternion.identity;
+
+			Vector3 vehicleScale = Vector3.one;
+
+			if (entity.Has<Position3DComponent>())
+			{
+				var positionComponent = entity.Get<Position3DComponent>();
+
+				vehiclePosition = positionComponent.Position;
+			}
+
+			if (entity.Has<QuaternionComponent>())
+			{
+				var quaternionComponent = entity.Get<QuaternionComponent>();
+
+				vehicleRotation = quaternionComponent.Quaternion;
+			}
+
+			Matrix4x4 vehicleTRSMatrix = Matrix4x4.TRS(
+				vehiclePosition,
+				vehicleRotation,
+				vehicleScale);
+
 			var attachWheelsComponent = entity.Get<AttachWheelsComponent>();
 
 			ref var fourWheeledVehicleComponent = ref entity.Get<FourWheeledVehicleComponent>();
 
 			for (int i = 0; i < 4; i++)
 			{
-				Vector3 wheelJointPosition = Vector3.zero;
+				Vector3 wheelJointLocalPosition = Vector3.zero;
+
+				Quaternion wheelJointLocalRotation = Quaternion.identity;
+
+				Vector3 wheelJointLocalScale = Vector3.one;
 
 				switch (i)
 				{
 					case 0:
-						wheelJointPosition = fourWheeledVehicleComponent.FrontRightWheelJointPosition;
+						wheelJointLocalPosition = fourWheeledVehicleComponent.FrontRightWheelJointPosition;
 						break;
 					case 1:
-						wheelJointPosition = fourWheeledVehicleComponent.RearRightWheelJointPosition;
+						wheelJointLocalPosition = fourWheeledVehicleComponent.RearRightWheelJointPosition;
 						break;
 					case 2:
-						wheelJointPosition = fourWheeledVehicleComponent.RearLeftWheelJointPosition;
+						wheelJointLocalPosition = fourWheeledVehicleComponent.RearLeftWheelJointPosition;
 						break;
 					case 3:
-						wheelJointPosition = fourWheeledVehicleComponent.FrontLeftWheelJointPosition;
+						wheelJointLocalPosition = fourWheeledVehicleComponent.FrontLeftWheelJointPosition;
 						break;
 				}
+
+				Matrix4x4 wheelJointTRSMatrix = vehicleTRSMatrix * Matrix4x4.TRS(
+					wheelJointLocalPosition,
+					wheelJointLocalRotation,
+					wheelJointLocalScale);
+
+				Vector3 wheelJointWorldPosition = wheelJointTRSMatrix.GetColumn(3);
 
 				Entity @wheelOverride = worldForOverrides.CreateEntity();
 
 				@wheelOverride.Set<Position3DComponent>(
 					new Position3DComponent()
 					{
-						Position = wheelJointPosition
+						Position = wheelJointLocalPosition
 					});
 
 				Vector3 suspensionDirectionNormalized = Vector3.down;
 
 				LocalTransform3D jointPosition = new LocalTransform3D()
 				{
-					LocalPosition = wheelJointPosition
+					LocalPosition = wheelJointLocalPosition
 						- suspensionDirectionNormalized
 							* (attachWheelsComponent.DesiredSuspensionRestLength - attachWheelsComponent.DesiredSuspensionTravelLength),
 					LocalRotation = Quaternion.identity,
@@ -92,7 +129,9 @@ namespace HereticalSolutions.HorizonRun
 						RestLength = attachWheelsComponent.DesiredSuspensionRestLength,
 						TravelLength = attachWheelsComponent.DesiredSuspensionTravelLength,
 						Stiffness = attachWheelsComponent.DesiredSuspensionStiffness,
-						Damping = attachWheelsComponent.DesiredSuspensionDamping
+						Damping = attachWheelsComponent.DesiredSuspensionDamping,
+						SuspensionAttachmentReceivesForce = true,
+						SuspensionJointReceivesForce = false
 					});
 
 				var wheelEntityID = entityManager.SpawnEntity(

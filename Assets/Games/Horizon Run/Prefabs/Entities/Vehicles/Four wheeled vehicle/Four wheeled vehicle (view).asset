@@ -15,7 +15,7 @@ MonoBehaviour:
   EntityJson: "{\n  \"PrototypeID\": \"Four wheeled vehicle\",\n  \"Components\":
     [\n    {\n      \"$type\": \"HereticalSolutions.Entities.SpawnPooledGameObjectViewComponent,
     Core\",\n      \"Address\": \"Vehicle view\"\n    },\n    {\n      \"$type\":
-    \"HereticalSolutions.HorizonRun.Position3DPresenterComponent, Assembly-CSharp\",\n     
+    \"HereticalSolutions.Templates.Universal.Unity.Position3DPresenterComponent, Assembly-CSharp\",\n     
     \"TargetEntity\": {\n        \"IsAlive\": false\n      }\n    },\n    {\n     
-    \"$type\": \"HereticalSolutions.HorizonRun.QuaternionPresenterComponent, Assembly-CSharp\",\n     
+    \"$type\": \"HereticalSolutions.Templates.Universal.Unity.QuaternionPresenterComponent, Assembly-CSharp\",\n     
     \"TargetEntity\": {\n        \"IsAlive\": false\n      }\n    }\n  ]\n}"

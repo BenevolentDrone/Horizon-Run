@@ -15,5 +15,5 @@ MonoBehaviour:
   EntityJson: "{\n  \"PrototypeID\": \"Joystick\",\n  \"Components\": [\n    {\n     
     \"$type\": \"HereticalSolutions.Entities.SpawnPooledGameObjectViewComponent,
     Core\",\n      \"Address\": \"Joystick view\"\n    },\n    {\n      \"$type\":
-    \"HereticalSolutions.HorizonRun.JoystickPresenterComponent, Assembly-CSharp\",\n     
+    \"HereticalSolutions.Templates.Universal.Unity.JoystickPresenterComponent, Assembly-CSharp\",\n     
     \"TargetEntity\": {\n        \"IsAlive\": false\n      }\n    }\n  ]\n}"

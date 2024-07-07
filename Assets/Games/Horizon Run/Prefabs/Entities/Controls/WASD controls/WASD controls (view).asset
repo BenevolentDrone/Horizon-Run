@@ -15,5 +15,5 @@ MonoBehaviour:
   EntityJson: "{\n  \"PrototypeID\": \"WASD controls\",\n  \"Components\": [\n   
     {\n      \"$type\": \"HereticalSolutions.Entities.SpawnPooledGameObjectViewComponent,
     Core\",\n      \"Address\": \"WASD controls view\"\n    },\n    {\n      \"$type\":
-    \"HereticalSolutions.HorizonRun.WASDControlsPresenterComponent, Assembly-CSharp\",\n     
+    \"HereticalSolutions.Templates.Universal.Unity.WASDControlsPresenterComponent, Assembly-CSharp\",\n     
     \"TargetEntity\": {\n        \"IsAlive\": false\n      }\n    }\n  ]\n}"

@@ -1,17 +1,13 @@
 using System;
-//using System.Collections.Generic;
 
 using HereticalSolutions.Pools;
 
-//using HereticalSolutions.Repositories;
-
-//using HereticalSolutions.SpacePartitioning;
-
 using HereticalSolutions.Time;
 
-//using HereticalSolutions.Synchronization;
-
 using HereticalSolutions.Entities;
+
+using HereticalSolutions.Templates.Universal;
+using HereticalSolutions.Templates.Universal.Unity;
 
 using HereticalSolutions.Logging;
 
@@ -28,7 +24,7 @@ namespace HereticalSolutions.HorizonRun.DI
 
 		public static void InitializeViewWorldSystemsContainer(
 			IContainsEntityInitializationSystems<IDefaultECSEntityInitializationSystem> viewWorldSystemsContainer,
-			HorizonRunEntityManager entityManager,
+			UniversalTemplateEntityManager entityManager,
 			INonAllocDecoratedPool<GameObject> gameObjectPool,
 			Transform hudCanvasTransform,
 			ILoggerResolver loggerResolver = null)
@@ -50,14 +46,14 @@ namespace HereticalSolutions.HorizonRun.DI
 			ILoggerResolver loggerResolver = null)
 		{
 			return new DefaultECSSequentialEntityInitializationSystem(
-				new ResolvePooledGameObjectViewSystem<HorizonRunSceneEntity>(
+				new ResolvePooledGameObjectViewSystem<UniversalTemplateSceneEntity>(
 					gameObjectPool,
-					loggerResolver?.GetLogger<ResolvePooledGameObjectViewSystem<HorizonRunSceneEntity>>())
+					loggerResolver?.GetLogger<ResolvePooledGameObjectViewSystem<UniversalTemplateSceneEntity>>())
 				);
 		}
 
 		public static IDefaultECSEntityInitializationSystem BuildViewWorldInitializationSystems(
-			HorizonRunEntityManager entityManager,
+			UniversalTemplateEntityManager entityManager,
 			INonAllocDecoratedPool<GameObject> gameObjectPool,
 			Transform hudCanvasTransform,
 			ILoggerResolver loggerResolver = null)
@@ -79,7 +75,7 @@ namespace HereticalSolutions.HorizonRun.DI
 		}
 
 		private static ISystem<Entity> BuildPresenterInitializationSystems(
-			HorizonRunEntityManager entityManager,
+			UniversalTemplateEntityManager entityManager,
 			ILoggerResolver loggerResolver = null)
 		{
 			return new DefaultECSSequentialEntityInitializationSystem(
@@ -126,7 +122,7 @@ namespace HereticalSolutions.HorizonRun.DI
 		public static void InitializeSimulationWorldSystemsContainer(
 			World worldForOverrides,
 			IContainsEntityInitializationSystems<IDefaultECSEntityInitializationSystem> simulationWorldSystemsContainer,
-			HorizonRunEntityManager entityManager,
+			UniversalTemplateEntityManager entityManager,
 			IEventEntityBuilder<Entity, Guid> eventEntityBuilder,
 			DefaultECSEntityListManager entityListManager,
 			ITimerManager simulationUpdateTimerManager,
@@ -152,30 +148,30 @@ namespace HereticalSolutions.HorizonRun.DI
 		}
 
 		public static IDefaultECSEntityInitializationSystem BuildSimulationWorldResolveSystems(
-			HorizonRunEntityManager entityManager,
+			UniversalTemplateEntityManager entityManager,
 			DefaultECSEntityListManager entityListManager,
 			ILoggerResolver loggerResolver = null)
 		{
 			return new DefaultECSSequentialEntityInitializationSystem(
 
 				// Position
-				new CopyPosition2DFromGameObjectResolveSystem<HorizonRunSceneEntity>(),
-				new CopyPosition3DFromGameObjectResolveSystem<HorizonRunSceneEntity>(),
+				new CopyPosition2DFromGameObjectResolveSystem<UniversalTemplateSceneEntity>(),
+				new CopyPosition3DFromGameObjectResolveSystem<UniversalTemplateSceneEntity>(),
 
 				// Rotation
-				new CopyUniformRotationFromGameObjectResolveSystem<HorizonRunSceneEntity>(),
-				new CopyQuaternionFromGameObjectResolveSystem<HorizonRunSceneEntity>(),
+				new CopyUniformRotationFromGameObjectResolveSystem<UniversalTemplateSceneEntity>(),
+				new CopyQuaternionFromGameObjectResolveSystem<UniversalTemplateSceneEntity>(),
 
 				// Sub spawners
-				new LinkSubSpawnersResolveSystem<HorizonRunSceneEntity>(
+				new LinkSubSpawnersResolveSystem<UniversalTemplateSceneEntity>(
 					entityManager,
 					entityListManager,
-					loggerResolver?.GetLogger<LinkSubSpawnersResolveSystem<HorizonRunSceneEntity>>()));
+					loggerResolver?.GetLogger<LinkSubSpawnersResolveSystem<UniversalTemplateSceneEntity>>()));
 		}
 
 		public static IDefaultECSEntityInitializationSystem BuildSimulationWorldInitializationSystems(
 			World worldForOverrides,
-			HorizonRunEntityManager entityManager,
+			UniversalTemplateEntityManager entityManager,
 			IEventEntityBuilder<Entity, Guid> eventEntityBuilder,
 			DefaultECSEntityListManager entityListManager,
 			ITimerManager simulationUpdateTimerManager,
@@ -217,7 +213,7 @@ namespace HereticalSolutions.HorizonRun.DI
 		}
 
 		public static IDefaultECSEntityInitializationSystem BuildSimulationWorldDeinitializationSystems(
-			HorizonRunEntityManager entityManager,
+			UniversalTemplateEntityManager entityManager,
 			DefaultECSEntityListManager entityListManager,
 			ITimerManager simulationUpdateTimerManager,
 			ILoggerResolver loggerResolver = null)
@@ -251,7 +247,7 @@ namespace HereticalSolutions.HorizonRun.DI
 			World eventWorld,
 			World viewWorld,
 			EEntityAuthoringPresets authoringPreset,
-			HorizonRunEntityManager entityManager,
+			UniversalTemplateEntityManager entityManager,
 			IEventEntityBuilder<Entity, Guid> eventEntityBuilder,
 			DefaultECSEntityListManager entityListManager,
 			bool includeViewWorld,
@@ -362,7 +358,7 @@ namespace HereticalSolutions.HorizonRun.DI
 		private static ISystem<float> BuildEntitySpawnedEventSystems(
 			World eventWorld,
 			EEntityAuthoringPresets authoringPreset,
-			HorizonRunEntityManager entityManager)
+			UniversalTemplateEntityManager entityManager)
 		{
 			return new SequentialSystem<float>(
 				new CreateEntityOnEntitySpawnedEventSystem(
@@ -523,7 +519,7 @@ namespace HereticalSolutions.HorizonRun.DI
 
 		public static ISystem<float> BuildFixedUpdateSystems(
 			World simulationWorld,
-			HorizonRunEntityManager entityManager,
+			UniversalTemplateEntityManager entityManager,
 			DefaultECSEntityListManager entityListManager)
 		{
 			return new SequentialSystem<float>(
@@ -600,7 +596,7 @@ namespace HereticalSolutions.HorizonRun.DI
 
 		public static ISystem<float> BuildLateUpdateSystems(
 			World viewWorld,
-			HorizonRunEntityManager entityManager,
+			UniversalTemplateEntityManager entityManager,
 			IEventEntityBuilder<Entity, Guid> eventEntityBuilder,
 			Camera mainRenderCamera,
 			IUIManager uiManager)
@@ -647,7 +643,7 @@ namespace HereticalSolutions.HorizonRun.DI
 
 		private static ISystem<float> BuildViewPresenterSystems(
 			World viewWorld,
-			HorizonRunEntityManager entityManager,
+			UniversalTemplateEntityManager entityManager,
 			IEventEntityBuilder<Entity, Guid> eventEntityBuilder)
 		{
 			return new SequentialSystem<float>(

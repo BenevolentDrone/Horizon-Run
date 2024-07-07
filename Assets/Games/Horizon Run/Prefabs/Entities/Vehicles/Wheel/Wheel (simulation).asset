@@ -15,7 +15,7 @@ MonoBehaviour:
   EntityJson: "{\n  \"PrototypeID\": \"Wheel\",\n  \"Components\": [\n    {\n     
     \"$type\": \"HereticalSolutions.Entities.HierarchyComponent, Core\",\n      \"Parent\":
     {\n        \"IsAlive\": false\n      },\n      \"ChildrenListHandle\": 0\n   
-    },\n    {\n      \"$type\": \"HereticalSolutions.HorizonRun.Transform3DComponent,
+    },\n    {\n      \"$type\": \"HereticalSolutions.Templates.Universal.Unity.Transform3DComponent,
     Assembly-CSharp\",\n      \"TRSMatrix\": {\n        \"m00\": 1.0,\n        \"m10\":
     0.0,\n        \"m20\": 0.0,\n        \"m30\": 0.0,\n        \"m01\": 0.0,\n       
     \"m11\": 1.0,\n        \"m21\": 0.0,\n        \"m31\": 0.0,\n        \"m02\":
@@ -33,25 +33,25 @@ MonoBehaviour:
     \"decomposeProjection\": {\n          \"left\": -1.0,\n          \"right\": 1.0,\n         
     \"bottom\": -1.0,\n          \"top\": 1.0,\n          \"zNear\": 1.0,\n         
     \"zFar\": -1.0\n        }\n      },\n      \"Dirty\": true\n    },\n    {\n     
-    \"$type\": \"HereticalSolutions.HorizonRun.Position3DComponent, Assembly-CSharp\",\n     
+    \"$type\": \"HereticalSolutions.Templates.Universal.Unity.Position3DComponent, Assembly-CSharp\",\n     
     \"Position\": {\n        \"x\": 0.0,\n        \"y\": 0.0,\n        \"z\": 0.0,\n       
     \"magnitude\": 0.0,\n        \"sqrMagnitude\": 0.0\n      }\n    },\n    {\n     
-    \"$type\": \"HereticalSolutions.HorizonRun.QuaternionComponent, Assembly-CSharp\",\n     
+    \"$type\": \"HereticalSolutions.Templates.Universal.Unity.QuaternionComponent, Assembly-CSharp\",\n     
     \"Quaternion\": {\n        \"x\": 0.0,\n        \"y\": 0.0,\n        \"z\": 0.0,\n       
     \"w\": 1.0,\n        \"eulerAngles\": {\n          \"x\": 0.0,\n          \"y\":
     0.0,\n          \"z\": 0.0,\n          \"magnitude\": 0.0,\n          \"sqrMagnitude\":
-    0.0\n        }\n      }\n    },\n    {\n      \"$type\": \"HereticalSolutions.HorizonRun.PhysicsBody3DComponent,
+    0.0\n        }\n      }\n    },\n    {\n      \"$type\": \"HereticalSolutions.Templates.Universal.Unity.PhysicsBody3DComponent,
     Assembly-CSharp\",\n      \"LinearVelocity\": {\n        \"x\": 0.0,\n       
     \"y\": 0.0,\n        \"z\": 0.0,\n        \"magnitude\": 0.0,\n        \"sqrMagnitude\":
     0.0\n      },\n      \"AngularVelocity\": {\n        \"x\": 0.0,\n        \"y\":
     0.0,\n        \"z\": 0.0,\n        \"magnitude\": 0.0,\n        \"sqrMagnitude\":
     0.0\n      },\n      \"LinearDragScalar\": 10.0,\n      \"AngularDragScalar\":
-    0.05\n    },\n    {\n      \"$type\": \"HereticalSolutions.HorizonRun.Gravity3DComponent,
+    0.05\n    },\n    {\n      \"$type\": \"HereticalSolutions.Templates.Universal.Unity.Gravity3DComponent,
     Assembly-CSharp\",\n      \"Gravity\": {\n        \"x\": 0.0,\n        \"y\":
     -9.8,\n        \"z\": 0.0,\n        \"normalized\": {\n          \"x\": 0.0,\n         
     \"y\": -1.0,\n          \"z\": 0.0,\n          \"magnitude\": 1.0,\n         
     \"sqrMagnitude\": 1.0\n        },\n        \"magnitude\": 9.8,\n        \"sqrMagnitude\":
-    96.04\n      },\n      \"Enabled\": true\n    },\n    {\n      \"$type\": \"HereticalSolutions.HorizonRun.Suspension3DComponent,
+    96.04\n      },\n      \"Enabled\": true\n    },\n    {\n      \"$type\": \"HereticalSolutions.Templates.Universal.Unity.Suspension3DComponent,
     Assembly-CSharp\",\n      \"JointPosition\": {\n        \"LocalPosition\": {\n         
     \"x\": 0.0,\n          \"y\": 0.0,\n          \"z\": 0.0,\n          \"magnitude\":
     0.0,\n          \"sqrMagnitude\": 0.0\n        },\n        \"LocalRotation\":
@@ -69,7 +69,7 @@ MonoBehaviour:
     \"SuspensionError\": {\n        \"x\": 0.0,\n        \"y\": 0.0,\n        \"z\":
     0.0,\n        \"magnitude\": 0.0,\n        \"sqrMagnitude\": 0.0\n      },\n     
     \"SuspensionAttachmentReceivesForce\": true,\n      \"SuspensionJointReceivesForce\":
-    false\n    },\n    {\n      \"$type\": \"HereticalSolutions.HorizonRun.Wheel3DComponent,
+    false\n    },\n    {\n      \"$type\": \"HereticalSolutions.Templates.Universal.Unity.Wheel3DComponent,
     Assembly-CSharp\",\n      \"Radius\": 0.78,\n      \"Width\": 0.78,\n      \"Force\":
     {\n        \"x\": 0.0,\n        \"y\": 0.0,\n        \"z\": 0.0,\n        \"magnitude\":
     0.0,\n        \"sqrMagnitude\": 0.0\n      }\n    }\n  ]\n}"

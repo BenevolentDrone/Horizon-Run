@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: Wheel (view)
   m_EditorClassIdentifier: 
   EntityJson: "{\n  \"PrototypeID\": \"Wheel\",\n  \"Components\": [\n    {\n     
-    \"$type\": \"HereticalSolutions.HorizonRun.Suspension3DPresenterComponent, Assembly-CSharp\",\n     
+    \"$type\": \"HereticalSolutions.Templates.Universal.Unity.Suspension3DPresenterComponent, Assembly-CSharp\",\n     
     \"TargetEntity\": {\n        \"IsAlive\": false\n      }\n    },\n    {\n     
-    \"$type\": \"HereticalSolutions.HorizonRun.Suspension3DDebugViewComponent, Assembly-CSharp\",\n     
+    \"$type\": \"HereticalSolutions.Templates.Universal.Unity.Suspension3DDebugViewComponent, Assembly-CSharp\",\n     
     \"SuspensionJointPosition\": {\n        \"x\": 0.0,\n        \"y\": 0.0,\n       
     \"z\": 0.0,\n        \"magnitude\": 0.0,\n        \"sqrMagnitude\": 0.0\n     
     },\n      \"SuspensionAttachmentPosition\": {\n        \"x\": 0.0,\n        \"y\":
@@ -33,9 +33,9 @@ MonoBehaviour:
     0.0,\n        \"sqrMagnitude\": 0.0\n      },\n      \"SuspensionLatteralError\":
     {\n        \"x\": 0.0,\n        \"y\": 0.0,\n        \"z\": 0.0,\n        \"magnitude\":
     0.0,\n        \"sqrMagnitude\": 0.0\n      },\n      \"SpringCompressionNormalized\":
-    0.0\n    },\n    {\n      \"$type\": \"HereticalSolutions.HorizonRun.Wheel3DPresenterComponent,
+    0.0\n    },\n    {\n      \"$type\": \"HereticalSolutions.Templates.Universal.Unity.Wheel3DPresenterComponent,
     Assembly-CSharp\",\n      \"TargetEntity\": {\n        \"IsAlive\": false\n     
-    }\n    },\n    {\n      \"$type\": \"HereticalSolutions.HorizonRun.Wheel3DDebugViewComponent,
+    }\n    },\n    {\n      \"$type\": \"HereticalSolutions.Templates.Universal.Unity.Wheel3DDebugViewComponent,
     Assembly-CSharp\",\n      \"WheelPosition\": {\n        \"x\": 0.0,\n       
     \"y\": 0.0,\n        \"z\": 0.0,\n        \"magnitude\": 0.0,\n        \"sqrMagnitude\":
     0.0\n      },\n      \"WheelRotation\": {\n        \"x\": 0.0,\n        \"y\":

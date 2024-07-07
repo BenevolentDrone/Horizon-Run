@@ -1,9 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Reflection;
-using System.Runtime.InteropServices;
 
-using HereticalSolutions.Repositories;
 using HereticalSolutions.Repositories.Factories;
 
 using HereticalSolutions.Logging;
@@ -245,11 +242,11 @@ namespace HereticalSolutions.Entities.Factories
         #region Subaddress manager
 
         public static SubaddressManager BuildSubaddressManager(
-            ILogger logger = null)
+            ILoggerResolver loggerResolver = null)
         {
             return new SubaddressManager(
                 RepositoriesFactory.BuildDictionaryOneToOneMap<string, ushort>(),
-                logger);
+                loggerResolver?.GetLogger<SubaddressManager>());
         }
 
         #endregion

@@ -15,5 +15,5 @@ MonoBehaviour:
   EntityJson: "{\n  \"PrototypeID\": \"LMB click\",\n  \"Components\": [\n    {\n     
     \"$type\": \"HereticalSolutions.Entities.SpawnPooledGameObjectViewComponent,
     Core\",\n      \"Address\": \"LMB click view\"\n    },\n    {\n      \"$type\":
-    \"HereticalSolutions.HorizonRun.LMBClickPresenterComponent, Assembly-CSharp\"\n   
+    \"HereticalSolutions.Templates.Universal.Unity.LMBClickPresenterComponent, Assembly-CSharp\"\n   
     }\n  ]\n}"

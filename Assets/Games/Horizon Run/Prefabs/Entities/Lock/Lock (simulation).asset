@@ -15,6 +15,6 @@ MonoBehaviour:
   EntityJson: "{\n  \"PrototypeID\": \"Lock\",\n  \"Components\": [\n    {\n     
     \"$type\": \"HereticalSolutions.Entities.HierarchyComponent, Core\",\n      \"Parent\":
     {\n        \"IsAlive\": false\n      },\n      \"ChildrenListHandle\": 0\n   
-    },\n    {\n      \"$type\": \"HereticalSolutions.HorizonRun.LockComponent, Assembly-CSharp\",\n     
+    },\n    {\n      \"$type\": \"HereticalSolutions.Templates.Universal.Unity.LockComponent, Assembly-CSharp\",\n     
     \"PreviousLink\": {\n        \"IsAlive\": false\n      },\n      \"NextLink\":
     {\n        \"IsAlive\": false\n      }\n    }\n  ]\n}"

@@ -15,5 +15,5 @@ MonoBehaviour:
   EntityJson: "{\n  \"PrototypeID\": \"Virtual camera\",\n  \"Components\": [\n   
     {\n      \"$type\": \"HereticalSolutions.Entities.SpawnPooledGameObjectViewComponent,
     Core\",\n      \"Address\": \"Virtual camera view\"\n    },\n    {\n      \"$type\":
-    \"HereticalSolutions.HorizonRun.VirtualCameraPresenterComponent, Assembly-CSharp\",\n     
+    \"HereticalSolutions.Templates.Universal.Unity.VirtualCameraPresenterComponent, Assembly-CSharp\",\n     
     \"TargetEntity\": {\n        \"IsAlive\": false\n      }\n    }\n  ]\n}"

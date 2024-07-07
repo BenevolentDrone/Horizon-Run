@@ -1,17 +1,14 @@
 using System;
-//using System.Collections.Generic;
-
 using HereticalSolutions.Pools;
-
-//using HereticalSolutions.Repositories;
-
-//using HereticalSolutions.SpacePartitioning;
 
 using HereticalSolutions.Time;
 
 using HereticalSolutions.Synchronization;
 
 using HereticalSolutions.Entities;
+
+using HereticalSolutions.Templates.Universal;
+using HereticalSolutions.Templates.Universal.Unity;
 
 using HereticalSolutions.Logging;
 
@@ -32,7 +29,7 @@ namespace HereticalSolutions.HorizonRun.DI
 		private ILoggerResolver loggerResolver;
 
 		[Inject]
-		private EEntityAuthoringPresets authoringPreset;
+		private EntityAuthoringSettings entityAuthoringSettings;
 
 		[Inject(Id = "Main render camera")]
 		private Camera mainRenderCamera;
@@ -47,7 +44,7 @@ namespace HereticalSolutions.HorizonRun.DI
 		private DefaultECSEntityListManager entityListManager;
 
 		[Inject]
-		private HorizonRunEntityManager entityManager;
+		private UniversalTemplateEntityManager entityManager;
 		
 		[Inject]
 		private IEventEntityBuilder<Entity, Guid> eventEntityBuilder;
@@ -77,25 +74,17 @@ namespace HereticalSolutions.HorizonRun.DI
 		private INonAllocDecoratedPool<GameObject> gameObjectPool;
 
 
-		/*
-		[SerializeField]
-		private SystemSettings systemSettings;
-		*/
-
         [SerializeField]
-        private HorizonRunSimulationBehaviour simulationBehaviour;
+        private UniversalTemplateSimulationBehaviour simulationBehaviour;
 
 		[SerializeField]
 		private Transform hudCanvasTransform;
         
-		/*
-        [SerializeField]
-        private HorizonRunTimeSynchronizationBehaviour timeSynchronizationBehaviour;
-		*/
-
 		public override void InstallBindings()
 		{
 			var logger = loggerResolver?.GetLogger<SystemsInstaller>();
+
+			var authoringPreset = entityAuthoringSettings.AuthoringPreset;
 
 			bool includeSimulationWorld = authoringPreset != EEntityAuthoringPresets.NONE;
 			
@@ -250,7 +239,7 @@ namespace HereticalSolutions.HorizonRun.DI
 				fixedUpdateSystems,
 				lateUpdateSystems,
 				
-				loggerResolver?.GetLogger<HorizonRunSimulationBehaviour>());
+				loggerResolver?.GetLogger<UniversalTemplateSimulationBehaviour>());
 
 			simulationBehaviour.StartSimulation();
 		}

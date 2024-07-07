@@ -15,5 +15,5 @@ MonoBehaviour:
   EntityJson: "{\n  \"PrototypeID\": \"Cursor switcher\",\n  \"Components\": [\n   
     {\n      \"$type\": \"HereticalSolutions.Entities.SpawnPooledGameObjectViewComponent,
     Core\",\n      \"Address\": \"Cursor switcher view\"\n    },\n    {\n      \"$type\":
-    \"HereticalSolutions.HorizonRun.CursorSwitcherPresenterComponent, Assembly-CSharp\",\n     
+    \"HereticalSolutions.Templates.Universal.Unity.CursorSwitcherPresenterComponent, Assembly-CSharp\",\n     
     \"TargetEntity\": {\n        \"IsAlive\": false\n      }\n    }\n  ]\n}"

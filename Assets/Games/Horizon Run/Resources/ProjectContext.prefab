@@ -706,7 +706,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d30dfcdecd3fc7c7b9fd074c6be7c8b6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enableLoggingByDefault: 1
+  loggingSettings: {fileID: 11400000, guid: 81db0bf50d0d80b2fa64da82b0632727, type: 2}
 --- !u!1 &8770109783334679225
 GameObject:
   m_ObjectHideFlags: 0

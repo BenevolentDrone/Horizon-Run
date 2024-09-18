@@ -1,10 +1,11 @@
-using UnityEngine;
+using HereticalSolutions.Allocations;
 
-using HereticalSolutions.Collections;
+using UnityEngine;
 
 namespace HereticalSolutions.Pools.AllocationCallbacks
 {
-	public class RenameByStringAndIndexCallback : IAllocationCallback<GameObject>
+	public class RenameByStringAndIndexCallback
+		: IAllocationCallback<GameObject>
 	{
 		private readonly string name;
 
@@ -16,17 +17,14 @@ namespace HereticalSolutions.Pools.AllocationCallbacks
 		}
 
 		public void OnAllocated(
-			IPoolElement<GameObject> currentElement)
+			GameObject instance)
 		{
-			if (currentElement.Value == null)
+			if (instance == null)
 				return;
 
-			if (currentElement.Metadata.Get<IIndexed>().Index == -1)
-			{
-				currentElement.Value.name = $"{name} {index.ToString()}";
+			instance.name = $"{name} {index.ToString()}";
 
-				index++;
-			}
+			index++;
 		}
 	}
 }

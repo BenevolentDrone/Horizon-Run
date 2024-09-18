@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 using HereticalSolutions.Allocations.Factories;
 
@@ -12,27 +13,32 @@ namespace HereticalSolutions.Time
 {
 	public class TimerManager
 		: ITimerManager,
-		  ICleanUppable,
+		  ICleanuppable,
 		  IDisposable
 	{
 		private readonly string timerManagerID;
 
 
-		private readonly IRepository<ushort, IPoolElement<TimerWithSubscriptionsContainer>> timerContainersRepository;
+		private readonly IRepository<int, IPoolElementFacade<TimerWithSubscriptionsContainer>> timerContainersRepository;
 
-		private readonly INonAllocDecoratedPool<TimerWithSubscriptionsContainer> timerContainersPool;
+		private readonly IRepository<string, List<DurationHandlePair>> sharedTimerHandleRepository;
+		
+		private readonly IManagedPool<TimerWithSubscriptionsContainer> timerContainersPool;
 
 		private readonly bool renameTimersOnPop;
 		
 		public TimerManager(
 			string timerManagerID,
-			IRepository<ushort, IPoolElement<TimerWithSubscriptionsContainer>> timerContainersRepository,
-			INonAllocDecoratedPool<TimerWithSubscriptionsContainer> timerContainersPool,
+			IRepository<int, IPoolElementFacade<TimerWithSubscriptionsContainer>> timerContainersRepository,
+			IRepository<string, List<DurationHandlePair>> sharedTimerHandleRepository,
+			IManagedPool<TimerWithSubscriptionsContainer> timerContainersPool,
 			bool renameTimersOnPop = true)
 		{
 			this.timerManagerID = timerManagerID;
 
 			this.timerContainersRepository = timerContainersRepository;
+			
+			this.sharedTimerHandleRepository = sharedTimerHandleRepository;
 
 			this.timerContainersPool = timerContainersPool;
 
@@ -66,13 +72,27 @@ namespace HereticalSolutions.Time
 			var timerContainer = pooledTimerContainer.Value;
 
 			timer = timerContainer.Timer;
-			
-			timer.OnStart.Subscribe(
-				timerContainer.StartTimerSubscription);
-			
-			timer.OnFinish.Subscribe(
-				timerContainer.FinishTimerSubscription);
 
+			if (!timerContainer.StartTimerSubscription.Active)
+			{
+				timerContainer.OnStartPrivateSubscribable.Subscribe(
+					timerContainer.StartTimerSubscription);
+			}
+
+			if (!timerContainer.FinishTimerSubscription.Active)
+			{
+				timerContainer.OnFinishPrivateSubscribable.Subscribe(
+					timerContainer.FinishTimerSubscription);
+			}
+
+			timer.Accumulate = false;
+			
+			timer.Repeat = false;
+
+			timer.FlushTimeElapsedOnRepeat = false;
+
+			timer.FireRepeatCallbackOnFinish = true;
+			
 			if (renameTimersOnPop)
 			{
 				var renameableTimer = timerContainer.Timer as IRenameableTimer;
@@ -84,6 +104,88 @@ namespace HereticalSolutions.Time
 					renameableTimer.ID = timerStringID;
 				}
 			}
+
+			return true;
+		}
+
+		public bool GetOrCreateSharedTimer(
+			string timerID,
+			float expectedDuration,
+			out ushort timerHandle,
+			out IRuntimeTimer timer,
+			out bool newInstance)
+		{
+			if (sharedTimerHandleRepository.TryGet(
+				timerID,
+				out var sharedTimers))
+			{
+				foreach (var candidate in sharedTimers)
+				{
+					if (Math.Abs(candidate.Duration - expectedDuration) < MathHelpers.EPSILON)
+					{
+						timerHandle = candidate.Handle;
+						
+						if (!TryGetTimer(
+							timerHandle,
+							out timer))
+						{
+							CreateTimer(
+								out timerHandle,
+								out timer);
+							
+							candidate.Handle = timerHandle;
+						
+							newInstance = true;
+							
+							return true;
+						}
+						
+						newInstance = false;
+
+						return true;
+					}
+				}
+				
+				CreateTimer(
+					out timerHandle,
+					out timer);
+				
+				sharedTimers.Add(
+					new DurationHandlePair
+					{
+						Duration = expectedDuration,
+						Handle = timerHandle
+					});
+
+				newInstance = true;
+				
+				if (timer is IRenameableTimer)
+					(timer as IRenameableTimer).ID = timerID;
+
+				return true;
+			}
+			
+			CreateTimer(
+				out timerHandle,
+				out timer);
+
+			newInstance = true;
+            
+			if (timer is IRenameableTimer)
+				(timer as IRenameableTimer).ID = timerID;
+			
+			var sharedTimersList = new List<DurationHandlePair>
+			{
+				new DurationHandlePair
+				{
+					Duration = expectedDuration,
+					Handle = timerHandle
+				}
+			};
+			
+			sharedTimerHandleRepository.Add(
+				timerID,
+				sharedTimersList);
 
 			return true;
 		}
@@ -121,6 +223,8 @@ namespace HereticalSolutions.Time
 			
 			timer.FlushTimeElapsedOnRepeat = false;
 
+			timer.FireRepeatCallbackOnFinish = true;
+
 			//pooledTimerContainer.Value.Timer.OnStart.Unsubscribe(
 			//	pooledTimerContainer.Value.StartTimerSubscription);
 			
@@ -131,9 +235,27 @@ namespace HereticalSolutions.Time
 			//	(pooledTimerContainer.Value.Timer as ICleanUppable).Cleanup();
 			
 			pooledTimerContainer.Value.Timer.OnStart.UnsubscribeAll();
+
+			if (pooledTimerContainer.Value.StartTimerSubscription.Active)
+			{
+				pooledTimerContainer.Value.OnStartPrivateSubscribable.Unsubscribe(
+					pooledTimerContainer.Value.StartTimerSubscription);
+			}
+
+			pooledTimerContainer.Value.Timer.OnStartRepeated.UnsubscribeAll();
+			
 			
 			pooledTimerContainer.Value.Timer.OnFinish.UnsubscribeAll();
+			
+			if (!pooledTimerContainer.Value.FinishTimerSubscription.Active)
+			{
+				pooledTimerContainer.Value.OnFinishPrivateSubscribable.Unsubscribe(
+					pooledTimerContainer.Value.FinishTimerSubscription);
+			}
+			
+			pooledTimerContainer.Value.Timer.OnFinishRepeated.UnsubscribeAll();
 
+			
 			pooledTimerContainer.Push();
 
 			timerContainersRepository.TryRemove(timerHandle);
@@ -148,11 +270,11 @@ namespace HereticalSolutions.Time
 
 		public void Cleanup()
 		{
-			if (timerContainersRepository is ICleanUppable)
-				(timerContainersRepository as ICleanUppable).Cleanup();
+			if (timerContainersRepository is ICleanuppable)
+				(timerContainersRepository as ICleanuppable).Cleanup();
 
-			if (timerContainersPool is ICleanUppable)
-				(timerContainersPool as ICleanUppable).Cleanup();
+			if (timerContainersPool is ICleanuppable)
+				(timerContainersPool as ICleanuppable).Cleanup();
 		}
 
 		#endregion

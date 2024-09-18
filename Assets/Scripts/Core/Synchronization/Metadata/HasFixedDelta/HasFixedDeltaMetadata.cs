@@ -14,7 +14,7 @@ namespace HereticalSolutions.Synchronization
 	public class HasFixedDeltaMetadata<TDelta>
 		: IHasFixedDelta<TDelta>,
 		  IPublisherDependencyRecipient<TDelta>,
-		  ICleanUppable,
+		  ICleanuppable,
 		  IDisposable
 	{
 		private readonly IRuntimeTimer fixedDeltaTimer;
@@ -51,13 +51,15 @@ namespace HereticalSolutions.Synchronization
 
 			fixedDeltaTimer.FlushTimeElapsedOnRepeat = false;
 
+			fixedDeltaTimer.FireRepeatCallbackOnFinish = false;
+
 			fixedDeltaTimer.Reset(
 				deltaToFloatDelegate(
 					FixedDelta));
 
 			fixedDeltaTimer.Start();
 
-			fixedDeltaTimer.OnFinish.Subscribe(
+			fixedDeltaTimer.OnFinishRepeated.Subscribe(
 				(ISubscriptionHandler<
 					INonAllocSubscribableSingleArgGeneric<IRuntimeTimer>,
 					IInvokableSingleArgGeneric<IRuntimeTimer>>)
@@ -109,14 +111,14 @@ namespace HereticalSolutions.Synchronization
 
 		public void Cleanup()
 		{
-			if (broadcasterAsPublisher is ICleanUppable)
-				(broadcasterAsPublisher as ICleanUppable).Cleanup();
+			if (broadcasterAsPublisher is ICleanuppable)
+				(broadcasterAsPublisher as ICleanuppable).Cleanup();
 
-			if (synchronizeFixedScubscription is ICleanUppable)
-				(synchronizeFixedScubscription as ICleanUppable).Cleanup();
+			if (synchronizeFixedScubscription is ICleanuppable)
+				(synchronizeFixedScubscription as ICleanuppable).Cleanup();
 
-			if (fixedDeltaTimer is ICleanUppable)
-				(fixedDeltaTimer as ICleanUppable).Cleanup();
+			if (fixedDeltaTimer is ICleanuppable)
+				(fixedDeltaTimer as ICleanuppable).Cleanup();
 		}
 
 		#endregion

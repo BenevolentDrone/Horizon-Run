@@ -1,3 +1,7 @@
+using HereticalSolutions.Entities;
+
+using ILogger = HereticalSolutions.Logging.ILogger;
+
 using UnityEngine;
 
 using DefaultEcs;
@@ -7,8 +11,14 @@ namespace HereticalSolutions.Templates.Universal.Unity
 {
 	public class Suspension3DDebugPresenterSystem : AEntitySetSystem<float>
 	{
+		private readonly DefaultECSEntityHierarchyManager entityHierarchyManager;
+
+		private readonly ILogger logger;
+
 		public Suspension3DDebugPresenterSystem(
-			World world)
+			World world,
+			DefaultECSEntityHierarchyManager entityHierarchyManager,
+			ILogger logger = null)
 			: base(
 				world
 					.GetEntities()
@@ -16,6 +26,9 @@ namespace HereticalSolutions.Templates.Universal.Unity
 					.With<Suspension3DDebugViewComponent>()
 					.AsSet())
 		{
+			this.entityHierarchyManager = entityHierarchyManager;
+
+			this.logger = logger;
 		}
 
 		protected override void Update(
@@ -38,7 +51,10 @@ namespace HereticalSolutions.Templates.Universal.Unity
 
 			var suspensionComponent = targetEntity.Get<Suspension3DComponent>();
 
-			var parentTRSMatrix = TransformHelpers.GetParentTRSMatrix(targetEntity);
+			var parentTRSMatrix = TransformHelpers.GetParentTRSMatrix(
+				targetEntity,
+				entityHierarchyManager,
+				logger);
 
 			//Get spring vector
 			Vector3 springAttachmentWorldPosition = TransformHelpers.GetWorldPosition3D(

@@ -7,7 +7,7 @@ using HereticalSolutions.Metadata.Allocations;
 
 namespace HereticalSolutions.Metadata.Factories
 {
-	public static partial class MetadataFactory
+	public static class MetadataFactory
 	{
 		public static IReadOnlyObjectRepository BuildTypeToObjectMetadataRepository(
 			MetadataAllocationDescriptor[] metadataDescriptors)
@@ -22,7 +22,8 @@ namespace HereticalSolutions.Metadata.Factories
 
 					repository.Add(
 						descriptor.BindingType,
-						AllocationsFactory.ActivatorAllocationDelegate(descriptor.ConcreteType));
+						AllocationsFactory.ActivatorAllocationDelegate(
+							descriptor.ConcreteType));
 				}
 
 			return repository;

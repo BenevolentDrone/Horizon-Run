@@ -1,5 +1,7 @@
 using System;
 
+using HereticalSolutions.LifetimeManagement;
+
 using HereticalSolutions.MVVM.View;
 
 using HereticalSolutions.Logging;
@@ -10,7 +12,10 @@ using UnityEngine.UIElements;
 
 namespace HereticalSolutions.MVVM.UIToolkit
 {
-    public class BackgroundColorView : AView
+    public class BackgroundColorView
+        : AView,
+          IInitializable,
+          ICleanuppable
     {
         protected string propertyID;
         
@@ -32,18 +37,20 @@ namespace HereticalSolutions.MVVM.UIToolkit
             this.visualElement = visualElement;
         }
 
-        protected override void InitializeInternal(object[] args)
+        public bool Initialize(object[] args)
         {
             if (!viewModel.GetObservable<Color>(
                 propertyID,
                 out colorProperty))
                 throw new Exception(
-                    logger.TryFormat<BackgroundColorView>(
+                    logger.TryFormatException<BackgroundColorView>(
                         $"Could not obtain property \"{propertyID}\" from ViewModel \"{viewModel.GetType()}\""));
             
             colorProperty.OnValueChanged += OnColorChanged;
 
             OnColorChanged(colorProperty.Value);
+
+            return true;
         }
         
         protected void OnColorChanged(Color newValue)
@@ -51,7 +58,7 @@ namespace HereticalSolutions.MVVM.UIToolkit
             visualElement.style.backgroundColor = newValue;
         }
 
-        protected override void CleanupInternal()
+        public void Cleanup()
         {
             if (colorProperty != null)
             {
@@ -59,8 +66,6 @@ namespace HereticalSolutions.MVVM.UIToolkit
 
                 colorProperty = null;
             }
-
-            base.CleanupInternal();
         }
     }
 }

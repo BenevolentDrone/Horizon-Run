@@ -118,7 +118,7 @@ namespace HereticalSolutions.StateMachines
         {
             if (!states.TryGet(typeof(TConcreteState), out var result))
                 throw new Exception(
-                    logger.TryFormat(
+                    logger.TryFormatException(
                         GetType(),
                         $"STATE {typeof(TConcreteState).Name} NOT FOUND"));
 
@@ -134,7 +134,7 @@ namespace HereticalSolutions.StateMachines
         {
             if (!states.TryGet(stateType, out var result))
                 throw new Exception(
-                    logger.TryFormat(
+                    logger.TryFormatException(
                         GetType(),
                         $"STATE {stateType.Name} NOT FOUND"));
 
@@ -167,7 +167,7 @@ namespace HereticalSolutions.StateMachines
 
             if (!events.TryGet(typeof(TEvent), out @event))
                 throw new Exception(
-                    logger.TryFormat(
+                    logger.TryFormatException(
                         GetType(),
                         $"EVENT {typeof(TEvent).Name} NOT FOUND"));
 
@@ -218,7 +218,7 @@ namespace HereticalSolutions.StateMachines
 
             if (!events.TryGet(eventType, out @event))
                 throw new Exception(
-                    logger.TryFormat(
+                    logger.TryFormatException(
                         GetType(),
                         $"EVENT {eventType.Name} NOT FOUND"));
 
@@ -270,7 +270,7 @@ namespace HereticalSolutions.StateMachines
 
             if (!events.TryGet(typeof(TEvent), out @event))
                 throw new Exception(
-                    logger.TryFormat(
+                    logger.TryFormatException(
                         GetType(),
                         $"EVENT {typeof(TEvent).Name} NOT FOUND"));
 
@@ -325,7 +325,7 @@ namespace HereticalSolutions.StateMachines
 
             if (!events.TryGet(eventType, out @event))
                 throw new Exception(
-                    logger.TryFormat(
+                    logger.TryFormatException(
                         GetType(),
                         $"EVENT {eventType.Name} NOT FOUND"));
 
@@ -384,7 +384,7 @@ namespace HereticalSolutions.StateMachines
         {
             if (!states.Has(typeof(TState)))
                 throw new Exception(
-                    logger.TryFormat(
+                    logger.TryFormatException(
                         GetType(),
                         $"STATE {typeof(TState).Name} NOT FOUND"));
 
@@ -435,7 +435,7 @@ namespace HereticalSolutions.StateMachines
         {
             if (!states.Has(stateType))
                 throw new Exception(
-                    logger.TryFormat(
+                    logger.TryFormatException(
                         GetType(),
                         $"STATE {stateType.Name} NOT FOUND"));
 
@@ -487,7 +487,7 @@ namespace HereticalSolutions.StateMachines
         {
             if (!states.Has(typeof(TState)))
                 throw new Exception(
-                    logger.TryFormat(
+                    logger.TryFormatException(
                         GetType(),
                         $"STATE {typeof(TState).Name} NOT FOUND"));
 
@@ -540,7 +540,7 @@ namespace HereticalSolutions.StateMachines
         {
             if (!states.Has(stateType))
                 throw new Exception(
-                    logger.TryFormat(
+                    logger.TryFormatException(
                         GetType(),
                         $"STATE {stateType.Name} NOT FOUND"));
 
@@ -677,7 +677,7 @@ namespace HereticalSolutions.StateMachines
                 string fromStateString = @event.From.GetType().Name;
 
                 throw new Exception(
-                    logger.TryFormat(
+                    logger.TryFormatException(
                         GetType(),
                         $"CURRENT STATE {currentStateString} IS NOT EQUAL TO TRANSITION FROM STATE {fromStateString}"));
             }

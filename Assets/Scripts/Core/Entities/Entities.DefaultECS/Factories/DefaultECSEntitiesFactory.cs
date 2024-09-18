@@ -1,7 +1,17 @@
 using System;
 using System.Collections.Generic;
 
+using HereticalSolutions.Allocations;
+using HereticalSolutions.Allocations.Factories;
+
 using HereticalSolutions.Repositories.Factories;
+
+using HereticalSolutions.Pools;
+using HereticalSolutions.Pools.Factories;
+
+using HereticalSolutions.Hierarchy;
+
+using HereticalSolutions.Relations;
 
 using HereticalSolutions.Logging;
 
@@ -14,13 +24,10 @@ namespace HereticalSolutions.Entities.Factories
     /// </summary>
     public static partial class DefaultECSEntityFactory
     {
-        /*
-        public delegate void ComponentReaderDelegate<TComponent>(
-            Entity entity,
-            IReadOnlyRepository<Type, int> typeToHash,
-            List<ECSComponentDTO> componentDTOs);
-        */
-
+        private const int INITIAL_ENTITY_LIST_POOL_CAPACITY = 5;
+        
+        private const int ADDITIONAL_ENTITY_LIST_POOL_CAPACITY = 5;
+        
         #region Entity manager
 
         public static DefaultECSEntityManager<TEntityID> BuildDefaultECSSimpleEntityManager<TEntityID, TEntityIDComponent>(
@@ -207,6 +214,159 @@ namespace HereticalSolutions.Entities.Factories
 
         #endregion
 
+        #region Entity list manager
+
+        public static DefaultECSEntityListManager BuildDefaultECSEntityListManager(
+            ILoggerResolver loggerResolver = null)
+        {
+            Func<List<Entity>> valueAllocationDelegate =
+                AllocationsFactory.ActivatorAllocationDelegate<List<Entity>>;
+
+            var initialAllocationCommand = new AllocationCommand<List<Entity>>
+            {
+                Descriptor = new AllocationCommandDescriptor
+                {
+                    Rule = EAllocationAmountRule.ADD_PREDEFINED_AMOUNT,
+
+                    Amount = INITIAL_ENTITY_LIST_POOL_CAPACITY
+                },
+                AllocationDelegate = valueAllocationDelegate
+            };
+            
+            var additionalAllocationCommand = new AllocationCommand<List<Entity>>
+            {
+                Descriptor = new AllocationCommandDescriptor
+                {
+                    Rule = EAllocationAmountRule.ADD_PREDEFINED_AMOUNT,
+                    
+                    Amount = ADDITIONAL_ENTITY_LIST_POOL_CAPACITY
+                },
+                AllocationDelegate = valueAllocationDelegate
+            };
+            
+            return new DefaultECSEntityListManager(
+                RepositoriesFactory.BuildDictionaryRepository<ushort, List<Entity>>(),
+                new Queue<ushort>(),
+                (handle) => { return ++handle; },
+                //() => AllocationsFactory.ActivatorAllocationDelegate<List<Entity>>(),
+                new PoolWithListCleanup<List<Entity>>(
+                    StackPoolFactory.BuildStackPool<List<Entity>>(
+                        initialAllocationCommand,
+                        additionalAllocationCommand,
+                        loggerResolver)),
+                loggerResolver?.GetLogger<DefaultECSEntityListManager>());
+        }
+
+        #endregion
+        
+        #region Entity hierarchy manager
+
+        public static DefaultECSEntityHierarchyManager BuildDefaultECSEntityHierarchyManager(
+            ILoggerResolver loggerResolver = null)
+        {
+            Func<IReadOnlyHierarchyNode<Entity>> valueAllocationDelegate =
+                () => AllocationsFactory.FuncAllocationDelegate<IReadOnlyHierarchyNode<Entity>, HierarchyNode<Entity>>(
+                    () =>
+                    {
+                        return new HierarchyNode<Entity>(
+                            new List<IReadOnlyHierarchyNode<Entity>>());
+                    });
+
+            var initialAllocationCommand = new AllocationCommand<IReadOnlyHierarchyNode<Entity>>
+            {
+                Descriptor = new AllocationCommandDescriptor
+                {
+                    Rule = EAllocationAmountRule.ADD_PREDEFINED_AMOUNT,
+
+                    Amount = INITIAL_ENTITY_LIST_POOL_CAPACITY
+                },
+                AllocationDelegate = valueAllocationDelegate
+            };
+            
+            var additionalAllocationCommand = new AllocationCommand<IReadOnlyHierarchyNode<Entity>>
+            {
+                Descriptor = new AllocationCommandDescriptor
+                {
+                    Rule = EAllocationAmountRule.ADD_PREDEFINED_AMOUNT,
+                    
+                    Amount = ADDITIONAL_ENTITY_LIST_POOL_CAPACITY
+                },
+                AllocationDelegate = valueAllocationDelegate
+            };
+            
+            return new DefaultECSEntityHierarchyManager(
+                RepositoriesFactory.BuildDictionaryRepository<ushort, IReadOnlyHierarchyNode<Entity>>(),
+                new Queue<ushort>(),
+                (handle) => { return ++handle; },
+                //() => AllocationsFactory.FuncAllocationDelegate<IReadOnlyHierarchyNode<Entity>>(
+                //    () =>
+                //    {
+                //        return new HierarchyNode<Entity>(
+                //            new List<IReadOnlyHierarchyNode<Entity>>());
+                //    }),
+                new PoolWithCleanup<IReadOnlyHierarchyNode<Entity>>(
+                    StackPoolFactory.BuildStackPool<IReadOnlyHierarchyNode<Entity>>(
+                        initialAllocationCommand,
+                        additionalAllocationCommand,
+                        loggerResolver)),
+                loggerResolver?.GetLogger<DefaultECSEntityHierarchyManager>());
+        }
+
+        #endregion
+        
+        #region Entity relations manager
+
+        public static DefaultECSEntityRelationsManager BuildDefaultECSEntityRelationsManager(
+            ILoggerResolver loggerResolver = null)
+        {
+            Func<IReadOnlyDirectedNamedGraphNode<Entity>> valueAllocationDelegate =
+                () => AllocationsFactory.FuncAllocationDelegate<
+                    IReadOnlyDirectedNamedGraphNode<Entity>,
+                    DirectedNamedGraphNode<Entity>>(
+                    () =>
+                    {
+                        return new DirectedNamedGraphNode<Entity>(
+                            RepositoriesFactory
+                                .BuildDictionaryRepository<string, IReadOnlyDirectedNamedGraphNode<Entity>>(),
+                            new List<RelationDTO<Entity>>());
+                    });
+
+            var initialAllocationCommand = new AllocationCommand<IReadOnlyDirectedNamedGraphNode<Entity>>
+            {
+                Descriptor = new AllocationCommandDescriptor
+                {
+                    Rule = EAllocationAmountRule.ADD_PREDEFINED_AMOUNT,
+
+                    Amount = INITIAL_ENTITY_LIST_POOL_CAPACITY
+                },
+                AllocationDelegate = valueAllocationDelegate
+            };
+            
+            var additionalAllocationCommand = new AllocationCommand<IReadOnlyDirectedNamedGraphNode<Entity>>
+            {
+                Descriptor = new AllocationCommandDescriptor
+                {
+                    Rule = EAllocationAmountRule.ADD_PREDEFINED_AMOUNT,
+                    
+                    Amount = ADDITIONAL_ENTITY_LIST_POOL_CAPACITY
+                },
+                AllocationDelegate = valueAllocationDelegate
+            };
+            
+            return new DefaultECSEntityRelationsManager(
+                RepositoriesFactory.BuildDictionaryRepository<ushort, IReadOnlyDirectedNamedGraphNode<Entity>>(),
+                new Queue<ushort>(),
+                (handle) => { return ++handle; },
+                new PoolWithCleanup<IReadOnlyDirectedNamedGraphNode<Entity>>(
+                    StackPoolFactory.BuildStackPool<IReadOnlyDirectedNamedGraphNode<Entity>>(
+                        initialAllocationCommand,
+                        additionalAllocationCommand,
+                        loggerResolver)),
+                loggerResolver?.GetLogger<DefaultECSEntityRelationsManager>());
+        }
+
+        #endregion
+        
         #region Prototypes repository
 
         public static DefaultECSPrototypesRepository BuildDefaultECSPrototypesRepository()
@@ -242,11 +402,11 @@ namespace HereticalSolutions.Entities.Factories
         #region Subaddress manager
 
         public static SubaddressManager BuildSubaddressManager(
-            ILoggerResolver loggerResolver = null)
+            ILogger logger = null)
         {
             return new SubaddressManager(
                 RepositoriesFactory.BuildDictionaryOneToOneMap<string, ushort>(),
-                loggerResolver?.GetLogger<SubaddressManager>());
+                logger);
         }
 
         #endregion
@@ -261,155 +421,5 @@ namespace HereticalSolutions.Entities.Factories
         }
 
         #endregion
-
-        /*
-        #region Component readers and writers
-
-        public static ReadComponentToDTOsListDelegate[] BuildComponentReaders(
-            MethodInfo readComponentMethodInfo,
-            Type[] componentTypes)
-        {
-            var result = new ReadComponentToDTOsListDelegate[componentTypes.Length];
-
-            for (int i = 0; i < result.Length; i++)
-            {
-                MethodInfo readComponentGeneric = readComponentMethodInfo.MakeGenericMethod(componentTypes[i]);
-                
-                ReadComponentToDTOsListDelegate readComponentGenericDelegate =
-                    (ReadComponentToDTOsListDelegate)readComponentGeneric.CreateDelegate(
-                        typeof(ReadComponentToDTOsListDelegate),
-                        null);
-
-                result[i] = readComponentGenericDelegate;
-            }
-
-            return result;
-        }
-        
-        public static IReadOnlyRepository<Type, WriteComponentFromDTODelegate> BuildComponentWriters(
-            MethodInfo writeComponentMethodInfo,
-            Type[] componentTypes)
-        {
-            IReadOnlyRepository<Type, WriteComponentFromDTODelegate> result = RepositoriesFactory.BuildDictionaryRepository<Type, WriteComponentFromDTODelegate>();
-
-            for (int i = 0; i < componentTypes.Length; i++)
-            {
-                MethodInfo writeComponentGeneric = writeComponentMethodInfo.MakeGenericMethod(componentTypes[i]);
-                
-                WriteComponentFromDTODelegate writeComponentGenericDelegate =
-                    (WriteComponentFromDTODelegate)writeComponentGeneric.CreateDelegate(
-                        typeof(WriteComponentFromDTODelegate),
-                        null);
-
-                ((IRepository<Type, WriteComponentFromDTODelegate>)result).Add(
-                    componentTypes[i],
-                    writeComponentGenericDelegate);
-            }
-
-            return result;
-        }
-        
-        public static void ReadComponentToDTOsList<TComponent>(
-            Entity entity,
-            IReadOnlyRepository<Type, int> typeToHash,
-            List<ECSComponentDTO> componentDTOs)
-        {
-            //Early return for AoT compilation calls
-            if (componentDTOs == null)
-                return;
-            
-            if (!entity.Has<TComponent>())
-            {
-                return;
-            }
-
-            var dto = new ECSComponentDTO();
-            
-            dto.TypeHash = typeToHash.Get(typeof(TComponent));
-            
-            dto.Data = ToBytes(entity.Get<TComponent>());
-            
-            componentDTOs.Add(dto);
-        }
-        
-        public static void WriteComponentFromDTO<TComponent>(
-            Entity entity,
-            ECSComponentDTO componentDTO)
-        {
-            //Early return for AoT compilation calls
-            if (componentDTO.Data == null)
-                return;
-            
-
-            var component = (TComponent)FromBytes(componentDTO.Data, typeof(TComponent));
-            
-            entity.Set<TComponent>(component);
-        }
-
-        public static byte[] ToBytes(object component)
-        {
-            int componentSize = Marshal.SizeOf(component);
-            
-            byte[] result = new byte[componentSize];
-            
-            IntPtr ptr = IntPtr.Zero;
-            
-            try
-            {
-                ptr = Marshal.AllocHGlobal(componentSize);
-                
-                Marshal.StructureToPtr(
-                    component,
-                    ptr,
-                    true);
-                
-                Marshal.Copy(
-                    ptr,
-                    result,
-                    0,
-                    componentSize);
-            }
-            finally
-            {
-                Marshal.FreeHGlobal(ptr);
-            }
-            
-            return result;
-        }
-
-        public static object FromBytes(
-            byte[] data,
-            Type componentType)
-        {
-            object result;
-            
-            int size = Marshal.SizeOf(componentType);
-            
-            IntPtr ptr = IntPtr.Zero;
-            
-            try
-            {
-                ptr = Marshal.AllocHGlobal(size);
-                
-                Marshal.Copy(
-                    data,
-                    0,
-                    ptr,
-                    size);
-                
-                result = Marshal.PtrToStructure(
-                    ptr,
-                    componentType);
-            }
-            finally
-            {
-                Marshal.FreeHGlobal(ptr);
-            }
-            
-            return result;
-        }
-
-        #endregion
-        */
     }
 }

@@ -13,6 +13,8 @@ namespace HereticalSolutions.MVVM.Mono
         [SerializeField]
         protected AViewModelComponent baseViewModel;
 
+        //TODO
+        /*
         public AViewModelComponent BaseViewModel
         {
             get => baseViewModel;
@@ -34,6 +36,7 @@ namespace HereticalSolutions.MVVM.Mono
                 }
             }
         }
+        */
 
         protected AView view;
 
@@ -43,6 +46,8 @@ namespace HereticalSolutions.MVVM.Mono
 
         protected bool started = false;
 
+        //TODO
+        /*
         #region Unity callbacks
 
         protected virtual void Awake()
@@ -76,7 +81,7 @@ namespace HereticalSolutions.MVVM.Mono
             if (isBeingCleanedUp)
                 return;
 
-            var cleanUppableView = view as ICleanUppable;
+            var cleanUppableView = view as ICleanuppable;
 
             cleanUppableView?.Cleanup();
         }
@@ -130,5 +135,6 @@ namespace HereticalSolutions.MVVM.Mono
 
             isBeingTornDown = false;
         }
+        */
     }
 }

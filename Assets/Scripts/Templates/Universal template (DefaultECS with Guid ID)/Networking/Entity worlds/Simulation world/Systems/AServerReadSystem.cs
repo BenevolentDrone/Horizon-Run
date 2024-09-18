@@ -98,7 +98,7 @@ namespace HereticalSolutions.Templates.Universal.Networking
                 out var timer))
             {
                 throw new Exception(
-                    logger.TryFormat(
+                    logger.TryFormatException(
                         GetType(),
                         $"ERROR CREATING TIMER FROM TIME MANAGER {simulationTimerManager.ID}"));
             }

@@ -16,6 +16,6 @@ namespace HereticalSolutions.Templates.Universal.Unity
 
 		public Collider[] Colliders;
 
-		public IPoolElement<GameObject> PoolElement;
+		public IPoolElementFacade<GameObject> PoolElement;
 	}
 }

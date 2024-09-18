@@ -17,5 +17,7 @@ namespace HereticalSolutions.Allocations
         /// Gets or sets the delegate used for the allocation.
         /// </summary>
         public Func<T> AllocationDelegate { get; set; }
+
+        public IAllocationCallback<T> AllocationCallback { get; set; }
     }
 }

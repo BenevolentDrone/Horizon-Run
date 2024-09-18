@@ -6,10 +6,10 @@ namespace HereticalSolutions.AssetImport
 {
 	public interface IAssetImporterPool
 	{
-		Task<IPoolElement<AAssetImporter>> PopImporter<TImporter>()
+		Task<IPoolElementFacade<AAssetImporter>> PopImporter<TImporter>()
 			where TImporter : AAssetImporter;
 
 		Task PushImporter(
-			IPoolElement<AAssetImporter> pooledImporter);
+			IPoolElementFacade<AAssetImporter> pooledImporter);
 	}
 }

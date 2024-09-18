@@ -55,7 +55,7 @@ namespace HereticalSolutions.Persistence
 				default:
 
 					throw new Exception(
-						logger.TryFormat(
+						logger.TryFormatException(
 							GetType(),
 							$"INVALID ARGUMENT TYPE. EXPECTED: \"{typeof(TDTO).Name}\" RECEIVED: \"{DTO.GetType().Name}\""));
 			}
@@ -77,7 +77,7 @@ namespace HereticalSolutions.Persistence
 				default:
 
 					throw new Exception(
-						logger.TryFormat(
+						logger.TryFormatException(
 							GetType(),
 							$"CANNOT CAST RETURN VALUE TYPE \"{typeof(TValue).Name}\" TO TYPE \"{typeof(TArgument).GetType().Name}\""));
 			}
@@ -106,7 +106,7 @@ namespace HereticalSolutions.Persistence
 				default:
 
 					throw new Exception(
-						logger.TryFormat(
+						logger.TryFormatException(
 							GetType(),
 							$"INVALID ARGUMENT TYPE. EXPECTED: \"{typeof(TDTO).Name}\" RECEIVED: \"{typeof(TDTO).Name}\""));
 			}
@@ -128,7 +128,7 @@ namespace HereticalSolutions.Persistence
 				default:
 
 					throw new Exception(
-						logger.TryFormat(
+						logger.TryFormatException(
 							GetType(),
 							$"CANNOT CAST RETURN VALUE TYPE \"{typeof(TValue).Name}\" TO TYPE \"{typeof(TArgument).Name}\""));
 			}
@@ -153,7 +153,7 @@ namespace HereticalSolutions.Persistence
 				default:
 
 					throw new Exception(
-						logger.TryFormat(
+						logger.TryFormatException(
 							GetType(),
 							$"INVALID ARGUMENT TYPE. EXPECTED: \"{typeof(TDTO).Name}\" RECEIVED: \"{DTO.GetType().Name}\""));
 			}
@@ -170,7 +170,7 @@ namespace HereticalSolutions.Persistence
 				default:
 
 					throw new Exception(
-						logger.TryFormat(
+						logger.TryFormatException(
 							GetType(),
 							$"CANNOT CAST RETURN VALUE TYPE \"{typeof(TValue).Name}\" TO TYPE \"{typeof(TArgument).Name}\""));
 			}
@@ -193,7 +193,7 @@ namespace HereticalSolutions.Persistence
 				default:
 
 					throw new Exception(
-						logger.TryFormat(
+						logger.TryFormatException(
 							GetType(),
 							$"INVALID ARGUMENT TYPE. EXPECTED: \"{typeof(TDTO).Name}\" RECEIVED: \"{typeof(TDTO).Name}\""));
 			}
@@ -210,7 +210,7 @@ namespace HereticalSolutions.Persistence
 				default:
 
 					throw new Exception(
-						logger.TryFormat(
+						logger.TryFormatException(
 							GetType(),
 							$"CANNOT CAST RETURN VALUE TYPE \"{typeof(TValue).Name}\" TO TYPE \"{typeof(TArgument).Name}\""));
 			}
@@ -252,7 +252,7 @@ namespace HereticalSolutions.Persistence
 				default:
 
 					throw new Exception(
-						logger.TryFormat(
+						logger.TryFormatException(
 							GetType(),
 							$"INVALID ARGUMENT TYPE. EXPECTED: \"{typeof(TValue).Name}\" RECEIVED: \"{typeof(TArgument).GetType().Name}\""));
 			}
@@ -290,7 +290,7 @@ namespace HereticalSolutions.Persistence
 				default:
 
 					throw new Exception(
-						logger.TryFormat(
+						logger.TryFormatException(
 							GetType(),
 							$"INVALID ARGUMENT TYPE. EXPECTED: \"{typeof(TValue).Name}\" RECEIVED: \"{typeof(TArgument).GetType().Name}\""));
 			}
@@ -312,7 +312,7 @@ namespace HereticalSolutions.Persistence
 				default:
 
 					throw new Exception(
-						logger.TryFormat(
+						logger.TryFormatException(
 							GetType(),
 							$"CANNOT CAST \"{typeof(TDTO).Name}\" TO \"{typeof(TDTO).GetType().Name}\""));
 			}

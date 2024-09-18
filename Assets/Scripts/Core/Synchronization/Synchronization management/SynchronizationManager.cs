@@ -10,7 +10,7 @@ namespace HereticalSolutions.Synchronization
 		: ISynchronizationManager,
 		  ISynchronizablesRepository,
 		  ISynchronizationProvidersRepository,
-		  ICleanUppable,
+		  ICleanuppable,
 		  IDisposable
 	{
 		private readonly IRepository<string, ISynchronizableNoArgs> synchroRepository;
@@ -112,8 +112,8 @@ namespace HereticalSolutions.Synchronization
 
 		public void Cleanup()
 		{
-			if (synchroRepository is ICleanUppable)
-				(synchroRepository as ICleanUppable).Cleanup();
+			if (synchroRepository is ICleanuppable)
+				(synchroRepository as ICleanuppable).Cleanup();
 		}
 
 		#endregion

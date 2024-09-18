@@ -41,7 +41,7 @@ namespace HereticalSolutions.Blackboard
                 
                 default:
                     throw new Exception(
-                        logger.TryFormat(
+                        logger.TryFormatException(
                             "INVALID VALUE TYPE"));
             }
 
@@ -64,7 +64,7 @@ namespace HereticalSolutions.Blackboard
                 return (float)value;
 
             throw new Exception(
-                logger.TryFormat(
+                logger.TryFormatException(
                     $"CANNOT CONVERT VALUE TYPE {valueType} TO float"));
         }
         

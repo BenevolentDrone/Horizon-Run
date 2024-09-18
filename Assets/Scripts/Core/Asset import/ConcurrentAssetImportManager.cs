@@ -37,7 +37,7 @@ namespace HereticalSolutions.AssetImport
 
 		private readonly IRepository<Type, List<AAssetImportPostProcessor>> postProcessorRepository;
 
-		private readonly IRepository<Type, INonAllocDecoratedPool<AAssetImporter>> importerPoolRepository;
+		private readonly IRepository<Type, IManagedPool<AAssetImporter>> importerPoolRepository;
 
 		private readonly SemaphoreSlim importerPoolSemaphore;
 
@@ -49,7 +49,7 @@ namespace HereticalSolutions.AssetImport
 
 		public ConcurrentAssetImportManager(
 			IRepository<Type, List<AAssetImportPostProcessor>> postProcessorRepository,
-			IRepository<Type, INonAllocDecoratedPool<AAssetImporter>> importerPoolRepository,
+			IRepository<Type, IManagedPool<AAssetImporter>> importerPoolRepository,
 			SemaphoreSlim importerPoolSemaphore,
 			SemaphoreSlim postProcessorsSemaphore,
 			ILoggerResolver loggerResolver = null,
@@ -78,7 +78,7 @@ namespace HereticalSolutions.AssetImport
 			logger?.Log<ConcurrentAssetImportManager>($"IMPORTING {typeof(TImporter).Name} INITIATED");
 
 			var importer = await PopImporter<TImporter>()
-				.ThrowExceptions< IPoolElement<AAssetImporter>, AssetImportManager>(
+				.ThrowExceptions< IPoolElementFacade<AAssetImporter>, AssetImportManager>(
 					logger);
 
 			initializationDelegate?.Invoke(
@@ -161,10 +161,10 @@ namespace HereticalSolutions.AssetImport
 
 		#region IAssetImporterPool
 
-		public async Task<IPoolElement<AAssetImporter>> PopImporter<TImporter>()
+		public async Task<IPoolElementFacade<AAssetImporter>> PopImporter<TImporter>()
 			where TImporter : AAssetImporter
 		{
-			INonAllocDecoratedPool<AAssetImporter> importerPool;
+			IManagedPool<AAssetImporter> importerPool;
 
 			await importerPoolSemaphore.WaitAsync();
 
@@ -172,7 +172,7 @@ namespace HereticalSolutions.AssetImport
 			{
 				if (!importerPoolRepository.Has(typeof(TImporter)))
 				{
-					importerPool = PoolsFactory.BuildSimpleResizableObjectPool<AAssetImporter, TImporter>(
+					importerPool = ObjectPoolsFactory.BuildManagedObjectPool<AAssetImporter, TImporter>(
 						initialAllocation,
 						additionalAllocation,
 						loggerResolver,
@@ -201,7 +201,7 @@ namespace HereticalSolutions.AssetImport
 		}
 
 		public async Task PushImporter(
-			IPoolElement<AAssetImporter> pooledImporter)
+			IPoolElementFacade<AAssetImporter> pooledImporter)
 		{
 			pooledImporter.Value.Cleanup();
 

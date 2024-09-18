@@ -436,7 +436,11 @@ namespace HereticalSolutions.Entities.Editor
 					break;
 
 				case Enum enumValue:
-					var enumResult = EditorGUILayout.EnumPopup(fieldName, enumValue);
+					bool hasFlags = valueType.GetCustomAttributes(typeof(FlagsAttribute), false).Length > 0;
+					
+					var enumResult = hasFlags
+						? EditorGUILayout.EnumFlagsField(fieldName, enumValue)
+						: EditorGUILayout.EnumPopup(fieldName, enumValue);
 
 					if (!Equals(enumResult, enumValue))
 					{

@@ -49,15 +49,23 @@ namespace HereticalSolutions.Time
         /// </summary>
         public bool Repeat { get; set; }
         
+        //[Name("FlushTimeElapsedOnRepeat")]
+        //[ProtoMember(6)]
+        public bool FlushTimeElapsedOnRepeat { get; set; }
+        
+        //[Name("FireRepeatCallbackOnFinish")]
+        //[ProtoMember(7)]
+        public bool FireRepeatCallbackOnFinish { get; set; }
+        
         // [Name("CurrentDuration")]
-        // [ProtoMember(6)]
+        // [ProtoMember(8)]
         /// <summary>
         /// Gets or sets the current duration of the timer
         /// </summary>
         public float CurrentDuration { get; set; }
         
         // [Name("DefaultDuration")]
-        // [ProtoMember(7)]
+        // [ProtoMember(9)]
         /// <summary>
         /// Gets or sets the default duration of the timer
         /// </summary>

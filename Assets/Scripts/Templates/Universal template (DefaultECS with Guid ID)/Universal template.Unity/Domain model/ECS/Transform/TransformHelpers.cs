@@ -1,5 +1,7 @@
 using HereticalSolutions.Entities;
 
+using ILogger = HereticalSolutions.Logging.ILogger;
+
 using DefaultEcs;
 
 using UnityEngine;
@@ -13,7 +15,9 @@ namespace HereticalSolutions.Templates.Universal.Unity
 		#region World position 2D
 
 		public static Vector2 GetWorldPosition2D(
-			Entity entity)
+			Entity entity,
+			DefaultECSEntityHierarchyManager entityHierarchyManager,
+			ILogger logger = null)
 		{
 			Vector2 position = Vector2.zero;
 
@@ -24,8 +28,10 @@ namespace HereticalSolutions.Templates.Universal.Unity
 
 			GetParentWorldPositionRotation(
 				entity,
+				entityHierarchyManager,
 				out Vector2 parentPosition,
-				out float parentRotation);
+				out float parentRotation,
+				logger);
 
 			var worldPosition = MathHelpersUnity.GetWorldPosition(
 				parentPosition,
@@ -37,8 +43,10 @@ namespace HereticalSolutions.Templates.Universal.Unity
 
 		public static void GetParentWorldPositionRotation(
 			Entity entity,
+			DefaultECSEntityHierarchyManager entityHierarchyManager,
 			out Vector2 worldPosition,
-			out float worldRotation)
+			out float worldRotation,
+			ILogger logger = null)
 		{
 			worldPosition = Vector2.zero;
 
@@ -46,12 +54,15 @@ namespace HereticalSolutions.Templates.Universal.Unity
 
 			if (entity.Has<HierarchyComponent>())
 			{
-				var hierarchyComponent = entity.Get<HierarchyComponent>();
-
-				if (hierarchyComponent.Parent.IsAlive
-					&& hierarchyComponent.Parent.Has<Transform2DComponent>())
+				if (HierarchyHelpers.TryGetParent(
+					entity,
+					entityHierarchyManager,
+					out var parent,
+					logger)
+					&& parent.IsAlive
+					&& parent.Has<Transform2DComponent>())
 				{
-					var parentTransformComponent = hierarchyComponent.Parent.Get<Transform2DComponent>();
+					var parentTransformComponent = parent.Get<Transform2DComponent>();
 
 					worldPosition = parentTransformComponent.WorldPosition;
 
@@ -110,7 +121,9 @@ namespace HereticalSolutions.Templates.Universal.Unity
 		}
 
 		public static Vector3 GetWorldPosition3D(
-			Entity entity)
+			Entity entity,
+			DefaultECSEntityHierarchyManager entityHierarchyManager,
+			ILogger logger = null)
 		{
 			Vector3 localPosition = Vector3.zero;
 
@@ -133,7 +146,10 @@ namespace HereticalSolutions.Templates.Universal.Unity
 				localRotation,
 				localScale);
 
-			var parentTRSMatrix = GetParentTRSMatrix(entity);
+			var parentTRSMatrix = GetParentTRSMatrix(
+				entity,
+				entityHierarchyManager,
+				logger);
 
 			var worldTransformMatrix = parentTRSMatrix * localTRSMatrix;
 
@@ -144,18 +160,23 @@ namespace HereticalSolutions.Templates.Universal.Unity
 		}
 
 		public static Matrix4x4 GetParentTRSMatrix(
-			Entity entity)
+			Entity entity,
+			DefaultECSEntityHierarchyManager entityHierarchyManager,
+			ILogger logger = null)
 		{
 			Matrix4x4 parentTRSMatrix = Matrix4x4.identity;
 
 			if (entity.Has<HierarchyComponent>())
 			{
-				var hierarchyComponent = entity.Get<HierarchyComponent>();
-
-				if (hierarchyComponent.Parent.IsAlive
-					&& hierarchyComponent.Parent.Has<Transform3DComponent>())
+				if (HierarchyHelpers.TryGetParent(
+					entity,
+					entityHierarchyManager,
+					out var parent,
+					logger)
+					&& parent.IsAlive
+					&& parent.Has<Transform3DComponent>())
 				{
-					var parentTransformComponent = hierarchyComponent.Parent.Get<Transform3DComponent>();
+					var parentTransformComponent = parent.Get<Transform3DComponent>();
 
 					parentTRSMatrix = parentTransformComponent.TRSMatrix;
 				}
@@ -174,7 +195,8 @@ namespace HereticalSolutions.Templates.Universal.Unity
 
 		public static void UpdateTransform2DRecursively(
 			Entity entity,
-			DefaultECSEntityListManager entityListManager)
+			DefaultECSEntityHierarchyManager entityHierarchyManager,
+			ILogger logger = null)
 		{
 			Vector2 parentPosition = Vector2.zero;
 
@@ -182,12 +204,15 @@ namespace HereticalSolutions.Templates.Universal.Unity
 
 			if (entity.Has<HierarchyComponent>())
 			{
-				var hierarchyComponent = entity.Get<HierarchyComponent>();
-
-				if (hierarchyComponent.Parent.IsAlive
-					&& hierarchyComponent.Parent.Has<Transform2DComponent>())
+				if (HierarchyHelpers.TryGetParent(
+					entity,
+					entityHierarchyManager,
+					out var parent,
+					logger)
+					&& parent.IsAlive
+					&& parent.Has<Transform2DComponent>())
 				{
-					var parentTransformComponent = hierarchyComponent.Parent.Get<Transform2DComponent>();
+					var parentTransformComponent = parent.Get<Transform2DComponent>();
 
 					if (parentTransformComponent.Dirty)
 					{
@@ -206,16 +231,18 @@ namespace HereticalSolutions.Templates.Universal.Unity
 
 			UpdateTransform2DRecursively(
 				entity,
-				entityListManager,
+				entityHierarchyManager,
 				parentPosition,
-				parentRotation);
+				parentRotation,
+				logger);
 		}
 
 		public static void UpdateTransform2DRecursively(
 			Entity entity,
-			DefaultECSEntityListManager entityListManager,
+			DefaultECSEntityHierarchyManager entityHierarchyManager,
 			Vector2 parentPosition,
-			float parentRotation)
+			float parentRotation,
+			ILogger logger = null)
 		{
 			ref var transformComponent = ref entity.Get<Transform2DComponent>();
 
@@ -248,15 +275,23 @@ namespace HereticalSolutions.Templates.Universal.Unity
 
 			var hierarchyComponent = entity.Get<HierarchyComponent>();
 
-			if (!entityListManager.TryGetList(
-				hierarchyComponent.ChildrenListHandle,
-				out var childrenList))
+			if (!entityHierarchyManager.TryGet(
+				hierarchyComponent.HierarchyHandle,
+				out var hierarchyNode))
 			{
+				logger?.LogError(
+					$"ENTITY {entity} HIERARCHY NODE INVALID: {hierarchyComponent.HierarchyHandle}");
+
 				return;
 			}
 
-			foreach (var child in childrenList)
+			foreach (var childNode in hierarchyNode.Children)
 			{
+				if (childNode == null)
+					continue;
+
+				var child = childNode.Contents;
+
 				if (!child.IsAlive)
 					continue;
 
@@ -265,9 +300,10 @@ namespace HereticalSolutions.Templates.Universal.Unity
 
 				UpdateTransform2DRecursively(
 					child,
-					entityListManager,
+					entityHierarchyManager,
 					transformComponent.WorldPosition,
-					transformComponent.WorldRotation);
+					transformComponent.WorldRotation,
+					logger);
 			}
 		}
 
@@ -296,18 +332,22 @@ namespace HereticalSolutions.Templates.Universal.Unity
 
 		public static void UpdateTransform3DRecursively(
 			Entity entity,
-			DefaultECSEntityListManager entityListManager)
+			DefaultECSEntityHierarchyManager entityHierarchyManager,
+			ILogger logger = null)
 		{
 			Matrix4x4 parentTRSMatrix = Matrix4x4.identity;
 
 			if (entity.Has<HierarchyComponent>())
 			{
-				var hierarchyComponent = entity.Get<HierarchyComponent>();
-
-				if (hierarchyComponent.Parent.IsAlive
-					&& hierarchyComponent.Parent.Has<Transform3DComponent>())
+				if (HierarchyHelpers.TryGetParent(
+					entity,
+					entityHierarchyManager,
+					out var parent,
+					logger)
+					&& parent.IsAlive
+					&& parent.Has<Transform3DComponent>())
 				{
-					var parentTransformComponent = hierarchyComponent.Parent.Get<Transform3DComponent>();
+					var parentTransformComponent = parent.Get<Transform3DComponent>();
 
 					if (parentTransformComponent.Dirty)
 					{
@@ -324,14 +364,16 @@ namespace HereticalSolutions.Templates.Universal.Unity
 
 			UpdateTransform3DRecursively(
 				entity,
-				entityListManager,
-				parentTRSMatrix);
+				entityHierarchyManager,
+				parentTRSMatrix,
+				logger);
 		}
 
 		public static void UpdateTransform3DRecursively(
 			Entity entity,
-			DefaultECSEntityListManager entityListManager,
-			Matrix4x4 parentTRSMatrix)
+			DefaultECSEntityHierarchyManager entityHierarchyManager,
+			Matrix4x4 parentTRSMatrix,
+			ILogger logger = null)
 		{
 			ref var transformComponent = ref entity.Get<Transform3DComponent>();
 
@@ -366,15 +408,23 @@ namespace HereticalSolutions.Templates.Universal.Unity
 
 			var hierarchyComponent = entity.Get<HierarchyComponent>();
 
-			if (!entityListManager.TryGetList(
-				hierarchyComponent.ChildrenListHandle,
-				out var childrenList))
+			if (!entityHierarchyManager.TryGet(
+				hierarchyComponent.HierarchyHandle,
+				out var hierarchyNode))
 			{
+				logger?.LogError(
+					$"ENTITY {entity} HIERARCHY NODE INVALID: {hierarchyComponent.HierarchyHandle}");
+
 				return;
 			}
 
-			foreach (var child in childrenList)
+			foreach (var childNode in hierarchyNode.Children)
 			{
+				if (childNode == null)
+					continue;
+
+				var child = childNode.Contents;
+
 				if (!child.IsAlive)
 					continue;
 
@@ -383,8 +433,9 @@ namespace HereticalSolutions.Templates.Universal.Unity
 
 				UpdateTransform3DRecursively(
 					child,
-					entityListManager,
-					transformComponent.TRSMatrix);
+					entityHierarchyManager,
+					transformComponent.TRSMatrix,
+					logger);
 			}
 		}
 

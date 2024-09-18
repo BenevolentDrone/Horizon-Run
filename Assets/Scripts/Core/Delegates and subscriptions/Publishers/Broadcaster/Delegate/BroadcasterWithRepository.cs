@@ -12,7 +12,7 @@ namespace HereticalSolutions.Delegates.Broadcasting
     public class BroadcasterWithRepository
         : IPublisherSingleArg,
           ISubscribableSingleArg,
-          ICleanUppable,
+          ICleanuppable,
           IDisposable
     {
         private readonly IReadOnlyObjectRepository broadcasterRepository;
@@ -38,7 +38,7 @@ namespace HereticalSolutions.Delegates.Broadcasting
                     valueType,
                     out object broadcasterObject))
                 throw new Exception(
-                    logger.TryFormat<BroadcasterWithRepository>(
+                    logger.TryFormatException<BroadcasterWithRepository>(
                         $"INVALID VALUE TYPE: \"{valueType.Name}\""));
 
             var broadcaster = (IPublisherSingleArgGeneric<TValue>)broadcasterObject;
@@ -54,7 +54,7 @@ namespace HereticalSolutions.Delegates.Broadcasting
                     valueType,
                     out object broadcasterObject))
                 throw new Exception(
-                    logger.TryFormat<BroadcasterWithRepository>(
+                    logger.TryFormatException<BroadcasterWithRepository>(
                         $"INVALID VALUE TYPE: \"{valueType.Name}\""));
 
             var broadcaster = (IPublisherSingleArg)broadcasterObject;
@@ -74,7 +74,7 @@ namespace HereticalSolutions.Delegates.Broadcasting
                     valueType,
                     out object broadcasterObject))
                 throw new Exception(
-                    logger.TryFormat<BroadcasterWithRepository>(
+                    logger.TryFormatException<BroadcasterWithRepository>(
                         $"INVALID VALUE TYPE: \"{valueType.Name}\""));
 
             var broadcaster = (ISubscribableSingleArgGeneric<TValue>)broadcasterObject;
@@ -90,7 +90,7 @@ namespace HereticalSolutions.Delegates.Broadcasting
                     valueType,
                     out object broadcasterObject))
                 throw new Exception(
-                    logger.TryFormat<BroadcasterWithRepository>(
+                    logger.TryFormatException<BroadcasterWithRepository>(
                         $"INVALID VALUE TYPE: \"{valueType.Name}\""));
 
             var broadcaster = (ISubscribableSingleArg)broadcasterObject;
@@ -106,7 +106,7 @@ namespace HereticalSolutions.Delegates.Broadcasting
                     valueType,
                     out object broadcasterObject))
                 throw new Exception(
-                    logger.TryFormat<BroadcasterWithRepository>(
+                    logger.TryFormatException<BroadcasterWithRepository>(
                         $"INVALID VALUE TYPE: \"{valueType.Name}\""));
 
             var broadcaster = (ISubscribableSingleArgGeneric<TValue>)broadcasterObject;
@@ -122,7 +122,7 @@ namespace HereticalSolutions.Delegates.Broadcasting
                     valueType,
                     out object broadcasterObject))
                 throw new Exception(
-                    logger.TryFormat<BroadcasterWithRepository>(
+                    logger.TryFormatException<BroadcasterWithRepository>(
                         $"INVALID VALUE TYPE: \"{valueType.Name}\""));
 
             var broadcaster = (ISubscribableSingleArg)broadcasterObject;
@@ -138,7 +138,7 @@ namespace HereticalSolutions.Delegates.Broadcasting
                     valueType,
                     out object broadcasterObject))
                 throw new Exception(
-                    logger.TryFormat<BroadcasterWithRepository>(
+                    logger.TryFormatException<BroadcasterWithRepository>(
                         $"INVALID VALUE TYPE: \"{valueType.Name}\""));
 
             var broadcaster = (ISubscribableSingleArgGeneric<TValue>)broadcasterObject;
@@ -152,7 +152,7 @@ namespace HereticalSolutions.Delegates.Broadcasting
                     valueType,
                     out object broadcasterObject))
                 throw new Exception(
-                    logger.TryFormat<BroadcasterWithRepository>(
+                    logger.TryFormatException<BroadcasterWithRepository>(
                         $"INVALID VALUE TYPE: \"{valueType.Name}\""));
 
             var broadcaster = (ISubscribable)broadcasterObject;
@@ -197,8 +197,8 @@ namespace HereticalSolutions.Delegates.Broadcasting
 
         public void Cleanup()
         {
-            if (broadcasterRepository is ICleanUppable)
-                (broadcasterRepository as ICleanUppable).Cleanup();
+            if (broadcasterRepository is ICleanuppable)
+                (broadcasterRepository as ICleanuppable).Cleanup();
         }
 
         #endregion

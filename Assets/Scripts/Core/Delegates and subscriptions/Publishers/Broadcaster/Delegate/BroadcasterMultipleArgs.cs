@@ -8,7 +8,7 @@ namespace HereticalSolutions.Delegates.Broadcasting
     public class BroadcasterMultipleArgs
         : IPublisherMultipleArgs,
           ISubscribableMultipleArgs,
-          ICleanUppable,
+          ICleanuppable,
           IDisposable
     {
         private readonly BroadcasterGeneric<object[]> innerBroadcaster;
@@ -70,8 +70,8 @@ namespace HereticalSolutions.Delegates.Broadcasting
 
         public void Cleanup()
         {
-            if (innerBroadcaster is ICleanUppable)
-                (innerBroadcaster as ICleanUppable).Cleanup();
+            if (innerBroadcaster is ICleanuppable)
+                (innerBroadcaster as ICleanuppable).Cleanup();
         }
 
         #endregion

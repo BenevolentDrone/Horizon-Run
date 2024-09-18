@@ -24,6 +24,8 @@ namespace HereticalSolutions.Time
 
         bool FlushTimeElapsedOnRepeat { get; set; }
 
+        bool FireRepeatCallbackOnFinish { get; set; }
+        
         void Reset();
 
         void Start();

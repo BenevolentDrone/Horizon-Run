@@ -1,5 +1,7 @@
 using HereticalSolutions.Entities;
 
+using ILogger = HereticalSolutions.Logging.ILogger;
+
 using UnityEngine;
 
 using DefaultEcs;
@@ -11,9 +13,15 @@ namespace HereticalSolutions.Templates.Universal.Unity
 	{
 		private readonly UniversalTemplateEntityManager entityManager;
 
+		private readonly DefaultECSEntityHierarchyManager entityHierarchyManager;
+
+		private readonly ILogger logger;
+
 		public PlaceEntity2DOnEntitySpawnedEventSystem(
 			World world,
-			UniversalTemplateEntityManager entityManager)
+			UniversalTemplateEntityManager entityManager,
+			DefaultECSEntityHierarchyManager entityHierarchyManager,
+			ILogger logger = null)
 			: base(
 				world
 					.GetEntities()
@@ -23,6 +31,10 @@ namespace HereticalSolutions.Templates.Universal.Unity
 					.AsSet())
 		{
 			this.entityManager = entityManager;
+
+			this.entityHierarchyManager = entityHierarchyManager;
+
+			this.logger = logger;
 		}
 
 		protected override void Update(
@@ -60,7 +72,10 @@ namespace HereticalSolutions.Templates.Universal.Unity
 			{
 				var sourceTransformComponent = sourceEntity.Get<Transform2DComponent>();
 
-				targetPosition = TransformHelpers.GetWorldPosition2D(sourceEntity);
+				targetPosition = TransformHelpers.GetWorldPosition2D(
+					sourceEntity,
+					entityHierarchyManager,
+					logger);
 			}
 			else
 			{

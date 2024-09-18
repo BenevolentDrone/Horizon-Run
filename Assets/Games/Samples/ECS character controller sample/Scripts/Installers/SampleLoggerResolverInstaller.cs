@@ -5,7 +5,7 @@ using UnityEngine;
 
 using Zenject;
 
-namespace HereticalSolutions.Samples.ECSCharacterControllerSample.DI
+namespace HereticalSolutions.Samples.ECSCharacterControllerSample.Installers
 {
     public class SampleLoggerResolverInstaller : MonoInstaller
     {

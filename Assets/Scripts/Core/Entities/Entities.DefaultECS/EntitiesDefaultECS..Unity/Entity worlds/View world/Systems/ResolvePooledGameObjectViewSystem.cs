@@ -1,7 +1,6 @@
 using System;
 
 using HereticalSolutions.Pools;
-using HereticalSolutions.Pools.Arguments;
 
 using HereticalSolutions.Logging;
 using ILogger = HereticalSolutions.Logging.ILogger;
@@ -16,16 +15,16 @@ namespace HereticalSolutions.Entities
 		: IDefaultECSEntityInitializationSystem
 		  where TSceneEntity : MonoBehaviour
 	{
-		private readonly INonAllocDecoratedPool<GameObject> pool;
+		private readonly IManagedPool<GameObject> pool;
 
 		private readonly AddressArgument addressArgument;
-		private readonly AppendArgument appendArgument;
-		private readonly IPoolDecoratorArgument[] arguments;
+		private readonly AppendToPoolArgument appendToPoolArgument;
+		private readonly IPoolPopArgument[] arguments;
 
 		private readonly ILogger logger;
 
 		public ResolvePooledGameObjectViewSystem(
-			INonAllocDecoratedPool<GameObject> pool,
+			IManagedPool<GameObject> pool,
 			ILogger logger = null)
 		{
 			this.pool = pool;
@@ -33,12 +32,12 @@ namespace HereticalSolutions.Entities
 			this.logger = logger;
 
 			addressArgument = new AddressArgument();
-			appendArgument = new AppendArgument();
+			appendToPoolArgument = new AppendToPoolArgument();
 
-			arguments = new IPoolDecoratorArgument[]
+			arguments = new IPoolPopArgument[]
 			{
 				addressArgument,
-				appendArgument
+				appendToPoolArgument
 			};
 		}
 
@@ -58,7 +57,7 @@ namespace HereticalSolutions.Entities
 				return;
 
 				//throw new Exception(
-				//	logger.TryFormat<ResolvePooledGameObjectViewSystem>(
+				//	logger.TryFormatException<ResolvePooledGameObjectViewSystem>(
 				//		$"ENTITY {entity.Get<GUIDComponent>().GUID} WAS REQUESTED TO BE RESOLVED BUT HAS NO SpawnPooledGameObjectViewComponent"));
 			}
 
@@ -78,23 +77,25 @@ namespace HereticalSolutions.Entities
 			if (pooledViewElement.Value != null)
 			{
 				throw new Exception(
-					logger.TryFormat<ResolvePooledGameObjectViewSystem<TSceneEntity>>(
+					logger.TryFormatException<ResolvePooledGameObjectViewSystem<TSceneEntity>>(
 						$"POOLED ELEMENT'S VALUE IS NOT NULL"));
 			}
 
-			if (pooledViewElement.Status != EPoolElementStatus.POPPED)
+			if (pooledViewElement.Status != EPoolElementStatus.UNINITIALIZED)
 			{
 				throw new Exception(
-					logger.TryFormat<ResolvePooledGameObjectViewSystem<TSceneEntity>>(
-						$"POOLED ELEMENT'S STATUS IS INVALID ({pooledViewElement.Value.name})"));
+					logger.TryFormatException<ResolvePooledGameObjectViewSystem<TSceneEntity>>(
+						$"POOLED ELEMENT'S STATUS IS INVALID ({pooledViewElement.Value.name}), EXPECTED: {EPoolElementStatus.UNINITIALIZED}"));
 			}
 
 			pooledViewElement.Value = (GameObject)resolveViewComponent.Source;
 
+			pooledViewElement.Status = EPoolElementStatus.POPPED;
+
 
 			var pooledGameObjectViewComponent = new PooledGameObjectViewComponent();
 
-			pooledGameObjectViewComponent.Element = pooledViewElement;
+			pooledGameObjectViewComponent.ElementFacade = pooledViewElement;
 
 			entity.Set<PooledGameObjectViewComponent>(pooledGameObjectViewComponent);
 
@@ -119,8 +120,6 @@ namespace HereticalSolutions.Entities
 						pooledViewElement.Value
 					});
 				
-				UnityEngine.Debug.Break();
-				
 				return;
 			}
 			
@@ -132,8 +131,6 @@ namespace HereticalSolutions.Entities
 					{
 						pooledViewElement.Value
 					});
-				
-				UnityEngine.Debug.Break();
 				
 				return;
 			}

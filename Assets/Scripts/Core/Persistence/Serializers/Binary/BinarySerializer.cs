@@ -35,7 +35,7 @@ namespace HereticalSolutions.Persistence.Serializers
                 argument.GetType(),
                 out var strategyObject))
                 throw new Exception(
-                    logger.TryFormat<BinarySerializer>(
+                    logger.TryFormatException<BinarySerializer>(
                         $"COULD NOT RESOLVE STRATEGY BY ARGUMENT: {argument.GetType().Name}"));
 
             var concreteStrategy = (IBinarySerializationStrategy)strategyObject;
@@ -55,7 +55,7 @@ namespace HereticalSolutions.Persistence.Serializers
                 argument.GetType(),
                 out var strategyObject))
                 throw new Exception(
-                    logger.TryFormat<BinarySerializer>(
+                    logger.TryFormatException<BinarySerializer>(
                         $"COULD NOT RESOLVE STRATEGY BY ARGUMENT: {argument.GetType().Name}"));
 
             var concreteStrategy = (IBinarySerializationStrategy)strategyObject;
@@ -74,7 +74,7 @@ namespace HereticalSolutions.Persistence.Serializers
                 argument.GetType(),
                 out var strategyObject))
                 throw new Exception(
-                    logger.TryFormat<BinarySerializer>(
+                    logger.TryFormatException<BinarySerializer>(
                         $"COULD NOT RESOLVE STRATEGY BY ARGUMENT: {argument.GetType().Name}"));
 
             var concreteStrategy = (IBinarySerializationStrategy)strategyObject;
@@ -98,7 +98,7 @@ namespace HereticalSolutions.Persistence.Serializers
                 argument.GetType(),
                 out var strategyObject))
                 throw new Exception(
-                    logger.TryFormat<BinarySerializer>(
+                    logger.TryFormatException<BinarySerializer>(
                         $"COULD NOT RESOLVE STRATEGY BY ARGUMENT: {argument.GetType().Name}"));
 
             var concreteStrategy = (IBinarySerializationStrategy)strategyObject;
@@ -112,7 +112,7 @@ namespace HereticalSolutions.Persistence.Serializers
                 argument.GetType(),
                 out var strategyObject))
                 throw new Exception(
-                    logger.TryFormat<BinarySerializer>(
+                    logger.TryFormatException<BinarySerializer>(
                         $"COULD NOT RESOLVE STRATEGY BY ARGUMENT: {argument.GetType().Name}"));
 
             var concreteStrategy = (IBinarySerializationStrategy)strategyObject;

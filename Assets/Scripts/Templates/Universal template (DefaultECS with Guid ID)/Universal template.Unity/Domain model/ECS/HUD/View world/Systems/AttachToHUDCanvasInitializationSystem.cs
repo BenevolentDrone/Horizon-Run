@@ -46,26 +46,26 @@ namespace HereticalSolutions.Templates.Universal.Unity
 
 			var pooledGameObjectViewComponent = entity.Get<PooledGameObjectViewComponent>();
 
-			var pooledViewElement = pooledGameObjectViewComponent.Element;
+			var pooledViewElement = pooledGameObjectViewComponent.ElementFacade;
 
 			if (pooledViewElement.Value == null)
 			{
 				throw new Exception(
-					logger.TryFormat<AttachToHUDCanvasInitializationSystem>(
+					logger.TryFormatException<AttachToHUDCanvasInitializationSystem>(
 						$"POOLED ELEMENT'S VALUE IS NULL"));
 			}
 
 			if (pooledViewElement.Status != EPoolElementStatus.POPPED)
 			{
 				throw new Exception(
-					logger.TryFormat<AttachToHUDCanvasInitializationSystem>(
+					logger.TryFormatException<AttachToHUDCanvasInitializationSystem>(
 						$"POOLED ELEMENT'S STATUS IS INVALID"));
 			}
 
 			if (!pooledViewElement.Value.activeInHierarchy)
 			{
 				throw new Exception(
-					logger.TryFormat<AttachToHUDCanvasInitializationSystem>(
+					logger.TryFormatException<AttachToHUDCanvasInitializationSystem>(
 						$"POOLED GAME OBJECT IS DISABLED"));
 			}
 

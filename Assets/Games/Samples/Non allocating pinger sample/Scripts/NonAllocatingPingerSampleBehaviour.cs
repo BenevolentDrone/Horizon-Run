@@ -48,7 +48,7 @@ namespace HereticalSolutions.Samples.NonAllocatingPingerSample
 
 			#region Pinger
 
-			var pinger = DelegatesFactory.BuildNonAllocPinger(loggerResolver);
+			var pinger = PingersFactory.BuildNonAllocPinger(loggerResolver);
 
 			pingerAsPublisher = (IPublisherNoArgs)pinger;
 

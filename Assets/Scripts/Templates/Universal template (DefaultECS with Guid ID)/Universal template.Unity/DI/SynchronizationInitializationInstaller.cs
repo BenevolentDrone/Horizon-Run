@@ -21,14 +21,14 @@ namespace HereticalSolutions.Templates.Universal.Unity.DI
         {
             #region Update
 
-            var updatePinger = DelegatesFactory.BuildNonAllocPinger(loggerResolver);
+            var updatePinger = PingersFactory.BuildNonAllocPinger(loggerResolver);
 
             Container
                 .Bind<IPublisherNoArgs>()
                 .WithId("Update")
                 .FromInstance(updatePinger)
                 .AsCached();
-            
+
             Container
                 .Bind<INonAllocSubscribableNoArgs>()
                 .WithId("Update")
@@ -39,14 +39,14 @@ namespace HereticalSolutions.Templates.Universal.Unity.DI
 
             #region Fixed update
 
-            var fixedUpdatePinger = DelegatesFactory.BuildNonAllocPinger(loggerResolver);
+            var fixedUpdatePinger = PingersFactory.BuildNonAllocPinger(loggerResolver);
 
             Container
                 .Bind<IPublisherNoArgs>()
                 .WithId("Fixed update")
                 .FromInstance(fixedUpdatePinger)
                 .AsCached();
-            
+
             Container
                 .Bind<INonAllocSubscribableNoArgs>()
                 .WithId("Fixed update")
@@ -57,14 +57,14 @@ namespace HereticalSolutions.Templates.Universal.Unity.DI
 
             #region Late update
 
-            var lateUpdatePinger = DelegatesFactory.BuildNonAllocPinger(loggerResolver);
+            var lateUpdatePinger = PingersFactory.BuildNonAllocPinger(loggerResolver);
 
             Container
                 .Bind<IPublisherNoArgs>()
                 .WithId("Late update")
                 .FromInstance(lateUpdatePinger)
                 .AsCached();
-            
+
             Container
                 .Bind<INonAllocSubscribableNoArgs>()
                 .WithId("Late update")
@@ -77,6 +77,11 @@ namespace HereticalSolutions.Templates.Universal.Unity.DI
                 updatePinger,
                 fixedUpdatePinger,
                 lateUpdatePinger);
+
+            Container
+                .Bind<MonoBehaviour>()
+                .FromInstance(synchronizationBehaviour)
+                .AsCached();
         }
     }
 }

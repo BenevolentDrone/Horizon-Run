@@ -1,3 +1,4 @@
+using HereticalSolutions.Delegates;
 using HereticalSolutions.Delegates.Subscriptions;
 
 namespace HereticalSolutions.Time
@@ -9,7 +10,11 @@ namespace HereticalSolutions.Time
         public SubscriptionSingleArgGeneric<float> TickSubscription;
 
         public SubscriptionSingleArgGeneric<IRuntimeTimer> StartTimerSubscription;
+
+        public INonAllocSubscribableSingleArgGeneric<IRuntimeTimer> OnStartPrivateSubscribable;
         
         public SubscriptionSingleArgGeneric<IRuntimeTimer> FinishTimerSubscription;
+        
+        public INonAllocSubscribableSingleArgGeneric<IRuntimeTimer> OnFinishPrivateSubscribable;
     }
 }

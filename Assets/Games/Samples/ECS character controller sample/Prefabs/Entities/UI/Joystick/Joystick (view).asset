@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Joystick (view)
   m_EditorClassIdentifier: 
   EntityJson: "{\n  \"PrototypeID\": \"Joystick\",\n  \"Components\": [\n    {\n     
-    \"$type\": \"HereticalSolutions.Entities.SpawnPooledGameObjectViewComponent, Core\",\n     
-    \"Address\": \"Joystick view\"\n    },\n    {\n      \"$type\": \"HereticalSolutions.Samples.ECSCharacterControllerSample.SampleJoystickPresenterComponent,
+    \"$type\": \"VirtuosGames.Entities.SpawnPooledGameObjectViewComponent, Core\",\n     
+    \"Address\": \"Joystick view\"\n    },\n    {\n      \"$type\": \"VirtuosGames.Samples.ECSCharacterControllerSample.SampleJoystickPresenterComponent,
     Assembly-CSharp\",\n      \"TargetEntity\": {\n        \"World\": null,\n       
     \"IsAlive\": false\n      }\n    }\n  ]\n}"

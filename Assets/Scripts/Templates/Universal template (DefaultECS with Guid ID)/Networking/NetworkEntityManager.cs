@@ -324,7 +324,7 @@ namespace HereticalSolutions.Templates.Universal.Networking
 
                 if (lastAllocatedNetworkID == cachedLastAllocatedNetworkID)
                     throw new Exception(
-                        logger.TryFormat<NetworkEntityManager>(
+                        logger.TryFormatException<NetworkEntityManager>(
                             $"NETWORK ID POOL EXHAUSTED"));
             } while (networkIDToEntityIDMap.HasLeft(lastAllocatedNetworkID));
 
@@ -951,7 +951,7 @@ namespace HereticalSolutions.Templates.Universal.Networking
                     currentPrototypeID = registryEntity.Get<PrototypeInstanceComponent>().PrototypeID;
                 
                 throw new Exception(
-                    logger.TryFormat<NetworkEntityManager>(
+                    logger.TryFormatException<NetworkEntityManager>(
                         $"ENTITY {entityID} FROM ENTITY CREATED PACKET HAS NO NetworkEntityComponent. PROTOTYPE ID: {currentPrototypeID}"));
             }
 
@@ -1100,13 +1100,13 @@ namespace HereticalSolutions.Templates.Universal.Networking
                         currentPrototypeID = entity.Get<PrototypeInstanceComponent>().PrototypeID;
                     
                     throw new Exception(
-                        logger.TryFormat<NetworkEntityManager>(
+                        logger.TryFormatException<NetworkEntityManager>(
                             $"ENTITY {entityID} HAS NO NetworkEntityComponent. PROTOTYPE ID: {currentPrototypeID}"));
                 }
 
                 if (!entity.Has<PrototypeInstanceComponent>())
                     throw new Exception(
-                        logger.TryFormat<NetworkEntityManager>(
+                        logger.TryFormatException<NetworkEntityManager>(
                             $"ENTITY {entityID} HAS NO PrototypeInstanceComponent"));
 
                 string prototypeID = entity.Get<PrototypeInstanceComponent>().PrototypeID;
@@ -1116,7 +1116,7 @@ namespace HereticalSolutions.Templates.Universal.Networking
                         out var prototypeIDAsUShort))
                 {
                     throw new Exception(
-                        logger.TryFormat<NetworkEntityManager>(
+                        logger.TryFormatException<NetworkEntityManager>(
                             $"PROTOTYPE ID {prototypeID} NOT REGISTERED IN THE MAP"));
                 }
                 
@@ -1224,13 +1224,13 @@ namespace HereticalSolutions.Templates.Universal.Networking
                     currentPrototypeID = entity.Get<PrototypeInstanceComponent>().PrototypeID;
                 
                 throw new Exception(
-                    logger.TryFormat<NetworkEntityManager>(
+                    logger.TryFormatException<NetworkEntityManager>(
                         $"ENTITY {entityID} HAS NO NetworkEntityComponent. PROTOTYPE ID: {currentPrototypeID}"));
             }
 
             if (!entity.Has<PrototypeInstanceComponent>())
                 throw new Exception(
-                    logger.TryFormat<NetworkEntityManager>(
+                    logger.TryFormatException<NetworkEntityManager>(
                         $"ENTITY {entityID} HAS NO PrototypeInstanceComponent"));
 
             string prototypeID = entity.Get<PrototypeInstanceComponent>().PrototypeID;
@@ -1239,7 +1239,7 @@ namespace HereticalSolutions.Templates.Universal.Networking
                 prototypeID,
                 out var prototypeIDAsUShort))
                 throw new Exception(
-                    logger.TryFormat<NetworkEntityManager>(
+                    logger.TryFormatException<NetworkEntityManager>(
                         $"PROTOTYPE ID {prototypeID} NOT REGISTERED IN THE MAP"));
 
             byte authoringPermission = byte.MaxValue;

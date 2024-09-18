@@ -111,13 +111,13 @@ namespace HereticalSolutions.Persistence.IO
         {
             if (string.IsNullOrEmpty(path))
                 throw new Exception(
-                    logger.TryFormat("INVALID PATH"));
+                    logger.TryFormatException("INVALID PATH"));
 			
             string directoryPath = Path.GetDirectoryName(path);
 
             if (string.IsNullOrEmpty(directoryPath))
                 throw new Exception(
-                    logger.TryFormat("INVALID DIRECTORY PATH"));
+                    logger.TryFormatException("INVALID DIRECTORY PATH"));
 			
             if (!Directory.Exists(directoryPath))
             {
@@ -133,13 +133,13 @@ namespace HereticalSolutions.Persistence.IO
         {
             if (string.IsNullOrEmpty(path))
                 throw new Exception(
-                    logger.TryFormat($"INVALID PATH"));
+                    logger.TryFormatException($"INVALID PATH"));
 			
             string directoryPath = Path.GetDirectoryName(path);
 
             if (string.IsNullOrEmpty(directoryPath))
                 throw new Exception(
-                    logger.TryFormat("INVALID DIRECTORY PATH"));
+                    logger.TryFormatException("INVALID DIRECTORY PATH"));
 			
             if (!Directory.Exists(directoryPath))
             {

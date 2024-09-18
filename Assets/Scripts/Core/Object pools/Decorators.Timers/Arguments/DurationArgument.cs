@@ -1,9 +1,9 @@
-namespace HereticalSolutions.Pools.Arguments
+namespace HereticalSolutions.Pools
 {
     /// <summary>
     /// Represents an argument used for decorating a pool with a specific duration.
     /// </summary>
-    public class DurationArgument : IPoolDecoratorArgument
+    public class DurationArgument : IPoolPopArgument
     {
         /// <summary>
         /// Gets or sets the duration value.

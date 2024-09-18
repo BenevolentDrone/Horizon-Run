@@ -16,6 +16,6 @@ namespace HereticalSolutions.Delegates
         /// <summary>
         /// Gets the pool element associated with the subscription state
         /// </summary>
-        IPoolElement<ISubscription> PoolElement { get; }
+        IPoolElementFacade<ISubscription> PoolElement { get; }
     }
 }

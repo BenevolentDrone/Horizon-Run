@@ -1,4 +1,9 @@
-using HereticalSolutions.Pools.Elements;
+using System;
+
+using HereticalSolutions.Allocations;
+
+using HereticalSolutions.Logging;
+using ILogger = HereticalSolutions.Logging.ILogger;
 
 namespace HereticalSolutions.Pools.AllocationCallbacks
 {
@@ -6,46 +11,55 @@ namespace HereticalSolutions.Pools.AllocationCallbacks
     /// Represents a callback for setting the address of an allocated pool element.
     /// </summary>
     /// <typeparam name="T">The type of the pool element.</typeparam>
-    public class SetAddressCallback<T> : IAllocationCallback<T>
+    public class SetAddressCallback<T>
+        : IAllocationCallback<IPoolElementFacade<T>>
     {
-        /// <summary>
-        /// Gets or sets the full address of the allocated pool element.
-        /// </summary>
         public string FullAddress { get; set; }
 
-        /// <summary>
-        /// Gets or sets the array of address hashes of the allocated pool element.
-        /// </summary>
         public int[] AddressHashes { get; set; }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="SetAddressCallback{T}"/> class.
-        /// </summary>
-        /// <param name="fullAddress">The full address of the allocated pool element.</param>
-        /// <param name="addressHashes">The array of address hashes of the allocated pool element.</param>
-        public SetAddressCallback(string fullAddress = null, int[] addressHashes = null)
+        private ILogger logger;
+        
+        public SetAddressCallback(
+            string fullAddress = null,
+            int[] addressHashes = null,
+            ILogger logger = null)
         {
             FullAddress = fullAddress;
+            
             AddressHashes = addressHashes;
+            
+            this.logger = logger;
         }
 
-        /// <summary>
-        /// Called when a pool element is allocated.
-        /// </summary>
-        /// <param name="currentElement">The current pool element.</param>
-        public void OnAllocated(IPoolElement<T> currentElement)
+        public void OnAllocated(IPoolElementFacade<T> poolElementFacade)
         {
-            //SUPPLY AND MERGE POOLS DO NOT PRODUCE ELEMENTS WITH VALUES
-            //if (currentElement.Value == null)
-            //    return;
-
             if (FullAddress == null || AddressHashes == null)
                 return;
 
-            var addressMetadata = (AddressMetadata)currentElement.Metadata.Get<IContainsAddress>();
+            IPoolElementFacadeWithMetadata<T> facadeWithMetadata =
+                poolElementFacade as IPoolElementFacadeWithMetadata<T>;
 
-            addressMetadata.FullAddress = FullAddress;
-            addressMetadata.AddressHashes = AddressHashes;
+            if (facadeWithMetadata == null)
+            {
+                throw new Exception(
+                    logger.TryFormatException<SetAddressCallback<T>>(
+                        "POOL ELEMENT FACADE HAS NO METADATA"));
+            }
+			
+            var metadata = (AddressMetadata)
+                facadeWithMetadata.Metadata.Get<IContainsAddress>();
+
+            if (metadata == null)
+            {
+                throw new Exception(
+                    logger.TryFormatException<SetAddressCallback<T>>(
+                        "POOL ELEMENT FACADE HAS NO ADDRESS METADATA"));
+            }
+            
+            metadata.FullAddress = FullAddress;
+            
+            metadata.AddressHashes = AddressHashes;
         }
     }
 }

@@ -22,6 +22,8 @@ namespace HereticalSolutions.MVVM.Mono
 
         private ILogger logger;
 
+        //TODO
+        /*
         protected override void Awake()
         {
             logger = loggerResolver.GetLogger<ButtonComponent>();
@@ -34,5 +36,6 @@ namespace HereticalSolutions.MVVM.Mono
             
             base.Awake();
         }
+        */
     }
 }

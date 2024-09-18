@@ -14,16 +14,14 @@ namespace HereticalSolutions.Delegates.Pinging
     public class NonAllocPinger
         : IPublisherNoArgs,
           INonAllocSubscribableNoArgs,
-          ICleanUppable,
+          ICleanuppable,
           IDisposable
     {
         #region Subscriptions
 
-        private readonly INonAllocDecoratedPool<ISubscription> subscriptionsPool;
+        private readonly IManagedPool<ISubscription> subscriptionsPool;
 
-        private readonly IIndexable<IPoolElement<ISubscription>> subscriptionsAsIndexable;
-
-        private readonly IFixedSizeCollection<IPoolElement<ISubscription>> subscriptionsWithCapacity;
+        private readonly IDynamicArray<IPoolElementFacade<ISubscription>> subscriptionsContents;
 
         #endregion
 
@@ -40,20 +38,17 @@ namespace HereticalSolutions.Delegates.Pinging
         private bool pingInProgress = false;
 
         public NonAllocPinger(
-            INonAllocDecoratedPool<ISubscription> subscriptionsPool,
-            INonAllocPool<ISubscription> subscriptionsContents,
+            IManagedPool<ISubscription> subscriptionsPool,
+            IDynamicArray<IPoolElementFacade<ISubscription>> subscriptionsContents,
             ILogger logger = null)
         {
             this.subscriptionsPool = subscriptionsPool;
 
             this.logger = logger;
 
-            subscriptionsAsIndexable = (IIndexable<IPoolElement<ISubscription>>)subscriptionsContents;
+            this.subscriptionsContents = subscriptionsContents;
 
-            subscriptionsWithCapacity =
-                (IFixedSizeCollection<IPoolElement<ISubscription>>)subscriptionsContents;
-
-            currentSubscriptionsBuffer = new ISubscription[subscriptionsWithCapacity.Capacity];
+            currentSubscriptionsBuffer = new ISubscription[subscriptionsContents.Capacity];
         }
 
         #region INonAllocSubscribableNoArgs
@@ -98,7 +93,7 @@ namespace HereticalSolutions.Delegates.Pinging
                 $"SUBSCRIPTION REMOVED: {previousValue.GetHashCode()}");
         }
 
-        public void Unsubscribe(IPoolElement<ISubscription> subscription)
+        public void Unsubscribe(IPoolElementFacade<ISubscription> subscription)
         {
             TryRemoveFromBuffer(subscription);
 
@@ -113,10 +108,10 @@ namespace HereticalSolutions.Delegates.Pinging
         {
             get
             {
-                ISubscription[] allSubscriptions = new ISubscription[subscriptionsAsIndexable.Count];
+                ISubscription[] allSubscriptions = new ISubscription[subscriptionsContents.Count];
 
                 for (int i = 0; i < allSubscriptions.Length; i++)
-                    allSubscriptions[i] = subscriptionsAsIndexable[i].Value;
+                    allSubscriptions[i] = subscriptionsContents[i].Value;
 
                 return allSubscriptions;
             }
@@ -124,15 +119,15 @@ namespace HereticalSolutions.Delegates.Pinging
 
         public void UnsubscribeAll()
         {
-            while (subscriptionsAsIndexable.Count > 0)
-                Unsubscribe(subscriptionsAsIndexable[0]);
+            while (subscriptionsContents.Count > 0)
+                Unsubscribe(subscriptionsContents[0]);
         }
 
         #endregion
 
         #endregion
 
-        private void TryRemoveFromBuffer(IPoolElement<ISubscription> subscriptionElement)
+        private void TryRemoveFromBuffer(IPoolElementFacade<ISubscription> subscriptionElement)
         {
             if (!pingInProgress)
                 return;
@@ -156,7 +151,7 @@ namespace HereticalSolutions.Delegates.Pinging
 
             ValidateBufferSize();
 
-            currentSubscriptionsBufferCount = subscriptionsAsIndexable.Count;
+            currentSubscriptionsBufferCount = subscriptionsContents.Count;
 
             CopySubscriptionsToBuffer();
 
@@ -171,15 +166,15 @@ namespace HereticalSolutions.Delegates.Pinging
 
         public void Cleanup()
         {
-            if (subscriptionsPool is ICleanUppable)
-                (subscriptionsPool as ICleanUppable).Cleanup();
+            if (subscriptionsPool is ICleanuppable)
+                (subscriptionsPool as ICleanuppable).Cleanup();
 
             for (int i = 0; i < currentSubscriptionsBufferCount; i++)
             {
                 if (currentSubscriptionsBuffer[i] != null
-                    && currentSubscriptionsBuffer[i] is ICleanUppable)
+                    && currentSubscriptionsBuffer[i] is ICleanuppable)
                 {
-                    (currentSubscriptionsBuffer[i] as ICleanUppable).Cleanup();
+                    (currentSubscriptionsBuffer[i] as ICleanuppable).Cleanup();
                 }
             }
 
@@ -213,14 +208,14 @@ namespace HereticalSolutions.Delegates.Pinging
 
         private void ValidateBufferSize()
         {
-            if (currentSubscriptionsBuffer.Length < subscriptionsWithCapacity.Capacity)
-                currentSubscriptionsBuffer = new ISubscription[subscriptionsWithCapacity.Capacity];
+            if (currentSubscriptionsBuffer.Length < subscriptionsContents.Capacity)
+                currentSubscriptionsBuffer = new ISubscription[subscriptionsContents.Capacity];
         }
 
         private void CopySubscriptionsToBuffer()
         {
             for (int i = 0; i < currentSubscriptionsBufferCount; i++)
-                currentSubscriptionsBuffer[i] = subscriptionsAsIndexable[i].Value;
+                currentSubscriptionsBuffer[i] = subscriptionsContents[i].Value;
         }
 
         private void InvokeSubscriptions()

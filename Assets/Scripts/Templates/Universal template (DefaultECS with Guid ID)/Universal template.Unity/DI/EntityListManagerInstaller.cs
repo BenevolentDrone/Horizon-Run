@@ -9,6 +9,7 @@ using HereticalSolutions.Logging;
 using Zenject;
 
 using DefaultEcs;
+using HereticalSolutions.Entities.Factories;
 
 namespace HereticalSolutions.Templates.Universal.Unity.DI
 {
@@ -19,10 +20,9 @@ namespace HereticalSolutions.Templates.Universal.Unity.DI
 		
 		public override void InstallBindings()
 		{
-			DefaultECSEntityListManager entityListManager = new DefaultECSEntityListManager(
-				new Queue<ushort>(),
-				RepositoriesFactory.BuildDictionaryRepository<ushort, List<Entity>>(),
-				loggerResolver?.GetLogger<DefaultECSEntityListManager>());
+			var entityListManager = DefaultECSEntityFactory
+				.BuildDefaultECSEntityListManager(
+					loggerResolver);
 
 			Container
 				.Bind<DefaultECSEntityListManager>()

@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: Player (registry)
   m_EditorClassIdentifier: 
   EntityJson: "{\n  \"PrototypeID\": \"Player\",\n  \"Components\": [\n    {\n     
-    \"$type\": \"HereticalSolutions.Entities.SimulationEntityComponent, Core\",\n     
+    \"$type\": \"VirtuosGames.Entities.SimulationEntityComponent, Core\",\n     
     \"SimulationEntity\": {\n        \"World\": null,\n        \"IsAlive\": false\n     
-    },\n      \"PrototypeID\": \"Player\"\n    },\n    {\n      \"$type\": \"HereticalSolutions.Entities.ViewEntityComponent,
+    },\n      \"PrototypeID\": \"Player\"\n    },\n    {\n      \"$type\": \"VirtuosGames.Entities.ViewEntityComponent,
     Core\",\n      \"ViewEntity\": {\n        \"World\": null,\n        \"IsAlive\":
     false\n      },\n      \"PrototypeID\": \"Player\"\n    }\n  ]\n}"

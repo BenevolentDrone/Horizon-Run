@@ -11,7 +11,7 @@ namespace HereticalSolutions.ResourceManagement
 	public abstract class AConcurrentReadOnlyResourceStorageHandle<TResource>
 		: AResourceStorageHandle<TResource>,
 		  IReadOnlyResourceStorageHandle,
-		  ICleanUppable,
+		  ICleanuppable,
 		  IDisposable
 	{
 		protected readonly SemaphoreSlim semaphore;
@@ -143,7 +143,7 @@ namespace HereticalSolutions.ResourceManagement
 				{
 					if (!allocated)
 						throw new Exception(
-							logger.TryFormat(
+							logger.TryFormatException(
 								GetType(),
 								"RESOURCE IS NOT ALLOCATED"));
 
@@ -164,7 +164,7 @@ namespace HereticalSolutions.ResourceManagement
 			{
 				if (!allocated)
 					throw new Exception(
-						logger.TryFormat(
+						logger.TryFormatException(
 							GetType(),
 							"RESOURCE IS NOT ALLOCATED"));
 
@@ -177,7 +177,7 @@ namespace HereticalSolutions.ResourceManagement
 					default:
 
 						throw new Exception(
-							logger.TryFormat(
+							logger.TryFormatException(
 								GetType(),
 								$"RESOURCE IS NOT OF TYPE {typeof(TValue).Name}"));
 				}

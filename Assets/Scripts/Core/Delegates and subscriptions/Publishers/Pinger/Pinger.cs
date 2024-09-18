@@ -12,7 +12,7 @@ namespace HereticalSolutions.Delegates.Pinging
     public class Pinger
         : IPublisherNoArgs,
           ISubscribableNoArgs,
-          ICleanUppable,
+          ICleanuppable,
           IDisposable
     {
         private Action multicastDelegate;

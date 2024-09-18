@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: Virtual camera (view)
   m_EditorClassIdentifier: 
   EntityJson: "{\n  \"PrototypeID\": \"Virtual camera\",\n  \"Components\": [\n   
-    {\n      \"$type\": \"HereticalSolutions.Entities.SpawnPooledGameObjectViewComponent,
+    {\n      \"$type\": \"VirtuosGames.Entities.SpawnPooledGameObjectViewComponent,
     Core\",\n      \"Address\": \"Virtual camera view\"\n    },\n    {\n      \"$type\":
-    \"HereticalSolutions.Samples.ECSCharacterControllerSample.SampleVirtualCameraPresenterComponent,
+    \"VirtuosGames.Samples.ECSCharacterControllerSample.SampleVirtualCameraPresenterComponent,
     Assembly-CSharp\",\n      \"TargetEntity\": {\n        \"World\": null,\n       
     \"IsAlive\": false\n      }\n    }\n  ]\n}"

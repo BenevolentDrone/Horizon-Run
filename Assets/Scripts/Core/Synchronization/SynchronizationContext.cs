@@ -11,7 +11,7 @@ namespace HereticalSolutions.Synchronization
     public class SynchronizationContext
         : ISynchronizableNoArgs,
           ISynchronizationProvider,
-          ICleanUppable,
+          ICleanuppable,
           IDisposable
     {
         private readonly IReadOnlyObjectRepository metadata;
@@ -90,11 +90,11 @@ namespace HereticalSolutions.Synchronization
 
         public void Cleanup()
         {
-            if (metadata is ICleanUppable)
-                (metadata as ICleanUppable).Cleanup();
+            if (metadata is ICleanuppable)
+                (metadata as ICleanuppable).Cleanup();
 
-            if (pingerAsPublisher is ICleanUppable)
-                (pingerAsPublisher as ICleanUppable).Cleanup();
+            if (pingerAsPublisher is ICleanuppable)
+                (pingerAsPublisher as ICleanuppable).Cleanup();
         }
 
         #endregion

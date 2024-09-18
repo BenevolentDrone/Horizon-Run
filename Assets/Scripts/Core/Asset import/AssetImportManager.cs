@@ -36,7 +36,7 @@ namespace HereticalSolutions.AssetImport
 
 		private readonly IRepository<Type, List<AAssetImportPostProcessor>> postProcessorRepository;
 
-		private readonly IRepository<Type, INonAllocDecoratedPool<AAssetImporter>> importerPoolRepository;
+		private readonly IRepository<Type, IManagedPool<AAssetImporter>> importerPoolRepository;
 
 		private readonly ILoggerResolver loggerResolver;
 
@@ -44,7 +44,7 @@ namespace HereticalSolutions.AssetImport
 
 		public AssetImportManager(
 			IRepository<Type, List<AAssetImportPostProcessor>> postProcessorRepository,
-			IRepository<Type, INonAllocDecoratedPool<AAssetImporter>> importerPoolRepository,
+			IRepository<Type, IManagedPool<AAssetImporter>> importerPoolRepository,
 			ILoggerResolver loggerResolver = null,
 			ILogger logger = null)
 		{
@@ -125,14 +125,14 @@ namespace HereticalSolutions.AssetImport
 
 		#region IAssetImporterPool
 
-		public async Task<IPoolElement<AAssetImporter>> PopImporter<TImporter>()
+		public async Task<IPoolElementFacade<AAssetImporter>> PopImporter<TImporter>()
 			where TImporter : AAssetImporter
 		{
 			return PopImporterSync<TImporter>();
 		}
 
 		public async Task PushImporter(
-			IPoolElement<AAssetImporter> pooledImporter)
+			IPoolElementFacade<AAssetImporter> pooledImporter)
 		{
 			pooledImporter.Value.Cleanup();
 
@@ -143,14 +143,14 @@ namespace HereticalSolutions.AssetImport
 
 		#endregion
 
-		private IPoolElement<AAssetImporter> PopImporterSync<TImporter>()
+		private IPoolElementFacade<AAssetImporter> PopImporterSync<TImporter>()
 			where TImporter : AAssetImporter
 		{
-			INonAllocDecoratedPool<AAssetImporter> importerPool;
+			IManagedPool<AAssetImporter> importerPool;
 
 			if (!importerPoolRepository.Has(typeof(TImporter)))
 			{
-				importerPool = PoolsFactory.BuildSimpleResizableObjectPool<AAssetImporter, TImporter>(
+				importerPool = ObjectPoolsFactory.BuildManagedObjectPool<AAssetImporter, TImporter>(
 					initialAllocation,
 					additionalAllocation,
 					loggerResolver,

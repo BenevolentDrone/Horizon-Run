@@ -1,5 +1,7 @@
 using System;
 
+using HereticalSolutions.LifetimeManagement;
+
 using HereticalSolutions.MVVM.View;
 
 using HereticalSolutions.Logging;
@@ -10,7 +12,9 @@ using UnityEngine.UIElements;
 namespace HereticalSolutions.MVVM.UIToolkit
 {
     public class ToggleView
-        : AView
+        : AView,
+          IInitializable,
+          ICleanuppable
     {
         protected string propertyID;
         
@@ -34,13 +38,13 @@ namespace HereticalSolutions.MVVM.UIToolkit
             this.toggle = toggle;
         }
 
-        protected override void InitializeInternal(object[] args)
+        public bool Initialize(object[] args)
         {
             if (!viewModel.GetObservable<bool>(
                 propertyID,
                 out boolProperty))
                 throw new Exception(
-                    logger.TryFormat<ToggleView>(
+                    logger.TryFormatException<ToggleView>(
                         $"Could not obtain property \"{propertyID}\" from ViewModel \"{viewModel.GetType()}\""));
 
             boolProperty.OnValueChanged += OnBoolChanged;
@@ -48,6 +52,8 @@ namespace HereticalSolutions.MVVM.UIToolkit
             OnBoolChanged(boolProperty.Value);
             
             toggle.RegisterValueChangedCallback(OnToggleValueChanged);
+
+            return true;
         }
         
         protected virtual void OnBoolChanged(bool newValue)
@@ -67,7 +73,7 @@ namespace HereticalSolutions.MVVM.UIToolkit
             togglePressed = false;
         }
 
-        protected override void CleanupInternal()
+        public void Cleanup()
         {
             togglePressed = false;
             
@@ -79,8 +85,6 @@ namespace HereticalSolutions.MVVM.UIToolkit
             }
             
             toggle.UnregisterValueChangedCallback(OnToggleValueChanged);
-
-            base.CleanupInternal();
         }
     }
 }

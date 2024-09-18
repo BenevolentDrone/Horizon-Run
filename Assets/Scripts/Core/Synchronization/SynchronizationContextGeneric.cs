@@ -11,7 +11,7 @@ namespace HereticalSolutions.Synchronization
 	public class SynchronizationContextGeneric<TDelta>
 		: ISynchronizableGenericArg<TDelta>,
 		  ISynchronizationProvider,
-		  ICleanUppable,
+		  ICleanuppable,
 		  IDisposable
 	{
 		private readonly IReadOnlyObjectRepository metadata;
@@ -122,11 +122,11 @@ namespace HereticalSolutions.Synchronization
 
 		public void Cleanup()
 		{
-			if (metadata is ICleanUppable)
-				(metadata as ICleanUppable).Cleanup();
+			if (metadata is ICleanuppable)
+				(metadata as ICleanuppable).Cleanup();
 
-			if (broadcasterAsPublisher is ICleanUppable)
-				(broadcasterAsPublisher as ICleanUppable).Cleanup();
+			if (broadcasterAsPublisher is ICleanuppable)
+				(broadcasterAsPublisher as ICleanuppable).Cleanup();
 		}
 
 		#endregion

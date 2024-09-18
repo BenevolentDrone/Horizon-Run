@@ -13,17 +13,17 @@ MonoBehaviour:
   m_Name: Player (simulation)
   m_EditorClassIdentifier: 
   EntityJson: "{\n  \"PrototypeID\": \"Player\",\n  \"Components\": [\n    {\n     
-    \"$type\": \"HereticalSolutions.Samples.ECSCharacterControllerSample.SamplePlayerComponent,
-    Assembly-CSharp\"\n    },\n    {\n      \"$type\": \"HereticalSolutions.Samples.ECSCharacterControllerSample.SamplePositionComponent,
+    \"$type\": \"VirtuosGames.Samples.ECSCharacterControllerSample.SamplePlayerComponent,
+    Assembly-CSharp\"\n    },\n    {\n      \"$type\": \"VirtuosGames.Samples.ECSCharacterControllerSample.SamplePositionComponent,
     Assembly-CSharp\",\n      \"Position\": {\n        \"x\": 0.0,\n        \"y\":
     0.0,\n        \"magnitude\": 0.0,\n        \"sqrMagnitude\": 0.0\n      }\n   
-    },\n    {\n      \"$type\": \"HereticalSolutions.Samples.ECSCharacterControllerSample.SampleRotationComponent,
-    Assembly-CSharp\",\n      \"Angle\": 0.0\n    },\n    {\n      \"$type\": \"HereticalSolutions.Samples.ECSCharacterControllerSample.SampleSteeringComponent,
+    },\n    {\n      \"$type\": \"VirtuosGames.Samples.ECSCharacterControllerSample.SampleRotationComponent,
+    Assembly-CSharp\",\n      \"Angle\": 0.0\n    },\n    {\n      \"$type\": \"VirtuosGames.Samples.ECSCharacterControllerSample.SampleSteeringComponent,
     Assembly-CSharp\",\n      \"TargetAngle\": 0.0,\n      \"AngularSpeed\": 700.0\n   
-    },\n    {\n      \"$type\": \"HereticalSolutions.Samples.ECSCharacterControllerSample.SampleLocomotionComponent,
+    },\n    {\n      \"$type\": \"VirtuosGames.Samples.ECSCharacterControllerSample.SampleLocomotionComponent,
     Assembly-CSharp\",\n      \"MaxLocomotionSpeed\": 5.0,\n      \"LocomotionVector\":
     {\n        \"x\": 0.0,\n        \"y\": 0.0,\n        \"magnitude\": 0.0,\n       
-    \"sqrMagnitude\": 0.0\n      }\n    },\n    {\n      \"$type\": \"HereticalSolutions.Samples.ECSCharacterControllerSample.SampleLocomotionMemoryComponent,
+    \"sqrMagnitude\": 0.0\n      }\n    },\n    {\n      \"$type\": \"VirtuosGames.Samples.ECSCharacterControllerSample.SampleLocomotionMemoryComponent,
     Assembly-CSharp\",\n      \"LastLocomotionVector\": {\n        \"x\": 0.0,\n       
     \"y\": 0.0,\n        \"magnitude\": 0.0,\n        \"sqrMagnitude\": 0.0\n     
     }\n    }\n  ]\n}"

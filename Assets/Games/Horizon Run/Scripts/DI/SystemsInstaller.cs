@@ -44,6 +44,9 @@ namespace HereticalSolutions.HorizonRun.DI
 		private DefaultECSEntityListManager entityListManager;
 
 		[Inject]
+		private DefaultECSEntityHierarchyManager entityHierarchyManager;
+
+		[Inject]
 		private UniversalTemplateEntityManager entityManager;
 		
 		[Inject]
@@ -71,7 +74,7 @@ namespace HereticalSolutions.HorizonRun.DI
 		
 
 		[Inject]
-		private INonAllocDecoratedPool<GameObject> gameObjectPool;
+		private IManagedPool<GameObject> gameObjectPool;
 
 
         [SerializeField]
@@ -169,6 +172,7 @@ namespace HereticalSolutions.HorizonRun.DI
 					entityManager,
 					eventEntityBuilder,
 					entityListManager,
+					entityHierarchyManager,
 					simulationUpdateTimerManager,
 					loggerResolver);
 			}					
@@ -186,6 +190,7 @@ namespace HereticalSolutions.HorizonRun.DI
 				entityManager,
 				eventEntityBuilder,
 				entityListManager,
+				entityHierarchyManager,
 				includeViewWorld,
 				loggerResolver);
 
@@ -199,6 +204,7 @@ namespace HereticalSolutions.HorizonRun.DI
 					viewWorld,
 					simulationUpdateTimerManager,
 					entityListManager,
+					entityHierarchyManager,
 					includeViewWorld,
 					loggerResolver)
 				: new PlaceholderSystem();
@@ -210,8 +216,8 @@ namespace HereticalSolutions.HorizonRun.DI
 			ISystem<float> fixedUpdateSystems = (includeSimulationWorld)
 				? SystemsFactory.BuildFixedUpdateSystems(
 					simulationWorld,
-					entityManager,
-					entityListManager)
+					entityHierarchyManager,
+					loggerResolver)
 				: new PlaceholderSystem();
 
 			#endregion
@@ -223,8 +229,10 @@ namespace HereticalSolutions.HorizonRun.DI
 					viewWorld,
 					entityManager,
 					eventEntityBuilder,
+					entityHierarchyManager,
 					mainRenderCamera,
-					uiManager)
+					uiManager,
+					loggerResolver)
 				: new PlaceholderSystem();
 
 			#endregion

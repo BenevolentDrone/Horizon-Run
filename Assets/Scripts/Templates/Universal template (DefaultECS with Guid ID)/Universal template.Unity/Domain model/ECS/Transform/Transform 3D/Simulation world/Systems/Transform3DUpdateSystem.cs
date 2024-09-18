@@ -1,5 +1,7 @@
 using HereticalSolutions.Entities;
 
+using ILogger = HereticalSolutions.Logging.ILogger;
+
 using UnityEngine;
 
 using DefaultEcs;
@@ -9,18 +11,23 @@ namespace HereticalSolutions.Templates.Universal.Unity
 {
 	public class Transform3DUpdateSystem : AEntitySetSystem<float>
 	{
-		private readonly DefaultECSEntityListManager entityListManager;
+		private readonly DefaultECSEntityHierarchyManager entityHierarchyManager;
+
+		private readonly ILogger logger;
 
 		public Transform3DUpdateSystem(
 			World world,
-			DefaultECSEntityListManager entityListManager)
+			DefaultECSEntityHierarchyManager entityHierarchyManager,
+			ILogger logger = null)
 			: base(
 				world
 					.GetEntities()
 					.With<Transform3DComponent>()
 					.AsSet())
 		{
-			this.entityListManager = entityListManager;
+			this.entityHierarchyManager = entityHierarchyManager;
+
+			this.logger = logger;
 		}
 
 		protected override void Update(
@@ -64,7 +71,8 @@ namespace HereticalSolutions.Templates.Universal.Unity
 
 			TransformHelpers.UpdateTransform3DRecursively(
 				entity,
-				entityListManager);
+				entityHierarchyManager,
+				logger);
 
 			//DEBUG
 			worldPosition = TransformHelpers.GetWorldPosition3D(

@@ -18,7 +18,7 @@ namespace HereticalSolutions.ResourceManagement
 		: IRuntimeResourceManager,
 		  IAsyncContainsRootResources,
 		  IContainsDependencyResources,
-		  ICleanUppable,
+		  ICleanuppable,
 		  IDisposable
 	{
 		private readonly IRepository<int, string> rootResourceIDHashToID;
@@ -874,14 +874,14 @@ namespace HereticalSolutions.ResourceManagement
 
 		public void Cleanup()
 		{
-			if (rootResourceIDHashToID is ICleanUppable)
-				(rootResourceIDHashToID as ICleanUppable).Cleanup();
+			if (rootResourceIDHashToID is ICleanuppable)
+				(rootResourceIDHashToID as ICleanuppable).Cleanup();
 
-			if (rootResourcesRepository is ICleanUppable)
-				(rootResourcesRepository as ICleanUppable).Cleanup();
+			if (rootResourcesRepository is ICleanuppable)
+				(rootResourcesRepository as ICleanuppable).Cleanup();
 
-			if (rootResourceAddedNotifier is ICleanUppable)
-				(rootResourceAddedNotifier as ICleanUppable).Cleanup();
+			if (rootResourceAddedNotifier is ICleanuppable)
+				(rootResourceAddedNotifier as ICleanuppable).Cleanup();
 		}
 
 		#endregion
@@ -946,7 +946,7 @@ namespace HereticalSolutions.ResourceManagement
 
 				if (concurrentCurrentData == null)
 					throw new Exception(
-						logger.TryFormat<ConcurrentRuntimeResourceManager>(
+						logger.TryFormatException<ConcurrentRuntimeResourceManager>(
 							$"RESOURCE DATA {currentData.Descriptor.ID} IS NOT CONCURRENT"));
 
 				currentData = await concurrentCurrentData
@@ -968,7 +968,7 @@ namespace HereticalSolutions.ResourceManagement
 
 				if (concurrentCurrentData == null)
 					throw new Exception(
-						logger.TryFormat<ConcurrentRuntimeResourceManager>(
+						logger.TryFormatException<ConcurrentRuntimeResourceManager>(
 							$"RESOURCE DATA {currentData.Descriptor.ID} IS NOT CONCURRENT"));
 
 				currentData = await concurrentCurrentData

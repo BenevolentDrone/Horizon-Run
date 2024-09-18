@@ -1,22 +1,25 @@
 using System;
 
-using HereticalSolutions.Collections;
-
 using HereticalSolutions.Allocations;
 using HereticalSolutions.Allocations.Factories;
-
+using HereticalSolutions.Collections;
 using HereticalSolutions.Delegates.Pinging;
 
 using HereticalSolutions.Pools;
 using HereticalSolutions.Pools.Factories;
 
+using HereticalSolutions.Metadata.Allocations;
+
 using HereticalSolutions.Logging;
 
 namespace HereticalSolutions.Delegates.Factories
 {
-    public static partial class DelegatesFactory
+    public static class PingersFactory
     {
         private const int DEFAULT_PINGER_CAPACITY = 16;
+
+        //TODO: make thread safe
+        private static ManagedPoolBuilder<ISubscription> managedPoolBuilder;
 
         #region Pinger
         
@@ -34,13 +37,17 @@ namespace HereticalSolutions.Delegates.Factories
         {
             Func<ISubscription> valueAllocationDelegate = AllocationsFactory.NullAllocationDelegate<ISubscription>;
 
-            var subscriptionsPool = PoolsFactory.BuildResizableNonAllocPool<ISubscription>(
+            if (managedPoolBuilder == null)
+                managedPoolBuilder = new ManagedPoolBuilder<ISubscription>(
+                    loggerResolver,
+                    loggerResolver?.GetLogger<ManagedPoolBuilder<ISubscription>>());
+            
+            managedPoolBuilder.Initialize(
                 valueAllocationDelegate,
-                false,
 
-                new []
+                new Func<MetadataAllocationDescriptor>[]
                 {
-                    PoolsFactory.BuildIndexedMetadataDescriptor()
+                    //ObjectPoolsMetadataFactory.BuildIndexedMetadataDescriptor
                 },
                 new AllocationCommandDescriptor
                 {
@@ -52,8 +59,12 @@ namespace HereticalSolutions.Delegates.Factories
                 {
                     Rule = EAllocationAmountRule.DOUBLE_AMOUNT
                 },
-                loggerResolver);
+                
+                null,
+                null);
 
+            var subscriptionsPool = managedPoolBuilder.BuildPackedArrayManagedPool();
+            
             return BuildNonAllocPinger(
                 subscriptionsPool,
                 loggerResolver);
@@ -66,17 +77,25 @@ namespace HereticalSolutions.Delegates.Factories
         {
             Func<ISubscription> valueAllocationDelegate = AllocationsFactory.NullAllocationDelegate<ISubscription>;
 
-            var subscriptionsPool = PoolsFactory.BuildResizableNonAllocPool<ISubscription>(
+            if (managedPoolBuilder == null)
+                managedPoolBuilder = new ManagedPoolBuilder<ISubscription>(
+                    loggerResolver,
+                    loggerResolver?.GetLogger<ManagedPoolBuilder<ISubscription>>());
+            
+            managedPoolBuilder.Initialize(
                 valueAllocationDelegate,
-                false,
 
-                new []
+                new Func<MetadataAllocationDescriptor>[]
                 {
-                    PoolsFactory.BuildIndexedMetadataDescriptor()
+                    //ObjectPoolsMetadataFactory.BuildIndexedMetadataDescriptor
                 },
                 initial,
                 additional,
-                loggerResolver);
+                
+                null,
+                null);
+            
+            var subscriptionsPool = managedPoolBuilder.BuildPackedArrayManagedPool();
 
             return BuildNonAllocPinger(
                 subscriptionsPool,
@@ -84,18 +103,19 @@ namespace HereticalSolutions.Delegates.Factories
         }
 
         public static NonAllocPinger BuildNonAllocPinger(
-            INonAllocDecoratedPool<ISubscription> subscriptionsPool,
+            IManagedPool<ISubscription> subscriptionsPool,
             ILoggerResolver loggerResolver = null)
         {
-            var contents = ((IModifiable<INonAllocPool<ISubscription>>)subscriptionsPool).Contents;
-
             ILogger logger =
                 loggerResolver?.GetLogger<NonAllocPinger>()
                 ?? null;
 
+            IDynamicArray<IPoolElementFacade<ISubscription>> subscriptionsContents =
+                subscriptionsPool as IDynamicArray<IPoolElementFacade<ISubscription>>;
+            
             return new NonAllocPinger(
                 subscriptionsPool,
-                contents,
+                subscriptionsContents,
                 logger);
         }
         

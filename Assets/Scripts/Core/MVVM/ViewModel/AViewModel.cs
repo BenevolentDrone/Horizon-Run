@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 
 using HereticalSolutions.Repositories;
 
@@ -10,8 +9,8 @@ using HereticalSolutions.Logging;
 namespace HereticalSolutions.MVVM.ViewModel
 {
     public abstract class AViewModel
-        : ALifetimeable,
-          IViewModel
+        : IViewModel,
+          ICleanuppable
     {
         protected readonly IRepository<string, CommandDelegate> commands;
 
@@ -19,55 +18,23 @@ namespace HereticalSolutions.MVVM.ViewModel
 
         protected readonly IRepository<string, object> observables;
 
+        protected readonly ILogger logger;
+
         public AViewModel(
             IRepository<string, CommandDelegate> commands,
             IRepository<string, CommandWithArgsDelegate> commandsWithArguments,
             IRepository<string, object> observables,
             ILogger logger = null)
-            : base (logger)
         {
             this.commands = commands;
 
             this.commandsWithArguments = commandsWithArguments;
 
             this.observables = observables;
+            
+            this.logger = logger;
         }
-
-        //VMs should not be implementing a default IInitializable because they should be called Initialize(..) with their specific arguments
-        //by other VMs or bootstrappers that DO know which VMs they're initializing and what arguments they need
-        //
-        //Views on the other side are not required to have specific arguments to be initialized, so they can implement a default IInitializable
-        /*
-        #region IIinitializable
-
-        public virtual void Initialize(object[] args)
-        {
-            if (!IsSetUp)
-            {
-                throw new Exception(
-                    logger.TryFormat(
-                        GetType(),
-                        "VIEWMODEL SHOULD BE SET UP BEFORE BEING INITIALIZED"));
-            }
-
-            if (IsInitialized)
-            {
-                throw new Exception(
-                    logger.TryFormat(
-                        GetType(),
-                        $"INITIALIZING VIEWMODEL THAT IS ALREADY INITIALIZED"));
-            }
-
-            InitializeInternal(args);
-
-            IsInitialized = true;
-
-            OnInitialized?.Invoke();
-        }
-
-        #endregion
-        */
-
+        
         #region IViewModel
 
         /// <summary>
@@ -104,7 +71,7 @@ namespace HereticalSolutions.MVVM.ViewModel
                 out CommandDelegate result))
             {
                 throw new Exception(
-                    logger.TryFormat(
+                    logger.TryFormatException(
                         GetType(),
                         $"EXPOSED COMMANDS LIST DOES NOT HAVE A KEY \"{key}\""));
             }
@@ -124,7 +91,7 @@ namespace HereticalSolutions.MVVM.ViewModel
                 out CommandWithArgsDelegate result))
             {
                 throw new Exception(
-                    logger.TryFormat(
+                    logger.TryFormatException(
                         GetType(),
                         $"EXPOSED COMMANDS WITH ARGUMENTS LIST DOES NOT HAVE A KEY \"{key}\""));
             }
@@ -134,13 +101,11 @@ namespace HereticalSolutions.MVVM.ViewModel
 
         #endregion
 
-        protected override void CleanupInternal()
+        public void Cleanup()
         {
             UnpublishObservables();
 
             UnpublishCommands();
-
-            base.CleanupInternal();
         }
 
         /// <summary>
@@ -181,7 +146,7 @@ namespace HereticalSolutions.MVVM.ViewModel
             if (observables.Has(key))
             {
                 throw new Exception(
-                    logger.TryFormat(
+                    logger.TryFormatException(
                         GetType(),
                         $"EXPOSED OBSERVABLES LIST ALREADY HAS A KEY \"{key}\""));
             }
@@ -209,7 +174,7 @@ namespace HereticalSolutions.MVVM.ViewModel
             if (commands.Has(key))
             {
                 throw new Exception(
-                    logger.TryFormat(
+                    logger.TryFormatException(
                         GetType(),
                         $"EXPOSED COMMANDS LIST ALREADY HAS A KEY \"{key}\""));
             }
@@ -231,7 +196,7 @@ namespace HereticalSolutions.MVVM.ViewModel
             if (commandsWithArguments.Has(key))
             {
                 throw new Exception(
-                    logger.TryFormat(
+                    logger.TryFormatException(
                         GetType(),
                         $"EXPOSED COMMANDS WITH ARGUMENTS LIST ALREADY HAS A KEY \"{key}\""));
             }

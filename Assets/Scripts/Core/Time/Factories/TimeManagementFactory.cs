@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 using HereticalSolutions.Pools;
 
 using HereticalSolutions.Repositories.Factories;
@@ -49,7 +51,8 @@ namespace HereticalSolutions.Time.Factories
         {
             return new TimerManager(
                 managerID,
-                RepositoriesFactory.BuildDictionaryRepository<ushort, IPoolElement<TimerWithSubscriptionsContainer>>(),
+                RepositoriesFactory.BuildDictionaryRepository<int, IPoolElementFacade<TimerWithSubscriptionsContainer>>(),
+                RepositoriesFactory.BuildDictionaryRepository<string, List<DurationHandlePair>>(),
                 TimerPoolFactory.BuildRuntimeTimersPool(
                     provider,
                     loggerResolver),

@@ -2,12 +2,18 @@ using System.Collections.Generic;
 
 namespace HereticalSolutions.Hierarchy
 {
-	public interface IReadOnlyHierarchyNode
+	public interface IReadOnlyHierarchyNode<TContents>
 	{
+		TContents Contents { get; }
+		
 		bool IsRoot { get; }
 
-		IReadOnlyHierarchyNode Parent { get; }
+		bool IsLeaf { get; }
 
-		IEnumerable<IReadOnlyHierarchyNode> Children { get; }
+		IReadOnlyHierarchyNode<TContents> Parent { get; }
+
+		IEnumerable<IReadOnlyHierarchyNode<TContents>> Children { get; }
+
+		int ChildCount { get; }
 	}
 }

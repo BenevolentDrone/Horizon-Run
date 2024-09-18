@@ -1,9 +1,9 @@
 using System;
 
-using HereticalSolutions.Collections;
-
 using HereticalSolutions.Allocations;
 using HereticalSolutions.Allocations.Factories;
+
+using HereticalSolutions.Collections;
 
 using HereticalSolutions.Delegates.Factories;
 
@@ -12,6 +12,8 @@ using HereticalSolutions.Pools.Factories;
 
 using HereticalSolutions.Repositories;
 using HereticalSolutions.Repositories.Factories;
+
+using HereticalSolutions.Metadata.Allocations;
 
 using HereticalSolutions.Logging;
 
@@ -25,6 +27,10 @@ namespace HereticalSolutions.Messaging.Factories
 
         private readonly NonAllocBroadcasterWithRepositoryBuilder broadcasterBuilder;
 
+        private readonly ManagedPoolBuilder<IMessage> messagePoolBuilder;
+
+        private readonly ManagedPoolBuilder<IPoolElementFacade<IMessage>> mailboxPoolBuilder;
+
         private readonly ILoggerResolver loggerResolver;
 
 
@@ -37,19 +43,26 @@ namespace HereticalSolutions.Messaging.Factories
 
             broadcasterBuilder = new NonAllocBroadcasterWithRepositoryBuilder(
                 loggerResolver);
+            
+            messagePoolBuilder = new ManagedPoolBuilder<IMessage>(
+                loggerResolver,
+                loggerResolver?.GetLogger<ManagedPoolBuilder<IMessage>>());
+            
+            mailboxPoolBuilder = new ManagedPoolBuilder<IPoolElementFacade<IMessage>>(
+                loggerResolver,
+                loggerResolver?.GetLogger<ManagedPoolBuilder<IPoolElementFacade<IMessage>>>());
         }
 
         public NonAllocMessageBusBuilder AddMessageType<TMessage>()
         {
             Func<IMessage> valueAllocationDelegate = AllocationsFactory.ActivatorAllocationDelegate<IMessage, TMessage>;
             
-            INonAllocDecoratedPool<IMessage> messagePool = PoolsFactory.BuildResizableNonAllocPool<IMessage>(
+            messagePoolBuilder.Initialize(
                 valueAllocationDelegate,
-                true,
 
-                new []
+                new Func<MetadataAllocationDescriptor>[]
                 {
-                    PoolsFactory.BuildIndexedMetadataDescriptor()
+                    //ObjectPoolsMetadataFactory.BuildIndexedMetadataDescriptor
                 },
                 new AllocationCommandDescriptor
                 {
@@ -61,7 +74,10 @@ namespace HereticalSolutions.Messaging.Factories
                 {
                     Rule = EAllocationAmountRule.DOUBLE_AMOUNT
                 },
-                loggerResolver);
+                null,
+                null);
+            
+            IManagedPool<IMessage> messagePool = messagePoolBuilder.BuildPackedArrayManagedPool();
             
             messagePoolRepository.Add(
                 typeof(TMessage),
@@ -74,15 +90,14 @@ namespace HereticalSolutions.Messaging.Factories
 
         public NonAllocMessageBus Build()
         {
-            Func<IPoolElement<IMessage>> valueAllocationDelegate = AllocationsFactory.NullAllocationDelegate<IPoolElement<IMessage>>;
+            Func<IPoolElementFacade<IMessage>> valueAllocationDelegate = AllocationsFactory.NullAllocationDelegate<IPoolElementFacade<IMessage>>;
             
-            INonAllocDecoratedPool<IPoolElement<IMessage>> mailbox = PoolsFactory.BuildResizableNonAllocPool<IPoolElement<IMessage>>(
+            mailboxPoolBuilder.Initialize(
                 valueAllocationDelegate,
-                false,
 
-                new []
+                new Func<MetadataAllocationDescriptor>[]
                 {
-                    PoolsFactory.BuildIndexedMetadataDescriptor()
+                    //ObjectPoolsMetadataFactory.BuildIndexedMetadataDescriptor
                 },
                 new AllocationCommandDescriptor
                 {
@@ -94,21 +109,23 @@ namespace HereticalSolutions.Messaging.Factories
                 {
                     Rule = EAllocationAmountRule.DOUBLE_AMOUNT
                 },
-                loggerResolver);
-            
-            var mailboxContents = ((IModifiable<INonAllocPool<IPoolElement<IMessage>>>)mailbox).Contents;
-            
-            var mailboxContentAsIndexable = (IIndexable<IPoolElement<IPoolElement<IMessage>>>)mailboxContents;
+                null,
+                null);
+
+            var mailbox = mailboxPoolBuilder.BuildPackedArrayManagedPool();
             
             ILogger logger = 
                 loggerResolver?.GetLogger<NonAllocMessageBus>()
                 ?? null;
 
+            var mailboxContents =
+                mailbox as IDynamicArray<IPoolElementFacade<IPoolElementFacade<IMessage>>>;
+            
             return new NonAllocMessageBus(
                 broadcasterBuilder.Build(),
                 (IReadOnlyObjectRepository)messagePoolRepository,
                 mailbox,
-                mailboxContentAsIndexable,
+                mailboxContents,
                 logger);
         }
     }

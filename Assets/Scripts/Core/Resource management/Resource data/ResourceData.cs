@@ -16,7 +16,7 @@ namespace HereticalSolutions.ResourceManagement
 	public class ResourceData
 		: IResourceData,
 		  IContainsDependencyResourceVariants,
-		  ICleanUppable,
+		  ICleanuppable,
 		  IDisposable
 	{
 		private readonly IRepository<int, string> variantIDHashToID;
@@ -510,7 +510,7 @@ namespace HereticalSolutions.ResourceManagement
 
 			if (dependencyResourceVariant == null)
 				throw new Exception(
-					logger.TryFormat<ResourceData>(
+					logger.TryFormatException<ResourceData>(
 						$"VARIANT {(string.IsNullOrEmpty(variantID) ? "NULL" : variantID)} DOES NOT EXIST"));
 
 			return dependencyResourceVariant;
@@ -522,17 +522,17 @@ namespace HereticalSolutions.ResourceManagement
 
 		public void Cleanup()
 		{
-			if (variantIDHashToID is ICleanUppable)
-				(variantIDHashToID as ICleanUppable).Cleanup();
+			if (variantIDHashToID is ICleanuppable)
+				(variantIDHashToID as ICleanuppable).Cleanup();
 
-			if (variantsRepository is ICleanUppable)
-				(variantsRepository as ICleanUppable).Cleanup();
+			if (variantsRepository is ICleanuppable)
+				(variantsRepository as ICleanuppable).Cleanup();
 
-			if (nestedResourceIDHashToID is ICleanUppable)
-				(nestedResourceIDHashToID as ICleanUppable).Cleanup();
+			if (nestedResourceIDHashToID is ICleanuppable)
+				(nestedResourceIDHashToID as ICleanuppable).Cleanup();
 
-			if (nestedResourcesRepository is ICleanUppable)
-				(nestedResourcesRepository as ICleanUppable).Cleanup();
+			if (nestedResourcesRepository is ICleanuppable)
+				(nestedResourcesRepository as ICleanuppable).Cleanup();
 		}
 
 		#endregion

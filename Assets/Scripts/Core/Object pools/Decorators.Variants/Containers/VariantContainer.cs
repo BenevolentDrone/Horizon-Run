@@ -14,6 +14,6 @@ namespace HereticalSolutions.Pools
         /// <summary>
         /// The variant pool of objects.
         /// </summary>
-        public INonAllocDecoratedPool<T> Pool;
+        public IManagedPool<T> Pool;
     }
 }

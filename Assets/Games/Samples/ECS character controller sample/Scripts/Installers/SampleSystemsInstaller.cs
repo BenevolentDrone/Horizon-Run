@@ -15,7 +15,7 @@ using DefaultEcs.System;
 
 using Zenject;
 
-namespace HereticalSolutions.Samples.ECSCharacterControllerSample.DI
+namespace HereticalSolutions.Samples.ECSCharacterControllerSample.Installers
 {
 	public class SampleSystemsInstaller : MonoInstaller
 	{
@@ -35,7 +35,7 @@ namespace HereticalSolutions.Samples.ECSCharacterControllerSample.DI
 		private ITimeManager lateUpdateTimeManager;
 
 		[Inject]
-		private INonAllocDecoratedPool<GameObject> gameObjectPool;
+		private IManagedPool<GameObject> gameObjectPool;
 
 		[SerializeField]
 		private SampleECSUpdateBehaviour sampleECSUpdateBehaviour;

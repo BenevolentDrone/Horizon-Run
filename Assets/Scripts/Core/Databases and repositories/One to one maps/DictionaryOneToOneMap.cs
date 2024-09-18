@@ -9,7 +9,7 @@ namespace HereticalSolutions.Repositories
 {
     public class DictionaryOneToOneMap<TValue1, TValue2> :
         IOneToOneMap<TValue1, TValue2>,
-        ICleanUppable,
+        ICleanuppable,
         IDisposable
     {
         private readonly Dictionary<TValue1, TValue2> leftToRightDatabase;
@@ -76,7 +76,7 @@ namespace HereticalSolutions.Repositories
             {
                 if (leftToRightDatabase.Count != rightToLeftDatabase.Count)
                     throw new Exception(
-                        logger.TryFormat<DictionaryOneToOneMap<TValue1, TValue2>>(
+                        logger.TryFormatException<DictionaryOneToOneMap<TValue1, TValue2>>(
                             $"LEFT TO RIGHT MAP COUNT ({leftToRightDatabase.Count}) IS NOT EQUAL TO RIGHT TO LEFT MAP COUNT ({rightToLeftDatabase.Count})"));
 
                 return leftToRightDatabase.Count;
@@ -288,14 +288,14 @@ namespace HereticalSolutions.Repositories
         {
             foreach (var value in leftToRightDatabase.Values)
             {
-                if (value is ICleanUppable)
-                    (value as ICleanUppable).Cleanup();
+                if (value is ICleanuppable)
+                    (value as ICleanuppable).Cleanup();
             }
             
             foreach (var value in rightToLeftDatabase.Values)
             {
-                if (value is ICleanUppable)
-                    (value as ICleanUppable).Cleanup();
+                if (value is ICleanuppable)
+                    (value as ICleanuppable).Cleanup();
             }
 
             Clear();

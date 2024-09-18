@@ -51,6 +51,11 @@ namespace HereticalSolutions.Entities
 
 			foreach (var viewComponent in viewComponents)
 			{
+				if (viewComponent == null)
+				{
+					UnityEngine.Debug.LogError($"[GameObjectViewEntityAdapter] MISSING REFERENCE", this);
+				}
+
 				viewComponent.Install(viewEntity);
 			}
 

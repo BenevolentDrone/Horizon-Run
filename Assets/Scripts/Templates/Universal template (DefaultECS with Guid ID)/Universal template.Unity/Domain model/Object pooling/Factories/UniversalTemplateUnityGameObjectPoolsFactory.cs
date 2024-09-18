@@ -1,9 +1,11 @@
 using System;
 
+using HereticalSolutions.Allocations;
 using HereticalSolutions.Allocations.Factories;
 
 using HereticalSolutions.Pools;
 using HereticalSolutions.Pools.AllocationCallbacks;
+using HereticalSolutions.Pools.Decorators;
 using HereticalSolutions.Pools.Factories;
 
 using HereticalSolutions.Metadata.Allocations;
@@ -18,7 +20,7 @@ namespace HereticalSolutions.Templates.Universal.Unity.Factories
 {
 	public static class UniversalTemplateUnityGameObjectPoolsFactory
 	{
-		public static INonAllocDecoratedPool<GameObject> BuildPool(
+		public static IManagedPool<GameObject> BuildPool(
 			DiContainer container,
 			GameObjectPoolSettings settings,
 			Transform parentTransform = null,
@@ -26,46 +28,33 @@ namespace HereticalSolutions.Templates.Universal.Unity.Factories
 		{
 			#region Builders
 
-			// Create a builder for pools with address.
-			var poolWithAddressBuilder = new PoolWithAddressBuilder<GameObject>(
+			var managedPoolBuilder = new ManagedPoolBuilder<GameObject>(
 				loggerResolver,
-				loggerResolver?.GetLogger<PoolWithAddressBuilder<GameObject>>());
-
-			// Create a builder for pools with variants.
-			var poolWithVariantsBuilder = new PoolWithVariantsBuilder<GameObject>(
-				loggerResolver,
-				loggerResolver?.GetLogger<PoolWithVariantsBuilder<GameObject>>());
-
-			// Create a builder for resizable pools.
-			var resizablePoolBuilder = new ResizablePoolBuilder<GameObject>(
-				loggerResolver,
-				loggerResolver?.GetLogger<ResizablePoolBuilder<GameObject>>());
+				loggerResolver?.GetLogger<ManagedPoolBuilder<GameObject>>());
 
 			#endregion
 
 			#region Callbacks
 
-			// Create a push to decorated pool callback.
-			PushToDecoratedPoolCallback<GameObject> pushCallback =
-				PoolsFactory.BuildPushToDecoratedPoolCallback<GameObject>(
-					PoolsFactory.BuildDeferredCallbackQueue<GameObject>());
+			PushToManagedPoolWhenAvailableCallback<GameObject> pushCallback =
+				ObjectPoolsAllocationCallbacksFactory.BuildPushToManagedPoolWhenAvailableCallback<GameObject>();
 
 			#endregion
 
 			#region Metadata descriptor builders
 
-			// Create an array of metadata descriptor builder functions.
 			var metadataDescriptorBuilders = new Func<MetadataAllocationDescriptor>[]
 			{
-				PoolsFactory.BuildIndexedMetadataDescriptor,
-				AddressDecoratorsPoolsFactory.BuildAddressMetadataDescriptor,
-				VariantsDecoratorsPoolsFactory.BuildVariantMetadataDescriptor
+				//ObjectPoolsMetadataFactory.BuildIndexedMetadataDescriptor,
+				AddressDecoratorMetadataFactory.BuildAddressMetadataDescriptor,
+				VariantDecoratorMetadataFactory.BuildVariantMetadataDescriptor
 			};
 
 			#endregion
 
-			// Initialize the pool with address builder.
-			poolWithAddressBuilder.Initialize();
+			ManagedPoolWithAddress<GameObject> poolWithAddress =
+				AddressDecoratorPoolsFactory.BuildPoolWithAddress<GameObject>(
+					loggerResolver);
 
 			foreach (var element in settings.Elements)
 			{
@@ -74,18 +63,20 @@ namespace HereticalSolutions.Templates.Universal.Unity.Factories
 				// Get the full address of the element
 				string fullAddress = element.GameObjectAddress;
 
-				// Convert the address to hashes.
+				// Convert the address to hashes
 				int[] addressHashes = fullAddress.AddressToHashes();
 
-				// Build a set address callback.
-				SetAddressCallback<GameObject> setAddressCallback = AddressDecoratorsPoolsFactory.BuildSetAddressCallback<GameObject>(
-					fullAddress,
-					addressHashes);
+				// Build a set address callback
+				SetAddressCallback<GameObject> setAddressCallback =
+					AddressDecoratorAllocationCallbacksFactory.BuildSetAddressCallback<GameObject>(
+						fullAddress,
+						addressHashes);
 
 				#endregion
 
-				// Initialize the pool with variants builder.
-				poolWithVariantsBuilder.Initialize();
+				ManagedPoolWithVariants<GameObject> poolWithVariants =
+					VariantDecoratorPoolsFactory.BuildPoolWithVariants<GameObject>(
+						loggerResolver);
 
 				for (int i = 0; i < element.Variants.Length; i++)
 				{
@@ -93,25 +84,29 @@ namespace HereticalSolutions.Templates.Universal.Unity.Factories
 
 					var currentVariant = element.Variants[i];
 
-					// Build the name of the current variant.
+					// Build the name of the current variant
 					string currentVariantName = $"{fullAddress} (Variant {i.ToString()})";
 
-					// Build a set variant callback.
+					// Build a set variant callback
 					SetVariantCallback<GameObject> setVariantCallback =
-						VariantsDecoratorsPoolsFactory.BuildSetVariantCallback<GameObject>(i);
+						VariantDecoratorAllocationCallbacksFactory.BuildSetVariantCallback<GameObject>(i);
 
-					// Build a rename callback.
+					// Build a rename callback
 					RenameByStringAndIndexCallback renameCallback =
-						UnityDecoratorsPoolsFactory.BuildRenameByStringAndIndexCallback(currentVariantName);
+						UnityDecoratorAllocationCallbacksFactory.BuildRenameByStringAndIndexCallback(currentVariantName);
 
 					#endregion
 
 					#region Allocation callbacks initialization
 
-					// Create an array of allocation callbacks.
-					var callbacks = new IAllocationCallback<GameObject>[]
+					// Create allocation callbacks
+					var valueAllocationCallbacks = new IAllocationCallback<GameObject>[]
 					{
-						renameCallback,
+						renameCallback
+					};
+
+					var facadeAllocationCallbacks = new IAllocationCallback<IPoolElementFacade<GameObject>>[]
+					{
 						setAddressCallback,
 						setVariantCallback,
 						pushCallback
@@ -121,10 +116,10 @@ namespace HereticalSolutions.Templates.Universal.Unity.Factories
 
 					#region Value allocation delegate initialization
 
-					// Get the prefab of the current variant.
+					// Get the prefab of the current variant
 					var prefab = currentVariant.Prefab;
 
-					// Create a value allocation delegate.
+					// Create a value allocation delegate
 					Func<GameObject> valueAllocationDelegate =
 						() => UnityZenjectAllocationsFactory.DIResolveOrInstantiateAllocationDelegate(
 							container,
@@ -132,58 +127,50 @@ namespace HereticalSolutions.Templates.Universal.Unity.Factories
 
 					#endregion
 
-					// Initialize the resizable pool builder.
-					resizablePoolBuilder.Initialize(
+					managedPoolBuilder.Initialize(
 						valueAllocationDelegate,
-						true,
 
 						metadataDescriptorBuilders,
 
 						currentVariant.Initial,
 						currentVariant.Additional,
-						
-						callbacks);
 
-					// Build the resizable pool.
-					var resizablePool = resizablePoolBuilder.BuildSupplyAndMergePool(); //.BuildResizablePool();
+						facadeAllocationCallbacks,
+						valueAllocationCallbacks);
 
-					// Build the game object pool.
-					var gameObjectPool = UnityDecoratorsPoolsFactory.BuildNonAllocGameObjectPool(
+					// Build the resizable pool
+					var resizablePool = managedPoolBuilder.BuildAppendableLinkedListManagedPool();
+
+					// Build the game object pool
+					var gameObjectPool = UnityDecoratorPoolsFactory.BuildGameObjectManagedPool(
 						resizablePool,
 						parentTransform);
 
-					// Build the prefab instance pool.
-					var prefabInstancePool = UnityDecoratorsPoolsFactory.BuildNonAllocPrefabInstancePool(
+					// Build the prefab instance pool
+					var prefabInstancePool = UnityDecoratorPoolsFactory.BuildPrefabInstanceManagedPool(
 						gameObjectPool,
 						prefab);
 
-					// Add the variant to the pool with variants builder.
-					poolWithVariantsBuilder.AddVariant(
+					// Add the variant to the pool with variants builder
+					poolWithVariants.AddVariant(
 						i,
 						currentVariant.Chance,
 						prefabInstancePool);
 				}
 
-				// Build the variant pool.
-				var variantPool = poolWithVariantsBuilder.Build();
-
-				// Parse the address and variant pool to the pool with address builder.
-				poolWithAddressBuilder.Parse(
+				poolWithAddress.AddPool(
 					fullAddress,
-					variantPool);
+					poolWithVariants);
 			}
 
-			// Build the pool with address.
-			var poolWithAddress = poolWithAddressBuilder.Build();
-
-			// Build the pool with ID.
-			var poolWithID = IDDecoratorsPoolsFactory.BuildNonAllocPoolWithID(
+			// Build the pool with ID
+			var poolWithID = PoolWithIDFactory.BuildManagedPoolWithID(
 				poolWithAddress,
 				settings.PoolID,
 				loggerResolver);
 
-			// Set the root of the push callback.
-			pushCallback.Root = poolWithID;
+			// Set the root of the push callback
+			pushCallback.TargetPool = poolWithID;
 
 			return poolWithID;
 		}

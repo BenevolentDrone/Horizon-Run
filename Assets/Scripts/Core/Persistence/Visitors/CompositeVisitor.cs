@@ -38,7 +38,7 @@ namespace HereticalSolutions.Persistence.Visitors
                 typeof(TValue),
                 out object concreteVisitorObject))
                 throw new Exception(
-                    logger.TryFormat<CompositeVisitor>(
+                    logger.TryFormatException<CompositeVisitor>(
                         $"COULD NOT FIND CONCRETE VISITOR FOR VALUE TYPE \"{typeof(TValue).Name}\""));
 
             var concreteVisitor = (ISaveVisitor)concreteVisitorObject;
@@ -56,7 +56,7 @@ namespace HereticalSolutions.Persistence.Visitors
                 typeof(TValue),
                 out object concreteVisitorObject))
                 throw new Exception(
-                    logger.TryFormat<CompositeVisitor>(
+                    logger.TryFormatException<CompositeVisitor>(
                         $"COULD NOT FIND CONCRETE VISITOR FOR VALUE TYPE \"{typeof(TValue).Name}\" AND DTO TYPE \"{typeof(TDTO).Name}\""));
 
             var concreteVisitor = (ISaveVisitorGeneric<TValue, TDTO>)concreteVisitorObject;
@@ -80,7 +80,7 @@ namespace HereticalSolutions.Persistence.Visitors
                 typeof(TValue),
                 out object concreteVisitorObject))
                 throw new Exception(
-                    logger.TryFormat<CompositeVisitor>(
+                    logger.TryFormatException<CompositeVisitor>(
                         $"COULD NOT FIND CONCRETE VISITOR FOR VALUE TYPE \"{typeof(TValue).Name}\""));
 
             var concreteVisitor = (ILoadVisitor)concreteVisitorObject;
@@ -100,7 +100,7 @@ namespace HereticalSolutions.Persistence.Visitors
                 typeof(TValue),
                 out object concreteVisitorObject))
                 throw new Exception(
-                    logger.TryFormat<CompositeVisitor>(
+                    logger.TryFormatException<CompositeVisitor>(
                         $"COULD NOT FIND CONCRETE VISITOR FOR VALUE TYPE \"{typeof(TValue).Name}\" AND DTO TYPE \"{typeof(TDTO).Name}\""));
 
             var concreteVisitor = (ILoadVisitorGeneric<TValue, TDTO>)concreteVisitorObject;
@@ -118,7 +118,7 @@ namespace HereticalSolutions.Persistence.Visitors
                 typeof(TValue),
                 out object concreteVisitorObject))
                 throw new Exception(
-                    logger.TryFormat<CompositeVisitor>(
+                    logger.TryFormatException<CompositeVisitor>(
                         $"COULD NOT FIND CONCRETE VISITOR FOR VALUE TYPE \"{typeof(TValue).Name}\""));
 
             var concreteVisitor = (ILoadVisitor)concreteVisitorObject;
@@ -136,7 +136,7 @@ namespace HereticalSolutions.Persistence.Visitors
                 typeof(TValue),
                 out object concreteVisitorObject))
                 throw new Exception(
-                    logger.TryFormat<CompositeVisitor>(
+                    logger.TryFormatException<CompositeVisitor>(
                         $"COULD NOT FIND CONCRETE VISITOR FOR VALUE TYPE \"{typeof(TValue).Name}\" AND DTO TYPE \"{typeof(TDTO).Name}\""));
 
             var concreteVisitor = (ILoadVisitorGeneric<TValue, TDTO>)concreteVisitorObject;

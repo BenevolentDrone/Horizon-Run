@@ -5,7 +5,7 @@ using HereticalSolutions.Logging;
 
 using Zenject;
 
-namespace HereticalSolutions.Samples.ECSCharacterControllerSample.DI
+namespace HereticalSolutions.Samples.ECSCharacterControllerSample.Installers
 {
 	public class SampleAssetImportManagerInstaller : MonoInstaller
 	{

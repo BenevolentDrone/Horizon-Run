@@ -1,5 +1,7 @@
 using HereticalSolutions.Entities;
 
+using ILogger = HereticalSolutions.Logging.ILogger;
+
 using DefaultEcs;
 using DefaultEcs.System;
 
@@ -7,18 +9,23 @@ namespace HereticalSolutions.Templates.Universal.Unity
 {
 	public class Transform2DUpdateSystem : AEntitySetSystem<float>
 	{
-		private readonly DefaultECSEntityListManager entityListManager;
+		private readonly DefaultECSEntityHierarchyManager entityHierarchyManager;
+
+		private readonly ILogger logger;
 
 		public Transform2DUpdateSystem(
 			World world,
-			DefaultECSEntityListManager entityListManager)
+			DefaultECSEntityHierarchyManager entityHierarchyManager,
+			ILogger logger = null)
 			: base(
 				world
 					.GetEntities()
 					.With<Transform2DComponent>()
 					.AsSet())
 		{
-			this.entityListManager = entityListManager;
+			this.entityHierarchyManager = entityHierarchyManager;
+
+			this.logger = logger;
 		}
 
 		protected override void Update(
@@ -34,7 +41,8 @@ namespace HereticalSolutions.Templates.Universal.Unity
 
 			TransformHelpers.UpdateTransform2DRecursively(
 				entity,
-				entityListManager);
+				entityHierarchyManager,
+				logger);
 		}
 	}
 }

@@ -78,7 +78,7 @@ namespace HereticalSolutions.Persistence.Serializers
                 argument.GetType(),
                 out var strategyObject))
                 throw new Exception(
-                    logger.TryFormat<JSONSerializer>(
+                    logger.TryFormatException<JSONSerializer>(
                         $"COULD NOT RESOLVE STRATEGY BY ARGUMENT: {argument.GetType().Name}"));
 
             var concreteStrategy = (IJsonSerializationStrategy)strategyObject;
@@ -100,7 +100,7 @@ namespace HereticalSolutions.Persistence.Serializers
                 argument.GetType(),
                 out var strategyObject))
                 throw new Exception(
-                    logger.TryFormat<JSONSerializer>(
+                    logger.TryFormatException<JSONSerializer>(
                         $"COULD NOT RESOLVE STRATEGY BY ARGUMENT: {argument.GetType().Name}"));
 
             var concreteStrategy = (IJsonSerializationStrategy)strategyObject;
@@ -125,7 +125,7 @@ namespace HereticalSolutions.Persistence.Serializers
                 argument.GetType(),
                 out var strategyObject))
                 throw new Exception(
-                    logger.TryFormat<JSONSerializer>(
+                    logger.TryFormatException<JSONSerializer>(
                         $"COULD NOT RESOLVE STRATEGY BY ARGUMENT: {argument.GetType().Name}"));
 
             var concreteStrategy = (IJsonSerializationStrategy)strategyObject;
@@ -159,7 +159,7 @@ namespace HereticalSolutions.Persistence.Serializers
                 argument.GetType(),
                 out var strategyObject))
                 throw new Exception(
-                    logger.TryFormat<JSONSerializer>(
+                    logger.TryFormatException<JSONSerializer>(
                         $"COULD NOT RESOLVE STRATEGY BY ARGUMENT: {argument.GetType().Name}"));
 
             var concreteStrategy = (IJsonSerializationStrategy)strategyObject;
@@ -183,7 +183,7 @@ namespace HereticalSolutions.Persistence.Serializers
                 argument.GetType(),
                 out var strategyObject))
                 throw new Exception(
-                    logger.TryFormat<JSONSerializer>(
+                    logger.TryFormatException<JSONSerializer>(
                         $"COULD NOT RESOLVE STRATEGY BY ARGUMENT: {argument.GetType().Name}"));
 
             var concreteStrategy = (IJsonSerializationStrategy)strategyObject;

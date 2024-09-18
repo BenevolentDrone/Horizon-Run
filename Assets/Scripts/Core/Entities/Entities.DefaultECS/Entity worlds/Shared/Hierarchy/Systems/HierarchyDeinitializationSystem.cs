@@ -1,4 +1,9 @@
 using System;
+using System.Collections.Generic;
+
+using HereticalSolutions.Pools;
+
+using HereticalSolutions.Hierarchy;
 
 using HereticalSolutions.Logging;
 using ILogger = HereticalSolutions.Logging.ILogger;
@@ -12,23 +17,28 @@ namespace HereticalSolutions.Entities
     {
         private readonly DefaultECSEntityManager<TEntityID> entityManager;
 
-        private readonly DefaultECSEntityListManager entityListManager;
+        private readonly DefaultECSEntityHierarchyManager entityHierarchyManager;
 
         private readonly Func<TEntityIDComponent, TEntityID> getEntityIDFromIDComponentDelegate;
+
+        private readonly IPool<List<IReadOnlyHierarchyNode<Entity>>> bufferPool;
         
         private readonly ILogger logger;
 
         public HierarchyDeinitializationSystem(
             DefaultECSEntityManager<TEntityID> entityManager,
-            DefaultECSEntityListManager entityListManager,
+            DefaultECSEntityHierarchyManager entityHierarchyManager,
             Func<TEntityIDComponent, TEntityID> getEntityIDFromIDComponentDelegate,
+            IPool<List<IReadOnlyHierarchyNode<Entity>>> bufferPool,
             ILogger logger = null)
         {
             this.entityManager = entityManager;
             
-            this.entityListManager = entityListManager;
+            this.entityHierarchyManager = entityHierarchyManager;
 
             this.getEntityIDFromIDComponentDelegate = getEntityIDFromIDComponentDelegate;
+            
+            this.bufferPool = bufferPool;
 
             this.logger = logger;
         }
@@ -45,54 +55,55 @@ namespace HereticalSolutions.Entities
                 return;
 
             var hierarchyComponent = entity.Get<HierarchyComponent>();
-            
-            var childrenList = entityListManager.GetList(
-                hierarchyComponent.ChildrenListHandle);
 
-            if (childrenList == null)
+            if (!entityHierarchyManager.TryGet(
+                hierarchyComponent.HierarchyHandle,
+                out var node))
             {
                 return;
             }
+
+            //var childNodes = node.Children;
             
-            //foreach (var child in childrenList)
-            for (int i = childrenList.Count - 1; i >= 0; i--)
+            var childNodes = bufferPool.Pop();
+            
+            childNodes.AddRange(node.Children);
+
+            foreach (var childNode in childNodes)
             {
-                var child = childrenList[i];
+                var childEntity = childNode.Contents;
                 
-                if (child.IsAlive)
+                if (childEntity.IsAlive)
                 {
                     logger?.Log<HierarchyDeinitializationSystem<TEntityIDComponent, TEntityID>>(
-                        $"DESPAWNING CHILD ENTITY {child} OF ENTITY {entity}");
+                        $"DESPAWNING CHILD ENTITY {childEntity} OF ENTITY {entity}");
                     
-                    if (child.Has<TEntityIDComponent>())
+                    if (childEntity.Has<TEntityIDComponent>())
                     {
                         var id = getEntityIDFromIDComponentDelegate.Invoke(
-                            child.Get<TEntityIDComponent>());
+                            childEntity.Get<TEntityIDComponent>());
                         
                         entityManager.DespawnEntity(
                             id);
                     }
                     else
                     {
-                        entityManager.DespawnWorldLocalEntity(child);
+                        entityManager.DespawnWorldLocalEntity(childEntity);
                     }
                 }
             }
+            
+            bufferPool.Push(childNodes);
 
-            if (hierarchyComponent.Parent.IsAlive)
+            if (node.Parent != null
+                && node.Parent.Contents.IsAlive)
             {
                 logger?.Log<HierarchyDeinitializationSystem<TEntityIDComponent, TEntityID>>(
-                    $"DETACHING ENTITY {entity} FROM PARENT ENTITY {hierarchyComponent.Parent}");
-                
-                HierarchyHelpers.RemoveChild(
-                    hierarchyComponent.Parent,
-                    entity,
-                    entityListManager,
-                    logger);
+                    $"DETACHING ENTITY {entity} FROM PARENT ENTITY {node.Parent.Contents}");
             }
 
-            entityListManager.RemoveList(
-                hierarchyComponent.ChildrenListHandle);
+            entityHierarchyManager.TryRemove(
+                hierarchyComponent.HierarchyHandle);
         }
 
         public void Dispose()

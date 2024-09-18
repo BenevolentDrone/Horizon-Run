@@ -29,7 +29,7 @@ namespace HereticalSolutions.Persistence.Serializers
                 argument.GetType(),
                 out var strategyObject))
                 throw new Exception(
-                    logger.TryFormat<CSVSerializer>(
+                    logger.TryFormatException<CSVSerializer>(
                         $"COULD NOT RESOLVE STRATEGY BY ARGUMENT: {argument.GetType().Name}"));
 
             var concreteStrategy = (ICsvSerializationStrategy)strategyObject;
@@ -47,7 +47,7 @@ namespace HereticalSolutions.Persistence.Serializers
         {
             if (!strategyRepository.TryGet(argument.GetType(), out var strategyObject))
                 throw new Exception(
-                    logger.TryFormat<CSVSerializer>(
+                    logger.TryFormatException<CSVSerializer>(
                         $"COULD NOT RESOLVE STRATEGY BY ARGUMENT: {argument.GetType().Name}"));
 
             var concreteStrategy = (ICsvSerializationStrategy)strategyObject;
@@ -66,7 +66,7 @@ namespace HereticalSolutions.Persistence.Serializers
                 argument.GetType(),
                 out var strategyObject))
                 throw new Exception(
-                    logger.TryFormat<CSVSerializer>(
+                    logger.TryFormatException<CSVSerializer>(
                         $"COULD NOT RESOLVE STRATEGY BY ARGUMENT: {argument.GetType().Name}"));
 
             var concreteStrategy = (ICsvSerializationStrategy)strategyObject;
@@ -90,7 +90,7 @@ namespace HereticalSolutions.Persistence.Serializers
                 argument.GetType(),
                 out var strategyObject))
                 throw new Exception(
-                    logger.TryFormat<CSVSerializer>(
+                    logger.TryFormatException<CSVSerializer>(
                         $"COULD NOT RESOLVE STRATEGY BY ARGUMENT: {argument.GetType().Name}"));
 
             var concreteStrategy = (ICsvSerializationStrategy)strategyObject;
@@ -104,7 +104,7 @@ namespace HereticalSolutions.Persistence.Serializers
                 argument.GetType(),
                 out var strategyObject))
                 throw new Exception(
-                    logger.TryFormat<CSVSerializer>(
+                    logger.TryFormatException<CSVSerializer>(
                         $"COULD NOT RESOLVE STRATEGY BY ARGUMENT: {argument.GetType().Name}"));
 
             var concreteStrategy = (ICsvSerializationStrategy)strategyObject;

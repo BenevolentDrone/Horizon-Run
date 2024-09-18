@@ -8,7 +8,7 @@ using UnityEngine;
 
 using Zenject;
 
-namespace HereticalSolutions.Samples.ECSCharacterControllerSample.DI
+namespace HereticalSolutions.Samples.ECSCharacterControllerSample.Installers
 {
 	public class SampleGameObjectPoolsInstaller : MonoInstaller
 	{
@@ -27,7 +27,7 @@ namespace HereticalSolutions.Samples.ECSCharacterControllerSample.DI
 				loggerResolver);
 
 			Container
-				.Bind<INonAllocDecoratedPool<GameObject>>()
+				.Bind<IManagedPool<GameObject>>()
 				.FromInstance(prefabsPool)
 				.AsCached();
 		}

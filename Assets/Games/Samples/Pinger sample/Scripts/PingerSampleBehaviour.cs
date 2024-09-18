@@ -49,7 +49,7 @@ namespace HereticalSolutions.Samples.PingerSample
 
 			#region Pinger
 
-			var pinger = DelegatesFactory.BuildPinger();
+			var pinger = PingersFactory.BuildPinger();
 
 			pingerAsPublisher = (IPublisherNoArgs)pinger;
 

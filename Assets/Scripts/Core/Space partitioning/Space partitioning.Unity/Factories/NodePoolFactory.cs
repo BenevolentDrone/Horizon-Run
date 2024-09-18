@@ -20,7 +20,7 @@ namespace HereticalSolutions.SpacePartitioning.Factories
 				loggerResolver?.GetLogger<Node<TValue>>()
 				?? null;
 
-			return PoolsFactory.BuildStackPool<Node<TValue>>(
+			return StackPoolFactory.BuildStackPool<Node<TValue>>(
 				new AllocationCommand<Node<TValue>>
 				{
 					Descriptor = new AllocationCommandDescriptor
@@ -52,7 +52,7 @@ namespace HereticalSolutions.SpacePartitioning.Factories
 
 		public static IPool<ValueSpaceData<TValue>> BuildValueDataPool<TValue>()
 		{
-			return PoolsFactory.BuildStackPool<ValueSpaceData<TValue>>(
+			return StackPoolFactory.BuildStackPool<ValueSpaceData<TValue>>(
 				new AllocationCommand<ValueSpaceData<TValue>>
 				{
 					Descriptor = new AllocationCommandDescriptor

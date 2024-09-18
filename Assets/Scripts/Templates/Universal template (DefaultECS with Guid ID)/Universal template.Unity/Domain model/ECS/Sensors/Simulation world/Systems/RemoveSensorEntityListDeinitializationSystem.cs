@@ -31,7 +31,7 @@ namespace HereticalSolutions.Templates.Universal.Unity
             if (sensorComponent.EntityListHandle == 0)
                 return;
 
-            entityListManager.RemoveList(
+            entityListManager.Remove(
                 sensorComponent.EntityListHandle);
         }
 

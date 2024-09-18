@@ -6,6 +6,6 @@ namespace HereticalSolutions.Entities
 {
 	public class PooledGameObjectViewComponent
 	{
-		public IPoolElement<GameObject> Element;
+		public IPoolElementFacade<GameObject> ElementFacade;
 	}
 }

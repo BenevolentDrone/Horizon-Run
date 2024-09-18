@@ -1,3 +1,5 @@
+using HereticalSolutions.Hierarchy;
+
 using DefaultEcs;
 
 namespace HereticalSolutions.Entities
@@ -5,12 +7,12 @@ namespace HereticalSolutions.Entities
     public class HierarchyInitializationSystem
         : IDefaultECSEntityInitializationSystem
     {
-        private readonly DefaultECSEntityListManager entityListManager;
+        private readonly DefaultECSEntityHierarchyManager entityHierarchyManager;
 
         public HierarchyInitializationSystem(
-            DefaultECSEntityListManager entityListManager)
+            DefaultECSEntityHierarchyManager entityHierarchyManager)
         {
-            this.entityListManager = entityListManager;
+            this.entityHierarchyManager = entityHierarchyManager;
         }
 
         //Required by ISystem
@@ -26,11 +28,13 @@ namespace HereticalSolutions.Entities
 
             ref var hierarchyComponent = ref entity.Get<HierarchyComponent>();
 
-            entityListManager.CreateList(
-                out var entityListHandle,
-                out var entityList);
+            entityHierarchyManager.TryAllocate(
+                out var entityHierarchyHandle,
+                out var node);
 
-            hierarchyComponent.ChildrenListHandle = entityListHandle;
+            hierarchyComponent.HierarchyHandle = entityHierarchyHandle;
+
+            ((IHierarchyNode<Entity>)node).Contents = entity;
         }
 
         public void Dispose()

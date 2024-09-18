@@ -110,6 +110,9 @@ namespace HereticalSolutions.Time.Strategies
         {
             context.SetState(ETimerState.FINISHED);
             
+            if (context.Repeat && context.FireRepeatCallbackOnFinish)
+                context.OnFinishRepeatedAsPublisher.Publish((IRuntimeTimer)context);
+            
             context.OnFinishAsPublisher.Publish((IRuntimeTimer)context);
         }
 
@@ -133,21 +136,21 @@ namespace HereticalSolutions.Time.Strategies
                 {
                     if (context.FlushTimeElapsedOnRepeat)
                     {
-                        context.OnFinishAsPublisher.Publish((IRuntimeTimer)context);
+                        context.OnFinishRepeatedAsPublisher.Publish((IRuntimeTimer)context);
                         
                         context.CurrentTimeElapsed = 0f;
                 
-                        context.OnStartAsPublisher.Publish((IRuntimeTimer)context);
+                        context.OnStartRepeatedAsPublisher.Publish((IRuntimeTimer)context);
                     }
                     else
                     {
                         while (context.CurrentTimeElapsed > context.CurrentDuration)
                         {
-                            context.OnFinishAsPublisher.Publish((IRuntimeTimer)context);
+                            context.OnFinishRepeatedAsPublisher.Publish((IRuntimeTimer)context);
 
                             context.CurrentTimeElapsed -= context.CurrentDuration;
 
-                            context.OnStartAsPublisher.Publish((IRuntimeTimer)context);
+                            context.OnStartRepeatedAsPublisher.Publish((IRuntimeTimer)context);
                         }
                     }
                 }

@@ -51,7 +51,7 @@ namespace HereticalSolutions.Delegates.Wrappers
                 default:
 
                     throw new Exception(
-                        logger.TryFormat<DelegateWrapperSingleArgGeneric<TValue>>(
+                        logger.TryFormatException<DelegateWrapperSingleArgGeneric<TValue>>(
                             $"INVALID ARGUMENT TYPE. EXPECTED: \"{typeof(TValue).Name}\" RECEIVED: \"{typeof(TArgument).Name}\""));
             }
         }
@@ -70,7 +70,7 @@ namespace HereticalSolutions.Delegates.Wrappers
                 default:
 
                     throw new Exception(
-                        logger.TryFormat<DelegateWrapperSingleArgGeneric<TValue>>(
+                        logger.TryFormatException<DelegateWrapperSingleArgGeneric<TValue>>(
                             $"INVALID ARGUMENT TYPE. EXPECTED: \"{typeof(TValue).Name}\" RECEIVED: \"{valueType.Name}\""));
             }
         }

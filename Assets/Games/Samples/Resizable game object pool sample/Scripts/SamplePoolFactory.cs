@@ -1,5 +1,6 @@
 using System;
 
+using HereticalSolutions.Allocations;
 using HereticalSolutions.Allocations.Factories;
 
 using HereticalSolutions.Pools;
@@ -18,35 +19,34 @@ namespace HereticalSolutions.Samples.ResizableGameObjectPoolSample
 {
     public static class SamplePoolFactory
     {
-        public static INonAllocDecoratedPool<GameObject> BuildPool(
+        public static IManagedPool<GameObject> BuildPool(
             DiContainer container,
             SamplePoolSettings settings,
             ILoggerResolver loggerResolver = null)
         {
             #region Builders
 
-            // Create a builder for resizable pools.
-            var resizablePoolBuilder = new ResizablePoolBuilder<GameObject>(
+            // Create a builder for resizable pools
+            var managedPoolBuilder = new ManagedPoolBuilder<GameObject>(
                 loggerResolver,
-                loggerResolver?.GetLogger<ResizablePoolBuilder<GameObject>>());
+                loggerResolver?.GetLogger<ManagedPoolBuilder<GameObject>>());
 
             #endregion
 
             #region Callbacks
 
-            // Create a push to decorated pool callback.
-            PushToDecoratedPoolCallback<GameObject> pushCallback =
-                PoolsFactory.BuildPushToDecoratedPoolCallback<GameObject>(
-                    PoolsFactory.BuildDeferredCallbackQueue<GameObject>());
+            // Create a push to decorated pool callback
+            PushToManagedPoolWhenAvailableCallback<GameObject> pushCallback =
+                ObjectPoolsAllocationCallbacksFactory.BuildPushToManagedPoolWhenAvailableCallback<GameObject>();
 
             #endregion
 
             #region Metadata descriptor builders
 
-            // Create an array of metadata descriptor builder functions.
+            // Create an array of metadata descriptor builder functions
             var metadataDescriptorBuilders = new Func<MetadataAllocationDescriptor>[]
             {
-                PoolsFactory.BuildIndexedMetadataDescriptor
+                //ObjectPoolsMetadataFactory.BuildIndexedMetadataDescriptor
             };
 
             #endregion
@@ -54,7 +54,7 @@ namespace HereticalSolutions.Samples.ResizableGameObjectPoolSample
             // Get the prefab of the current element
             var prefab = settings.Prefab;
 
-            // Create a value allocation delegate.
+            // Create a value allocation delegate
             Func<GameObject> valueAllocationDelegate =
                 () => UnityZenjectAllocationsFactory.DIResolveOrInstantiateAllocationDelegate(
                     container,
@@ -62,36 +62,35 @@ namespace HereticalSolutions.Samples.ResizableGameObjectPoolSample
 
             #region Allocation callbacks initialization
 
-            // Create an array of allocation callbacks.
-            var callbacks = new IAllocationCallback<GameObject>[]
+            var facadeAllocationCallbacks = new IAllocationCallback<IPoolElementFacade<GameObject>>[]
             {
                 pushCallback
             };
 
             #endregion
 
-            // Initialize the resizable pool builder.
-            resizablePoolBuilder.Initialize(
+            // Initialize the resizable pool builder
+            managedPoolBuilder.Initialize(
                 valueAllocationDelegate,
-                true,
 
                 metadataDescriptorBuilders,
 
                 settings.Initial,
                 settings.Additional,
                 
-                callbacks);
+                facadeAllocationCallbacks,
+                null);
 
-            // Build the resizable pool.
-            var resizablePool = resizablePoolBuilder.BuildResizablePool();
+            // Build the resizable pool
+            var resizablePool = managedPoolBuilder.BuildLinkedListManagedPool();
 
-            // Build the game object pool.
-            var gameObjectPool = UnityDecoratorsPoolsFactory.BuildNonAllocGameObjectPool(
+            // Build the game object pool
+            var gameObjectPool = UnityDecoratorPoolsFactory.BuildGameObjectManagedPool(
                 resizablePool,
                 null);
 
-            // Set the root of the push callback.
-            pushCallback.Root = gameObjectPool;
+            // Set the root of the push callback
+            pushCallback.TargetPool = gameObjectPool;
 
             return gameObjectPool;
         }

@@ -21,6 +21,7 @@ namespace HereticalSolutions.Pools
         public AddressMetadata()
         {
             FullAddress = string.Empty;
+            
             AddressHashes = new int[0];
         }
     }

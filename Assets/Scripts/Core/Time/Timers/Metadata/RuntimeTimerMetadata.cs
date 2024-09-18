@@ -6,7 +6,7 @@ namespace HereticalSolutions.Time
 {
 	public class RuntimeTimerMetadata
 		: IContainsRuntimeTimer,
-		  ICleanUppable,
+		  ICleanuppable,
 		  IDisposable
 	{
 		public RuntimeTimerMetadata()
@@ -24,8 +24,8 @@ namespace HereticalSolutions.Time
 
 		public void Cleanup()
 		{
-			if (RuntimeTimer is ICleanUppable)
-				(RuntimeTimer as ICleanUppable).Cleanup();
+			if (RuntimeTimer is ICleanuppable)
+				(RuntimeTimer as ICleanuppable).Cleanup();
 		}
 
 		#endregion

@@ -30,7 +30,7 @@ namespace HereticalSolutions.Templates.Universal.Unity.DI
 				loggerResolver);
 
 			Container
-				.Bind<INonAllocDecoratedPool<GameObject>>()
+				.Bind<IManagedPool<GameObject>>()
 				.FromInstance(prefabsPool)
 				.AsCached();
 		}

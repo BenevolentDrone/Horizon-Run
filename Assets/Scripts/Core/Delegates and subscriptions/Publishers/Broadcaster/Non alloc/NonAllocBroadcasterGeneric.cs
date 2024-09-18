@@ -16,17 +16,15 @@ namespace HereticalSolutions.Delegates.Broadcasting
           IPublisherSingleArg,
           INonAllocSubscribableSingleArgGeneric<TValue>,
           INonAllocSubscribableSingleArg,
-          ICleanUppable,
+          ICleanuppable,
           IDisposable
     {
         #region Subscriptions
 
-        private readonly INonAllocDecoratedPool<ISubscription> subscriptionsPool;
+        private readonly IManagedPool<ISubscription> subscriptionsPool;
 
-        private readonly IIndexable<IPoolElement<ISubscription>> subscriptionsAsIndexable;
-
-        private readonly IFixedSizeCollection<IPoolElement<ISubscription>> subscriptionsWithCapacity;
-
+        private readonly IDynamicArray<IPoolElementFacade<ISubscription>> subscriptionsContents;
+        
         #endregion
 
         private readonly ILogger logger;
@@ -42,19 +40,17 @@ namespace HereticalSolutions.Delegates.Broadcasting
         private bool broadcastInProgress = false;
 
         public NonAllocBroadcasterGeneric(
-            INonAllocDecoratedPool<ISubscription> subscriptionsPool,
-            INonAllocPool<ISubscription> subscriptionsContents,
+            IManagedPool<ISubscription> subscriptionsPool,
+            IDynamicArray<IPoolElementFacade<ISubscription>> subscriptionsContents,
             ILogger logger = null)
         {
             this.subscriptionsPool = subscriptionsPool;
 
             this.logger = logger;
 
-            subscriptionsAsIndexable = (IIndexable<IPoolElement<ISubscription>>)subscriptionsContents;
+            this.subscriptionsContents = subscriptionsContents;
 
-            subscriptionsWithCapacity = (IFixedSizeCollection<IPoolElement<ISubscription>>)subscriptionsContents;
-
-            currentSubscriptionsBuffer = new ISubscription[subscriptionsWithCapacity.Capacity];
+            currentSubscriptionsBuffer = new ISubscription[subscriptionsContents.Capacity];
         }
 
         #region INonAllocSubscribableSingleArgGeneric
@@ -116,13 +112,13 @@ namespace HereticalSolutions.Delegates.Broadcasting
                 var allSubscriptions = new ISubscriptionHandler<
                     INonAllocSubscribableSingleArgGeneric<TValue>,
                     IInvokableSingleArgGeneric<TValue>>
-                    [subscriptionsAsIndexable.Count];
+                    [subscriptionsContents.Count];
 
                 for (int i = 0; i < allSubscriptions.Length; i++)
                     allSubscriptions[i] = (ISubscriptionHandler<
                         INonAllocSubscribableSingleArgGeneric<TValue>,
                         IInvokableSingleArgGeneric<TValue>>)
-                        subscriptionsAsIndexable[i].Value;
+                        subscriptionsContents[i].Value;
 
                 return allSubscriptions;
             }
@@ -152,7 +148,7 @@ namespace HereticalSolutions.Delegates.Broadcasting
                 default:
 
                     throw new Exception(
-                        logger.TryFormat<NonAllocBroadcasterGeneric<TValue>>(
+                        logger.TryFormatException<NonAllocBroadcasterGeneric<TValue>>(
                             $"INVALID ARGUMENT TYPE. EXPECTED: \"{typeof(TValue).Name}\" RECEIVED: \"{typeof(TArgument).Name}\""));
             }
         }
@@ -179,7 +175,7 @@ namespace HereticalSolutions.Delegates.Broadcasting
                 default:
 
                     throw new Exception(
-                        logger.TryFormat<NonAllocBroadcasterGeneric<TValue>>(
+                        logger.TryFormatException<NonAllocBroadcasterGeneric<TValue>>(
                             $"INVALID ARGUMENT TYPE. EXPECTED: \"{typeof(TValue).Name}\" RECEIVED: \"{valueType.Name}\""));
             }
         }
@@ -206,7 +202,7 @@ namespace HereticalSolutions.Delegates.Broadcasting
                 default:
 
                     throw new Exception(
-                        logger.TryFormat<NonAllocBroadcasterGeneric<TValue>>(
+                        logger.TryFormatException<NonAllocBroadcasterGeneric<TValue>>(
                             $"INVALID ARGUMENT TYPE. EXPECTED: \"{typeof(TValue).Name}\" RECEIVED: \"{typeof(TArgument).Name}\""));
             }
         }
@@ -233,7 +229,7 @@ namespace HereticalSolutions.Delegates.Broadcasting
                 default:
 
                     throw new Exception(
-                        logger.TryFormat<NonAllocBroadcasterGeneric<TValue>>(
+                        logger.TryFormatException<NonAllocBroadcasterGeneric<TValue>>(
                             $"INVALID ARGUMENT TYPE. EXPECTED: \"{typeof(TValue).Name}\" RECEIVED: \"{valueType.Name}\""));
             }
         }
@@ -247,23 +243,23 @@ namespace HereticalSolutions.Delegates.Broadcasting
             var allSubscriptions = new ISubscriptionHandler<
                 INonAllocSubscribableSingleArgGeneric<TValue>,
                 IInvokableSingleArgGeneric<TValue>>
-                [subscriptionsAsIndexable.Count];
+                [subscriptionsContents.Count];
 
             for (int i = 0; i < allSubscriptions.Length; i++)
                 allSubscriptions[i] = (ISubscriptionHandler<
                     INonAllocSubscribableSingleArgGeneric<TValue>,
                     IInvokableSingleArgGeneric<TValue>>)
-                    subscriptionsAsIndexable[i].Value;
+                    subscriptionsContents[i].Value;
 
             return allSubscriptions;
         }
 
         public IEnumerable<ISubscription> GetAllSubscriptions(Type valueType)
         {
-            ISubscription[] allSubscriptions = new ISubscription[subscriptionsAsIndexable.Count];
+            ISubscription[] allSubscriptions = new ISubscription[subscriptionsContents.Count];
 
             for (int i = 0; i < allSubscriptions.Length; i++)
-                allSubscriptions[i] = subscriptionsAsIndexable[i].Value;
+                allSubscriptions[i] = subscriptionsContents[i].Value;
 
             return allSubscriptions;
         }
@@ -279,13 +275,13 @@ namespace HereticalSolutions.Delegates.Broadcasting
                 var allSubscriptions = new ISubscriptionHandler<
                     INonAllocSubscribableSingleArg,
                     IInvokableSingleArg>
-                    [subscriptionsAsIndexable.Count];
+                    [subscriptionsContents.Count];
 
                 for (int i = 0; i < allSubscriptions.Length; i++)
                     allSubscriptions[i] = (ISubscriptionHandler<
                         INonAllocSubscribableSingleArg,
                         IInvokableSingleArg>)
-                        subscriptionsAsIndexable[i].Value;
+                        subscriptionsContents[i].Value;
 
                 return allSubscriptions;
             }
@@ -299,10 +295,10 @@ namespace HereticalSolutions.Delegates.Broadcasting
         {
             get
             {
-                ISubscription[] allSubscriptions = new ISubscription[subscriptionsAsIndexable.Count];
+                ISubscription[] allSubscriptions = new ISubscription[subscriptionsContents.Count];
 
                 for (int i = 0; i < allSubscriptions.Length; i++)
-                    allSubscriptions[i] = subscriptionsAsIndexable[i].Value;
+                    allSubscriptions[i] = subscriptionsContents[i].Value;
 
                 return allSubscriptions;
             }
@@ -310,12 +306,12 @@ namespace HereticalSolutions.Delegates.Broadcasting
 
         public void UnsubscribeAll()
         {
-            while (subscriptionsAsIndexable.Count > 0)
+            while (subscriptionsContents.Count > 0)
             {
                 var subscription = (ISubscriptionHandler<
                     INonAllocSubscribableSingleArgGeneric<TValue>,
                     IInvokableSingleArgGeneric<TValue>>)
-                    subscriptionsAsIndexable[0].Value;
+                    subscriptionsContents[0].Value;
 
                 Unsubscribe(subscription);
             }
@@ -333,7 +329,7 @@ namespace HereticalSolutions.Delegates.Broadcasting
 
             ValidateBufferSize();
 
-            currentSubscriptionsBufferCount = subscriptionsAsIndexable.Count;
+            currentSubscriptionsBufferCount = subscriptionsContents.Count;
 
             CopySubscriptionsToBuffer();
 
@@ -360,7 +356,7 @@ namespace HereticalSolutions.Delegates.Broadcasting
                 default:
 
                     throw new Exception(
-                        logger.TryFormat<NonAllocBroadcasterGeneric<TValue>>(
+                        logger.TryFormatException<NonAllocBroadcasterGeneric<TValue>>(
                             $"INVALID ARGUMENT TYPE. EXPECTED: \"{typeof(TValue).Name}\" RECEIVED: \"{typeof(TArgument).Name}\""));
             }
         }
@@ -379,7 +375,7 @@ namespace HereticalSolutions.Delegates.Broadcasting
                 default:
 
                     throw new Exception(
-                        logger.TryFormat<NonAllocBroadcasterGeneric<TValue>>(
+                        logger.TryFormatException<NonAllocBroadcasterGeneric<TValue>>(
                             $"INVALID ARGUMENT TYPE. EXPECTED: \"{typeof(TValue).Name}\" RECEIVED: \"{valueType.Name}\""));
             }
         }
@@ -390,15 +386,15 @@ namespace HereticalSolutions.Delegates.Broadcasting
 
         public void Cleanup()
         {
-            if (subscriptionsPool is ICleanUppable)
-                (subscriptionsPool as ICleanUppable).Cleanup();
+            if (subscriptionsPool is ICleanuppable)
+                (subscriptionsPool as ICleanuppable).Cleanup();
 
             for (int i = 0; i < currentSubscriptionsBufferCount; i++)
             {
                 if (currentSubscriptionsBuffer[i] != null
-                    && currentSubscriptionsBuffer[i] is ICleanUppable)
+                    && currentSubscriptionsBuffer[i] is ICleanuppable)
                 {
-                    (currentSubscriptionsBuffer[i] as ICleanUppable).Cleanup();
+                    (currentSubscriptionsBuffer[i] as ICleanuppable).Cleanup();
                 }
             }
             
@@ -430,7 +426,7 @@ namespace HereticalSolutions.Delegates.Broadcasting
 
         #endregion
 
-        private void TryRemoveFromBuffer(IPoolElement<ISubscription> subscriptionElement)
+        private void TryRemoveFromBuffer(IPoolElementFacade<ISubscription> subscriptionElement)
         {
             if (!broadcastInProgress)
                 return;
@@ -447,14 +443,14 @@ namespace HereticalSolutions.Delegates.Broadcasting
 
         private void ValidateBufferSize()
         {
-            if (currentSubscriptionsBuffer.Length < subscriptionsWithCapacity.Capacity)
-                currentSubscriptionsBuffer = new ISubscription[subscriptionsWithCapacity.Capacity];
+            if (currentSubscriptionsBuffer.Length < subscriptionsContents.Capacity)
+                currentSubscriptionsBuffer = new ISubscription[subscriptionsContents.Capacity];
         }
 
         private void CopySubscriptionsToBuffer()
         {
             for (int i = 0; i < currentSubscriptionsBufferCount; i++)
-                currentSubscriptionsBuffer[i] = subscriptionsAsIndexable[i].Value;
+                currentSubscriptionsBuffer[i] = subscriptionsContents[i].Value;
         }
 
         private void InvokeSubscriptions(TValue value)

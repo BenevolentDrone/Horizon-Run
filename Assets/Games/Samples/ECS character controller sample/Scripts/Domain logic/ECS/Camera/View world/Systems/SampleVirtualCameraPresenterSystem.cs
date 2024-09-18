@@ -38,7 +38,7 @@ namespace HereticalSolutions.Samples.ECSCharacterControllerSample
 
 			var pooledViewComponent = targetEntity.Get<PooledGameObjectViewComponent>();
 
-			var transform = pooledViewComponent.Element.Value.transform;
+			var transform = pooledViewComponent.ElementFacade.Value.transform;
 
 
 			if (sampleVirtualCameraViewComponent.VirtualCamera.Follow != transform)

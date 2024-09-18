@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using HereticalSolutions.Repositories;
 
 using HereticalSolutions.Pools;
-using HereticalSolutions.Pools.Arguments;
 
 using HereticalSolutions.Logging;
 using ILogger = HereticalSolutions.Logging.ILogger;
@@ -23,7 +22,7 @@ namespace HereticalSolutions.Templates.Universal.Unity
 		//...
 		//...
 		//FLOOOOOOOOOOOOOR!
-		private readonly INonAllocDecoratedPool<GameObject> physicsBodiesPool;
+		private readonly IManagedPool<GameObject> physicsBodiesPool;
 
 		private readonly Queue<ushort> freeHandles;
 
@@ -31,14 +30,14 @@ namespace HereticalSolutions.Templates.Universal.Unity
 
 		private readonly AddressArgument addressArgument;
 
-		private readonly IPoolDecoratorArgument[] arguments;
+		private readonly IPoolPopArgument[] arguments;
 
 		private readonly ILogger logger;
 
 		private ushort nextHandleToAllocate;
 
 		public UnityPhysicsManager(
-			INonAllocDecoratedPool<GameObject> physicsBodiesPool,
+			IManagedPool<GameObject> physicsBodiesPool,
 			Queue<ushort> freeHandles,
 			IRepository<ushort, UnityPhysicsBodyDescriptor> physicsBodiesRepository,
 			ILogger logger = null)
@@ -55,7 +54,7 @@ namespace HereticalSolutions.Templates.Universal.Unity
 
 			addressArgument = new AddressArgument();
 
-			arguments = new IPoolDecoratorArgument[]
+			arguments = new IPoolPopArgument[]
 			{
 				addressArgument
 			};
@@ -94,21 +93,21 @@ namespace HereticalSolutions.Templates.Universal.Unity
 			if (pooledPhysicsBodyElement.Value == null)
 			{
 				throw new Exception(
-					logger.TryFormat<UnityPhysicsManager>(
+					logger.TryFormatException<UnityPhysicsManager>(
 						$"POOLED ELEMENT'S VALUE IS NULL"));
 			}
 
 			if (pooledPhysicsBodyElement.Status != EPoolElementStatus.POPPED)
 			{
 				throw new Exception(
-					logger.TryFormat<UnityPhysicsManager>(
+					logger.TryFormatException<UnityPhysicsManager>(
 						$"POOLED ELEMENT'S STATUS IS INVALID ({pooledPhysicsBodyElement.Value.name})"));
 			}
 
 			if (!pooledPhysicsBodyElement.Value.activeInHierarchy)
 			{
 				throw new Exception(
-					logger.TryFormat<UnityPhysicsManager>(
+					logger.TryFormatException<UnityPhysicsManager>(
 						$"POOLED GAME OBJECT IS SPAWNED DISABLED ({pooledPhysicsBodyElement.Value.name})"));
 			}
 
@@ -119,7 +118,7 @@ namespace HereticalSolutions.Templates.Universal.Unity
 			if (physicsBody == null)
 			{
 				throw new Exception(
-					logger.TryFormat<UnityPhysicsManager>(
+					logger.TryFormatException<UnityPhysicsManager>(
 						$"PHYSICS BODY DESCRIPTOR IS NULL"));
 			}
 
@@ -141,7 +140,7 @@ namespace HereticalSolutions.Templates.Universal.Unity
 		{
 			if (physicsBodyHandle == 0)
 				throw new Exception(
-					logger.TryFormat<UnityPhysicsManager>(
+					logger.TryFormatException<UnityPhysicsManager>(
 						$"INVALID PHYSICS BODY HANDLE {physicsBodyHandle}"));
 
 			var result = physicsBodiesRepository.TryGet(
@@ -169,7 +168,7 @@ namespace HereticalSolutions.Templates.Universal.Unity
 			if (poolElement == null)
 			{
 				throw new Exception(
-					logger.TryFormat<UnityPhysicsManager>(
+					logger.TryFormatException<UnityPhysicsManager>(
 						$"POOL ELEMENT IS NULL"));
 			}
 

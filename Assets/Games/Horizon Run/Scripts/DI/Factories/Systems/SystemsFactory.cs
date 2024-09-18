@@ -1,6 +1,14 @@
 using System;
+using System.Collections.Generic;
+
+using HereticalSolutions.Allocations;
+using HereticalSolutions.Allocations.Factories;
+
+using HereticalSolutions.Hierarchy;
 
 using HereticalSolutions.Pools;
+using HereticalSolutions.Pools.Factories;
+using HereticalSolutions.Pools.Decorators;
 
 using HereticalSolutions.Time;
 
@@ -25,7 +33,7 @@ namespace HereticalSolutions.HorizonRun.DI
 		public static void InitializeViewWorldSystemsContainer(
 			IContainsEntityInitializationSystems<IDefaultECSEntityInitializationSystem> viewWorldSystemsContainer,
 			UniversalTemplateEntityManager entityManager,
-			INonAllocDecoratedPool<GameObject> gameObjectPool,
+			IManagedPool<GameObject> gameObjectPool,
 			Transform hudCanvasTransform,
 			ILoggerResolver loggerResolver = null)
 		{
@@ -42,7 +50,7 @@ namespace HereticalSolutions.HorizonRun.DI
 		}
 
 		public static IDefaultECSEntityInitializationSystem BuildViewWorldResolveSystems(
-			INonAllocDecoratedPool<GameObject> gameObjectPool,
+			IManagedPool<GameObject> gameObjectPool,
 			ILoggerResolver loggerResolver = null)
 		{
 			return new DefaultECSSequentialEntityInitializationSystem(
@@ -54,7 +62,7 @@ namespace HereticalSolutions.HorizonRun.DI
 
 		public static IDefaultECSEntityInitializationSystem BuildViewWorldInitializationSystems(
 			UniversalTemplateEntityManager entityManager,
-			INonAllocDecoratedPool<GameObject> gameObjectPool,
+			IManagedPool<GameObject> gameObjectPool,
 			Transform hudCanvasTransform,
 			ILoggerResolver loggerResolver = null)
 		{
@@ -125,31 +133,34 @@ namespace HereticalSolutions.HorizonRun.DI
 			UniversalTemplateEntityManager entityManager,
 			IEventEntityBuilder<Entity, Guid> eventEntityBuilder,
 			DefaultECSEntityListManager entityListManager,
+			DefaultECSEntityHierarchyManager entityHierarchyManager,
 			ITimerManager simulationUpdateTimerManager,
 			ILoggerResolver loggerResolver = null)
 		{
 			simulationWorldSystemsContainer.Initialize(
 				BuildSimulationWorldResolveSystems(
 					entityManager,
-					entityListManager,
+					entityHierarchyManager,
 					loggerResolver),
 				BuildSimulationWorldInitializationSystems(
 					worldForOverrides,
 					entityManager,
 					eventEntityBuilder,
 					entityListManager,
+					entityHierarchyManager,
 					simulationUpdateTimerManager,
 					loggerResolver),
 				BuildSimulationWorldDeinitializationSystems(
 					entityManager,
 					entityListManager,
+					entityHierarchyManager,
 					simulationUpdateTimerManager,
 					loggerResolver));
 		}
 
 		public static IDefaultECSEntityInitializationSystem BuildSimulationWorldResolveSystems(
 			UniversalTemplateEntityManager entityManager,
-			DefaultECSEntityListManager entityListManager,
+			DefaultECSEntityHierarchyManager entityHierarchyManager,
 			ILoggerResolver loggerResolver = null)
 		{
 			return new DefaultECSSequentialEntityInitializationSystem(
@@ -165,7 +176,7 @@ namespace HereticalSolutions.HorizonRun.DI
 				// Sub spawners
 				new LinkSubSpawnersResolveSystem<UniversalTemplateSceneEntity>(
 					entityManager,
-					entityListManager,
+					entityHierarchyManager,
 					loggerResolver?.GetLogger<LinkSubSpawnersResolveSystem<UniversalTemplateSceneEntity>>()));
 		}
 
@@ -174,6 +185,7 @@ namespace HereticalSolutions.HorizonRun.DI
 			UniversalTemplateEntityManager entityManager,
 			IEventEntityBuilder<Entity, Guid> eventEntityBuilder,
 			DefaultECSEntityListManager entityListManager,
+			DefaultECSEntityHierarchyManager entityHierarchyManager,
 			ITimerManager simulationUpdateTimerManager,
 			ILoggerResolver loggerResolver = null)
 		{
@@ -184,7 +196,7 @@ namespace HereticalSolutions.HorizonRun.DI
 
 				// Hierarchy
 				new HierarchyInitializationSystem(
-					entityListManager),
+					entityHierarchyManager),
 
 				// Spawners
 				new SpawnerWithLoopedTimerInitializationSystem(
@@ -208,13 +220,14 @@ namespace HereticalSolutions.HorizonRun.DI
 				new AttachWheelsInitializationSystem(
 					worldForOverrides,
 					entityManager,
-					entityListManager)
+					entityHierarchyManager)
 				);
 		}
 
 		public static IDefaultECSEntityInitializationSystem BuildSimulationWorldDeinitializationSystems(
 			UniversalTemplateEntityManager entityManager,
 			DefaultECSEntityListManager entityListManager,
+			DefaultECSEntityHierarchyManager entityHierarchyManager,
 			ITimerManager simulationUpdateTimerManager,
 			ILoggerResolver loggerResolver = null)
 		{
@@ -223,11 +236,36 @@ namespace HereticalSolutions.HorizonRun.DI
 				// Hierarchy
 				new HierarchyDeinitializationSystem<GUIDComponent, Guid>(
 					entityManager,
-					entityListManager,
+					entityHierarchyManager,
 					(GUIDComponent) =>
 					{
 						return GUIDComponent.GUID;
 					},
+					new PoolWithListCleanup<List<IReadOnlyHierarchyNode<Entity>>>(
+						StackPoolFactory.BuildStackPool<List<IReadOnlyHierarchyNode<Entity>>>(
+							new AllocationCommand<List<IReadOnlyHierarchyNode<Entity>>>
+							{
+								Descriptor = new AllocationCommandDescriptor
+								{
+									Rule = EAllocationAmountRule.ADD_PREDEFINED_AMOUNT,
+
+									Amount = 5 //TODO: REMOVE MAGIC
+								},
+								AllocationDelegate = AllocationsFactory.
+									ActivatorAllocationDelegate<List<IReadOnlyHierarchyNode<Entity>>>
+							},
+							new AllocationCommand<List<IReadOnlyHierarchyNode<Entity>>>
+							{
+								Descriptor = new AllocationCommandDescriptor
+								{
+									Rule = EAllocationAmountRule.ADD_PREDEFINED_AMOUNT,
+
+									Amount = 5 //TODO: REMOVE MAGIC
+								},
+								AllocationDelegate = AllocationsFactory.
+									ActivatorAllocationDelegate<List<IReadOnlyHierarchyNode<Entity>>>
+							},
+							loggerResolver)),
 					loggerResolver?.GetLogger<HierarchyDeinitializationSystem<GUIDComponent, Guid>>()),
 
 				// Sensors
@@ -250,6 +288,7 @@ namespace HereticalSolutions.HorizonRun.DI
 			UniversalTemplateEntityManager entityManager,
 			IEventEntityBuilder<Entity, Guid> eventEntityBuilder,
 			DefaultECSEntityListManager entityListManager,
+			DefaultECSEntityHierarchyManager entityHierarchyManager,
 			bool includeViewWorld,
 			ILoggerResolver loggerResolver = null)
 		{
@@ -286,7 +325,9 @@ namespace HereticalSolutions.HorizonRun.DI
 				BuildEntitySpawnedEventSystems(
 					eventWorld,
 					authoringPreset,
-					entityManager),
+					entityManager,
+					entityHierarchyManager,
+					loggerResolver),
 
 				// Sensor scan performed
 				BuildSensorScanPerformedEventSystems(
@@ -358,7 +399,9 @@ namespace HereticalSolutions.HorizonRun.DI
 		private static ISystem<float> BuildEntitySpawnedEventSystems(
 			World eventWorld,
 			EEntityAuthoringPresets authoringPreset,
-			UniversalTemplateEntityManager entityManager)
+			UniversalTemplateEntityManager entityManager,
+			DefaultECSEntityHierarchyManager entityHierarchyManager,
+			ILoggerResolver loggerResolver = null)
 		{
 			return new SequentialSystem<float>(
 				new CreateEntityOnEntitySpawnedEventSystem(
@@ -367,10 +410,14 @@ namespace HereticalSolutions.HorizonRun.DI
 					authoringPreset),
 				new PlaceEntity2DOnEntitySpawnedEventSystem(
 					eventWorld,
-					entityManager),
+					entityManager,
+					entityHierarchyManager,
+					loggerResolver?.GetLogger<PlaceEntity2DOnEntitySpawnedEventSystem>()),
 				new PlaceEntity3DOnEntitySpawnedEventSystem(
 					eventWorld,
-					entityManager),
+					entityManager,
+					entityHierarchyManager,
+					loggerResolver?.GetLogger<PlaceEntity3DOnEntitySpawnedEventSystem>()),
 				new RotateEntityOnEntitySpawnedEventSystem(
 					eventWorld,
 					entityManager),
@@ -414,6 +461,7 @@ namespace HereticalSolutions.HorizonRun.DI
 			World viewWorld,
 			ITimerManager simulationUpdateTimerManager,
 			DefaultECSEntityListManager entityListManager,
+			DefaultECSEntityHierarchyManager entityHierarchyManager,
 			bool includeViewWorld,
 			ILoggerResolver loggerResolver = null)
 		{
@@ -426,7 +474,7 @@ namespace HereticalSolutions.HorizonRun.DI
 				BuildGameLogicSystems(
 					simulationWorld,
 					simulationUpdateTimerManager,
-					entityListManager,
+					entityHierarchyManager,
 					loggerResolver),
 
 				BuildSimulationWorldLifetimeSystems(
@@ -465,7 +513,7 @@ namespace HereticalSolutions.HorizonRun.DI
 		private static ISystem<float> BuildGameLogicSystems(
 			World simulationWorld,
 			ITimerManager simulationUpdateTimerManager,
-			DefaultECSEntityListManager entityListManager,
+			DefaultECSEntityHierarchyManager entityHierarchyManager,
 			ILoggerResolver loggerResolver = null)
 		{
 			return new SequentialSystem<float>(
@@ -473,10 +521,11 @@ namespace HereticalSolutions.HorizonRun.DI
 				// Transform updating
 				new Transform2DUpdateSystem(
 					simulationWorld,
-					entityListManager),
+					entityHierarchyManager),
 				new Transform3DUpdateSystem(
 					simulationWorld,
-					entityListManager),
+					entityHierarchyManager,
+					loggerResolver?.GetLogger<Transform3DUpdateSystem>()),
 
 				// Sensors
 				new SensorWithTimerSystem(
@@ -519,18 +568,20 @@ namespace HereticalSolutions.HorizonRun.DI
 
 		public static ISystem<float> BuildFixedUpdateSystems(
 			World simulationWorld,
-			UniversalTemplateEntityManager entityManager,
-			DefaultECSEntityListManager entityListManager)
+			DefaultECSEntityHierarchyManager entityHierarchyManager,
+			ILoggerResolver loggerResolver = null)
 		{
 			return new SequentialSystem<float>(
 
 					//Transform updating
 					new Transform2DUpdateSystem(
 						simulationWorld,
-						entityListManager),
+						entityHierarchyManager,
+						loggerResolver?.GetLogger<Transform2DUpdateSystem>()),
 					new Transform3DUpdateSystem(
 						simulationWorld,
-						entityListManager),
+						entityHierarchyManager,
+						loggerResolver?.GetLogger<Transform3DUpdateSystem>()),
 
 					// Looking
 					new LookTowardsLastLocomotion2DVectorSystem(
@@ -575,7 +626,9 @@ namespace HereticalSolutions.HorizonRun.DI
 
 					// Suspension
 					new Suspension3DSystem(
-						simulationWorld),
+						simulationWorld,
+						entityHierarchyManager,
+						loggerResolver?.GetLogger<Suspension3DSystem>()),
 
 					// Vehicle
 					//new CollectForcesFromSuspensionsSystem(
@@ -598,8 +651,10 @@ namespace HereticalSolutions.HorizonRun.DI
 			World viewWorld,
 			UniversalTemplateEntityManager entityManager,
 			IEventEntityBuilder<Entity, Guid> eventEntityBuilder,
+			DefaultECSEntityHierarchyManager entityHierarchyManager,
 			Camera mainRenderCamera,
-			IUIManager uiManager)
+			IUIManager uiManager,
+			ILoggerResolver loggerResolver = null)
 		{
 			return new SequentialSystem<float>(
 
@@ -611,7 +666,9 @@ namespace HereticalSolutions.HorizonRun.DI
 				BuildViewPresenterSystems(
 					viewWorld,
 					entityManager,
-					eventEntityBuilder),
+					entityHierarchyManager,
+					eventEntityBuilder,
+					loggerResolver),
 
 				BuildViewVisualsSystems(
 					viewWorld));
@@ -644,7 +701,9 @@ namespace HereticalSolutions.HorizonRun.DI
 		private static ISystem<float> BuildViewPresenterSystems(
 			World viewWorld,
 			UniversalTemplateEntityManager entityManager,
-			IEventEntityBuilder<Entity, Guid> eventEntityBuilder)
+			DefaultECSEntityHierarchyManager entityHierarchyManager,
+			IEventEntityBuilder<Entity, Guid> eventEntityBuilder,
+			ILoggerResolver loggerResolver = null)
 		{
 			return new SequentialSystem<float>(
 
@@ -680,7 +739,9 @@ namespace HereticalSolutions.HorizonRun.DI
 
 				// Suspension debug presenters
 				new Suspension3DDebugPresenterSystem(
-					viewWorld),
+					viewWorld,
+					entityHierarchyManager,
+					loggerResolver?.GetLogger<Suspension3DDebugPresenterSystem>()),
 
 				// Wheel debug presenters
 				new Wheel3DDebugPresenterSystem(

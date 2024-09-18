@@ -1,8 +1,8 @@
 using UnityEngine;
 
-namespace HereticalSolutions.Pools.Arguments
+namespace HereticalSolutions.Pools
 {
-	public class WorldPositionArgument : IPoolDecoratorArgument
+	public class WorldPositionArgument : IPoolPopArgument
 	{
 		public Vector3 Position;
 	}

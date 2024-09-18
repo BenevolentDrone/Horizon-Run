@@ -1,17 +1,13 @@
-using UnityEngine;
-
-using HereticalSolutions.Allocations;
-using HereticalSolutions.Allocations.Factories;
-
-using HereticalSolutions.Collections;
+using System.Collections.Generic;
 
 using HereticalSolutions.Pools;
 using HereticalSolutions.Pools.Factories;
-using HereticalSolutions.Pools.Arguments;
 
 using HereticalSolutions.Logging;
 using HereticalSolutions.Logging.Factories;
 using ILogger = HereticalSolutions.Logging.ILogger;
+
+using UnityEngine;
 
 namespace HereticalSolutions.Samples.ResizableGameObjectPoolSample
 {
@@ -23,17 +19,15 @@ namespace HereticalSolutions.Samples.ResizableGameObjectPoolSample
 		private SamplePoolSettings poolSettings;
 
 		
-		private INonAllocDecoratedPool<GameObject> gameObjectPool;
+		private IManagedPool<GameObject> gameObjectPool;
 
 
-		private INonAllocPool<IPoolElement<GameObject>> poppedElements;
-
-		private IIndexable<IPoolElement<IPoolElement<GameObject>>> poppedElementsAsIndexable;
+		private List<IPoolElementFacade<GameObject>> poppedElements;
 
 
 		private WorldPositionArgument worldPositionArgument;
 
-		private IPoolDecoratorArgument[] argumentsCache;
+		private IPoolPopArgument[] argumentsCache;
 
 
 		private ILoggerResolver loggerResolver;
@@ -80,21 +74,7 @@ namespace HereticalSolutions.Samples.ResizableGameObjectPoolSample
 
 			#region Initiate popped elements pool
 
-			poppedElements = PoolsFactory.BuildPackedArrayPool<IPoolElement<GameObject>>(
-				PoolsFactory.BuildPoolElementAllocationCommand<IPoolElement<GameObject>>(
-					new AllocationCommandDescriptor
-					{
-						Rule = EAllocationAmountRule.ADD_PREDEFINED_AMOUNT,
-						Amount = 100
-					},
-					AllocationsFactory.NullAllocationDelegate<IPoolElement<GameObject>>,
-					new[]
-					{
-						PoolsFactory.BuildIndexedMetadataDescriptor()
-					}),
-					loggerResolver);
-
-			poppedElementsAsIndexable = (IIndexable<IPoolElement<IPoolElement<GameObject>>>)poppedElements;
+			poppedElements = new List<IPoolElementFacade<GameObject>>(100);
 
 			#endregion
 		}
@@ -121,18 +101,18 @@ namespace HereticalSolutions.Samples.ResizableGameObjectPoolSample
 
 		private void PushRandomElement()
 		{
-			if (poppedElementsAsIndexable.Count == 0)
+			if (poppedElements.Count == 0)
 				return;
 
-			var randomIndex = UnityEngine.Random.Range(0, poppedElementsAsIndexable.Count);
+			var randomIndex = UnityEngine.Random.Range(0, poppedElements.Count);
 
-			var activeElement = poppedElementsAsIndexable[randomIndex];
+			var activeElement = poppedElements[randomIndex];
 
 			//Both options should work the same way
 			//nonAllocPool.Push(activeElement.Value);
-			activeElement.Value.Push();
+			activeElement.Push();
 
-			poppedElements.Push(activeElement);
+			poppedElements.RemoveAt(randomIndex);
 		}
 
 		private void PopRandomElement()
@@ -144,9 +124,7 @@ namespace HereticalSolutions.Samples.ResizableGameObjectPoolSample
 
 			var value = gameObjectPool.Pop(argumentsCache);
 
-			var activeElement = poppedElements.Pop();
-
-			activeElement.Value = value;
+			poppedElements.Add(value);
 		}
 	}
 }

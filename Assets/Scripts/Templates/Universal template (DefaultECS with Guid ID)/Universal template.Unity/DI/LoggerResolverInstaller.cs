@@ -20,6 +20,7 @@ using ILogger = HereticalSolutions.Logging.ILogger;
 using UnityEngine;
 
 using Zenject;
+using HereticalSolutions.Pools;
 
 namespace HereticalSolutions.Templates.Universal.Unity.DI
 {
@@ -152,13 +153,20 @@ namespace HereticalSolutions.Templates.Universal.Unity.DI
                     false)
 
                 .ToggleLogSource(
+                    typeof(IManagedTypeResourceManager<,>),
+                    false)
+
+                .ToggleLogSource(
                     typeof(ResolveEntitiesOnSceneInstaller),
                     false)
                 .ToggleLogSource(
-                    typeof(SupplyAndMergePool<>),
+                    typeof(PackedArrayManagedPool<>),
                     false)
                 .ToggleLogSource(
-                    typeof(ResizableNonAllocPool<>),
+                    typeof(AppendablePackedArrayManagedPool<>),
+                    false)
+                .ToggleLogSource(
+                    typeof(StackManagedPool<>),
                     false)
 
                 //.ToggleLogSource(

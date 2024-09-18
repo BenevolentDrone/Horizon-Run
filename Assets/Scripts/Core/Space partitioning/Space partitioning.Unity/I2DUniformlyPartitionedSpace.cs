@@ -4,6 +4,8 @@ namespace HereticalSolutions.SpacePartitioning
 {
     public interface I2DUniformlyPartitionedSpace<TValue>
     {
+        float PartitionSize { get; }
+
         #region Register
 
         void Register(
@@ -22,7 +24,8 @@ namespace HereticalSolutions.SpacePartitioning
         
         int EntitiesIntersectingAt(
             Vector2 position,
-            TValue[] result);
+            TValue[] result,
+            int clearance = 0);
 
         #endregion
     }

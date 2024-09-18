@@ -41,7 +41,7 @@ namespace HereticalSolutions.Blackboard
         {
             if (blackboardCarrierReferenceBehaviour == null)
                 throw new Exception(
-                    logger.TryFormat<BlackboardCarrierReferenceTriggerBehaviour>(
+                    logger.TryFormatException<BlackboardCarrierReferenceTriggerBehaviour>(
                         "CARRIER BEHAVIOUR IS NULL"));
 
 

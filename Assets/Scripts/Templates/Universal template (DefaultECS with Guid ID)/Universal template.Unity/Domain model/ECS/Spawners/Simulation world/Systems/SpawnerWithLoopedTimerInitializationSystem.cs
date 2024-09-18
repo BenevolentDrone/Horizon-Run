@@ -63,7 +63,7 @@ namespace HereticalSolutions.Templates.Universal.Unity
 				out var timer))
 			{
 				throw new Exception(
-					logger.TryFormat<SpawnerWithLoopedTimerInitializationSystem>(
+					logger.TryFormatException<SpawnerWithLoopedTimerInitializationSystem>(
 						$"ERROR CREATING TIMER FROM TIME MANAGER {simulationTimerManager.ID}"));
 			}
 

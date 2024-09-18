@@ -176,7 +176,7 @@ namespace HereticalSolutions.Templates.Universal.Unity.Networking.Factories
                 AllocationDelegate = valueAllocationDelegate
             };
 
-            return PoolsFactory.BuildStackPool(
+            return StackPoolFactory.BuildStackPool(
                 initialAllocationCommand,
                 additionalAllocationCommand,
                 loggerResolver);

@@ -33,26 +33,26 @@ namespace HereticalSolutions.Entities
             
             var pooledGameObjectViewComponent = entity.Get<PooledGameObjectViewComponent>();
 
-            var pooledViewElement = pooledGameObjectViewComponent.Element;
+            var pooledViewElement = pooledGameObjectViewComponent.ElementFacade;
             
             if (pooledViewElement.Value == null)
             {
                 throw new Exception(
-                    logger.TryFormat<PushPooledGameObjectViewSystem>(
+                    logger.TryFormatException<PushPooledGameObjectViewSystem>(
                         $"POOLED ELEMENT'S VALUE IS NULL"));
             }
 
             if (pooledViewElement.Status != EPoolElementStatus.POPPED)
             {
                 throw new Exception(
-                    logger.TryFormat<PushPooledGameObjectViewSystem>(
+                    logger.TryFormatException<PushPooledGameObjectViewSystem>(
                         $"POOLED ELEMENT'S STATUS IS INVALID"));
             }
 			
             if (!pooledViewElement.Value.activeInHierarchy)
             {
                 throw new Exception(
-                    logger.TryFormat<PushPooledGameObjectViewSystem>(
+                    logger.TryFormatException<PushPooledGameObjectViewSystem>(
                         $"POOLED GAME OBJECT IS DISABLED"));
             }
             
@@ -67,8 +67,6 @@ namespace HereticalSolutions.Entities
                         pooledViewElement.Value
                     });
 				
-                UnityEngine.Debug.Break();
-				
                 return;
             }
 
@@ -80,10 +78,10 @@ namespace HereticalSolutions.Entities
             //logger?.Log<PushPooledGameObjectViewSystem>(
             //    $"PUSHING POOLED GAME OBJECT {pooledGameObjectViewComponent.Element.Value.name} ENTITY {entity}");
             
-            pooledGameObjectViewComponent.Element.Push();
+            pooledGameObjectViewComponent.ElementFacade.Push();
             
             
-            pooledGameObjectViewComponent.Element = null;
+            pooledGameObjectViewComponent.ElementFacade = null;
             
             entity.Remove<PooledGameObjectViewComponent>();
         }

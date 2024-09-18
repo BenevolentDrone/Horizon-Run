@@ -12,7 +12,7 @@ using HereticalSolutions.Logging;
 namespace HereticalSolutions.ResourceManagement
 {
 	public abstract class AResourceStorageHandle<TResource>
-		: ICleanUppable,
+		: ICleanuppable,
 		  IDisposable
 	{
 		protected readonly IRuntimeResourceManager runtimeResourceManager;
@@ -42,8 +42,8 @@ namespace HereticalSolutions.ResourceManagement
 
 		public void Cleanup()
 		{
-			if (resource is ICleanUppable)
-				(resource as ICleanUppable).Cleanup();
+			if (resource is ICleanuppable)
+				(resource as ICleanuppable).Cleanup();
 		}
 
 		#endregion

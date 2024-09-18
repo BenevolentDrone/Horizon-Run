@@ -29,7 +29,7 @@ namespace HereticalSolutions.Synchronization.Factories
 					typeof(ITogglable),
 					new TogglableMetadata());
 
-			var pinger = DelegatesFactory.BuildNonAllocPinger(loggerResolver);
+			var pinger = PingersFactory.BuildNonAllocPinger(loggerResolver);
 
 			return new SynchronizationContext(
 				descriptor,
@@ -67,7 +67,7 @@ namespace HereticalSolutions.Synchronization.Factories
 						scale,
 						scaleDeltaDelegate));
 
-			var broadcaster = DelegatesFactory.BuildNonAllocBroadcasterGeneric<TDelta>(
+			var broadcaster = BroadcastersFactory.BuildNonAllocBroadcasterGeneric<TDelta>(
 				loggerResolver);
 
 			return new SynchronizationContextGeneric<TDelta>(
@@ -123,7 +123,7 @@ namespace HereticalSolutions.Synchronization.Factories
 					deltaToFloatDelegate,
 					loggerResolver));
 
-			var broadcaster = DelegatesFactory.BuildNonAllocBroadcasterGeneric<TDelta>(
+			var broadcaster = BroadcastersFactory.BuildNonAllocBroadcasterGeneric<TDelta>(
 				loggerResolver);
 
 			return new SynchronizationContextGeneric<TDelta>(

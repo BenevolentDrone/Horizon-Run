@@ -343,6 +343,14 @@ namespace HereticalSolutions.Entities
             string prototypeID,
             EEntityAuthoringPresets authoringPreset = EEntityAuthoringPresets.DEFAULT)
         {
+            if (registryEntitiesRepository.Has(entityID))
+            {
+                logger?.LogError<DefaultECSEntityManager<TEntityID>>(
+                    $"ENTITY WITH ID {entityID} ALREADY PRESENT");
+                
+                return false;
+            }
+
             return SpawnAndResolveEntityInAllRelevantWorlds(
                 entityID,
                 prototypeID,
@@ -358,6 +366,14 @@ namespace HereticalSolutions.Entities
             PrototypeOverride<Entity>[] overrides,
             EEntityAuthoringPresets authoringPreset = EEntityAuthoringPresets.DEFAULT)
         {
+            if (registryEntitiesRepository.Has(entityID))
+            {
+                logger?.LogError<DefaultECSEntityManager<TEntityID>>(
+                    $"ENTITY WITH ID {entityID} ALREADY PRESENT");
+                
+                return false;
+            }
+            
             return SpawnAndResolveEntityInAllRelevantWorlds(
                 entityID,
                 prototypeID,

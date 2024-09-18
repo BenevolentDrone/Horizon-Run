@@ -13,18 +13,18 @@ namespace HereticalSolutions.Templates.Universal.Unity
 
 		private readonly UniversalTemplateEntityManager entityManager;
 
-		private readonly DefaultECSEntityListManager entityListManager;
+		private readonly DefaultECSEntityHierarchyManager entityHierarchyManager;
 
 		public AttachWheelsInitializationSystem(
 			World worldForOverrides,
 			UniversalTemplateEntityManager entityManager,
-			DefaultECSEntityListManager entityListManager)
+			DefaultECSEntityHierarchyManager entityHierarchyManager)
 		{
 			this.worldForOverrides = worldForOverrides;
 
 			this.entityManager = entityManager;
 
-			this.entityListManager = entityListManager;
+			this.entityHierarchyManager = entityHierarchyManager;
 		}
 
 		//Required by ISystem
@@ -167,7 +167,7 @@ namespace HereticalSolutions.Templates.Universal.Unity
 					entityManager.GetEntity(
 						wheelEntityID,
 						WorldConstants.SIMULATION_WORLD_ID),
-						entityListManager);
+						entityHierarchyManager);
 			}
 
 			entity.Remove<AttachWheelsComponent>();

@@ -61,7 +61,7 @@ namespace HereticalSolutions.Messaging.Factories
                 AllocationDelegate = valueAllocationDelegate
             };
             
-            IPool<IMessage> messagePool = PoolsFactory.BuildStackPool<IMessage>(
+            IPool<IMessage> messagePool = StackPoolFactory.BuildStackPool<IMessage>(
                 initialAllocationCommand,
                 additionalAllocationCommand,
                 loggerResolver);

@@ -1,23 +1,24 @@
 namespace HereticalSolutions.Hierarchy
 {
-	public interface IHierarchyNode
-		: IReadOnlyHierarchyNode
+	public interface IHierarchyNode<TContents>
+		: IReadOnlyHierarchyNode<TContents>
 	{
+		TContents Contents { set; }
+		
 		void SetParent(
-			IReadOnlyHierarchyNode parent,
-			bool addAsChild = true);
+			IReadOnlyHierarchyNode<TContents> parent,
+			bool addToParentsChildren = true);
 
-		void RemoveFromParent(bool removeAsChild = true);
-
+		void RemoveParent(bool removeFromParentsChildren = true);
 
 		void AddChild(
-			IReadOnlyHierarchyNode child,
-			bool setParent = true);
+			IReadOnlyHierarchyNode<TContents> child,
+			bool setAsChildsParent = true);
 
 		void RemoveChild(
-			IReadOnlyHierarchyNode child,
-			bool removeParent = true);
+			IReadOnlyHierarchyNode<TContents> child,
+			bool removeFromChildsParent = true);
 
-		void RemoveAllChildren(bool removeParents = true);
+		void RemoveAllChildren(bool removeFromChildrensParent = true);
 	}
 }

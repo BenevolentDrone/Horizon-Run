@@ -75,10 +75,14 @@ namespace HereticalSolutions.Time
         /// </summary>
         INonAllocSubscribableSingleArgGeneric<IPersistentTimer> OnStart { get; }
         
+        INonAllocSubscribableSingleArgGeneric<IPersistentTimer> OnStartRepeated { get; }
+        
         /// <summary>
         /// Event that is triggered when the timer finishes
         /// </summary>
         INonAllocSubscribableSingleArgGeneric<IPersistentTimer> OnFinish { get; }
+        
+        INonAllocSubscribableSingleArgGeneric<IPersistentTimer> OnFinishRepeated { get; }
 
         #endregion
     }

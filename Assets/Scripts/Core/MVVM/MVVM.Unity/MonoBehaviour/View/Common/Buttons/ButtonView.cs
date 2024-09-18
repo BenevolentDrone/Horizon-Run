@@ -1,16 +1,20 @@
 using System;
 
-using HereticalSolutions.Logging;
-using ILogger = HereticalSolutions.Logging.ILogger;
+using HereticalSolutions.LifetimeManagement;
 
 using HereticalSolutions.MVVM.View;
+
+using HereticalSolutions.Logging;
+using ILogger = HereticalSolutions.Logging.ILogger;
 
 using UnityEngine.UI;
 
 namespace HereticalSolutions.MVVM.Mono
 {
     public class ButtonView
-        : AView
+        : AView,
+          IInitializable,
+          ICleanuppable
     {
         protected string commandID;
 
@@ -32,28 +36,36 @@ namespace HereticalSolutions.MVVM.Mono
             this.button = button;
         }
 
-        protected override void InitializeInternal(object[] args)
+        #region IInitializable
+        
+        public bool Initialize(object[] args)
         {
             onClickCommand = viewModel.GetCommand(commandID);
 
             if (onClickCommand == null)
                 throw new Exception(
-                    logger.TryFormat<ButtonView>(
+                    logger.TryFormatException<ButtonView>(
                         $"Could not obtain command \"{commandID}\" from ViewModel \"{viewModel.GetType()}\""));
             
             button.onClick.AddListener(OnButtonClicked);
+
+            return true;
         }
+        
+        #endregion
         
         protected void OnButtonClicked()
         {
             onClickCommand();
         }
 
-        protected override void CleanupInternal()
+        #region ICleanUppable
+
+        public void Cleanup()
         {
             button.onClick.RemoveAllListeners();
-
-            base.CleanupInternal();
         }
+        
+        #endregion
     }
 }

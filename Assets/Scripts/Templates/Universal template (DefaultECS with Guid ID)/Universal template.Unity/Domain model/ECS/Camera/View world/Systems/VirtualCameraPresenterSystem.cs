@@ -39,7 +39,7 @@ namespace HereticalSolutions.Templates.Universal.Unity
 
 			var pooledViewComponent = targetEntity.Get<PooledGameObjectViewComponent>();
 
-			var transform = pooledViewComponent.Element.Value.transform;
+			var transform = pooledViewComponent.ElementFacade.Value.transform;
 
 
 			if (virtualCameraViewComponent.VirtualCamera.Follow != transform)

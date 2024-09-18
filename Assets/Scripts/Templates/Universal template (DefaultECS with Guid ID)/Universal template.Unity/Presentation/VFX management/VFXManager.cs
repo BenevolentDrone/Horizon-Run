@@ -1,14 +1,13 @@
 using UnityEngine;
 
 using HereticalSolutions.Pools;
-using HereticalSolutions.Pools.Arguments;
 
 namespace HereticalSolutions.Templates.Universal.Unity
 {
     public class VFXManager
         : IVFXManager
     {
-        private readonly INonAllocDecoratedPool<GameObject> vfxPool;
+        private readonly IManagedPool<GameObject> vfxPool;
         
         
         private readonly AddressArgument addressArgument;
@@ -16,14 +15,14 @@ namespace HereticalSolutions.Templates.Universal.Unity
         private readonly WorldPositionArgument worldPositionArgument;
         private readonly WorldRotationArgument worldRotationArgument;
 
-        private readonly IPoolDecoratorArgument[] argumentsCache;
+        private readonly IPoolPopArgument[] argumentsCache;
 
         public VFXManager(
-            INonAllocDecoratedPool<GameObject> vfxPool,
+            IManagedPool<GameObject> vfxPool,
             AddressArgument addressArgument,
             WorldPositionArgument worldPositionArgument,
             WorldRotationArgument worldRotationArgument,
-            IPoolDecoratorArgument[] argumentsCache)
+            IPoolPopArgument[] argumentsCache)
         {
             this.vfxPool = vfxPool;
             

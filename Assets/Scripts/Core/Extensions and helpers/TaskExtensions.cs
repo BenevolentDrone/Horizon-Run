@@ -120,7 +120,7 @@ namespace HereticalSolutions
 						}
 
 						throw new Exception(
-							logger.TryFormat<TSource>(
+							logger.TryFormatException<TSource>(
 								$"{targetTask.Exception.Message} INNER EXCEPTIONS:\n{stringBuilder.ToString()}"));
 					})
 				.ConfigureAwait(AWAIT_IN_THE_SAME_THREAD);
@@ -178,7 +178,7 @@ namespace HereticalSolutions
 						}
 
 						throw new Exception(
-							logger.TryFormat(
+							logger.TryFormatException(
 								logSource,
 								$"{targetTask.Exception.Message} INNER EXCEPTIONS:\n{stringBuilder.ToString()}"));
 					})
@@ -290,7 +290,7 @@ namespace HereticalSolutions
 						}
 
 						throw new Exception(
-							logger.TryFormat<TSource>(
+							logger.TryFormatException<TSource>(
 								$"{targetTask.Exception.Message} INNER EXCEPTIONS:\n{stringBuilder.ToString()}"));
 					})
 				.ConfigureAwait(AWAIT_IN_THE_SAME_THREAD);
@@ -350,7 +350,7 @@ namespace HereticalSolutions
 						}
 
 						throw new Exception(
-							logger.TryFormat(
+							logger.TryFormatException(
 								logSource,
 								$"{targetTask.Exception.Message} INNER EXCEPTIONS:\n{stringBuilder.ToString()}"));
 					})

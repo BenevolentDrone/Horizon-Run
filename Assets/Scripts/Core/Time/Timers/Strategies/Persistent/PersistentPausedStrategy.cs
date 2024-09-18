@@ -132,6 +132,9 @@ namespace HereticalSolutions.Time.Strategies
             
             context.SetState(ETimerState.FINISHED);
             
+            if (context.Repeat && context.FireRepeatCallbackOnFinish)
+                context.OnFinishRepeatedAsPublisher.Publish((IPersistentTimer)context);
+            
             context.OnFinishAsPublisher.Publish((IPersistentTimer)context);
         }
 

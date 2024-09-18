@@ -14,18 +14,18 @@ namespace HereticalSolutions.Templates.Universal.Unity
 	{
 		private readonly UniversalTemplateEntityManager entityManager;
 
-		private readonly DefaultECSEntityListManager entityListManager;
+		private readonly DefaultECSEntityHierarchyManager entityHierarchyManager;
 
 		private readonly ILogger logger;
 
 		public LinkSubSpawnersResolveSystem(
 			UniversalTemplateEntityManager entityManager,
-			DefaultECSEntityListManager entityListManager,
+			DefaultECSEntityHierarchyManager entityHierarchyManager,
 			ILogger logger = null)
 		{
 			this.entityManager = entityManager;
 
-			this.entityListManager = entityListManager;
+			this.entityHierarchyManager = entityHierarchyManager;
 			
 			this.logger = logger;
 		}
@@ -83,7 +83,7 @@ namespace HereticalSolutions.Templates.Universal.Unity
 					HierarchyHelpers.AddChild(
 						entity,
 						subSpawner,
-						entityListManager,
+						entityHierarchyManager,
 						logger);
 				}
 			}

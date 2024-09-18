@@ -12,7 +12,7 @@ namespace HereticalSolutions.Time
         : ITimeManager,
           ISynchronizablesGenericArgRepository<float>,
           ISynchronizationProvidersRepository,
-          ICleanUppable,
+          ICleanuppable,
           IDisposable
     {
         private readonly IRepository<string, ISynchronizableGenericArg<float>> chronoRepository;
@@ -136,14 +136,14 @@ namespace HereticalSolutions.Time
 
         public void Cleanup()
         {
-            if (chronoRepository is ICleanUppable)
-                (chronoRepository as ICleanUppable).Cleanup();
+            if (chronoRepository is ICleanuppable)
+                (chronoRepository as ICleanuppable).Cleanup();
 
-            if (applicationRuntimeTimer is ICleanUppable)
-                (applicationRuntimeTimer as ICleanUppable).Cleanup();
+            if (applicationRuntimeTimer is ICleanuppable)
+                (applicationRuntimeTimer as ICleanuppable).Cleanup();
 
-            if (applicationPersistentTimer is ICleanUppable)
-                (applicationPersistentTimer as ICleanUppable).Cleanup();
+            if (applicationPersistentTimer is ICleanuppable)
+                (applicationPersistentTimer as ICleanuppable).Cleanup();
         }
 
         #endregion

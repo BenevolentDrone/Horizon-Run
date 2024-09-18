@@ -61,15 +61,23 @@ namespace HereticalSolutions.Time
         /// </summary>
         public bool Repeat { get; set; }
 
-        //[Name("CurrentDurationSpan")]
+        //[Name("FlushTimeElapsedOnRepeat")]
         //[ProtoMember(8)]
+        public bool FlushTimeElapsedOnRepeat { get; set; }
+        
+        //[Name("FireRepeatCallbackOnFinish")]
+        //[ProtoMember(9)]
+        public bool FireRepeatCallbackOnFinish { get; set; }
+        
+        //[Name("CurrentDurationSpan")]
+        //[ProtoMember(10)]
         /// <summary>
         /// Gets or sets the current duration of the persistent timer
         /// </summary>
         public TimeSpan CurrentDurationSpan { get; set; }
 
         //[Name("DefaultDurationSpan")]
-        //[ProtoMember(9)]
+        //[ProtoMember(11)]
         /// <summary>
         /// Gets or sets the default duration of the persistent timer
         /// </summary>

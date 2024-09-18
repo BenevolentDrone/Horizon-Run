@@ -103,6 +103,10 @@ namespace HereticalSolutions.Time.Strategies
         public void Finish(IRuntimeTimerContext context)
         {
             context.SetState(ETimerState.FINISHED);
+            
+            if (context.Repeat && context.FireRepeatCallbackOnFinish)
+                context.OnFinishRepeatedAsPublisher.Publish((IRuntimeTimer)context);
+            
             context.OnFinishAsPublisher.Publish((IRuntimeTimer)context);
         }
 

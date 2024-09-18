@@ -1,5 +1,5 @@
 using System;
-
+using HereticalSolutions.Delegates;
 using HereticalSolutions.Delegates.Factories;
 
 using HereticalSolutions.Repositories;
@@ -25,9 +25,13 @@ namespace HereticalSolutions.Time.Factories
             TimeSpan defaultDurationSpan,
             ILoggerResolver loggerResolver = null)
         {
-            var onStart = DelegatesFactory.BuildNonAllocBroadcasterGeneric<IPersistentTimer>(loggerResolver);
+            var onStart = BroadcastersFactory.BuildNonAllocBroadcasterGeneric<IPersistentTimer>(loggerResolver);
             
-            var onFinish = DelegatesFactory.BuildNonAllocBroadcasterGeneric<IPersistentTimer>(loggerResolver);
+            var onStartRepeated = BroadcastersFactory.BuildNonAllocBroadcasterGeneric<IPersistentTimer>(loggerResolver);
+            
+            var onFinish = BroadcastersFactory.BuildNonAllocBroadcasterGeneric<IPersistentTimer>(loggerResolver);
+            
+            var onFinishRepeated = BroadcastersFactory.BuildNonAllocBroadcasterGeneric<IPersistentTimer>(loggerResolver);
             
             ILogger logger =
                 loggerResolver?.GetLogger<PersistentTimer>()
@@ -40,8 +44,14 @@ namespace HereticalSolutions.Time.Factories
                 onStart,
                 onStart,
                 
+                onStartRepeated,
+                onStartRepeated,
+                
                 onFinish,
                 onFinish,
+                
+                onFinishRepeated,
+                onFinishRepeated,
                 
                 BuildPersistentStrategyRepository(),
                 
@@ -78,9 +88,13 @@ namespace HereticalSolutions.Time.Factories
             float defaultDuration,
             ILoggerResolver loggerResolver = null)
         {
-            var onStart = DelegatesFactory.BuildNonAllocBroadcasterGeneric<IRuntimeTimer>(loggerResolver);
+            var onStart = BroadcastersFactory.BuildNonAllocBroadcasterGeneric<IRuntimeTimer>(loggerResolver);
             
-            var onFinish = DelegatesFactory.BuildNonAllocBroadcasterGeneric<IRuntimeTimer>(loggerResolver);
+            var onStartRepeated = BroadcastersFactory.BuildNonAllocBroadcasterGeneric<IRuntimeTimer>(loggerResolver);
+            
+            var onFinish = BroadcastersFactory.BuildNonAllocBroadcasterGeneric<IRuntimeTimer>(loggerResolver);
+            
+            var onFinishRepeated = BroadcastersFactory.BuildNonAllocBroadcasterGeneric<IRuntimeTimer>(loggerResolver);
             
             ILogger logger =
                 loggerResolver?.GetLogger<RuntimeTimer>()
@@ -93,8 +107,87 @@ namespace HereticalSolutions.Time.Factories
                 onStart,
                 onStart,
                 
+                onStartRepeated,
+                onStartRepeated,
+                
                 onFinish,
                 onFinish,
+                
+                onFinishRepeated,
+                onFinishRepeated,
+                
+                BuildRuntimeStrategyRepository(),
+                
+                logger);
+        }
+        
+        public static RuntimeTimer BuildRuntimeTimerWithPrivateSubscriptions(
+            string id,
+            float defaultDuration,
+            out INonAllocSubscribableSingleArgGeneric<IRuntimeTimer> onStartPrivateSubscribable,
+            out INonAllocSubscribableSingleArgGeneric<IRuntimeTimer> onFinishPrivateSubscribable,
+            ILoggerResolver loggerResolver = null)
+        {
+            
+            var onStart = BroadcastersFactory.BuildNonAllocBroadcasterGeneric<IRuntimeTimer>(loggerResolver);
+            
+            var onStartPrivate = BroadcastersFactory.BuildNonAllocBroadcasterGeneric<IRuntimeTimer>(loggerResolver);
+            
+            var onStartRepeated = BroadcastersFactory.BuildNonAllocBroadcasterGeneric<IRuntimeTimer>(loggerResolver);
+            
+            var onFinish = BroadcastersFactory.BuildNonAllocBroadcasterGeneric<IRuntimeTimer>(loggerResolver);
+            
+            var onFinishPrivate = BroadcastersFactory.BuildNonAllocBroadcasterGeneric<IRuntimeTimer>(loggerResolver);
+            
+            var onFinishRepeated = BroadcastersFactory.BuildNonAllocBroadcasterGeneric<IRuntimeTimer>(loggerResolver);
+            
+            
+            ISubscription privateStartSubscription = DelegatesFactory.BuildSubscriptionSingleArgGeneric<IRuntimeTimer>(
+                onStart.Publish,
+                loggerResolver);
+            
+            onStartPrivate.Subscribe(
+                (ISubscriptionHandler<
+                    INonAllocSubscribableSingleArgGeneric<IRuntimeTimer>,
+                    IInvokableSingleArgGeneric<IRuntimeTimer>>)
+                privateStartSubscription);
+            
+            
+            ISubscription privateFinishSubscription = DelegatesFactory.BuildSubscriptionSingleArgGeneric<IRuntimeTimer>(
+                onFinish.Publish,
+                loggerResolver);
+            
+            onFinishPrivate.Subscribe(
+                (ISubscriptionHandler<
+                    INonAllocSubscribableSingleArgGeneric<IRuntimeTimer>,
+                    IInvokableSingleArgGeneric<IRuntimeTimer>>)
+                privateFinishSubscription);
+
+            
+            onStartPrivateSubscribable = onStartPrivate;
+            
+            onFinishPrivateSubscribable = onFinishPrivate;
+            
+            
+            ILogger logger =
+                loggerResolver?.GetLogger<RuntimeTimer>()
+                ?? null;
+
+            return new RuntimeTimer(
+                id,
+                defaultDuration,
+                
+                onStartPrivate,
+                onStart,
+                
+                onStartRepeated,
+                onStartRepeated,
+                
+                onFinishPrivate,
+                onFinish,
+                
+                onFinishRepeated,
+                onFinishRepeated,
                 
                 BuildRuntimeStrategyRepository(),
                 
@@ -130,9 +223,13 @@ namespace HereticalSolutions.Time.Factories
             float duration = 0f,
             ILoggerResolver loggerResolver = null)
         {
-            var timer = TimeFactory.BuildRuntimeTimer(
+            var logger = loggerResolver?.GetLogger<RuntimeTimer>();
+            
+            var timer = TimeFactory.BuildRuntimeTimerWithPrivateSubscriptions(
                 id,
                 duration,
+                out var onStartPrivateSubscribable,
+                out var onFinishPrivateSubscribable,
                 loggerResolver);
 
             // Subscribe to the runtime timer's tick event
@@ -145,7 +242,11 @@ namespace HereticalSolutions.Time.Factories
                 (timer) =>
                 {
                     if (!tickSubscription.Active)
+                    {
+                        //logger?.Log<RuntimeTimer>($"TIMER {timer.ID} STARTED. SUBSCRIBING TO TICKS");
+                        
                         provider.Subscribe(tickSubscription);
+                    }
                 },
                 loggerResolver);
 
@@ -156,7 +257,11 @@ namespace HereticalSolutions.Time.Factories
                 (timer) =>
                 {
                     if (tickSubscription.Active)
+                    {
+                        //logger?.Log<RuntimeTimer>($"TIMER {timer.ID} STOPPED. UNSUBSCRIBING FROM TICKS");
+                        
                         provider.Unsubscribe(tickSubscription);
+                    }
                 },
                 loggerResolver);
 
@@ -171,7 +276,11 @@ namespace HereticalSolutions.Time.Factories
                 
                 StartTimerSubscription = startTimerSubscription,
                 
-                FinishTimerSubscription = finishTimerSubscription
+                OnStartPrivateSubscribable = onStartPrivateSubscribable,
+                
+                FinishTimerSubscription = finishTimerSubscription,
+                
+                OnFinishPrivateSubscribable = onFinishPrivateSubscribable
             };
         }
     }

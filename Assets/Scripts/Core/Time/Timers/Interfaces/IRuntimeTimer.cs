@@ -50,6 +50,12 @@ namespace HereticalSolutions.Time
         /// <param name="duration">The duration to set for the timer.</param>
         void Start(float duration);
 
+        /// <summary>
+        /// Resumes the timer with the specified duration
+        /// </summary>
+        /// <param name="duration">The duration to set for the timer.</param>
+        void Resume(float duration);
+
         #endregion
         
         #region Callbacks
@@ -59,10 +65,14 @@ namespace HereticalSolutions.Time
         /// </summary>
         INonAllocSubscribableSingleArgGeneric<IRuntimeTimer> OnStart { get; }
         
+        INonAllocSubscribableSingleArgGeneric<IRuntimeTimer> OnStartRepeated { get; }
+        
         /// <summary>
         /// Event that is triggered when the timer finishes
         /// </summary>
         INonAllocSubscribableSingleArgGeneric<IRuntimeTimer> OnFinish { get; }
+        
+        INonAllocSubscribableSingleArgGeneric<IRuntimeTimer> OnFinishRepeated { get; }
 
         #endregion
     }

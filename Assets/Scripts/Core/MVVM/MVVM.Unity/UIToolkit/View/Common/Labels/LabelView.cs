@@ -6,10 +6,14 @@ using HereticalSolutions.Logging;
 using ILogger = HereticalSolutions.Logging.ILogger;
 
 using UnityEngine.UIElements;
+using HereticalSolutions.LifetimeManagement;
 
 namespace HereticalSolutions.MVVM.UIToolkit
 {
-    public class LabelView : AView
+    public class LabelView
+        : AView,
+          IInitializable,
+          ICleanuppable
     {
         protected string propertyID;
         
@@ -31,16 +35,18 @@ namespace HereticalSolutions.MVVM.UIToolkit
             this.label = label;
         }
 
-        protected override void InitializeInternal(object[] args)
+        public bool Initialize(object[] args)
         {
             if (!viewModel.GetObservable<string>(propertyID, out textProperty))
                 throw new Exception(
-                    logger.TryFormat<LabelView>(
+                    logger.TryFormatException<LabelView>(
                         $"Could not obtain property \"{propertyID}\" from ViewModel \"{viewModel.GetType()}\""));
 
             textProperty.OnValueChanged += OnTextChanged;
 
             OnTextChanged(textProperty.Value);
+
+            return true;
         }
         
         protected void OnTextChanged(string newValue)
@@ -50,7 +56,7 @@ namespace HereticalSolutions.MVVM.UIToolkit
                 : newValue;
         }
 
-        protected override void CleanupInternal()
+        public void Cleanup()
         {
             if (textProperty != null)
             {
@@ -58,8 +64,6 @@ namespace HereticalSolutions.MVVM.UIToolkit
 
                 textProperty = null;
             }
-
-            base.CleanupInternal();
         }
     }
 }

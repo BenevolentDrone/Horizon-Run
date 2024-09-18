@@ -23,7 +23,7 @@ namespace HereticalSolutions.Delegates
         /// <param name="poolElement">The pool element associated with the subscription</param>
         void Activate(
             TSubscribable publisher,
-            IPoolElement<ISubscription> poolElement);
+            IPoolElementFacade<ISubscription> poolElement);
 
         /// <summary>
         /// Validates if the subscription can be terminated for the specified publisher

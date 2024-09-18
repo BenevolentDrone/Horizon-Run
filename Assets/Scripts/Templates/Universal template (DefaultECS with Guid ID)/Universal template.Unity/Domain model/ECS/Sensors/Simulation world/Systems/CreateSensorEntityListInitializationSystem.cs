@@ -28,7 +28,7 @@ namespace HereticalSolutions.Templates.Universal.Unity
 
             ref var sensorComponent = ref entity.Get<SensorComponent>();
 
-            entityListManager.CreateList(
+            entityListManager.TryAllocate(
                 out var listHandle,
                 out var entityList);
 

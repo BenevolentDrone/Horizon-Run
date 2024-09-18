@@ -9,7 +9,7 @@ namespace HereticalSolutions.ResourceManagement
     /// </summary>
     public class ResourceVariantData
         : IResourceVariantData,
-          ICleanUppable,
+          ICleanuppable,
           IDisposable
     {
         /// <summary>
@@ -47,8 +47,8 @@ namespace HereticalSolutions.ResourceManagement
 
         public void Cleanup()
         {
-            if (StorageHandle is ICleanUppable)
-                (StorageHandle as ICleanUppable).Cleanup();
+            if (StorageHandle is ICleanuppable)
+                (StorageHandle as ICleanuppable).Cleanup();
         }
 
         #endregion

@@ -1,8 +1,8 @@
 using UnityEngine;
 
-namespace HereticalSolutions.Pools.Arguments
+namespace HereticalSolutions.Pools
 {
-	public class ParentTransformArgument : IPoolDecoratorArgument
+	public class ParentTransformArgument : IPoolPopArgument
 	{
 		public Transform Parent;
 

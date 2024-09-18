@@ -1,38 +1,50 @@
-using HereticalSolutions.Pools.Elements;
+using System;
+
+using HereticalSolutions.Allocations;
+
+using HereticalSolutions.Logging;
 
 namespace HereticalSolutions.Pools.AllocationCallbacks
 {
-    /// <summary>
-    /// Represents a callback for setting the variant of an allocated object in a pool.
-    /// </summary>
-    /// <typeparam name="T">The type of object in the pool.</typeparam>
-    public class SetVariantCallback<T> : IAllocationCallback<T>
+    public class SetVariantCallback<T>
+        : IAllocationCallback<IPoolElementFacade<T>>
     {
-        /// <summary>
-        /// Gets or sets the variant value to set.
-        /// </summary>
         public int Variant { get; set; }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="SetVariantCallback{T}"/> class with a specified variant value.
-        /// </summary>
-        /// <param name="variant">The variant value to set. Default is -1.</param>
-        public SetVariantCallback(int variant = -1)
+        private ILogger logger;
+        
+        public SetVariantCallback(
+            int variant = -1,
+            ILogger logger = null)
         {
             Variant = variant;
+
+            this.logger = logger;
         }
-
-        /// <summary>
-        /// Performs the action of setting the variant of an allocated object in a pool.
-        /// </summary>
-        /// <param name="currentElement">The currently allocated object.</param>
-        public void OnAllocated(IPoolElement<T> currentElement)
+        
+        public void OnAllocated(IPoolElementFacade<T> poolElementFacade)
         {
-            //SUPPLY AND MERGE POOLS DO NOT PRODUCE ELEMENTS WITH VALUES
-            //if (currentElement.Value == null)
-            //    return;
+            IPoolElementFacadeWithMetadata<T> facadeWithMetadata =
+                poolElementFacade as IPoolElementFacadeWithMetadata<T>;
 
-            ((VariantMetadata)currentElement.Metadata.Get<IContainsVariant>()).Variant = Variant;
+            if (facadeWithMetadata == null)
+            {
+                throw new Exception(
+                    logger.TryFormatException<SetVariantCallback<T>>(
+                        "POOL ELEMENT FACADE HAS NO METADATA"));
+            }
+            
+            var metadata = (VariantMetadata)
+                facadeWithMetadata.Metadata.Get<IContainsVariant>();
+            
+            if (metadata == null)
+            {
+                throw new Exception(
+                    logger.TryFormatException<SetVariantCallback<T>>(
+                        "POOL ELEMENT FACADE HAS NO VARIANT METADATA"));
+            }
+            
+            metadata.Variant = Variant;
         }
     }
 }

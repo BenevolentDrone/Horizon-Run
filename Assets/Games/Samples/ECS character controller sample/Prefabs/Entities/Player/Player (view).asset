@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: Player (view)
   m_EditorClassIdentifier: 
   EntityJson: "{\n  \"PrototypeID\": \"Player\",\n  \"Components\": [\n    {\n     
-    \"$type\": \"HereticalSolutions.Entities.SpawnPooledGameObjectViewComponent, Core\",\n     
-    \"Address\": \"Player view\"\n    },\n    {\n      \"$type\": \"HereticalSolutions.Samples.ECSCharacterControllerSample.SamplePositionPresenterComponent,
+    \"$type\": \"VirtuosGames.Entities.SpawnPooledGameObjectViewComponent, Core\",\n     
+    \"Address\": \"Player view\"\n    },\n    {\n      \"$type\": \"VirtuosGames.Samples.ECSCharacterControllerSample.SamplePositionPresenterComponent,
     Assembly-CSharp\",\n      \"TargetEntity\": {\n        \"World\": null,\n       
-    \"IsAlive\": false\n      }\n    },\n    {\n      \"$type\": \"HereticalSolutions.Samples.ECSCharacterControllerSample.SampleRotationPresenterComponent,
+    \"IsAlive\": false\n      }\n    },\n    {\n      \"$type\": \"VirtuosGames.Samples.ECSCharacterControllerSample.SampleRotationPresenterComponent,
     Assembly-CSharp\",\n      \"TargetEntity\": {\n        \"World\": null,\n       
-    \"IsAlive\": false\n      }\n    },\n    {\n      \"$type\": \"HereticalSolutions.Samples.ECSCharacterControllerSample.SampleAnimatorPresenterComponent,
+    \"IsAlive\": false\n      }\n    },\n    {\n      \"$type\": \"VirtuosGames.Samples.ECSCharacterControllerSample.SampleAnimatorPresenterComponent,
     Assembly-CSharp\",\n      \"TargetEntity\": {\n        \"World\": null,\n       
     \"IsAlive\": false\n      }\n    }\n  ]\n}"

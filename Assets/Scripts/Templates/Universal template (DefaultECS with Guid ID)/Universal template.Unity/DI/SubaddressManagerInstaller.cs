@@ -18,7 +18,7 @@ namespace HereticalSolutions.Templates.Universal.Unity.DI
 		public override void InstallBindings()
 		{
 			var subaddressManager = DefaultECSEntityFactory.BuildSubaddressManager(
-				loggerResolver);
+				loggerResolver?.GetLogger<ISubaddressManager>());
 
 			Container
 				.Bind<ISubaddressManager>()

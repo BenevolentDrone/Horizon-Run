@@ -10,7 +10,7 @@ namespace HereticalSolutions.ResourceManagement
 	public abstract class AReadOnlyResourceStorageHandle<TResource>
 		: AResourceStorageHandle<TResource>,
 		  IReadOnlyResourceStorageHandle,
-		  ICleanUppable,
+		  ICleanuppable,
 		  IDisposable
 	{
 		public AReadOnlyResourceStorageHandle(
@@ -104,7 +104,7 @@ namespace HereticalSolutions.ResourceManagement
 			{
 				if (!allocated)
 					throw new Exception(
-						logger.TryFormat(
+						logger.TryFormatException(
 							GetType(),
 							"RESOURCE IS NOT ALLOCATED"));
 
@@ -116,7 +116,7 @@ namespace HereticalSolutions.ResourceManagement
 		{
 			if (!allocated)
 				throw new Exception(
-					logger.TryFormat(
+					logger.TryFormatException(
 						GetType(),
 						"RESOURCE IS NOT ALLOCATED"));
 
@@ -129,7 +129,7 @@ namespace HereticalSolutions.ResourceManagement
 				default:
 
 					throw new Exception(
-						logger.TryFormat(
+						logger.TryFormatException(
 							GetType(),
 							$"CANNOT GET RESOURCE OF TYPE {typeof(TValue).Name} FROM RESOURCE OF TYPE {typeof(TResource).Name}"));
 			}

@@ -2,7 +2,6 @@ using UnityEngine;
 
 using HereticalSolutions.Pools;
 using HereticalSolutions.Pools.Factories;
-using HereticalSolutions.Pools.Arguments;
 
 using HereticalSolutions.Synchronization;
 using HereticalSolutions.Synchronization.Factories;
@@ -35,7 +34,7 @@ namespace HereticalSolutions.Samples.PoolWithAddressVariantAndTimerSample
 		private ITimerManager timerManager;
 
 		
-		private INonAllocDecoratedPool<GameObject> gameObjectPool;
+		private IManagedPool<GameObject> gameObjectPool;
 
 
 		private ILoggerResolver	loggerResolver;
@@ -47,7 +46,7 @@ namespace HereticalSolutions.Samples.PoolWithAddressVariantAndTimerSample
 		
 		private WorldPositionArgument worldPositionArgument;
 
-		private IPoolDecoratorArgument[] argumentsCache;
+		private IPoolPopArgument[] argumentsCache;
 
 
 		private int[][] addressHashesCache;

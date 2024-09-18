@@ -22,9 +22,9 @@ namespace HereticalSolutions.Messaging
 
         private readonly IReadOnlyObjectRepository messageRepository;
 
-        private readonly INonAllocDecoratedPool<IPoolElement<IMessage>> mailbox;
+        private readonly IManagedPool<IPoolElementFacade<IMessage>> mailbox;
 
-        private readonly IIndexable<IPoolElement<IPoolElement<IMessage>>> mailboxContentsAsIndexable;
+        private readonly IDynamicArray<IPoolElementFacade<IPoolElementFacade<IMessage>>> mailboxContents;
 
         private readonly ILogger logger;
         
@@ -34,12 +34,12 @@ namespace HereticalSolutions.Messaging
         /// <param name="broadcaster">The broadcaster used to publish messages.</param>
         /// <param name="messageRepository">The repository that stores message pools.</param>
         /// <param name="mailbox">The pool of message elements.</param>
-        /// <param name="mailboxContentsAsIndexable">The indexable collection of message elements.</param>
+        /// <param name="mailboxContents">The indexable collection of message elements.</param>
         public NonAllocMessageBus(
             NonAllocBroadcasterWithRepository broadcaster,
             IReadOnlyObjectRepository messageRepository,
-            INonAllocDecoratedPool<IPoolElement<IMessage>> mailbox,
-            IIndexable<IPoolElement<IPoolElement<IMessage>>> mailboxContentsAsIndexable,
+            IManagedPool<IPoolElementFacade<IMessage>> mailbox,
+            IDynamicArray<IPoolElementFacade<IPoolElementFacade<IMessage>>> mailboxContents,
             ILogger logger = null)
         {
             this.broadcaster = broadcaster;
@@ -48,7 +48,7 @@ namespace HereticalSolutions.Messaging
 
             this.mailbox = mailbox;
 
-            this.mailboxContentsAsIndexable = mailboxContentsAsIndexable;
+            this.mailboxContents = mailboxContents;
 
             this.logger = logger;
         }
@@ -59,32 +59,32 @@ namespace HereticalSolutions.Messaging
         
         public INonAllocMessageSender PopMessage(
             Type messageType,
-            out IPoolElement<IMessage> message)
+            out IPoolElementFacade<IMessage> message)
         {
             if (!messageRepository.TryGet(
                 messageType,
                 out object messagePoolObject))
                 throw new Exception(
-                    logger.TryFormat<NonAllocMessageBus>(
+                    logger.TryFormatException<NonAllocMessageBus>(
                         $"INVALID MESSAGE TYPE FOR PARTICULAR MESSAGE BUS: {messageType.Name}"));
 
-            INonAllocDecoratedPool<IMessage> messagePool = (INonAllocDecoratedPool<IMessage>)messagePoolObject;
+            IManagedPool<IMessage> messagePool = (IManagedPool<IMessage>)messagePoolObject;
 
             message = messagePool.Pop(null);
 
             return this;
         }
 
-        public INonAllocMessageSender PopMessage<TMessage>(out IPoolElement<IMessage> message) where TMessage : IMessage
+        public INonAllocMessageSender PopMessage<TMessage>(out IPoolElementFacade<IMessage> message) where TMessage : IMessage
         {
             if (!messageRepository.TryGet(
                     typeof(TMessage),
                     out object messagePoolObject))
                 throw new Exception(
-                    logger.TryFormat<NonAllocMessageBus>(
+                    logger.TryFormatException<NonAllocMessageBus>(
                         $"INVALID MESSAGE TYPE FOR PARTICULAR MESSAGE BUS: {typeof(TMessage).Name}"));
 
-            INonAllocDecoratedPool<IMessage> messagePool = (INonAllocDecoratedPool<IMessage>)messagePoolObject;
+            IManagedPool<IMessage> messagePool = (IManagedPool<IMessage>)messagePoolObject;
 
             message = messagePool.Pop(null);
 
@@ -96,12 +96,12 @@ namespace HereticalSolutions.Messaging
         #region Write
 
         public INonAllocMessageSender Write(
-            IPoolElement<IMessage> messageElement,
+            IPoolElementFacade<IMessage> messageElement,
             object[] args)
         {
             if (messageElement == null)
                 throw new Exception(
-                    logger.TryFormat<NonAllocMessageBus>(
+                    logger.TryFormatException<NonAllocMessageBus>(
                         $"INVALID MESSAGE"));
 
             messageElement.Value.Write(args);
@@ -110,12 +110,12 @@ namespace HereticalSolutions.Messaging
         }
 
         public INonAllocMessageSender Write<TMessage>(
-            IPoolElement<IMessage> messageElement,
+            IPoolElementFacade<IMessage> messageElement,
             object[] args) where TMessage : IMessage
         {
             if (messageElement == null)
                 throw new Exception(
-                    logger.TryFormat<NonAllocMessageBus>(
+                    logger.TryFormatException<NonAllocMessageBus>(
                         $"INVALID MESSAGE"));
 
             messageElement.Value.Write(args);
@@ -131,7 +131,7 @@ namespace HereticalSolutions.Messaging
         /// Sends a message to the message bus.
         /// </summary>
         /// <param name="message">The message to send.</param>
-        public void Send(IPoolElement<IMessage> message)
+        public void Send(IPoolElementFacade<IMessage> message)
         {
             var messageElement = mailbox.Pop(null);
 
@@ -143,7 +143,7 @@ namespace HereticalSolutions.Messaging
         /// </summary>
         /// <typeparam name="TMessage">The type of the message to send.</typeparam>
         /// <param name="message">The message to send.</param>
-        public void Send<TMessage>(IPoolElement<IMessage> message) where TMessage : IMessage
+        public void Send<TMessage>(IPoolElementFacade<IMessage> message) where TMessage : IMessage
         {
             var messageElement = mailbox.Pop(null);
 
@@ -154,7 +154,7 @@ namespace HereticalSolutions.Messaging
         /// Sends a message to the message bus and immediately publishes it to subscribers.
         /// </summary>
         /// <param name="message">The message to send.</param>
-        public void SendImmediately(IPoolElement<IMessage> message)
+        public void SendImmediately(IPoolElementFacade<IMessage> message)
         {
             broadcaster.Publish(message.Value.GetType(), message.Value);
 
@@ -166,7 +166,7 @@ namespace HereticalSolutions.Messaging
         /// </summary>
         /// <typeparam name="TMessage">The type of the message to send.</typeparam>
         /// <param name="message">The message to send.</param>
-        public void SendImmediately<TMessage>(IPoolElement<IMessage> message) where TMessage : IMessage
+        public void SendImmediately<TMessage>(IPoolElementFacade<IMessage> message) where TMessage : IMessage
         {
             broadcaster.Publish<TMessage>((TMessage)message.Value);
 
@@ -182,11 +182,11 @@ namespace HereticalSolutions.Messaging
         /// </summary>
         public void DeliverMessagesInMailbox()
         {
-            int messagesToReceive = mailboxContentsAsIndexable.Count;
+            int messagesToReceive = mailboxContents.Count;
 
             for (int i = 0; i < messagesToReceive; i++)
             {
-                var message = mailboxContentsAsIndexable[0];
+                var message = mailboxContents[0];
 
                 SendImmediately(message.Value);
                 
@@ -196,7 +196,7 @@ namespace HereticalSolutions.Messaging
 
         #endregion
         
-        private void PushMessageToPool(IPoolElement<IMessage> message)
+        private void PushMessageToPool(IPoolElementFacade<IMessage> message)
         {
             var messageType = message.Value.GetType();
 
@@ -204,15 +204,15 @@ namespace HereticalSolutions.Messaging
                 messageType,
                 out object messagePoolObject))
                 throw new Exception(
-                    logger.TryFormat<NonAllocMessageBus>(
+                    logger.TryFormatException<NonAllocMessageBus>(
                         $"INVALID MESSAGE TYPE FOR PARTICULAR MESSAGE BUS: {messageType.Name}"));
 
-            INonAllocDecoratedPool<IMessage> messagePool = (INonAllocDecoratedPool<IMessage>)messagePoolObject;
+            IManagedPool<IMessage> messagePool = (IManagedPool<IMessage>)messagePoolObject;
 
             messagePool.Push(message);
         }
 
-        private void PushMessageToPool<TMessage>(IPoolElement<IMessage> message) where TMessage : IMessage
+        private void PushMessageToPool<TMessage>(IPoolElementFacade<IMessage> message) where TMessage : IMessage
         {
             var messageType = typeof(TMessage);
 
@@ -220,10 +220,10 @@ namespace HereticalSolutions.Messaging
                 messageType,
                 out object messagePoolObject))
                 throw new Exception(
-                    logger.TryFormat<NonAllocMessageBus>(
+                    logger.TryFormatException<NonAllocMessageBus>(
                         $"INVALID MESSAGE TYPE FOR PARTICULAR MESSAGE BUS: {typeof(TMessage).Name}"));
 
-            INonAllocDecoratedPool<IMessage> messagePool = (INonAllocDecoratedPool<IMessage>)messagePoolObject;
+            IManagedPool<IMessage> messagePool = (IManagedPool<IMessage>)messagePoolObject;
 
             messagePool.Push(message);
         }

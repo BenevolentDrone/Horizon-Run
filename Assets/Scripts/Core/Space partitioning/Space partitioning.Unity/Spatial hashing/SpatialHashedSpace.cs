@@ -7,9 +7,11 @@ namespace HereticalSolutions.SpacePartitioning
     public class SpatialHashedSpace<TValue>
         : I2DUniformlyPartitionedSpace<TValue>
     {
-        private const int MASK_SIZE = 1;
+        //Half extent of the search pattern
+        //for instance, 1 means the mask is 3x3, 2 means the mask is 5x5 etc.
+        private const int LOOKUP_MASK_SIZE = 1;
 
-        private const int MAX_VALUES_PER_PARTITION = 3;
+        private const int MAX_VALUES_PER_PARTITION = 10; //3;
 
         private const int MAX_DIRTY_HASHES = 500;
         
@@ -48,6 +50,8 @@ namespace HereticalSolutions.SpacePartitioning
         
         #region I2DUniformlyPartitionedSpace
 
+        public float PartitionSize { get => partitionSize; }
+        
         #region Register
 
         public void Register(
@@ -96,7 +100,8 @@ namespace HereticalSolutions.SpacePartitioning
 
         public int EntitiesIntersectingAt(
             Vector2 position,
-            TValue[] result)
+            TValue[] result,
+            int clearance = 0)
         {
             int resultsFound = 0;
             
@@ -109,9 +114,11 @@ namespace HereticalSolutions.SpacePartitioning
             
             int positionY = (int)(relativePosition.y / partitionSize);
             
-            for (int i = -MASK_SIZE; i <= MASK_SIZE; i++)
+            int halfExtent = LOOKUP_MASK_SIZE + clearance;
+            
+            for (int i = -halfExtent; i <= halfExtent; i++)
             {
-                for (int j = -MASK_SIZE; j <= MASK_SIZE; j++)
+                for (int j = -halfExtent; j <= halfExtent; j++)
                 {
                     int x = positionX + i;
                     

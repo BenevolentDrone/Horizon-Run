@@ -1,22 +1,23 @@
 using System;
 
+using HereticalSolutions.Allocations;
+
 using HereticalSolutions.Delegates.Factories;
 
-using HereticalSolutions.Synchronization;
-
 using HereticalSolutions.Time;
-using HereticalSolutions.Time.Factories;
 
 using HereticalSolutions.Logging;
 
 namespace HereticalSolutions.Pools.AllocationCallbacks
 {
     public class SetDurationAndPushSubscriptionCallback<T>
-        : IAllocationCallback<T>
+        : IAllocationCallback<IPoolElementFacade<T>>
     {
         public float Duration { get; set; }
 
         private ILoggerResolver loggerResolver;
+
+        private ILogger logger;
 
         public SetDurationAndPushSubscriptionCallback(
             float duration = 0f,
@@ -25,20 +26,37 @@ namespace HereticalSolutions.Pools.AllocationCallbacks
             Duration = duration;
 
             this.loggerResolver = loggerResolver;
+
+            logger = this.loggerResolver?.GetLogger<SetDurationAndPushSubscriptionCallback<T>>();
         }
 
-        public void OnAllocated(IPoolElement<T> currentElement)
+        public void OnAllocated(IPoolElementFacade<T> poolElementFacade)
         {
-            var metadata = (RuntimeTimerWithPushSubscriptionMetadata)
-                currentElement.Metadata.Get<IContainsRuntimeTimer>();
+            IPoolElementFacadeWithMetadata<T> facadeWithMetadata =
+                poolElementFacade as IPoolElementFacadeWithMetadata<T>;
 
+            if (facadeWithMetadata == null)
+            {
+                throw new Exception(
+                    logger.TryFormatException<SetDurationAndPushSubscriptionCallback<T>>(
+                        "POOL ELEMENT FACADE HAS NO METADATA"));
+            }
+            
+            var metadata = (RuntimeTimerWithPushableSubscriptionMetadata)
+                facadeWithMetadata.Metadata.Get<IContainsRuntimeTimer>();
 
+            if (metadata == null)
+            {
+                throw new Exception(
+                    logger.TryFormatException<SetDurationAndPushSubscriptionCallback<T>>(
+                        "POOL ELEMENT FACADE HAS NO TIMER METADATA"));
+            }
+            
             metadata.Duration = Duration;
-
 
             Action<IRuntimeTimer> pushDelegate = (timer) =>
             {
-                currentElement.Push();
+                poolElementFacade.Push();
             };
 
             var pushSubscription = DelegatesFactory.BuildSubscriptionSingleArgGeneric<IRuntimeTimer>(

@@ -11,7 +11,7 @@ namespace HereticalSolutions.Repositories
 	public class ConcurrentDictionaryRepository<TKey, TValue> :
 		IRepository<TKey, TValue>,
 		IClonableRepository<TKey, TValue>,
-		ICleanUppable,
+		ICleanuppable,
 		IDisposable
 	{
 		private readonly ConcurrentDictionary<TKey, TValue> database;
@@ -135,8 +135,8 @@ namespace HereticalSolutions.Repositories
 		{
 			foreach (var value in database.Values)
 			{
-				if (value is ICleanUppable)
-					(value as ICleanUppable).Cleanup();
+				if (value is ICleanuppable)
+					(value as ICleanuppable).Cleanup();
 			}
 
 			Clear();

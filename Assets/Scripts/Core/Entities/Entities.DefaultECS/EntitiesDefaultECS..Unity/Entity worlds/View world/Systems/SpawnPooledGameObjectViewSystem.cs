@@ -1,6 +1,6 @@
 using System;
+
 using HereticalSolutions.Pools;
-using HereticalSolutions.Pools.Arguments;
 
 using HereticalSolutions.Logging;
 using ILogger = HereticalSolutions.Logging.ILogger;
@@ -13,18 +13,18 @@ namespace HereticalSolutions.Entities
 {
 	public class SpawnPooledGameObjectViewSystem : IDefaultECSEntityInitializationSystem
 	{
-		private readonly INonAllocDecoratedPool<GameObject> pool;
+		private readonly IManagedPool<GameObject> pool;
 
 
 		private readonly AddressArgument addressArgument;
 
-		private readonly IPoolDecoratorArgument[] arguments;
+		private readonly IPoolPopArgument[] arguments;
 
 
 		private readonly ILogger logger;
 
 		public SpawnPooledGameObjectViewSystem(
-			INonAllocDecoratedPool<GameObject> pool,
+			IManagedPool<GameObject> pool,
 			ILogger logger = null)
 		{
 			this.pool = pool;
@@ -33,7 +33,7 @@ namespace HereticalSolutions.Entities
 
 			addressArgument = new AddressArgument();
 
-			arguments = new IPoolDecoratorArgument[]
+			arguments = new IPoolPopArgument[]
 			{
 				addressArgument
 			};
@@ -65,28 +65,28 @@ namespace HereticalSolutions.Entities
 			if (pooledViewElement.Value == null)
 			{
 				throw new Exception(
-					logger.TryFormat<SpawnPooledGameObjectViewSystem>(
-						$"POOLED ELEMENT'S VALUE IS NULL"));
+					logger.TryFormatException<SpawnPooledGameObjectViewSystem>(
+						$"POOLED ELEMENT'S VALUE IS NULL ({address})"));
 			}
 
 			if (pooledViewElement.Status != EPoolElementStatus.POPPED)
 			{
 				throw new Exception(
-					logger.TryFormat<SpawnPooledGameObjectViewSystem>(
+					logger.TryFormatException<SpawnPooledGameObjectViewSystem>(
 						$"POOLED ELEMENT'S STATUS IS INVALID ({pooledViewElement.Value.name})"));
 			}
 			
 			if (!pooledViewElement.Value.activeInHierarchy)
 			{
 				throw new Exception(
-					logger.TryFormat<SpawnPooledGameObjectViewSystem>(
+					logger.TryFormatException<SpawnPooledGameObjectViewSystem>(
 						$"POOLED GAME OBJECT IS SPAWNED DISABLED ({pooledViewElement.Value.name})"));
 			}
 
 
 			var pooledGameObjectViewComponent = new PooledGameObjectViewComponent();
 
-			pooledGameObjectViewComponent.Element = pooledViewElement;
+			pooledGameObjectViewComponent.ElementFacade = pooledViewElement;
 
 			entity.Set<PooledGameObjectViewComponent>(pooledGameObjectViewComponent);
 
@@ -105,8 +105,6 @@ namespace HereticalSolutions.Entities
 						pooledViewElement.Value
 					});
 				
-				UnityEngine.Debug.Break();
-				
 				return;
 			}
 			
@@ -118,8 +116,6 @@ namespace HereticalSolutions.Entities
 					{
 						pooledViewElement.Value
 					});
-				
-				UnityEngine.Debug.Break();
 				
 				return;
 			}

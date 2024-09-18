@@ -43,6 +43,10 @@ namespace HereticalSolutions.Time.Visitors
             value.Accumulate = DTO.Accumulate;
 
             value.Repeat = DTO.Repeat;
+            
+            value.FlushTimeElapsedOnRepeat = DTO.FlushTimeElapsedOnRepeat;
+            
+            value.FireRepeatCallbackOnFinish = DTO.FireRepeatCallbackOnFinish;
 
             return true;
         }
@@ -64,6 +68,10 @@ namespace HereticalSolutions.Time.Visitors
             valueToPopulate.Accumulate = DTO.Accumulate;
 
             valueToPopulate.Repeat = DTO.Repeat;
+            
+            valueToPopulate.FlushTimeElapsedOnRepeat = DTO.FlushTimeElapsedOnRepeat;
+            
+            valueToPopulate.FireRepeatCallbackOnFinish = DTO.FireRepeatCallbackOnFinish;
 
             return true;
         }

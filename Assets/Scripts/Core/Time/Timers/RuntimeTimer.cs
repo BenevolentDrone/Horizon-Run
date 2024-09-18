@@ -20,7 +20,7 @@ namespace HereticalSolutions.Time.Timers
           IRenameableTimer,
           ITickable,
           IVisitable,
-          ICleanUppable,
+          ICleanuppable,
           IDisposable
     {
         private readonly IReadOnlyRepository<ETimerState, ITimerStrategy<IRuntimeTimerContext, float>> strategyRepository;
@@ -37,8 +37,14 @@ namespace HereticalSolutions.Time.Timers
             IPublisherSingleArgGeneric<IRuntimeTimer> onStartAsPublisher,
             INonAllocSubscribableSingleArgGeneric<IRuntimeTimer> onStartAsSubscribable,
 
+            IPublisherSingleArgGeneric<IRuntimeTimer> onStartRepeatedAsPublisher,
+            INonAllocSubscribableSingleArgGeneric<IRuntimeTimer> onStartRepeatedAsSubscribable,
+            
             IPublisherSingleArgGeneric<IRuntimeTimer> onFinishAsPublisher,
             INonAllocSubscribableSingleArgGeneric<IRuntimeTimer> onFinishAsSubscribable,
+            
+            IPublisherSingleArgGeneric<IRuntimeTimer> onFinishRepeatedAsPublisher,
+            INonAllocSubscribableSingleArgGeneric<IRuntimeTimer> onFinishRepeatedAsSubscribable,
 
             IReadOnlyRepository<ETimerState, ITimerStrategy<IRuntimeTimerContext, float>> strategyRepository,
 
@@ -54,10 +60,21 @@ namespace HereticalSolutions.Time.Timers
             OnStartAsPublisher = onStartAsPublisher;
 
             OnStart = onStartAsSubscribable;
+            
+            
+            OnStartRepeatedAsPublisher = onStartRepeatedAsPublisher;
+            
+            OnStartRepeated = onStartRepeatedAsSubscribable;
 
+            
             OnFinishAsPublisher = onFinishAsPublisher;
 
             OnFinish = onFinishAsSubscribable;
+            
+            
+            OnFinishRepeatedAsPublisher = onFinishRepeatedAsPublisher;
+            
+            OnFinishRepeated = onFinishRepeatedAsSubscribable;
 
 
             this.strategyRepository = strategyRepository;
@@ -88,11 +105,15 @@ namespace HereticalSolutions.Time.Timers
         /// Gets the publisher for the OnStart event
         /// </summary>
         public IPublisherSingleArgGeneric<IRuntimeTimer> OnStartAsPublisher { get; private set; }
+        
+        public IPublisherSingleArgGeneric<IRuntimeTimer> OnStartRepeatedAsPublisher { get; private set; }
 
         /// <summary>
         /// Gets the publisher for the OnFinish event
         /// </summary>
         public IPublisherSingleArgGeneric<IRuntimeTimer> OnFinishAsPublisher { get; private set; }
+        
+        public IPublisherSingleArgGeneric<IRuntimeTimer> OnFinishRepeatedAsPublisher { get; private set; }
 
         #endregion
 
@@ -129,6 +150,8 @@ namespace HereticalSolutions.Time.Timers
 
         public bool FlushTimeElapsedOnRepeat { get; set; }
 
+        public bool FireRepeatCallbackOnFinish { get; set; }
+        
         /// <summary>
         /// Resets the timer
         /// </summary>
@@ -212,15 +235,29 @@ namespace HereticalSolutions.Time.Timers
         }
 
         /// <summary>
+        /// Resumes the timer with the specified duration
+        /// </summary>
+        /// <param name="duration">The duration to set for the timer.</param>
+        public void Resume(float duration)
+        {
+            CurrentDuration = duration;
+            Resume();
+        }
+
+        /// <summary>
         /// Gets the subscribable for the OnStart event
         /// </summary>
         public INonAllocSubscribableSingleArgGeneric<IRuntimeTimer> OnStart { get; private set; }
 
+        public INonAllocSubscribableSingleArgGeneric<IRuntimeTimer> OnStartRepeated { get; private set; }
+        
         /// <summary>
         /// Gets the subscribable for the OnFinish event
         /// </summary>
         public INonAllocSubscribableSingleArgGeneric<IRuntimeTimer> OnFinish { get; private set; }
 
+        public INonAllocSubscribableSingleArgGeneric<IRuntimeTimer> OnFinishRepeated { get; private set; }
+        
         #endregion
 
         #region ITickable
@@ -281,7 +318,7 @@ namespace HereticalSolutions.Time.Timers
                 default:
 
                     throw new Exception(
-                        logger.TryFormat<RuntimeTimer>(
+                        logger.TryFormatException<RuntimeTimer>(
                             $"CANNOT CAST RETURN VALUE TYPE \"{typeof(RuntimeTimerDTO).Name}\" TO TYPE \"{typeof(TDTO).GetType().Name}\""));
             }
 
@@ -320,7 +357,7 @@ namespace HereticalSolutions.Time.Timers
                 default:
 
                     throw new Exception(
-                        logger.TryFormat<RuntimeTimer>(
+                        logger.TryFormatException<RuntimeTimer>(
                             $"INVALID ARGUMENT TYPE. EXPECTED: \"{typeof(RuntimeTimerDTO).Name}\" RECEIVED: \"{typeof(TDTO).GetType().Name}\""));
             }
         }
@@ -342,14 +379,20 @@ namespace HereticalSolutions.Time.Timers
 
         public void Cleanup()
         {
-            if (OnStartAsPublisher is ICleanUppable)
-                (OnStartAsPublisher as ICleanUppable).Cleanup();
+            if (OnStartAsPublisher is ICleanuppable)
+                (OnStartAsPublisher as ICleanuppable).Cleanup();
 
-            if (OnFinishAsPublisher is ICleanUppable)
-                (OnFinishAsPublisher as ICleanUppable).Cleanup();
+            if (OnStartRepeatedAsPublisher is ICleanuppable)
+                (OnStartRepeatedAsPublisher as ICleanuppable).Cleanup();
+            
+            if (OnFinishAsPublisher is ICleanuppable)
+                (OnFinishAsPublisher as ICleanuppable).Cleanup();
+            
+            if (OnFinishRepeatedAsPublisher is ICleanuppable)
+                (OnFinishRepeatedAsPublisher as ICleanuppable).Cleanup();
 
-            if (strategyRepository is ICleanUppable)
-                (strategyRepository as ICleanUppable).Cleanup();
+            if (strategyRepository is ICleanuppable)
+                (strategyRepository as ICleanuppable).Cleanup();
         }
 
         #endregion
@@ -360,10 +403,16 @@ namespace HereticalSolutions.Time.Timers
         {
             if (OnStartAsPublisher is IDisposable)
                 (OnStartAsPublisher as IDisposable).Dispose();
+            
+            if (OnStartRepeatedAsPublisher is IDisposable)
+                (OnStartRepeatedAsPublisher as IDisposable).Dispose();
 
             if (OnFinishAsPublisher is IDisposable)
                 (OnFinishAsPublisher as IDisposable).Dispose();
 
+            if (OnFinishRepeatedAsPublisher is IDisposable)
+                (OnFinishRepeatedAsPublisher as IDisposable).Dispose();
+            
             if (strategyRepository is IDisposable)
                 (strategyRepository as IDisposable).Dispose();
         }

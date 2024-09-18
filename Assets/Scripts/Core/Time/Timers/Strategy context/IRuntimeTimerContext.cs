@@ -29,6 +29,8 @@ namespace HereticalSolutions.Time
         bool Repeat { get; }
 
         bool FlushTimeElapsedOnRepeat { get; }
+        
+        bool FireRepeatCallbackOnFinish { get; }
 
         #endregion
 
@@ -36,7 +38,11 @@ namespace HereticalSolutions.Time
         
         IPublisherSingleArgGeneric<IRuntimeTimer> OnStartAsPublisher { get; }
         
+        IPublisherSingleArgGeneric<IRuntimeTimer> OnStartRepeatedAsPublisher { get; }
+        
         IPublisherSingleArgGeneric<IRuntimeTimer> OnFinishAsPublisher { get; }
+        
+        IPublisherSingleArgGeneric<IRuntimeTimer> OnFinishRepeatedAsPublisher { get; }
         
         #endregion
     }

@@ -1,8 +1,8 @@
 using UnityEngine;
 
-namespace HereticalSolutions.Pools.Arguments
+namespace HereticalSolutions.Pools
 {
-	public class LocalRotationArgument : IPoolDecoratorArgument
+	public class LocalRotationArgument : IPoolPopArgument
 	{
 		public Quaternion Rotation;
 	}

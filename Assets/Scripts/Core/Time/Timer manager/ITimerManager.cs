@@ -7,6 +7,13 @@ namespace HereticalSolutions.Time
 		bool CreateTimer(
 			out ushort timerHandle,
 			out IRuntimeTimer timer);
+		
+		bool GetOrCreateSharedTimer(
+			string timerID,
+			float expectedDuration,
+			out ushort timerHandle,
+			out IRuntimeTimer timer,
+			out bool newInstance);
 
 		bool TryGetTimer(
 			ushort timerHandle,

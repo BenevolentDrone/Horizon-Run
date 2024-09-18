@@ -46,7 +46,7 @@ namespace HereticalSolutions.Templates.Universal.Unity
                 out var timer))
             {
                 throw new Exception(
-                    logger.TryFormat<SensorWithTimerSystem>(
+                    logger.TryFormatException<SensorWithTimerSystem>(
                         $"FAILED TO GET TIMER WITH ID {loopedTimerComponent.TimerHandle}"));
             }
 

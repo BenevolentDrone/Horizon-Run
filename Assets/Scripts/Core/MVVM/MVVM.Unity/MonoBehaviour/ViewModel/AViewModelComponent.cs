@@ -19,20 +19,21 @@ namespace HereticalSolutions.MVVM.Mono
 
         protected bool isBeingTornDown = false;
         
-        /*
-        #region Hierarchy
-
-        [SerializeField]
-        protected AViewModelComponent parentVM;
         
-        /// <summary>
-        /// Reference to parent VM component
-        /// </summary>
-        public AViewModelComponent Parent { get; protected set; }
-
-        #endregion
-        */
-
+        //#region Hierarchy
+        //
+        //[SerializeField]
+        //protected AViewModelComponent parentVM;
+        //
+        ///// <summary>
+        ///// Reference to parent VM component
+        ///// </summary>
+        //public AViewModelComponent Parent { get; protected set; }
+        //
+        //#endregion
+        
+        //TODO
+        /*
         #region Unity callbacks
         
         protected virtual void Awake()
@@ -61,25 +62,23 @@ namespace HereticalSolutions.MVVM.Mono
 
         //The VM will be initialized by its parent VM or a bootstrapper
         //And synched to it too
-        /*
-        protected virtual void Start()
-        {
-            //Sync with parent VM if there is one
-            if (Parent != null)
-            {
-                LifetimeSynchronizer.SyncLifetimes(
-                    viewModel as ILifetimeable,
-                    Parent.ViewModel as ILifetimeable);
-            }
-        }
-        */
+        //protected virtual void Start()
+        //{
+        //    //Sync with parent VM if there is one
+        //    if (Parent != null)
+        //    {
+        //        LifetimeSynchronizer.SyncLifetimes(
+        //            viewModel as ILifetimeable,
+        //            Parent.ViewModel as ILifetimeable);
+        //    }
+        //}
 
         protected void OnDisable()
         {
             if (isBeingCleanedUp)
                 return;
 
-            var cleanUppableViewModel = viewModel as ICleanUppable;
+            var cleanUppableViewModel = viewModel as ICleanuppable;
 
             cleanUppableViewModel?.Cleanup();
         }
@@ -95,7 +94,7 @@ namespace HereticalSolutions.MVVM.Mono
         }
         
         #endregion
-
+        
         protected void EnableOnInitialize()
         {
             gameObject.SetActive(true);
@@ -124,5 +123,6 @@ namespace HereticalSolutions.MVVM.Mono
 
             isBeingTornDown = false;
         }
+        */
     }
 }

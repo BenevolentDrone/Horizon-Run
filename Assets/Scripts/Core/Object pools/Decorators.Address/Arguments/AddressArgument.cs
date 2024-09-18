@@ -1,9 +1,9 @@
-namespace HereticalSolutions.Pools.Arguments
+namespace HereticalSolutions.Pools
 {
     /// <summary>
     /// Represents an argument for decorating a pool with an address.
     /// </summary>
-    public class AddressArgument : IPoolDecoratorArgument
+    public class AddressArgument : IPoolPopArgument
     {
         /// <summary>
         /// Gets or sets the full address.

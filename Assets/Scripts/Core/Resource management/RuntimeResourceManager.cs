@@ -18,7 +18,7 @@ namespace HereticalSolutions.ResourceManagement
     public class RuntimeResourceManager
         : IRuntimeResourceManager,
           IContainsDependencyResources,
-          ICleanUppable,
+          ICleanuppable,
           IDisposable
     {
         private readonly IRepository<int, string> rootResourceIDHashToID;
@@ -482,7 +482,7 @@ namespace HereticalSolutions.ResourceManagement
 
             if (dependencyResource == null)
                 throw new Exception(
-                    logger.TryFormat<RuntimeResourceManager>(
+                    logger.TryFormatException<RuntimeResourceManager>(
                         $"RESOURCE {path} DOES NOT EXIST"));
 
             return dependencyResource;
@@ -494,11 +494,11 @@ namespace HereticalSolutions.ResourceManagement
 
         public void Cleanup()
         {
-            if (rootResourceIDHashToID is ICleanUppable)
-                (rootResourceIDHashToID as ICleanUppable).Cleanup();
+            if (rootResourceIDHashToID is ICleanuppable)
+                (rootResourceIDHashToID as ICleanuppable).Cleanup();
 
-            if (rootResourcesRepository is ICleanUppable)
-                (rootResourcesRepository as ICleanUppable).Cleanup();
+            if (rootResourcesRepository is ICleanuppable)
+                (rootResourcesRepository as ICleanuppable).Cleanup();
         }
 
         #endregion

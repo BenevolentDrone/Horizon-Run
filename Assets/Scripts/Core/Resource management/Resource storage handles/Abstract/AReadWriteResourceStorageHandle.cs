@@ -49,7 +49,7 @@ namespace HereticalSolutions.ResourceManagement
 				default:
 
 					throw new Exception(
-						logger.TryFormat(
+						logger.TryFormatException(
 							GetType(),
 							$"CANNOT SET RESOURCE OF TYPE {typeof(TValue).Name} TO RESOURCE OF TYPE {typeof(TResource).Name}"));
 			}

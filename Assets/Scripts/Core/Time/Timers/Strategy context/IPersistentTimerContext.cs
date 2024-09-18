@@ -22,9 +22,15 @@ namespace HereticalSolutions.Time
         bool Repeat { get; }
 
         bool FlushTimeElapsedOnRepeat { get; }
+        
+        bool FireRepeatCallbackOnFinish { get; }
 
         IPublisherSingleArgGeneric<IPersistentTimer> OnStartAsPublisher { get; }
         
+        IPublisherSingleArgGeneric<IPersistentTimer> OnStartRepeatedAsPublisher { get; }
+        
         IPublisherSingleArgGeneric<IPersistentTimer> OnFinishAsPublisher { get; }
+        
+        IPublisherSingleArgGeneric<IPersistentTimer> OnFinishRepeatedAsPublisher { get; }
     }
 }

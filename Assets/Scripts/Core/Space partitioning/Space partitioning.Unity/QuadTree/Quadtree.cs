@@ -79,7 +79,7 @@ namespace HereticalSolutions.SpacePartitioning
         {
             if (registeredValues.Has(value))
                 throw new Exception(
-                    logger.TryFormat<Quadtree<TValue>>(
+                    logger.TryFormatException<Quadtree<TValue>>(
                         $"KEY ALREADY PRESENT: {value.ToString()}"));
 
             Bounds2D bounds = new Bounds2D(x, y, radius);
@@ -105,7 +105,7 @@ namespace HereticalSolutions.SpacePartitioning
         {
             if (registeredValues.Has(value))
                 throw new Exception(
-                    logger.TryFormat<Quadtree<TValue>>(
+                    logger.TryFormatException<Quadtree<TValue>>(
                         $"KEY ALREADY PRESENT: {value.ToString()}"));
 
             Bounds2D bounds = new Bounds2D(position, radius);
@@ -130,7 +130,7 @@ namespace HereticalSolutions.SpacePartitioning
         {
             if (registeredValues.Has(value))
                 throw new Exception(
-                    logger.TryFormat<Quadtree<TValue>>(
+                    logger.TryFormatException<Quadtree<TValue>>(
                         $"KEY ALREADY PRESENT: {value.ToString()}"));
 
             Bounds2D bounds = new Bounds2D(position, size);
@@ -155,7 +155,7 @@ namespace HereticalSolutions.SpacePartitioning
         {
             if (!registeredValues.Has(value))
                 throw new Exception(
-                    logger.TryFormat<Quadtree<TValue>>(
+                    logger.TryFormatException<Quadtree<TValue>>(
                         $"KEY NOT FOUND: {value.ToString()}"));
 
             return registeredValues.Get(value).Bounds;
@@ -181,7 +181,7 @@ namespace HereticalSolutions.SpacePartitioning
         {
             if (!registeredValues.Has(value))
                 throw new Exception(
-                    logger.TryFormat<Quadtree<TValue>>(
+                    logger.TryFormatException<Quadtree<TValue>>(
                         $"KEY NOT FOUND: {value.ToString()}"));
 
             ValueSpaceData<TValue> data = registeredValues.Get(value);
@@ -213,7 +213,7 @@ namespace HereticalSolutions.SpacePartitioning
 
             if (!registeredValues.Has(value))
                 throw new Exception(
-                    logger.TryFormat<Quadtree<TValue>>(
+                    logger.TryFormatException<Quadtree<TValue>>(
                         $"KEY NOT FOUND: {value.ToString()}"));
 
             ValueSpaceData<TValue> data = registeredValues.Get(value);
@@ -296,7 +296,7 @@ namespace HereticalSolutions.SpacePartitioning
         {
             if (!registeredValues.Has(value))
                 throw new Exception(
-                    logger.TryFormat<Quadtree<TValue>>(
+                    logger.TryFormatException<Quadtree<TValue>>(
                         $"KEY NOT FOUND: {value.ToString()}"));
 
             var valuesBounds = registeredValues.Get(value).Bounds;
@@ -420,7 +420,7 @@ namespace HereticalSolutions.SpacePartitioning
         {
             if (!registeredValues.Has(value))
                 throw new Exception(
-                    logger.TryFormat<Quadtree<TValue>>(
+                    logger.TryFormatException<Quadtree<TValue>>(
                         $"KEY NOT FOUND: {value.ToString()}"));
 
             var valuesBounds = registeredValues.Get(value).Bounds;
@@ -540,7 +540,7 @@ namespace HereticalSolutions.SpacePartitioning
                 default:
                 {
                     throw new Exception(
-                        logger.TryFormat<Quadtree<TValue>>(
+                        logger.TryFormatException<Quadtree<TValue>>(
                             $"UNSUPPORTED COLLECTION TYPE: {result.GetType().ToString()}"));
                 }
             }

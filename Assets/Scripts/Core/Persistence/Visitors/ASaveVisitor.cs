@@ -50,7 +50,7 @@ namespace HereticalSolutions.Persistence
 				default:
 
 					throw new Exception(
-						logger.TryFormat(
+						logger.TryFormatException(
 							GetType(),
 							$"INVALID ARGUMENT TYPE. EXPECTED: \"{typeof(TValue).Name}\" RECEIVED: \"{typeof(TArgument).GetType().Name}\""));
 			}
@@ -88,7 +88,7 @@ namespace HereticalSolutions.Persistence
 				default:
 
 					throw new Exception(
-						logger.TryFormat(
+						logger.TryFormatException(
 							GetType(),
 							$"INVALID ARGUMENT TYPE. EXPECTED: \"{typeof(TValue).Name}\" RECEIVED: \"{typeof(TArgument).GetType().Name}\""));
 			}
@@ -110,7 +110,7 @@ namespace HereticalSolutions.Persistence
 				default:
 
 					throw new Exception(
-						logger.TryFormat(
+						logger.TryFormatException(
 							GetType(),
 							$"CANNOT CAST \"{typeof(TDTO).Name}\" TO \"{typeof(TDTO).GetType().Name}\""));
 			}

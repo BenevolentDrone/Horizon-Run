@@ -10,7 +10,7 @@ namespace HereticalSolutions.Repositories
     public class DictionaryObjectRepository
         : IObjectRepository,
           ICloneableObjectRepository,
-          ICleanUppable,
+          ICleanuppable,
           IDisposable
     {
         private readonly IRepository<Type, object> database;
@@ -232,8 +232,8 @@ namespace HereticalSolutions.Repositories
         {
             foreach (var value in database.Values)
             {
-                if (value is ICleanUppable)
-                    (value as ICleanUppable).Cleanup();
+                if (value is ICleanuppable)
+                    (value as ICleanuppable).Cleanup();
             }
 
             Clear();

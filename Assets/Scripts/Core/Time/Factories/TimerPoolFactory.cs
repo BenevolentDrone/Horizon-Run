@@ -20,39 +20,37 @@ namespace HereticalSolutions.Time.Factories
 
 		public const int ADDITIONAL_TIMERS_AMOUNT = 100;
 
-		public static INonAllocDecoratedPool<TimerWithSubscriptionsContainer> BuildRuntimeTimersPool(
+		public static IManagedPool<TimerWithSubscriptionsContainer> BuildRuntimeTimersPool(
 			ISynchronizationProvider provider,
 			ILoggerResolver loggerResolver = null)
 		{
 			#region Builders
 
-			// Create a builder for resizable pools.
-			var resizablePoolBuilder = new ResizablePoolBuilder<TimerWithSubscriptionsContainer>(
+			var managedPoolBuilder = new ManagedPoolBuilder<TimerWithSubscriptionsContainer>(
 				loggerResolver,
-				loggerResolver?.GetLogger<ResizablePoolBuilder<TimerWithSubscriptionsContainer>>());
+				loggerResolver?.GetLogger<ManagedPoolBuilder<TimerWithSubscriptionsContainer>>());
 
 			#endregion
 
 			#region Callbacks
 
-			// Create a push to decorated pool callback.
-			PushToDecoratedPoolCallback<TimerWithSubscriptionsContainer> pushCallback =
-				PoolsFactory.BuildPushToDecoratedPoolCallback<TimerWithSubscriptionsContainer>(
-					PoolsFactory.BuildDeferredCallbackQueue<TimerWithSubscriptionsContainer>());
+			// Create a push to decorated pool callback
+			PushToManagedPoolWhenAvailableCallback<TimerWithSubscriptionsContainer> pushCallback =
+				ObjectPoolsAllocationCallbacksFactory.BuildPushToManagedPoolWhenAvailableCallback<TimerWithSubscriptionsContainer>();
 
 			#endregion
 
 			#region Metadata descriptor builders
 
-			// Create an array of metadata descriptor builder functions.
+			// Create an array of metadata descriptor builder functions
 			var metadataDescriptorBuilders = new Func<MetadataAllocationDescriptor>[]
 			{
-				PoolsFactory.BuildIndexedMetadataDescriptor
+				//ObjectPoolsMetadataFactory.BuildIndexedMetadataDescriptor
 			};
 
 			#endregion
 
-			// Create a value allocation delegate.
+			// Create a value allocation delegate
 			Func<TimerWithSubscriptionsContainer> valueAllocationDelegate =
 				() => 
 				{
@@ -65,24 +63,26 @@ namespace HereticalSolutions.Time.Factories
 					result.Timer.Accumulate = false;
 			
 					result.Timer.FlushTimeElapsedOnRepeat = false;
+
+					result.Timer.FireRepeatCallbackOnFinish = true;
 					
 					return result;
 				};
 
 			#region Allocation callbacks initialization
 
-			// Create an array of allocation callbacks.
-			var callbacks = new IAllocationCallback<TimerWithSubscriptionsContainer>[]
-			{
-				pushCallback
-			};
+			// Create an array of allocation callbacks	
+			var facadeAllocationCallbacks =
+				new IAllocationCallback<IPoolElementFacade<TimerWithSubscriptionsContainer>>[]
+				{
+					pushCallback
+				};
 
 			#endregion
 
 			// Initialize the resizable pool builder
-			resizablePoolBuilder.Initialize(
+			managedPoolBuilder.Initialize(
 				valueAllocationDelegate,
-				true,
 
 				metadataDescriptorBuilders,
 
@@ -100,13 +100,14 @@ namespace HereticalSolutions.Time.Factories
 				
 				},
 
-				callbacks);
+				facadeAllocationCallbacks,
+				null);
 
-			// Build the resizable pool.
-			var resizablePool = resizablePoolBuilder.BuildResizablePool();
+			// Build the resizable pool
+			var resizablePool = managedPoolBuilder.BuildLinkedListManagedPool();
 
-			// Set the root of the push callback.
-			pushCallback.Root = resizablePool;
+			// Set the root of the push callback
+			pushCallback.TargetPool = resizablePool;
 
 			return resizablePool;
 		}

@@ -44,7 +44,7 @@ namespace HereticalSolutions.Templates.Universal.Unity
             var sensorComponent = sensorEntity.Get<SensorComponent>();
             
             
-            var scanResults =  entityListManager.GetList(
+            var scanResults =  entityListManager.Get(
                 sensorComponent.EntityListHandle);
 
             if (scanResults == null)

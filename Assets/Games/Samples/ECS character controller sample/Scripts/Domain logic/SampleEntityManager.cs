@@ -18,7 +18,7 @@ namespace HereticalSolutions.Samples.ECSCharacterControllerSample
 		public SampleEntityManager(
 			Func<Guid> allocateIDDelegate,
 			IRepository<Guid, Entity> registryEntitiesRepository,
-			IReadOnlyEntityWorldsRepository<World, IDefaultECSEntityWorldController> entityWorldsRepository,
+			IReadOnlyEntityWorldRepository<World, IDefaultECSEntityWorldController> entityWorldsRepository,
 			IReadOnlyList<World> childEntityWorlds,
 			ILogger logger = null)
 			: base (

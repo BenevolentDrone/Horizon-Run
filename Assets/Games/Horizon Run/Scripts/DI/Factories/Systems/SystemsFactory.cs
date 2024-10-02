@@ -31,7 +31,7 @@ namespace HereticalSolutions.HorizonRun.DI
 		#region View world systems
 
 		public static void InitializeViewWorldSystemsContainer(
-			IContainsEntityInitializationSystems<IDefaultECSEntityInitializationSystem> viewWorldSystemsContainer,
+			IEntityWorldControllerWithLifeCycleSystems<IEntityInitializationSystem> viewWorldSystemsContainer,
 			UniversalTemplateEntityManager entityManager,
 			IManagedPool<GameObject> gameObjectPool,
 			Transform hudCanvasTransform,
@@ -49,7 +49,7 @@ namespace HereticalSolutions.HorizonRun.DI
 				BuildViewWorldDeinitializationSystems());
 		}
 
-		public static IDefaultECSEntityInitializationSystem BuildViewWorldResolveSystems(
+		public static IEntityInitializationSystem BuildViewWorldResolveSystems(
 			IManagedPool<GameObject> gameObjectPool,
 			ILoggerResolver loggerResolver = null)
 		{
@@ -60,7 +60,7 @@ namespace HereticalSolutions.HorizonRun.DI
 				);
 		}
 
-		public static IDefaultECSEntityInitializationSystem BuildViewWorldInitializationSystems(
+		public static IEntityInitializationSystem BuildViewWorldInitializationSystems(
 			UniversalTemplateEntityManager entityManager,
 			IManagedPool<GameObject> gameObjectPool,
 			Transform hudCanvasTransform,
@@ -115,7 +115,7 @@ namespace HereticalSolutions.HorizonRun.DI
 				);
 		}
 
-		public static IDefaultECSEntityInitializationSystem BuildViewWorldDeinitializationSystems(
+		public static IEntityInitializationSystem BuildViewWorldDeinitializationSystems(
 			ILoggerResolver loggerResolver = null)
 		{
 			return new DefaultECSSequentialEntityInitializationSystem(
@@ -129,7 +129,7 @@ namespace HereticalSolutions.HorizonRun.DI
 
 		public static void InitializeSimulationWorldSystemsContainer(
 			World worldForOverrides,
-			IContainsEntityInitializationSystems<IDefaultECSEntityInitializationSystem> simulationWorldSystemsContainer,
+			IEntityWorldControllerWithLifeCycleSystems<IEntityInitializationSystem> simulationWorldSystemsContainer,
 			UniversalTemplateEntityManager entityManager,
 			IEventEntityBuilder<Entity, Guid> eventEntityBuilder,
 			DefaultECSEntityListManager entityListManager,
@@ -158,7 +158,7 @@ namespace HereticalSolutions.HorizonRun.DI
 					loggerResolver));
 		}
 
-		public static IDefaultECSEntityInitializationSystem BuildSimulationWorldResolveSystems(
+		public static IEntityInitializationSystem BuildSimulationWorldResolveSystems(
 			UniversalTemplateEntityManager entityManager,
 			DefaultECSEntityHierarchyManager entityHierarchyManager,
 			ILoggerResolver loggerResolver = null)
@@ -180,7 +180,7 @@ namespace HereticalSolutions.HorizonRun.DI
 					loggerResolver?.GetLogger<LinkSubSpawnersResolveSystem<UniversalTemplateSceneEntity>>()));
 		}
 
-		public static IDefaultECSEntityInitializationSystem BuildSimulationWorldInitializationSystems(
+		public static IEntityInitializationSystem BuildSimulationWorldInitializationSystems(
 			World worldForOverrides,
 			UniversalTemplateEntityManager entityManager,
 			IEventEntityBuilder<Entity, Guid> eventEntityBuilder,
@@ -224,7 +224,7 @@ namespace HereticalSolutions.HorizonRun.DI
 				);
 		}
 
-		public static IDefaultECSEntityInitializationSystem BuildSimulationWorldDeinitializationSystems(
+		public static IEntityInitializationSystem BuildSimulationWorldDeinitializationSystems(
 			UniversalTemplateEntityManager entityManager,
 			DefaultECSEntityListManager entityListManager,
 			DefaultECSEntityHierarchyManager entityHierarchyManager,

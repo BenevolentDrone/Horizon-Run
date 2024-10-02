@@ -7,7 +7,7 @@ using DefaultEcs;
 namespace HereticalSolutions.Samples.ECSCharacterControllerSample
 {
 	public class SamplePositionPresenterInitializationSystem
-		: IDefaultECSEntityInitializationSystem
+		: IEntityInitializationSystem
 	{
 		private readonly SampleEntityManager sampleEntityManager;
 

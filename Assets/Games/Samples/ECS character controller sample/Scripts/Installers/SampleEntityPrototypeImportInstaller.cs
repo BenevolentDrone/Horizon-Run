@@ -62,9 +62,9 @@ namespace HereticalSolutions.Samples.ECSCharacterControllerSample.Installers
 							var entityWorldsRepository = worldContainer.EntityWorldsRepository;
 
 
-							var registryWorldController = entityWorldsRepository.GetWorldController(WorldConstants.REGISTRY_WORLD_ID);
+							var registryWorldController = entityWorldsRepository.GeTEntityWorldController(WorldConstants.REGISTRY_WORLD_ID);
 
-							var registryWorldWithPrototype = registryWorldController as IPrototypeCompliantWorldController<World, Entity>;
+							var registryWorldWithPrototype = registryWorldController as IEntityWorldControllerWithPrototypes<World, Entity>;
 
 							var registryWorldPrototypeRepository = registryWorldWithPrototype.PrototypeRepository;
 
@@ -73,9 +73,9 @@ namespace HereticalSolutions.Samples.ECSCharacterControllerSample.Installers
 								loggerResolver?.GetLogger<DefaultECSEntityPrototypeVisitor>());
 
 
-							var simulationWorldController = entityWorldsRepository.GetWorldController(WorldConstants.SIMULATION_WORLD_ID);
+							var simulationWorldController = entityWorldsRepository.GeTEntityWorldController(WorldConstants.SIMULATION_WORLD_ID);
 
-							var simulationWorldWithPrototype = simulationWorldController as IPrototypeCompliantWorldController<World, Entity>;
+							var simulationWorldWithPrototype = simulationWorldController as IEntityWorldControllerWithPrototypes<World, Entity>;
 
 							var simulationWorldPrototypeRepository = simulationWorldWithPrototype.PrototypeRepository;
 
@@ -84,9 +84,9 @@ namespace HereticalSolutions.Samples.ECSCharacterControllerSample.Installers
 								loggerResolver?.GetLogger<DefaultECSEntityPrototypeVisitor>());
 
 
-							var viewWorldController = entityWorldsRepository.GetWorldController(WorldConstants.VIEW_WORLD_ID);
+							var viewWorldController = entityWorldsRepository.GeTEntityWorldController(WorldConstants.VIEW_WORLD_ID);
 
-							var viewWorldWithPrototype = viewWorldController as IPrototypeCompliantWorldController<World, Entity>;
+							var viewWorldWithPrototype = viewWorldController as IEntityWorldControllerWithPrototypes<World, Entity>;
 
 							var viewWorldPrototypeRepository = viewWorldWithPrototype.PrototypeRepository;
 

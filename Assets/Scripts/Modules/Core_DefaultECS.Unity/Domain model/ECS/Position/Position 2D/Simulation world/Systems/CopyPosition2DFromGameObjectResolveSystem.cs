@@ -1,0 +1,66 @@
+using HereticalSolutions.Entities;
+
+using UnityEngine;
+
+using DefaultEcs;
+
+namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
+{
+	public class CopyPosition2DFromGameObjectResolveSystem<TSceneEntity>
+		: IEntityInitializationSystem
+		  where TSceneEntity : MonoBehaviour
+	{
+		//Required by ISystem
+		public bool IsEnabled { get; set; } = true;
+
+		public void Update(Entity entity)
+		{
+			if (!IsEnabled)
+				return;
+
+			if (!entity.Has<ResolveComponent>())
+				return;
+
+			if (!entity.Has<Position2DComponent>())
+				return;
+
+
+			ref ResolveComponent ResolveComponent = ref entity.Get<ResolveComponent>();
+
+			ref Position2DComponent position2DComponent = ref entity.Get<Position2DComponent>();
+
+
+			GameObject source = ResolveComponent.Source as GameObject;
+
+			if (source == null)
+				return;
+
+
+			var worldPosition = source.transform.position;
+
+
+			TransformPosition2DViewComponent positionViewComponent = source.GetComponentInChildren<TransformPosition2DViewComponent>();
+
+			if (positionViewComponent != null)
+			{
+				worldPosition = positionViewComponent.PositionTransform.position;
+			}
+
+			position2DComponent.Position = MathHelpersUnity.Vector3To2XZ(worldPosition);
+
+			if (entity.Has<Transform2DComponent>())
+			{
+				ref Transform2DComponent transformComponent = ref entity.Get<Transform2DComponent>();
+
+				transformComponent.Dirty = true;
+			}
+		}
+
+		/// <summary>
+		/// Disposes the system.
+		/// </summary>
+		public void Dispose()
+		{
+		}
+	}
+}

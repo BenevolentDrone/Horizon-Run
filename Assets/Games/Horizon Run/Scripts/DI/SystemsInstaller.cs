@@ -142,10 +142,10 @@ namespace HereticalSolutions.HorizonRun.DI
 
 			if (includeViewWorld)
 			{
-				var viewWorldController = entityWorldsRepository.GetWorldController(WorldConstants.VIEW_WORLD_ID);
+				var viewWorldController = entityWorldsRepository.GeTEntityWorldController(WorldConstants.VIEW_WORLD_ID);
 
 				var viewWorldSystemsContainer =
-					viewWorldController as IContainsEntityInitializationSystems<IDefaultECSEntityInitializationSystem>;
+					viewWorldController as IEntityWorldControllerWithLifeCycleSystems<IEntityInitializationSystem>;
 
 				SystemsFactory.InitializeViewWorldSystemsContainer(
 					viewWorldSystemsContainer,
@@ -161,10 +161,10 @@ namespace HereticalSolutions.HorizonRun.DI
 
 			if (includeSimulationWorld)
 			{
-				var simulationWorldController = entityWorldsRepository.GetWorldController(WorldConstants.SIMULATION_WORLD_ID);
+				var simulationWorldController = entityWorldsRepository.GeTEntityWorldController(WorldConstants.SIMULATION_WORLD_ID);
 
 				var simulationWorldSystemsContainer = simulationWorldController as 
-					IContainsEntityInitializationSystems<IDefaultECSEntityInitializationSystem>;
+					IEntityWorldControllerWithLifeCycleSystems<IEntityInitializationSystem>;
 
 				SystemsFactory.InitializeSimulationWorldSystemsContainer(
 					simulationWorld,

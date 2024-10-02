@@ -52,7 +52,7 @@ namespace HereticalSolutions.Samples.ECSCharacterControllerSample.Factories
 
 			entityWorldsRepository.AddWorld(
 				WorldConstants.EVENT_WORLD_ID,
-				DefaultECSEntityFactory.BuildDefaultECSEventWorldController(
+				DefaultECSEntityFactory.BuildDefaultECSEvenTEntityWorldController(
 					loggerResolver));
 
 			entityWorldsRepository.AddWorld(
@@ -61,7 +61,7 @@ namespace HereticalSolutions.Samples.ECSCharacterControllerSample.Factories
 					<Guid,
 					GUIDComponent,
 					SimulationEntityComponent,
-					ResolveSimulationComponent>(
+					ResolveComponent>(
 						getEntityIDFromIDComponentDelegate,
 						createIDComponentDelegate,
 
@@ -77,7 +77,7 @@ namespace HereticalSolutions.Samples.ECSCharacterControllerSample.Factories
 							};
 						},
 
-						(source) => { return new ResolveSimulationComponent { Source = source }; },
+						(source) => { return new ResolveComponent { Source = source }; },
 
 						loggerResolver));
 
@@ -87,7 +87,7 @@ namespace HereticalSolutions.Samples.ECSCharacterControllerSample.Factories
 					<Guid,
 					GUIDComponent,
 					ViewEntityComponent,
-					ResolveViewComponent>(
+					ResolveComponent>(
 						getEntityIDFromIDComponentDelegate,
 						createIDComponentDelegate,
 
@@ -103,7 +103,7 @@ namespace HereticalSolutions.Samples.ECSCharacterControllerSample.Factories
 							};
 						},
 
-						(source) => { return new ResolveViewComponent { Source = source }; },
+						(source) => { return new ResolveComponent { Source = source }; },
 
 						loggerResolver));
 

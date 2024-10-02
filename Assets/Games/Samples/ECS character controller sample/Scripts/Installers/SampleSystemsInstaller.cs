@@ -50,9 +50,9 @@ namespace HereticalSolutions.Samples.ECSCharacterControllerSample.Installers
 
 			var entityWorldsRepository = worldContainer.EntityWorldsRepository;
 
-			var viewWorldController = entityWorldsRepository.GetWorldController(WorldConstants.VIEW_WORLD_ID);
+			var viewWorldController = entityWorldsRepository.GeTEntityWorldController(WorldConstants.VIEW_WORLD_ID);
 
-			var viewWorldSystemsContainer = viewWorldController as  IContainsEntityInitializationSystems<IDefaultECSEntityInitializationSystem>;
+			var viewWorldSystemsContainer = viewWorldController as  IEntityWorldControllerWithLifeCycleSystems<IEntityInitializationSystem>;
 
 			viewWorldSystemsContainer.Initialize(
 				new DefaultECSSequentialEntityInitializationSystem(

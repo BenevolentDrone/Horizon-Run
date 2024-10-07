@@ -7,7 +7,7 @@ using UnityEngine;
 
 using Zenject;
 
-namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.DI
+namespace HereticalSolutions.Modules.Core_DefaultECS.DI
 {
 	public class ResolveEntitiesOnSceneInstaller : MonoInstaller
 	{
@@ -18,11 +18,12 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.DI
 		private EntityAuthoringSettings entityAuthoringSettings;
 
 		[Inject]
-		private UniversalTemplateEntityManager entityManager;
+		private EntityManager entityManager;
 
 		public override void InstallBindings()
 		{
-			var logger = loggerResolver?.GetLogger<ResolveEntitiesOnSceneInstaller>();
+			var logger = loggerResolver?.GetLogger(
+				GetType());
 
 			var gameObjectsWithTag = GameObject.FindGameObjectsWithTag("Entity");
 
@@ -31,14 +32,15 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.DI
 				if (gameObjectWithTag.activeInHierarchy == false)
 					continue;
 
-				var sceneEntity = gameObjectWithTag.GetComponent<UniversalTemplateSceneEntity>();
+				var sceneEntity = gameObjectWithTag.GetComponent<SceneEntity>();
 
 				var worldLocalSceneEntity = gameObjectWithTag.GetComponent<WorldLocalSceneEntity>();
 
 				if (sceneEntity == null
 					&& worldLocalSceneEntity == null)
 				{
-					logger?.LogError<ResolveEntitiesOnSceneInstaller>(
+					logger?.LogError(
+						GetType(),
 						$"GAME OBJECT {gameObjectWithTag.name} HAS AN ENTITY TAG BUT NEITHER SceneEntity NOR WorldLocalSceneEntity COMPONENT",
 						new object[]
 						{
@@ -48,7 +50,8 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.DI
 					continue;
 				}
 
-				logger?.Log<ResolveEntitiesOnSceneInstaller>(
+				logger?.Log(
+					GetType(),
 					$"RESOLVING GAME OBJECT {gameObjectWithTag.name}",
 					new object[]
 					{
@@ -75,6 +78,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.DI
 						logger);
 
 					entityManager.ResolveWorldLocalEntity(
+						out var _,
 						worldLocalSceneEntity.PrototypeID,
 						gameObjectWithTag,
 						worldLocalSceneEntity.WorldID);
@@ -96,14 +100,15 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.DI
 				if (childSceneEntity.gameObject.activeInHierarchy == false)
 					continue;
 
-				logger?.Log<ResolveEntitiesOnSceneInstaller>(
+				logger?.Log(
+					GetType(),
 					$"RESOLVING GAME OBJECT {childSceneEntity.gameObject.name}",
 					new object[]
 					{
 						childSceneEntity.gameObject
 					});
 
-				var concreteSceneEntity = childSceneEntity as UniversalTemplateSceneEntity;
+				var concreteSceneEntity = childSceneEntity as SceneEntity;
 
 				if (concreteSceneEntity != null)
 				{
@@ -127,6 +132,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.DI
 						logger);
 
 					entityManager.ResolveWorldLocalEntity(
+						out var _,
 						childWorldLocalSceneEntity.PrototypeID,
 						childWorldLocalSceneEntity.gameObject,
 						childWorldLocalSceneEntity.WorldID);

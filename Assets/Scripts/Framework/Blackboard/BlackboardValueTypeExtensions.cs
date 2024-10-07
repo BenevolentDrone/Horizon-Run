@@ -4,8 +4,6 @@ using System.Collections.Generic;
 using HereticalSolutions.Logging;
 using ILogger = HereticalSolutions.Logging.ILogger;
 
-using UnityEngine;
-
 namespace HereticalSolutions.Blackboard
 {
     public static class BlackboardValueTypeExtensions
@@ -92,7 +90,7 @@ namespace HereticalSolutions.Blackboard
                 valueToCompareType,
                 logger);
                             
-            return Mathf.Abs(a - b) < MathHelpers.EPSILON;
+            return Math.Abs(a - b) < MathHelpers.EPSILON;
         }
 
         public static bool LessRaw<TValue>(

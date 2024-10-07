@@ -4,7 +4,7 @@ using HereticalSolutions.Allocations;
 
 using UnityEngine;
 
-namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
+namespace HereticalSolutions.Modules.Core_DefaultECS
 {
     [Serializable]
     public class VFXElementSettings

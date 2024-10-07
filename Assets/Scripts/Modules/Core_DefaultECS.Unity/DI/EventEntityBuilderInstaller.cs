@@ -1,28 +1,32 @@
 using System;
 
 using HereticalSolutions.Entities;
-using HereticalSolutions.Entities.Factories;
+
+using HereticalSolutions.Modules.Core_DefaultECS.Factories;
 
 using DefaultEcs;
 
 using Zenject;
 
-namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.DI
+namespace HereticalSolutions.Modules.Core_DefaultECS.DI
 {
 	public class EventEntityBuilderInstaller : MonoInstaller
 	{
 		[Inject]
-		private UniversalTemplateEntityManager entityManager;
+		private EntityWorldRepository entityWorldRepository;
 
 		public override void InstallBindings()
 		{
-			var worldContainer = entityManager as IContainsEntityWorlds<World, IDefaultECSEntityWorldController>;
+			if (!entityWorldRepository.TryGetWorld(
+				WorldConstants.EVENT_WORLD_ID,
+				out var eventWorld))
+			{
+				//TODO: Log error
 
-			var entityWorldsRepository = worldContainer.EntityWorldsRepository;
+				return;
+			}
 
-			var eventWorld = entityWorldsRepository.GetWorld(WorldConstants.EVENT_WORLD_ID);
-
-			var eventEntityBuilder = DefaultECSEntityFactory.BuildDefaultECSEventEntityBuilder<Guid>(
+			var eventEntityBuilder = EntityFactory.BuildEventEntityBuilder<Guid>(
 				eventWorld);
 
 			Container

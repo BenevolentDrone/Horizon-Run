@@ -1,6 +1,6 @@
 using HereticalSolutions.Pools;
 
-using HereticalSolutions.Templates.Universal.Unity.Factories;
+using HereticalSolutions.Modules.Core_DefaultECS.Factories;
 
 using HereticalSolutions.Logging;
 
@@ -8,7 +8,7 @@ using UnityEngine;
 
 using Zenject;
 
-namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.DI
+namespace HereticalSolutions.Modules.Core_DefaultECS.DI
 {
 	public class GameObjectPoolsInstaller : MonoInstaller
 	{
@@ -23,7 +23,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.DI
 
 		public override void InstallBindings()
 		{
-			var prefabsPool = UniversalTemplateUnityGameObjectPoolsFactory.BuildPool(
+			var prefabsPool = GameObjectPoolFactory.BuildPool(
 				Container,
 				prefabsPoolsSettings,
 				poolParentTransform,

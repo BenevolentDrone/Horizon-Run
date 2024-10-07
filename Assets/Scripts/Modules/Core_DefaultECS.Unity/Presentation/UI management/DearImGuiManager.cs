@@ -2,7 +2,7 @@ using UnityEngine;
 
 using System.Collections.Generic;
 
-namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
+namespace HereticalSolutions.Modules.Core_DefaultECS
 {
 	public class DearImGuiManager
 		: MonoBehaviour,

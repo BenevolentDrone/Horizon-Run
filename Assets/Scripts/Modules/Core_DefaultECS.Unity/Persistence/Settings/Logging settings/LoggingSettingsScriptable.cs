@@ -2,9 +2,12 @@ using HereticalSolutions.Entities;
 
 using UnityEngine;
 
-namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
+namespace HereticalSolutions.Modules.Core_DefaultECS
 {
-	[CreateAssetMenu(fileName = "Logging settings", menuName = "Settings/Logging/Logging settings", order = 0)]
+	[CreateAssetMenu(
+		fileName = "Logging settings",
+		menuName = "Settings/Logging/Logging settings",
+		order = 0)]
 	public class LoggingSettingsScriptable : ScriptableObject
 	{
 		[Header("Basic logging settings")]

@@ -1,5 +1,3 @@
-using System;
-
 namespace HereticalSolutions.Entities
 {
 	public interface IMultiWorldEntityManager<TWorldID, TWorld, TPrototypeID, TEntityID, TEntity>

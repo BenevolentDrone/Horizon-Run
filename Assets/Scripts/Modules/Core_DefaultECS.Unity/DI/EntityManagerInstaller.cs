@@ -1,14 +1,12 @@
-using System;
-
 using HereticalSolutions.Entities;
+
+using HereticalSolutions.Modules.Core_DefaultECS.Factories;
 
 using HereticalSolutions.Logging;
 
 using Zenject;
 
-using HereticalSolutions.Templates.Universal.Factories;
-
-namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.DI
+namespace HereticalSolutions.Modules.Core_DefaultECS.DI
 {
     public class EntityManagerInstaller : MonoInstaller
     {
@@ -20,18 +18,12 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.DI
 
         public override void InstallBindings()
         {
-            var entityManager = UniversalTemplateEntityFactory.BuildUniversalTemplateEntityManager(
+            var entityManager = EntityFactory.BuildEntityManager(
                 entityAuthoringSettings.AuthoringPreset,
                 loggerResolver);
 
             Container
-                .Bind<UniversalTemplateEntityManager>()
-                .FromInstance(entityManager)
-                .AsCached();
-
-            //For editor purposes
-            Container
-                .Bind<DefaultECSEntityManager<Guid>>()
+                .Bind<EntityManager>()
                 .FromInstance(entityManager)
                 .AsCached();
         }

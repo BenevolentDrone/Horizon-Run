@@ -11,7 +11,7 @@ using UnityEngine;
 
 using Zenject;
 
-namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.DI
+namespace HereticalSolutions.Modules.Core_DefaultECS.DI
 {
     public class TimeManagersInstaller : MonoInstaller
     {
@@ -19,7 +19,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.DI
         private ILoggerResolver loggerResolver;
 
         [SerializeField]
-        private UniversalTemplateTimeSynchronizationBehaviour timeSynchronizationBehaviour;
+        private TimeSynchronizationBehaviour timeSynchronizationBehaviour;
 
         public override void InstallBindings()
         {

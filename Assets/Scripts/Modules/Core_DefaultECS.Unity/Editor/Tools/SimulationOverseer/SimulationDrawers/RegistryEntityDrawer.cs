@@ -4,9 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Reflection;
 
-using HereticalSolutions.Entities;
-using HereticalSolutions.Entities.Editor;
-
 using DefaultEcs;
 
 using UnityEngine;
@@ -16,14 +13,10 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Editor
 {
     public class RegistryEntityDrawer : SimulationDrawer
     {
-        private IEntityIDEditorHelper[] entityIDEditorHelpers;
-        
-        private IEntityIDEditorHelper effectiveEntityIDEditorHelper;
-        
-        private object entityManager;
+        private EntityWorldRepository entityWorldRepository;
 
-        private IContainsEntityWorlds<World, IDefaultECSEntityWorldController> entityWorldsRepository;
-     
+        private EntityManager entityManager;
+
         private Dictionary<Guid, bool> toggledEntities;
      
         private string searchPattern = string.Empty;
@@ -42,54 +35,27 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Editor
 
         private void LazyInitialization()
         {
-            if (entityIDEditorHelpers == null)
-            {
-                entityIDEditorHelpers = GetHelpers();
-            }
-            
             if (entityManager == null)
             {
-                foreach (var helper in entityIDEditorHelpers)
-                {
-                    if (helper.TryGetEntityManager(out entityManager))
-                    {
-                        effectiveEntityIDEditorHelper = helper;
-                        
-                        entityWorldsRepository = entityManager as IContainsEntityWorlds<World, IDefaultECSEntityWorldController>;
-
-                        break;
-                    }
-                }
+                entityManager = DIHelpers.TryGetDependencyFromSceneContext<EntityManager>();
             }
-        }
 
-        private static IEntityIDEditorHelper[] GetHelpers()
-        {
-            var interfaceType = typeof(IEntityIDEditorHelper);
-
-            var types = AppDomain
-                .CurrentDomain
-                .GetAssemblies()
-                .SelectMany(
-                    s => s.GetTypes())
-                .Where(
-                    p => interfaceType.IsAssignableFrom(p)
-                         && p.IsClass
-                         && !p.IsAbstract);
-
-            IEntityIDEditorHelper[] result = new IEntityIDEditorHelper[types.Count()];
-
-            for (int i = 0; i < types.Count(); i++)
+            if (entityWorldRepository == null)
             {
-                result[i] = (IEntityIDEditorHelper)Activator.CreateInstance(types.ElementAt(i));
+                entityWorldRepository = DIHelpers.TryGetDependencyFromSceneContext<EntityWorldRepository>();
             }
-
-            return result;
         }
 
         protected override void Draw()
         {
             LazyInitialization();
+
+            if (entityManager == null || entityWorldRepository == null)
+            {
+                EditorGUILayout.LabelField("Could not find entity manager or entity world repository");
+
+                return;
+            }
 
             searchPattern = EditorGUILayout.TextField(
                 "Search pattern",
@@ -97,8 +63,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Editor
 
             GUILayout.Space(10);
 
-            var allRegistryEntityIDs = effectiveEntityIDEditorHelper
-                .GetAllRegistryEntityIDs(entityManager);
+            var allRegistryEntityIDs = entityManager.AllAllocatedIDs;
 
             if (allRegistryEntityIDs == null || allRegistryEntityIDs.Count() == 0)
             {
@@ -143,9 +108,12 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Editor
                 if (!toggledEntities[registryEntityID])
                     continue;
 
-                var registryEntity = effectiveEntityIDEditorHelper.GetRegistryEntity(
-                    entityManager,
-                    registryEntityID);
+                if (!entityManager.TryGetRegistryEntity(
+                    registryEntityID,
+                    out var registryEntity))
+                {
+                    continue;
+                }
 
                 DrawEntity(
                     registryEntity,
@@ -153,19 +121,15 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Editor
 
                 EditorGUILayout.Space();
 
-                foreach (var worldID in entityWorldsRepository.EntityWorldsRepository.AllWorldIDs)
+                foreach (var worldID in entityWorldRepository.AllWorldIDs)
                 {
-                    var localEntity = default(Entity);
-
-                    localEntity = effectiveEntityIDEditorHelper.GetEntity(
-                        entityManager,
-                        registryEntityID,
-                        worldID);
-
-                    if (localEntity == default)
-                    {
-                        continue;
-                    }
+                    if (!entityManager.TryGetEntity(
+						registryEntityID,
+						worldID,
+						out var localEntity))
+					{
+						continue;
+					}
 
                     DrawEntity(
                         localEntity,

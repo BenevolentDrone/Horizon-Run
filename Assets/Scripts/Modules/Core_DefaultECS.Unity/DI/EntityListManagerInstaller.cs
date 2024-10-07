@@ -1,17 +1,10 @@
-using System.Collections.Generic;
-
-using HereticalSolutions.Entities;
-
-using HereticalSolutions.Repositories.Factories;
-
 using HereticalSolutions.Logging;
 
 using Zenject;
 
-using DefaultEcs;
-using HereticalSolutions.Entities.Factories;
+using HereticalSolutions.Modules.Core_DefaultECS.Factories;
 
-namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.DI
+namespace HereticalSolutions.Modules.Core_DefaultECS.DI
 {
 	public class EntityListManagerInstaller : MonoInstaller
 	{
@@ -20,12 +13,12 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.DI
 		
 		public override void InstallBindings()
 		{
-			var entityListManager = DefaultECSEntityFactory
-				.BuildDefaultECSEntityListManager(
+			var entityListManager = EntityFactory
+				.BuildEntityListManager(
 					loggerResolver);
 
 			Container
-				.Bind<DefaultECSEntityListManager>()
+				.Bind<EntityListManager>()
 				.FromInstance(entityListManager)
 				.AsCached();
 		}

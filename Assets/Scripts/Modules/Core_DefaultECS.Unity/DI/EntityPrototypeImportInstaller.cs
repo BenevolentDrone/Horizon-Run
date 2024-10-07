@@ -7,13 +7,23 @@ using HereticalSolutions.Entities;
 using HereticalSolutions.Logging;
 using ILogger = HereticalSolutions.Logging.ILogger;
 
+
 using UnityEngine;
 
 using DefaultEcs;
 
 using Zenject;
 
-namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Installers
+
+using TWorldID = System.String;
+
+using TWorld = DefaultEcs.World;
+
+using TPrototypeID = System.String;
+
+using TEntity = DefaultEcs.Entity;
+
+namespace HereticalSolutions.Modules.Core_DefaultECS.DI
 {
 	public class EntityPrototypeImportInstaller : MonoInstaller
 	{
@@ -36,11 +46,11 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Installers
 		private IRuntimeResourceManager runtimeResourceManager;
 
 		[Inject]
-		private UniversalTemplateEntityManager entityManager;
+		private EntityWorldRepository entityWorldRepository;
 
 		[Inject]
-		private ISubaddressManager subaddressManager;
-		
+		private EntityManager entityManager;
+
 		[SerializeField]
 		private ResourcesSettings[] settingsPages;
 
@@ -52,9 +62,10 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Installers
             
 			bool includeSimulationWorld = authoringPreset != EEntityAuthoringPresets.NONE;
 			
-			bool includeViewWorld = authoringPreset == EEntityAuthoringPresets.DEFAULT
-			                        || authoringPreset == EEntityAuthoringPresets.NETWORKING_HOST
-			                        || authoringPreset == EEntityAuthoringPresets.NETWORKING_CLIENT;
+			bool includeViewWorld =
+				authoringPreset == EEntityAuthoringPresets.DEFAULT
+				|| authoringPreset == EEntityAuthoringPresets.NETWORKING_HOST
+				|| authoringPreset == EEntityAuthoringPresets.NETWORKING_CLIENT;
 
 			foreach (var settingsPage in settingsPages)
 			{
@@ -69,28 +80,19 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Installers
 						.ContinueWith(
 							targetTask =>
 							{
-								logger?.Log<EntityPrototypeImportInstaller>(
+								logger?.Log(
+									GetType(),
 									$"CREATING ENTITY PROTOTYPE VISITORS");
 
-								if (!TryGetEntityWorldsRepository(
-									    out IReadOnlyEntityWorldsRepository<World, IDefaultECSEntityWorldController>
-										    entityWorldsRepository,
-									    logger))
-								{
-									logger?.LogError<EntityPrototypeImportInstaller>(
-										$"COULD NOT GET entityWorldsRepository");
-
-									return;
-								}
-
 								if (!TryGetWorldPrototypeVisitor(
-									    entityWorldsRepository,
+									    entityWorldRepository,
 									    WorldConstants.REGISTRY_WORLD_ID,
 									    out DefaultECSEntityPrototypeVisitor registryWorldPrototypeVisitor,
 									    true,
 									    logger))
 								{
-									logger?.LogError<EntityPrototypeImportInstaller>(
+									logger?.LogError(
+										GetType(),
 										$"COULD NOT GET registryWorldPrototypeVisitor");
 
 									return;
@@ -101,7 +103,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Installers
 								if (includeSimulationWorld)
 								{
 									TryGetWorldPrototypeVisitor(
-										entityWorldsRepository,
+										entityWorldRepository,
 										WorldConstants.SIMULATION_WORLD_ID,
 										out simulationWorldPrototypeVisitor,
 										false,
@@ -114,7 +116,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Installers
 								if (includeViewWorld)
 								{
 									TryGetWorldPrototypeVisitor(
-										entityWorldsRepository,
+										entityWorldRepository,
 										WorldConstants.VIEW_WORLD_ID,
 										out viewWorldPrototypeVisitor,
 										false,
@@ -137,67 +139,38 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Installers
 			}
 		}
 
-		private bool TryGetEntityWorldsRepository(
-			out IReadOnlyEntityWorldRepository<World,IDefaultECSEntityWorldController> entityWorldsRepository,
-			ILogger logger = null)
-		{
-			var worldContainer = entityManager as IContainsEntityWorlds<World, IDefaultECSEntityWorldController>;
-			
-			if (worldContainer == null)
-			{
-				logger?.LogError<EntityPrototypeImportInstaller>(
-					$"entityManager CANNOT BE CAST TO IContainsEntityWorlds<World, IDefaultECSEntityWorldController>");
-				
-				entityWorldsRepository = null;
-				
-				return false;
-			}
-
-			entityWorldsRepository = worldContainer.EntityWorldsRepository;
-			
-			if (entityWorldsRepository == null)
-			{
-				logger?.LogError<EntityPrototypeImportInstaller>(
-					$"worldContainer DOES NOT HAVE EntityWorldsRepository");
-				
-				entityWorldsRepository = null;
-				
-				return false;
-			}
-
-			return true;
-		}
-
 		private bool TryGetWorldPrototypeVisitor(
-			IReadOnlyEntityWorldRepository<World,IDefaultECSEntityWorldController> entityWorldsRepository,
-			string worldID,
+			IEntityWorldRepository<TWorldID, TWorld, TEntity> entityWorldRepository,
+			TWorldID worldID,
+
 			out DefaultECSEntityPrototypeVisitor worldPrototypeVisitor,
+
 			bool logErrorIfWorldNotFound = true,
 			ILogger logger = null)
 		{
-			if (!entityWorldsRepository.HasWorld(
-				worldID))
+			if (!entityWorldRepository.TryGetEntityWorldController(
+				worldID,
+				out var worldController))
 			{
 				if (logErrorIfWorldNotFound)
 				{
-					logger?.LogError<EntityPrototypeImportInstaller>(
-						$"entityWorldsRepository DOES NOT HAVE {worldID}");
+					logger?.LogError(
+						GetType(),
+						$"entityWorldRepository DOES NOT HAVE {worldID}");
 				}
 
 				worldPrototypeVisitor = null;
-				
+
 				return false;
 			}
-			
-			var worldController = entityWorldsRepository.GeTEntityWorldController(
-				worldID);
 
-			var worldWithPrototype = worldController as IEntityWorldControllerWithPrototypes<World, Entity>;
+			var worldWithPrototype = worldController as IEntityWorldControllerWithPrototypes<TWorld, TPrototypeID, TEntity>;
 
 			if (worldWithPrototype == null)
 			{
-				logger?.LogError<EntityPrototypeImportInstaller>(
-					$"worldController CANNOT BE CAST TO IPrototypeComplianTEntityWorldController<World, Entity>");
+				logger?.LogError(
+					GetType(),
+					$"worldController CANNOT BE CAST TO IEntityWorldControllerWithPrototypes");
 				
 				worldPrototypeVisitor = null;
 				
@@ -208,7 +181,8 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Installers
 			
 			if (worldPrototypeRepository == null)
 			{
-				logger?.LogError<EntityPrototypeImportInstaller>(
+				logger?.LogError(
+					GetType(),
 					$"worldWithPrototype DOES NOT HAVE PrototypeRepository");
 				
 				worldPrototypeVisitor = null;
@@ -235,21 +209,24 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Installers
 			
 			ILogger logger = null)
 		{
-			logger?.Log<EntityPrototypeImportInstaller>(
+			logger?.Log(
+				GetType(),
 				$"PARSING RESOURCE PAGE: {resourcePage.ResourcePageName}");
 			
 			foreach (var resource in resourcePage.Resources)
 			{
 				string entityName = resource.ResourceID;
 
-				logger?.Log<EntityPrototypeImportInstaller>(
+				logger?.Log(
+					GetType(),
 					$"CREATING ENTITY PROTOTYPES FOR ENTITY: {entityName}");
 
 				if (!runtimeResourceManager.TryGetResource(
 					entityName.SplitAddressBySeparator(),
 					out IReadOnlyResourceData entityResourceData))
 				{
-					logger?.LogError<EntityPrototypeImportInstaller>(
+					logger?.LogError(
+						GetType(),
 						$"COULD NOT FIND RESOURCE FOR ENTITY: {entityName}");
 
 					continue;
@@ -278,12 +255,6 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Installers
 					{
 						continue;
 					}
-
-					if (simulationEntityPrototype.Has<SubaddressComponent>())
-					{
-						subaddressManager.MemorizeSubaddressPart(
-							simulationEntityPrototype.Get<SubaddressComponent>().Subaddress);
-					}
 				}
 				
 				if (includeViewWorld)
@@ -305,9 +276,11 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Installers
 		private bool CreateEntityPrototype(
 			string entityName,
 			string variantID,
+
 			IReadOnlyResourceData entityResourceData,
 			DefaultECSEntityPrototypeVisitor registryWorldPrototypeVisitor,
-			out Entity entityPrototype,
+
+			out TEntity entityPrototype,
 			ILogger logger = null)
 		{
 			if (entityResourceData.TryGetVariant(
@@ -321,19 +294,22 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Installers
 					    .GetPrototypeDTO(loggerResolver),
 					out entityPrototype))
 				{
-					logger?.LogError<EntityPrototypeImportInstaller>(
+					logger?.LogError(
+						GetType(),
 						$"COULD NOT CREATE {variantID} PROTOTYPE FOR: {entityName}");
 
 					return false;
 				}
 
-				logger?.Log<EntityPrototypeImportInstaller>(
+				logger?.Log(
+					GetType(),
 					$"CREATED {variantID} PROTOTYPE FOR: {entityName}");
 
 				return true;
 			}
 			
-			logger?.Log<EntityPrototypeImportInstaller>(
+			logger?.Log(
+				GetType(),
 				$"NO {variantID} FOUND FOR: {entityName}");
 			
 			entityPrototype = default;

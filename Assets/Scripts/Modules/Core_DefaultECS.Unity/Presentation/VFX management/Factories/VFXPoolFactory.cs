@@ -18,7 +18,7 @@ using UnityEngine;
 
 using Zenject;
 
-namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Factories
+namespace HereticalSolutions.Modules.Core_DefaultECS.Factories
 {
     public static class VFXPoolFactory
     {

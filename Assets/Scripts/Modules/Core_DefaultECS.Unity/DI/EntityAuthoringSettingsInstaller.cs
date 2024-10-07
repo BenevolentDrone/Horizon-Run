@@ -4,7 +4,7 @@ using UnityEngine;
 
 using Zenject;
 
-namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.DI
+namespace HereticalSolutions.Modules.Core_DefaultECS.DI
 {
 	public class EntityAuthoringSettingsInstaller : MonoInstaller
 	{

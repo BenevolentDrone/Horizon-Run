@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
+namespace HereticalSolutions.Modules.Core_DefaultECS
 {
     public interface IVFXManager
     {

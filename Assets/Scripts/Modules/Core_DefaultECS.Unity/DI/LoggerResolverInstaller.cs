@@ -5,6 +5,7 @@ using HereticalSolutions.Delegates.Pinging;
 using HereticalSolutions.Delegates.Broadcasting;
 using HereticalSolutions.Delegates.Subscriptions;
 
+using HereticalSolutions.Pools;
 using HereticalSolutions.Pools.Decorators;
 
 using HereticalSolutions.ResourceManagement;
@@ -20,9 +21,8 @@ using ILogger = HereticalSolutions.Logging.ILogger;
 using UnityEngine;
 
 using Zenject;
-using HereticalSolutions.Pools;
 
-namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.DI
+namespace HereticalSolutions.Modules.Core_DefaultECS.DI
 {
     public class LoggerResolverInstaller : MonoInstaller
     {
@@ -132,6 +132,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.DI
                     LoggersFactory.BuildLoggerWrapperWithRecursionPreventionGate(
                         loggerBuilder.CurrentLogger))
 
+                //TODO: extract to file
                 .ToggleLogSource(
                     typeof(NonAllocPinger),
                     false)
@@ -174,11 +175,11 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.DI
                 //    false)
 
                 .ToggleLogSource(
-                    typeof(DefaultECSEntityManager<>),
+                    typeof(EntityManager),
                     false)
 
                 .ToggleLogSource(
-                    typeof(DefaultECSEntityListManager),
+                    typeof(EntityListManager),
                     false)
 
                 //.ToggleLogSource(

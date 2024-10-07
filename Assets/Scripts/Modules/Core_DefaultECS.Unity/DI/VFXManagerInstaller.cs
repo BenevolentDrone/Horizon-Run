@@ -1,6 +1,6 @@
 using HereticalSolutions.Time;
 
-using HereticalSolutions.Templates.Universal.Unity.Factories;
+using HereticalSolutions.Modules.Core_DefaultECS.Factories;
 
 using HereticalSolutions.Logging;
 
@@ -8,7 +8,7 @@ using UnityEngine;
 
 using Zenject;
 
-namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.DI
+namespace HereticalSolutions.Modules.Core_DefaultECS.DI
 {
     public class VFXManagerInstaller : MonoInstaller
     {

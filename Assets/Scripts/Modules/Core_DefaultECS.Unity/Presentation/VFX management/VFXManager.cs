@@ -2,7 +2,7 @@ using UnityEngine;
 
 using HereticalSolutions.Pools;
 
-namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
+namespace HereticalSolutions.Modules.Core_DefaultECS
 {
     public class VFXManager
         : IVFXManager

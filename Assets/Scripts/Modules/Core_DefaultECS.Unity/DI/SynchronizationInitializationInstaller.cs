@@ -7,7 +7,7 @@ using UnityEngine;
 
 using Zenject;
 
-namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.DI
+namespace HereticalSolutions.Modules.Core_DefaultECS.DI
 {
     public class SynchronizationInitializationInstaller : MonoInstaller
     {
@@ -15,7 +15,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.DI
         private ILoggerResolver loggerResolver;
 
         [SerializeField]
-        private UniversalTemplateSynchronizationBehaviour synchronizationBehaviour;
+        private SynchronizationBehaviour synchronizationBehaviour;
 
         public override void InstallBindings()
         {

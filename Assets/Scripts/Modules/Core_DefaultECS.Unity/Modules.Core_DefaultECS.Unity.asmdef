@@ -1,0 +1,18 @@
+{
+    "name": "Modules.Core_DefaultECS.Unity",
+    "rootNamespace": "",
+    "references": [
+        "GUID:4078fbd9635323d24903cca3d8fee2a6",
+        "GUID:4957caa676d23547b80e855580501e35",
+        "GUID:0d8beb7f090555447a6cf5ce9e54dbb4"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

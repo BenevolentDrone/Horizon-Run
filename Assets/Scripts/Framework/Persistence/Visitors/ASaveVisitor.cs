@@ -36,7 +36,6 @@ namespace HereticalSolutions.Persistence
 
 			DTO = default;
 
-			//LOL, pattern matching to the rescue of converting TArgument to TValue
 			switch (value)
 			{
 				case TValue worldValue:
@@ -98,7 +97,6 @@ namespace HereticalSolutions.Persistence
 				return false;
 			}
 
-			//LOL, pattern matching to the rescue of converting TArgument to TValue
 			switch (returnDTO)
 			{
 				case TDTO targetTypeDTO:

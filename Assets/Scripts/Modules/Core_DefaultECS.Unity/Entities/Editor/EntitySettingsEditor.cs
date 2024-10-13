@@ -70,12 +70,12 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Editor
 
 				loggerBuilder
 					.ToggleAllowedByDefault(true)
-					.AddOrWrap(
-						LoggersFactoryUnity.BuildUnityDebugLogger())
-					.AddOrWrap(
+					.AddSink(
+						LoggersFactoryUnity.BuildUnityDebugLogSink())
+					.Wrap(
 						LoggersFactory.BuildLoggerWrapperWithLogTypePrefix(
 							loggerBuilder.CurrentLogger))
-					.AddOrWrap(
+					.Wrap(
 						LoggersFactory.BuildLoggerWrapperWithSourceTypePrefix(
 							loggerBuilder.CurrentLogger));
 

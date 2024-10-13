@@ -65,7 +65,6 @@ namespace HereticalSolutions.Persistence
 				return false;
 			}
 
-			//LOL, pattern matching to the rescue of converting TArgument to TValue
 			switch (returnValue)
 			{
 				case TArgument tArgumentReturnValue:
@@ -116,7 +115,6 @@ namespace HereticalSolutions.Persistence
 				return false;
 			}
 
-			//LOL, pattern matching to the rescue of converting TArgument to TValue
 			switch (returnValue)
 			{
 				case TArgument tArgumentReturnValue:
@@ -158,7 +156,6 @@ namespace HereticalSolutions.Persistence
 							$"INVALID ARGUMENT TYPE. EXPECTED: \"{typeof(TDTO).Name}\" RECEIVED: \"{DTO.GetType().Name}\""));
 			}
 
-			//LOL, pattern matching to the rescue of converting TArgument to TValue
 			switch (valueToPopulate)
 			{
 				case TValue world:
@@ -198,7 +195,6 @@ namespace HereticalSolutions.Persistence
 							$"INVALID ARGUMENT TYPE. EXPECTED: \"{typeof(TDTO).Name}\" RECEIVED: \"{typeof(TDTO).Name}\""));
 			}
 
-			//LOL, pattern matching to the rescue of converting TArgument to TValue
 			switch (valueToPopulate)
 			{
 				case TValue world:
@@ -238,7 +234,6 @@ namespace HereticalSolutions.Persistence
 
 			DTO = default;
 
-			//LOL, pattern matching to the rescue of converting TArgument to TValue
 			switch (value)
 			{
 				case TValue worldValue:
@@ -300,7 +295,6 @@ namespace HereticalSolutions.Persistence
 				return false;
 			}
 
-			//LOL, pattern matching to the rescue of converting TArgument to TValue
 			switch (returnDTO)
 			{
 				case TDTO targetTypeDTO:

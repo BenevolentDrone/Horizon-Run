@@ -32,7 +32,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.DI
 
         private ILogger cachedLogger;
 
-        private IDumpable cachedDumpableLogger;
+        //private IDumpable cachedDumpableLogger;
 
 
         private bool catchingLogs;
@@ -64,49 +64,58 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.DI
 
                 // Output
 
-                .AddOrWrap(
-                    LoggersFactoryUnity.BuildUnityDebugLogger(
+                .AddSink(
+                    LoggersFactoryUnity.BuildUnityDebugLogSink())
+
+                //Toggling
+
+                .Wrap(
+                    LoggersFactory.BuildLoggerWrapperWithToggling(
+                        loggerBuilder.CurrentLogger,
+                        true,
                         false,
                         false,
                         true))
 
                 // Recursion prevention prefix
 
-                .AddOrWrap(
+                .Wrap(
                     LoggersFactory.BuildLoggerWrapperWithRecursionPreventionPrefix(
                         loggerBuilder.CurrentLogger))
 
                 // Logging to file
 
-                .AddOrWrap(
-                    LoggersFactory.BuildLoggerWrapperWithFileDump(
-                        (loggingSettings.LoggingEnvironmentSettings.GetLogsFolderFromEnvironment)
-                            ? System.Environment.GetEnvironmentVariable(
-                                loggingSettings.LoggingEnvironmentSettings.LogsFolderEnvironmentKey)
-                            : $"{Application.dataPath}/../",
-                        $"Runtime logs/{logFileName}.log",
-                        (ILoggerResolver)loggerBuilder,
-                        loggerBuilder.CurrentLogger))
+                .Branch(
+                    new []
+                    {
+                        LoggersFactory.BuildFileSink(
+                            (loggingSettings.LoggingEnvironmentSettings.GetLogsFolderFromEnvironment)
+                                ? System.Environment.GetEnvironmentVariable(
+                                    loggingSettings.LoggingEnvironmentSettings.LogsFolderEnvironmentKey)
+                                : $"{Application.dataPath}/../",
+                            $"Runtime logs/{logFileName}.log",
+                            (ILoggerResolver)loggerBuilder)
+                    })
 
                 //Prefixes
 
-                .AddOrWrap(
+                .Wrap(
                     LoggersFactory.BuildLoggerWrapperWithTimestampPrefix(
                         loggingSettings.BasicLoggingSettings.LogTimeInUtc,
                         loggerBuilder.CurrentLogger))
-                .AddOrWrap(
+                .Wrap(
                     LoggersFactory.BuildLoggerWrapperWithLogTypePrefix(
                         loggerBuilder.CurrentLogger))
-                .AddOrWrap(
+                .Wrap(
                     LoggersFactory.BuildLoggerWrapperWithSourceTypePrefix(
                         loggerBuilder.CurrentLogger))
-                .AddOrWrap(
+                .Wrap(
                     LoggersFactory.BuildLoggerWrapperWithThreadIndexPrefix(
                         loggerBuilder.CurrentLogger))
 
                 //Thread safety
 
-                .AddOrWrap(
+                .Wrap(
                     LoggersFactory.BuildLoggerWrapperWithSemaphoreSlim(
                         loggerBuilder.CurrentLogger))
 
@@ -128,7 +137,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.DI
                 //MAKING A DEADLOCK
                 //THE EASIEST WAY TO PREVENT THIS IS TO PERFORM A RECURSION GATE BEFORE THE SEMAPHORE
 
-                .AddOrWrap(
+                .Wrap(
                     LoggersFactory.BuildLoggerWrapperWithRecursionPreventionGate(
                         loggerBuilder.CurrentLogger))
 
@@ -227,41 +236,41 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.DI
 
             cachedLogger = loggerBuilder.CurrentLogger;
 
-            #region Dumpable
-
-            cachedDumpableLogger = null;
-
-            var currentLogger = loggerBuilder.CurrentLogger;
-
-            do
-            {
-                if (currentLogger is IDumpable dumpableLogger)
-                {
-                    cachedDumpableLogger = (IDumpable)currentLogger;
-
-                    break;
-                }
-
-                if (currentLogger is not ILoggerWrapper loggerWrapper)
-                {
-                    cachedDumpableLogger = null;
-
-                    break;
-                }
-
-                currentLogger = loggerWrapper.InnerLogger;
-            }
-            while (true);
-
-            if (cachedDumpableLogger != null)
-            {
-                Container
-                    .Bind<IDumpable>()
-                    .FromInstance(cachedDumpableLogger)
-                    .AsCached();
-            }
-
-            #endregion
+            //#region Dumpable
+            //
+            //cachedDumpableLogger = null;
+            //
+            //var currentLogger = loggerBuilder.CurrentLogger;
+            //
+            //do
+            //{
+            //    if (currentLogger is IDumpable dumpableLogger)
+            //    {
+            //        cachedDumpableLogger = (IDumpable)currentLogger;
+            //
+            //        break;
+            //    }
+            //
+            //    if (currentLogger is not ILoggerWrapper loggerWrapper)
+            //    {
+            //        cachedDumpableLogger = null;
+            //
+            //        break;
+            //    }
+            //
+            //    currentLogger = loggerWrapper.InnerLogger;
+            //}
+            //while (true);
+            //
+            //if (cachedDumpableLogger != null)
+            //{
+            //    Container
+            //        .Bind<IDumpable>()
+            //        .FromInstance(cachedDumpableLogger)
+            //        .AsCached();
+            //}
+            //
+            //#endregion
 
             #region Catch logs
 
@@ -347,7 +356,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.DI
                 Application.logMessageReceivedThreaded -= ReceivedLog;
             }
 
-            cachedDumpableLogger?.Dump();
+            //cachedDumpableLogger?.Dump();
         }
     }
 }

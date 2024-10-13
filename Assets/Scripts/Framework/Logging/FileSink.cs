@@ -6,39 +6,27 @@ using HereticalSolutions.Persistence.Arguments;
 
 namespace HereticalSolutions.Logging
 {
-	public class LoggerWrapperWithFileDump
-		: ILogger,
-		  ILoggerWrapper,
+	public class FileSink
+		: ILoggerSink,
 		  IDumpable
 	{
-		private readonly ILogger innerLogger;
-
 		private readonly ISerializationArgument serializationArgument;
 
 		private readonly ISerializer serializer;
 
 		private readonly List<string> fullLog;
 
-		public LoggerWrapperWithFileDump(
-			ILogger innerLogger,
+		public FileSink(
 			ISerializationArgument serializationArgument,
 			ISerializer serializer,
 			List<string> fullLog)
 		{
-			this.innerLogger = innerLogger;
-
 			this.serializationArgument = serializationArgument;
 
 			this.serializer = serializer;
 
 			this.fullLog = fullLog;
 		}
-
-		#region ILoggerWrapper
-
-		public ILogger InnerLogger { get => innerLogger; }
-
-		#endregion
 
 		#region ILogger
 
@@ -59,8 +47,6 @@ namespace HereticalSolutions.Logging
 			{
 				fullLog.Add(value);
 			}
-
-			innerLogger.Log(value);
 		}
 
 		public void Log<TSource>(
@@ -78,8 +64,6 @@ namespace HereticalSolutions.Logging
 			{
 				fullLog.Add(value);
 			}
-
-			innerLogger.Log<TSource>(value);
 		}
 
 		public void Log(
@@ -98,10 +82,6 @@ namespace HereticalSolutions.Logging
 			{
 				fullLog.Add(value);
 			}
-
-			innerLogger.Log(
-				logSource,
-				value);
 		}
 
 		public void Log(
@@ -120,10 +100,6 @@ namespace HereticalSolutions.Logging
 			{
 				fullLog.Add(value);
 			}
-
-			innerLogger.Log(
-				value,
-				arguments);
 		}
 
 		public void Log<TSource>(
@@ -142,10 +118,6 @@ namespace HereticalSolutions.Logging
 			{
 				fullLog.Add(value);
 			}
-
-			innerLogger.Log<TSource>(
-				value,
-				arguments);
 		}
 
 		public void Log(
@@ -165,11 +137,6 @@ namespace HereticalSolutions.Logging
 			{
 				fullLog.Add(value);
 			}
-
-			innerLogger.Log(
-				logSource,
-				value,
-				arguments);
 		}
 
 		#endregion
@@ -191,9 +158,6 @@ namespace HereticalSolutions.Logging
 			{
 				fullLog.Add(value);
 			}
-
-			innerLogger.LogWarning(
-				value);
 		}
 
 		public void LogWarning<TSource>(
@@ -211,8 +175,6 @@ namespace HereticalSolutions.Logging
 			{
 				fullLog.Add(value);
 			}
-
-			innerLogger.LogWarning<TSource>(value);
 		}
 
 		public void LogWarning(
@@ -231,10 +193,6 @@ namespace HereticalSolutions.Logging
 			{
 				fullLog.Add(value);
 			}
-
-			innerLogger.LogWarning(
-				logSource,
-				value);
 		}
 
 		public void LogWarning(
@@ -253,10 +211,6 @@ namespace HereticalSolutions.Logging
 			{
 				fullLog.Add(value);
 			}
-
-			innerLogger.LogWarning(
-				value,
-				arguments);
 		}
 
 		public void LogWarning<TSource>(
@@ -275,10 +229,6 @@ namespace HereticalSolutions.Logging
 			{
 				fullLog.Add(value);
 			}
-
-			innerLogger.LogWarning<TSource>(
-				value,
-				arguments);
 		}
 
 		public void LogWarning(
@@ -298,11 +248,6 @@ namespace HereticalSolutions.Logging
 			{
 				fullLog.Add(value);
 			}
-
-			innerLogger.LogWarning(
-				logSource,
-				value,
-				arguments);
 		}
 
 		#endregion
@@ -324,9 +269,6 @@ namespace HereticalSolutions.Logging
 			{
 				fullLog.Add(value);
 			}
-
-			innerLogger.LogError(
-				value);
 		}
 
 		public void LogError<TSource>(
@@ -344,8 +286,6 @@ namespace HereticalSolutions.Logging
 			{
 				fullLog.Add(value);
 			}
-
-			innerLogger.LogError<TSource>(value);
 		}
 
 		public void LogError(
@@ -364,10 +304,6 @@ namespace HereticalSolutions.Logging
 			{
 				fullLog.Add(value);
 			}
-
-			innerLogger.LogError(
-				logSource,
-				value);
 		}
 
 		public void LogError(
@@ -386,10 +322,6 @@ namespace HereticalSolutions.Logging
 			{
 				fullLog.Add(value);
 			}
-
-			innerLogger.LogError(
-				value,
-				arguments);
 		}
 
 		public void LogError<TSource>(
@@ -408,10 +340,6 @@ namespace HereticalSolutions.Logging
 			{
 				fullLog.Add(value);
 			}
-
-			innerLogger.LogError<TSource>(
-				value,
-				arguments);
 		}
 
 		public void LogError(
@@ -431,11 +359,6 @@ namespace HereticalSolutions.Logging
 			{
 				fullLog.Add(value);
 			}
-
-			innerLogger.LogError(
-				logSource,
-				value,
-				arguments);
 		}
 
 		#endregion
@@ -445,8 +368,6 @@ namespace HereticalSolutions.Logging
 		public string FormatException(
 			string value)
 		{
-			var result = innerLogger.FormatException(value);
-
 			if (serializationArgument is StreamArgument streamArgument)
 			{
 				streamArgument.KeepOpen = true;
@@ -460,14 +381,12 @@ namespace HereticalSolutions.Logging
 				fullLog.Add(value);
 			}
 
-			return result;	
+			return value;	
 		}
 
 		public string FormatException<TSource>(
 			string value)
 		{
-			var result = innerLogger.FormatException<TSource>(value);
-
 			if (serializationArgument is StreamArgument streamArgument)
 			{
 				streamArgument.KeepOpen = true;
@@ -481,17 +400,13 @@ namespace HereticalSolutions.Logging
 				fullLog.Add(value);
 			}
 
-			return result;
+			return value;
 		}
 
 		public string FormatException(
 			Type logSource,
 			string value)
 		{
-			var result = innerLogger.FormatException(				
-				logSource,
-				value);
-
 			if (serializationArgument is StreamArgument streamArgument)
 			{
 				streamArgument.KeepOpen = true;
@@ -505,7 +420,7 @@ namespace HereticalSolutions.Logging
 				fullLog.Add(value);
 			}
 
-			return result;
+			return value;
 		}
 
 		#endregion

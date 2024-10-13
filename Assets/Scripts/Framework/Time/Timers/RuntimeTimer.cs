@@ -306,7 +306,6 @@ namespace HereticalSolutions.Time.Timers
 
             DTO = default;
 
-            //LOL, pattern matching to the rescue of converting TArgument to TValue
             switch (runtimeTimerDTO)
             {
                 case TDTO targetTypeDTO:
@@ -344,7 +343,6 @@ namespace HereticalSolutions.Time.Timers
             ILoadVisitor visitor,
             TDTO DTO)
         {
-            //LOL, pattern matching to the rescue of converting TArgument to TValue
             switch (DTO)
             {
                 case RuntimeTimerDTO targetTypeDTO:

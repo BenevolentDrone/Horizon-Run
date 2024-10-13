@@ -18,12 +18,12 @@ namespace HereticalSolutions.Samples.ECSCharacterControllerSample.Installers
 
             loggerBuilder
                 .ToggleAllowedByDefault(allowedByDefault)
-                .AddOrWrap(
-                    LoggersFactoryUnity.BuildUnityDebugLogger())
-                .AddOrWrap(
+                .AddSink(
+                    LoggersFactoryUnity.BuildUnityDebugLogSink())
+                .Wrap(
                     LoggersFactory.BuildLoggerWrapperWithLogTypePrefix(
                         loggerBuilder.CurrentLogger))
-                .AddOrWrap(
+                .Wrap(
                     LoggersFactory.BuildLoggerWrapperWithSourceTypePrefix(
                         loggerBuilder.CurrentLogger));
 

@@ -19,7 +19,9 @@ namespace HereticalSolutions.ResourceManagement
 		private readonly Func<TResource> newResourceAllocationDelegate;
 
 		private readonly EqualityComparer<THandle> handleEqualityComparer;
-		
+
+		private readonly THandle uninitializedHandle;
+
 		private readonly ILogger logger;
 		
 		private THandle lastAllocatedHandle;
@@ -29,6 +31,7 @@ namespace HereticalSolutions.ResourceManagement
 			Queue<THandle> freeHandles,
 			Func<THandle, THandle> newHandleAllocationDelegate,
 			Func<TResource> newResourceAllocationDelegate,
+			THandle uninitializedHandle = default(THandle),
 			ILogger logger = null)
 		{
 			this.resourceRepository = resourceRepository;
@@ -41,9 +44,11 @@ namespace HereticalSolutions.ResourceManagement
 
 			handleEqualityComparer = EqualityComparer<THandle>.Default;
 			
+			this.uninitializedHandle = uninitializedHandle;
+
 			this.logger = logger;
 
-			lastAllocatedHandle = default(THandle);
+			lastAllocatedHandle = uninitializedHandle;
 		}
 
 		#region IManagedTypeResourceManager
@@ -51,7 +56,7 @@ namespace HereticalSolutions.ResourceManagement
 		public bool Has(
 			THandle handle)
 		{
-			if (handleEqualityComparer.Equals(handle, default(THandle)))
+			if (handleEqualityComparer.Equals(handle, uninitializedHandle))
 				return false;
 			
 			return resourceRepository.Has(handle);
@@ -60,7 +65,7 @@ namespace HereticalSolutions.ResourceManagement
 		public TResource Get(
 			THandle handle)
 		{
-			if (handleEqualityComparer.Equals(handle, default(THandle)))
+			if (handleEqualityComparer.Equals(handle, uninitializedHandle))
 				throw new Exception(
 					logger.TryFormatException(
 						GetType(),
@@ -80,7 +85,7 @@ namespace HereticalSolutions.ResourceManagement
 			THandle handle,
 			out TResource resource)
 		{
-			if (handleEqualityComparer.Equals(handle, default(THandle)))
+			if (handleEqualityComparer.Equals(handle, uninitializedHandle))
 			{
 				resource = default(TResource);
 
@@ -123,7 +128,7 @@ namespace HereticalSolutions.ResourceManagement
 		public void Remove(
 			THandle handle)
 		{
-			if (handleEqualityComparer.Equals(handle, default(THandle)))
+			if (handleEqualityComparer.Equals(handle, uninitializedHandle))
 				return;
 			
 			if (!resourceRepository.TryRemove(handle))
@@ -141,7 +146,7 @@ namespace HereticalSolutions.ResourceManagement
 		public bool TryRemove(
 			THandle handle)
 		{
-			if (handleEqualityComparer.Equals(handle, default(THandle)))
+			if (handleEqualityComparer.Equals(handle, uninitializedHandle))
 				return false;
 			
 			if (!resourceRepository.TryRemove(handle))

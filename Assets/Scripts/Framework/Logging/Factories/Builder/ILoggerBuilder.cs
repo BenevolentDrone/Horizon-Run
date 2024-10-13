@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace HereticalSolutions.Logging
 {
@@ -18,6 +19,10 @@ namespace HereticalSolutions.Logging
 			Type logSourceType,
 			bool allowed);
 
-		ILoggerBuilder AddOrWrap(ILogger logger);
+		ILoggerBuilder AddSink(ILoggerSink logger);
+
+		ILoggerBuilder Wrap(ILoggerWrapper logger);
+
+		ILoggerBuilder Branch(IEnumerable<ILogger> siblingLoggers);
 	}
 }

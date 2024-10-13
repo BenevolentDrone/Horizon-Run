@@ -25,12 +25,14 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
             Queue<THandle> freeHandles,
             Func<THandle, THandle> newHandleAllocationDelegate,
             IPool<TResource> resourcePool,
+            THandle uninitializedHandle = default(THandle),
             ILogger logger = null)
             : base(
                 resourceRepository,
                 freeHandles,
                 newHandleAllocationDelegate,
                 resourcePool,
+                uninitializedHandle,
                 logger)
         {
         }

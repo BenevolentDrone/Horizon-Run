@@ -2,15 +2,9 @@ namespace HereticalSolutions.Logging.Factories
 {
 	public static class LoggersFactoryUnity
 	{
-		public static UnityDebugLogger BuildUnityDebugLogger(
-			bool printLogs = true,
-			bool printWarnings = true,
-			bool printErrors = true)
+		public static UnityDebugLogSink BuildUnityDebugLogSink()
 		{
-			return new UnityDebugLogger(
-				printLogs,
-				printWarnings,
-				printErrors);
+			return new UnityDebugLogSink();
 		}
 	}
 }

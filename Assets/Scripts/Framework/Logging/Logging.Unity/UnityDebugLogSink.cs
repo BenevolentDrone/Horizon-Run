@@ -4,27 +4,9 @@ using UnityEngine;
 
 namespace HereticalSolutions.Logging
 {
-	public class UnityDebugLogger
-		: ILogger
+	public class UnityDebugLogSink
+		: ILoggerSink
 	{
-		private readonly bool printLogs;
-		
-		private readonly bool printWarnings;
-		
-		private readonly bool printErrors;
-		
-		public UnityDebugLogger(
-			bool printLogs,
-			bool printWarnings,
-			bool printErrors)
-		{
-			this.printLogs = printLogs;
-			
-			this.printWarnings = printWarnings;
-			
-			this.printErrors = printErrors;
-		}
-		
 		#region ILogger
 
 		#region Log
@@ -32,9 +14,6 @@ namespace HereticalSolutions.Logging
 		public void Log(
 			string value)
 		{
-			if (!printLogs)
-				return;
-
 			Debug.Log(
 				value);
 		}
@@ -106,9 +85,6 @@ namespace HereticalSolutions.Logging
 		public void LogWarning(
 			string value)
 		{
-			if (!printWarnings)
-				return;
-			
 			Debug.LogWarning(
 				value);
 		}
@@ -180,9 +156,6 @@ namespace HereticalSolutions.Logging
 		public void LogError(
 			string value)
 		{
-			if (!printErrors)
-				return;
-			
 			Debug.LogError(
 				value);
 		}

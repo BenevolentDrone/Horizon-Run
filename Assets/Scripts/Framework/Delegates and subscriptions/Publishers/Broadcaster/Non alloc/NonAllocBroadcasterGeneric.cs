@@ -134,7 +134,6 @@ namespace HereticalSolutions.Delegates.Broadcasting
                 IInvokableSingleArgGeneric<TArgument>>
                 subscription)
         {
-            //LOL, pattern matching to the rescue of converting TArgument to TValue
             switch (subscription)
             {
                 case ISubscriptionHandler<
@@ -160,7 +159,6 @@ namespace HereticalSolutions.Delegates.Broadcasting
                 IInvokableSingleArg>
                 subscription)
         {
-            //LOL, pattern matching to the rescue of converting TArgument to TValue
             switch (subscription)
             {
                 case ISubscriptionHandler<
@@ -180,14 +178,12 @@ namespace HereticalSolutions.Delegates.Broadcasting
             }
         }
 
-        /// <param name="subscription">The subscription handler to unsubscribe.</param>
         public void Unsubscribe<TArgument>(
             ISubscriptionHandler<
                 INonAllocSubscribableSingleArgGeneric<TArgument>,
                 IInvokableSingleArgGeneric<TArgument>>
                 subscription)
         {
-            //LOL, pattern matching to the rescue of converting TArgument to TValue
             switch (subscription)
             {
                 case ISubscriptionHandler<
@@ -214,7 +210,6 @@ namespace HereticalSolutions.Delegates.Broadcasting
                 IInvokableSingleArg>
                 subscription)
         {
-            //LOL, pattern matching to the rescue of converting TArgument to TValue
             switch (subscription)
             {
                 case ISubscriptionHandler<
@@ -344,7 +339,6 @@ namespace HereticalSolutions.Delegates.Broadcasting
 
         public void Publish<TArgument>(TArgument value)
         {
-            //LOL, pattern matching to the rescue of converting TArgument to TValue
             switch (value)
             {
                 case TValue tValue:
@@ -363,7 +357,6 @@ namespace HereticalSolutions.Delegates.Broadcasting
 
         public void Publish(Type valueType, object value)
         {
-            //LOL, pattern matching to the rescue of converting TArgument to TValue
             switch (value)
             {
                 case TValue tValue:

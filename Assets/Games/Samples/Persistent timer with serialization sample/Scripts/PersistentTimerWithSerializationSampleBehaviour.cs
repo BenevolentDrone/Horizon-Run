@@ -102,12 +102,12 @@ namespace HereticalSolutions.Samples.PersistentTimerWithSerializationSample
 
 			loggerBuilder
 				.ToggleAllowedByDefault(false)
-				.AddOrWrap(
-					LoggersFactoryUnity.BuildUnityDebugLogger())
-				.AddOrWrap(
+				.AddSink(
+					LoggersFactoryUnity.BuildUnityDebugLogSink())
+				.Wrap(
 					LoggersFactory.BuildLoggerWrapperWithLogTypePrefix(
 						loggerBuilder.CurrentLogger))
-				.AddOrWrap(
+				.Wrap(
 					LoggersFactory.BuildLoggerWrapperWithSourceTypePrefix(
 						loggerBuilder.CurrentLogger))
 				.ToggleLogSource(typeof(PersistentTimerWithSerializationSampleBehaviour), true);

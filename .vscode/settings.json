@@ -56,7 +56,7 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "Horizon Run.sln",
+    "dotnet.defaultSolution": "Heretical Unity Projects.sln",
     "antlr4.generation": {
         "package": "HereticalSolutions.StanleyScript.Grammars",
         "mode": "external",

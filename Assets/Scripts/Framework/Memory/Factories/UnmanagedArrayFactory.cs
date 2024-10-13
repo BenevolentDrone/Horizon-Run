@@ -5,7 +5,7 @@ using HereticalSolutions.Collections.Unmanaged;
 
 namespace HereticalSolutions.Collections.Factories
 {
-    public static partial class CollectionsFactory
+    public static class CollectionsFactory
     {
         /// <summary>
         /// Builds an instance of UnmanagedArray.

@@ -1,5 +1,6 @@
 using System;
-
+using System.Collections.Generic;
+using HereticalSolutions.Logging.Factories;
 using HereticalSolutions.Repositories;
 
 namespace HereticalSolutions.Logging
@@ -59,9 +60,52 @@ namespace HereticalSolutions.Logging
 			return this;
 		}
 
-		public ILoggerBuilder AddOrWrap(ILogger logger)
+		public ILoggerBuilder AddSink(ILoggerSink loggerSink)
 		{
-			currentLogger = logger;
+			if (currentLogger != null)
+				throw new Exception("CURRENT LOGGER IS NOT EMPTY");
+
+			currentLogger = loggerSink;
+
+			return this;
+		}
+
+		public ILoggerBuilder Wrap(ILoggerWrapper loggerWrapper)
+		{
+			if (currentLogger == null)
+				throw new Exception("NO LOGGER TO WRAP");
+
+			currentLogger = loggerWrapper;
+
+			return this;
+		}
+
+		public ILoggerBuilder Branch(IEnumerable<ILogger> siblingLoggers)
+		{
+			if (currentLogger == null)
+				throw new Exception("NO LOGGER TO BRANCH FROM");
+
+			IEnumerable<ILogger> innerLoggers = null;
+
+			if (siblingLoggers is ICollection<ILogger> siblingsList)
+			{
+				siblingsList.Add(currentLogger);
+
+				innerLoggers = siblingLoggers;
+			}
+			else
+			{
+				var siblings = new List<ILogger>(siblingLoggers);
+
+				siblings.Add(currentLogger);
+
+				innerLoggers = siblings.ToArray();
+			}
+
+			if (innerLoggers == null)
+				throw new Exception("INVALID INNER LOGGERS COLLECTION");
+
+			currentLogger = LoggersFactory.BuildCompositeLoggerWrapper(innerLoggers);
 
 			return this;
 		}

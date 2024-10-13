@@ -1,10 +1,32 @@
 using System;
 
-namespace HereticalSolutions.Logging
+using HereticalSolutions.Logging;
+
+using TMPro;
+
+namespace HereticalSolutions.Modules.Core_DefaultECS
 {
-	public class ConsoleLogger
-		: ILogger
+	public class TMProSink
+		: ILoggerSink
 	{
+		private readonly TMP_Text logTextComponent;
+
+		private readonly TMP_Text warningTextComponent;
+
+		private readonly TMP_Text errorTextComponent;
+
+		public TMProSink(
+			TMP_Text logTextComponent = null,
+			TMP_Text warningTextComponent = null,
+			TMP_Text errorTextComponent = null)
+		{
+			this.logTextComponent = logTextComponent;
+
+			this.warningTextComponent = warningTextComponent;
+
+			this.errorTextComponent = errorTextComponent;
+		}
+
 		#region ILogger
 
 		#region Log
@@ -12,8 +34,8 @@ namespace HereticalSolutions.Logging
 		public void Log(
 			string value)
 		{
-			Console.WriteLine(
-				value);
+			if (logTextComponent != null)
+				logTextComponent.text = value;
 		}
 
 		public void Log<TSource>(
@@ -58,8 +80,8 @@ namespace HereticalSolutions.Logging
 		public void LogWarning(
 			string value)
 		{
-			Console.WriteLine(
-				value);
+			if (warningTextComponent != null)
+				warningTextComponent.text = value;
 		}
 
 		public void LogWarning<TSource>(
@@ -104,8 +126,8 @@ namespace HereticalSolutions.Logging
 		public void LogError(
 			string value)
 		{
-			Console.WriteLine(
-				value);
+			if (errorTextComponent != null)
+				errorTextComponent.text = value;
 		}
 
 		public void LogError<TSource>(
@@ -169,13 +191,5 @@ namespace HereticalSolutions.Logging
 		#endregion
 
 		#endregion
-
-		/*
-		private string FormatLogWithRichText(
-			string value)
-		{
-			return value; //TODO: https://stackoverflow.com/questions/2743260/is-it-possible-to-write-to-the-console-in-colour-in-net
-		}
-		*/
 	}
 }

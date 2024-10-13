@@ -1,6 +1,8 @@
 using HereticalSolutions.Messaging;
 
-namespace HereticalSolutions.Entities
+using HereticalSolutions.Entities;
+
+namespace HereticalSolutions.Modules.Core_DefaultECS
 {
     /// <summary>
     /// Represents a request to resolve a game entity.

@@ -39,7 +39,6 @@ namespace HereticalSolutions.Delegates.Wrappers
         
         public void Invoke<TArgument>(TArgument value)
         {
-            //LOL, pattern matching to the rescue of converting TArgument to TValue
             switch (value)
             {
                 case TValue tValue:
@@ -58,7 +57,6 @@ namespace HereticalSolutions.Delegates.Wrappers
 
         public void Invoke(Type valueType, object value)
         {
-            //LOL, pattern matching to the rescue of converting TArgument to TValue
             switch (value)
             {
                 case TValue tValue:

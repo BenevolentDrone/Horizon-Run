@@ -166,6 +166,7 @@ namespace HereticalSolutions.ResourceManagement.Factories
         public static ManagedTypeResourceManager<TResource, THandle> BuildManagedTypeResourceManager<TResource, THandle>(
             Func<THandle, THandle> newHandleAllocationDelegate,
             Func<TResource> newResourceAllocationDelegate,
+            THandle uninitializedHandle = default,
             ILoggerResolver loggerResolver = null)
         {
             return new ManagedTypeResourceManager<TResource, THandle>(
@@ -173,6 +174,7 @@ namespace HereticalSolutions.ResourceManagement.Factories
                 new Queue<THandle>(),
                 newHandleAllocationDelegate,
                 newResourceAllocationDelegate,
+                uninitializedHandle,
                 loggerResolver?.GetLogger<ManagedTypeResourceManager<TResource, THandle>>());
         }
     }

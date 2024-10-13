@@ -31,12 +31,12 @@ namespace HereticalSolutions.Samples.PingerSample
 
 			loggerBuilder
 				.ToggleAllowedByDefault(false)
-				.AddOrWrap(
-					LoggersFactoryUnity.BuildUnityDebugLogger())
-				.AddOrWrap(
+				.AddSink(
+					LoggersFactoryUnity.BuildUnityDebugLogSink())
+				.Wrap(
 					LoggersFactory.BuildLoggerWrapperWithLogTypePrefix(
 						loggerBuilder.CurrentLogger))
-				.AddOrWrap(
+				.Wrap(
 					LoggersFactory.BuildLoggerWrapperWithSourceTypePrefix(
 						loggerBuilder.CurrentLogger))
 				.ToggleLogSource(typeof(PingerSampleBehaviour), true);

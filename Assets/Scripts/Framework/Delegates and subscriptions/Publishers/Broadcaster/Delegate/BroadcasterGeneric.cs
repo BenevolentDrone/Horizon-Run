@@ -1,6 +1,7 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Linq; //error CS1061: 'Delegate[]' does not contain a definition for 'Cast'
+//using System.Linq; //error CS1061: 'Delegate[]' does not contain a definition for 'Cast'
 
 using HereticalSolutions.LifetimeManagement;
 
@@ -50,7 +51,6 @@ namespace HereticalSolutions.Delegates.Broadcasting
 
         public void Publish<TArgument>(TArgument value)
         {
-            //LOL, pattern matching to the rescue of converting TArgument to TValue
             switch (value)
             {
                 case TValue tValue:
@@ -69,7 +69,6 @@ namespace HereticalSolutions.Delegates.Broadcasting
 
         public void Publish(Type valueType, object value)
         {
-            //LOL, pattern matching to the rescue of converting TArgument to TValue
             switch (value)
             {
                 case TValue tValue:
@@ -115,7 +114,12 @@ namespace HereticalSolutions.Delegates.Broadcasting
             get
             {
                 //Kudos to Copilot for Cast() and the part after the ?? operator
-                return multicastDelegate?.GetInvocationList().Cast<Action<TValue>>() ?? Enumerable.Empty<Action<TValue>>();
+                return multicastDelegate?
+                    .GetInvocationList()
+                    //.Cast<Action<TValue>>() //LINQ
+                    .CastInvokationListToGenericActions<TValue>()
+                    //?? Enumerable.Empty<Action<TValue>>(); //LINQ
+                    ?? new Action<TValue>[0];
             }
         }
 
@@ -125,7 +129,6 @@ namespace HereticalSolutions.Delegates.Broadcasting
 
         public void Subscribe<TArgument>(Action<TArgument> @delegate)
         {
-            //LOL, pattern matching to the rescue of converting TArgument to TValue
             switch (@delegate)
             {
                 case Action<TValue> tValue:
@@ -144,7 +147,6 @@ namespace HereticalSolutions.Delegates.Broadcasting
 
         public void Subscribe(Type valueType, object @delegate)
         {
-            //LOL, pattern matching to the rescue of converting TArgument to TValue
             switch (@delegate)
             {
                 case Action<TValue> tValue:
@@ -163,7 +165,6 @@ namespace HereticalSolutions.Delegates.Broadcasting
 
         public void Unsubscribe<TArgument>(Action<TArgument> @delegate)
         {
-            //LOL, pattern matching to the rescue of converting TArgument to TValue
             switch (@delegate)
             {
                 case Action<TValue> tValue:
@@ -182,7 +183,6 @@ namespace HereticalSolutions.Delegates.Broadcasting
 
         public void Unsubscribe(Type valueType, object @delegate)
         {
-            //LOL, pattern matching to the rescue of converting TArgument to TValue
             switch (@delegate)
             {
                 case Action<TValue> tValue:
@@ -202,13 +202,23 @@ namespace HereticalSolutions.Delegates.Broadcasting
         public IEnumerable<Action<TArgument>> GetAllSubscriptions<TArgument>()
         {
             //Kudos to Copilot for Cast() and the part after the ?? operator
-            return multicastDelegate?.GetInvocationList().Cast<Action<TArgument>>() ?? Enumerable.Empty<Action<TArgument>>();
+            return multicastDelegate?
+                .GetInvocationList()
+                //.Cast<Action<TArgument>>() //LINQ
+                .CastInvokationListToGenericActions<TArgument>()
+                //?? Enumerable.Empty<Action<TArgument>>(); //LINQ
+                ?? new Action<TArgument>[0];
         }
 
         public IEnumerable<object> GetAllSubscriptions(Type valueType)
         {
             //Kudos to Copilot for Cast() and the part after the ?? operator
-            return multicastDelegate?.GetInvocationList().Cast<object>() ?? Enumerable.Empty<object>();
+            return multicastDelegate?
+                .GetInvocationList()
+                //.Cast<object>() //LINQ
+                .CastInvokationListToObjects()
+                //?? Enumerable.Empty<object>(); //LINQ
+                ?? new object[0];
         }
 
         #endregion
@@ -220,7 +230,12 @@ namespace HereticalSolutions.Delegates.Broadcasting
             get
             {
                 //Kudos to Copilot for Cast() and the part after the ?? operator
-                return multicastDelegate?.GetInvocationList().Cast<object>() ?? Enumerable.Empty<object>();
+                return multicastDelegate?
+                    .GetInvocationList()
+                    //.Cast<object>() //LINQ
+                    .CastInvokationListToObjects()
+                    //?? Enumerable.Empty<object>(); //LINQ
+                    ?? new object[0];
             }
         }
 

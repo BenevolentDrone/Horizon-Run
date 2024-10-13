@@ -20,11 +20,17 @@ namespace HereticalSolutions.Logging.Factories
                 RepositoriesFactory.BuildDictionaryRepository<Type, bool>());
         }
 
-        public static ConsoleLogger BuildConsoleLogger()
+        public static ConsoleSink BuildConsoleSink()
         {
-            return new ConsoleLogger();
+            return new ConsoleSink();
         }
-        
+
+        public static CompositeLoggerWrapper BuildCompositeLoggerWrapper(
+            IEnumerable<ILogger> innerLoggers)
+        {
+            return new CompositeLoggerWrapper(innerLoggers);
+        }
+
         public static LoggerWrapperWithSemaphoreSlim BuildLoggerWrapperWithSemaphoreSlim(
             ILogger innerLogger)
         {
@@ -72,11 +78,25 @@ namespace HereticalSolutions.Logging.Factories
             return new LoggerWrapperWithRecursionPreventionGate(innerLogger);
         }
 
-        public static LoggerWrapperWithFileDump BuildLoggerWrapperWithFileDump(
+        public static LoggerWrapperWithToggling BuildLoggerWrapperWithToggling(
+            ILogger innerLogger,
+            bool active = true,
+            bool logsActive = true,
+            bool warningsActive = true,
+            bool errorsActive = true)
+        {
+            return new LoggerWrapperWithToggling(
+                innerLogger,
+                active,
+                logsActive,
+                warningsActive,
+                errorsActive);
+        }
+
+        public static FileSink BuildFileSink(
             string applicationDataFolder,
             string relativePath,
-            ILoggerResolver loggerResolver,
-            ILogger innerLogger)
+            ILoggerResolver loggerResolver)
         {
             var serializationArgument = new StreamArgument(); //TextFileArgument();
 
@@ -86,8 +106,7 @@ namespace HereticalSolutions.Logging.Factories
                 ApplicationDataFolder = applicationDataFolder
             };
 
-            var result = new LoggerWrapperWithFileDump(
-                innerLogger,
+            var result = new FileSink(
                 serializationArgument,
                 PersistenceFactory.BuildSimplePlainTextSerializer(loggerResolver),
                 new List<string>());

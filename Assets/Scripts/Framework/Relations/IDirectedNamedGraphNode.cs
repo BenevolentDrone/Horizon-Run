@@ -3,7 +3,7 @@ namespace HereticalSolutions.Relations
     public interface IDirectedNamedGraphNode<TContents>
         : IReadOnlyDirectedNamedGraphNode<TContents>
     {
-        TContents Contents { set; } //TAKE NOTE THAT THIS IS A SETTER. A GETTER IS IN A READ ONLY INTERFACE
+        new TContents Contents { get; set; }
         
         void AddRelation(
             string key,

@@ -3,7 +3,7 @@ namespace HereticalSolutions.Hierarchy
 	public interface IHierarchyNode<TContents>
 		: IReadOnlyHierarchyNode<TContents>
 	{
-		TContents Contents { set; }
+		new TContents Contents { get; set; }
 		
 		void SetParent(
 			IReadOnlyHierarchyNode<TContents> parent,

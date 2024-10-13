@@ -276,7 +276,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Factories
 						initialAllocationCommand,
 						additionalAllocationCommand,
 						loggerResolver)),
-				loggerResolver?.GetLogger<EntityListManager>());
+				logger: loggerResolver?.GetLogger<EntityListManager>());
 		}
 
 		#endregion
@@ -331,7 +331,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Factories
 						initialAllocationCommand,
 						additionalAllocationCommand,
 						loggerResolver)),
-				loggerResolver?.GetLogger<EntityHierarchyManager>());
+				logger: loggerResolver?.GetLogger<EntityHierarchyManager>());
 		}
 
 		#endregion
@@ -384,7 +384,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Factories
 						initialAllocationCommand,
 						additionalAllocationCommand,
 						loggerResolver)),
-				loggerResolver?.GetLogger<EntityRelationsManager>());
+				logger: loggerResolver?.GetLogger<EntityRelationsManager>());
 		}
 
 		#endregion

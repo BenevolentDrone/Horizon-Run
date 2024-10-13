@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Linq; //error CS1061: 'Delegate[]' does not contain a definition for 'Cast'
+//using System.Linq; //error CS1061: 'Delegate[]' does not contain a definition for 'Cast'
 
 using HereticalSolutions.LifetimeManagement;
 
@@ -63,7 +63,12 @@ namespace HereticalSolutions.Delegates.Pinging
             get
             {
                 //Kudos to Copilot for Cast() and the part after the ?? operator
-                return multicastDelegate?.GetInvocationList().Cast<Action>() ?? Enumerable.Empty<Action>();
+                return multicastDelegate?
+                    .GetInvocationList()
+                    //.Cast<Action>() //LINQ
+                    .CastInvokationListToActions()
+                    //?? Enumerable.Empty<Action>(); //LINQ
+                    ?? new Action[0];
             }
         }
 
@@ -74,7 +79,12 @@ namespace HereticalSolutions.Delegates.Pinging
             get
             {
                 //Kudos to Copilot for Cast() and the part after the ?? operator
-                return multicastDelegate?.GetInvocationList().Cast<object>() ?? Enumerable.Empty<object>();
+                return multicastDelegate?
+                    .GetInvocationList()
+                    //.Cast<object>() //LINQ
+                    .CastInvokationListToObjects()
+                    //?? Enumerable.Empty<object>(); //LINQ
+                    ?? new object[0];
             }
         }
 

@@ -8,12 +8,30 @@ namespace HereticalSolutions.Logging
 	{
 		private readonly ILogger innerLogger;
 
-		public bool Active { get; set; } = true;
+		public bool Active { get; set; }
+
+		public bool LogsActive { get; set; }
+
+		public bool WarningsActive { get; set; }
+
+		public bool ErrorsActive { get; set; }
 
 		public LoggerWrapperWithToggling(
-			ILogger innerLogger)
+			ILogger innerLogger,
+			bool active = true,
+			bool printLogs = true,
+			bool printWarnings = true,
+			bool printErrors = true)
 		{
 			this.innerLogger = innerLogger;
+
+			Active = active;
+
+			LogsActive = printLogs;
+
+			WarningsActive = printWarnings;
+
+			ErrorsActive = printErrors;
 		}
 
 		#region ILoggerWrapper
@@ -34,6 +52,9 @@ namespace HereticalSolutions.Logging
 				return;
 			}
 
+			if (!LogsActive)
+				return;
+
 			innerLogger.Log(value);
 		}
 
@@ -44,6 +65,9 @@ namespace HereticalSolutions.Logging
 			{
 				return;
 			}
+
+			if (!LogsActive)
+				return;
 
 			innerLogger.Log<TSource>(value);
 		}
@@ -56,6 +80,9 @@ namespace HereticalSolutions.Logging
 			{
 				return;
 			}
+
+			if (!LogsActive)
+				return;
 
 			innerLogger.Log(
 				logSource,
@@ -71,6 +98,9 @@ namespace HereticalSolutions.Logging
 				return;
 			}
 
+			if (!LogsActive)
+				return;
+
 			innerLogger.Log(
 				value,
 				arguments);
@@ -84,6 +114,9 @@ namespace HereticalSolutions.Logging
 			{
 				return;
 			}
+
+			if (!LogsActive)
+				return;
 
 			innerLogger.Log<TSource>(
 				value,
@@ -99,6 +132,9 @@ namespace HereticalSolutions.Logging
 			{
 				return;
 			}
+
+			if (!LogsActive)
+				return;
 
 			innerLogger.Log(
 				logSource,
@@ -117,6 +153,9 @@ namespace HereticalSolutions.Logging
 			{
 				return;
 			}
+
+			if (!WarningsActive)
+				return;
 
 			innerLogger.LogWarning(
 				value);
@@ -142,6 +181,9 @@ namespace HereticalSolutions.Logging
 				return;
 			}
 
+			if (!WarningsActive)
+				return;
+
 			innerLogger.LogWarning(
 				logSource,
 				value);
@@ -155,6 +197,9 @@ namespace HereticalSolutions.Logging
 			{
 				return;
 			}
+
+			if (!WarningsActive)
+				return;
 
 			innerLogger.LogWarning(
 				value,
@@ -170,6 +215,9 @@ namespace HereticalSolutions.Logging
 				return;
 			}
 
+			if (!WarningsActive)
+				return;
+
 			innerLogger.LogWarning<TSource>(
 				value,
 				arguments);
@@ -184,6 +232,9 @@ namespace HereticalSolutions.Logging
 			{
 				return;
 			}
+
+			if (!WarningsActive)
+				return;
 
 			innerLogger.LogWarning(
 				logSource,
@@ -203,6 +254,9 @@ namespace HereticalSolutions.Logging
 				return;
 			}
 
+			if (!ErrorsActive)
+				return;
+
 			innerLogger.LogError(
 				value);
 		}
@@ -215,6 +269,9 @@ namespace HereticalSolutions.Logging
 				return;
 			}
 
+			if (!ErrorsActive)
+				return;
+
 			innerLogger.LogError<TSource>(value);
 		}
 
@@ -226,6 +283,9 @@ namespace HereticalSolutions.Logging
 			{
 				return;
 			}
+
+			if (!ErrorsActive)
+				return;
 
 			innerLogger.LogError(
 				logSource,
@@ -241,6 +301,9 @@ namespace HereticalSolutions.Logging
 				return;
 			}
 
+			if (!ErrorsActive)
+				return;
+
 			innerLogger.LogError(
 				value,
 				arguments);
@@ -254,6 +317,9 @@ namespace HereticalSolutions.Logging
 			{
 				return;
 			}
+
+			if (!ErrorsActive)
+				return;
 
 			innerLogger.LogError<TSource>(
 				value,
@@ -269,6 +335,9 @@ namespace HereticalSolutions.Logging
 			{
 				return;
 			}
+
+			if (!ErrorsActive)
+				return;
 
 			innerLogger.LogError(
 				logSource,

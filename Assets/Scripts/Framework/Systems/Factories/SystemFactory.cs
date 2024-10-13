@@ -21,7 +21,7 @@ namespace HereticalSolutions.Systems.Factories
 
 		public static StageNode<TSystem> BuildStageNode<TSystem>(
 			string stage,
-			TSystem system,
+			TSystem system = default(TSystem),
 			sbyte priority = 0)
 		{
 			return new StageNode<TSystem>(

@@ -14,6 +14,9 @@ namespace HereticalSolutions.Systems
 		bool HasStageNode(
 			string stageID);
 
+		bool HasAllStageNodes(
+			IEnumerable<string> stageIDs);
+
 		bool HasSystemNodes(
 			Type systemType);
 
@@ -93,6 +96,20 @@ namespace HereticalSolutions.Systems
 
 		bool TryRemoveNodes(
 			IEnumerable<IReadOnlySystemNode<TSystem>> nodes);
+
+		#endregion
+
+		#region Link
+
+		bool TryLinkNodes(
+			IReadOnlySystemNode<TSystem> predecessor,
+			IReadOnlySystemNode<TSystem> successor);
+
+		#endregion
+
+		#region Build
+
+		TSystem BuildSystem();
 
 		#endregion
 	}

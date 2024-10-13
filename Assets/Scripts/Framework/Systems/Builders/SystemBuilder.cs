@@ -56,6 +56,11 @@ namespace HereticalSolutions.Systems
 		{
 			return stages.Has(stageID);	
 		}
+		public bool HasAllStageNodes(
+			IEnumerable<string> stageIDs)
+		{
+			
+		}
 
 		public bool HasSystemNodes(
 			Type systemType)
@@ -399,6 +404,26 @@ namespace HereticalSolutions.Systems
 			}
 
 			return success;
+		}
+
+		#endregion
+
+		#region Link
+
+		public bool TryLinkNodes(
+			IReadOnlySystemNode<TSystem> predecessor,
+			IReadOnlySystemNode<TSystem> successor)
+		{
+
+		}
+
+		#endregion
+
+		#region Build
+
+		public TSystem BuildSystem()
+		{
+
 		}
 
 		#endregion

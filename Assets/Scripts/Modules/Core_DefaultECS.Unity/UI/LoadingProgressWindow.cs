@@ -67,7 +67,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
 
 			localProgressLogger = loggerBuilder.CurrentLogger;
 
-
+			//TODO: refactor
 			IEnumerable<ILogger> innerLoggers = loadingProgressLogger.InnerLoggers;
 
 			if (innerLoggers is ICollection<ILogger> siblingsList)

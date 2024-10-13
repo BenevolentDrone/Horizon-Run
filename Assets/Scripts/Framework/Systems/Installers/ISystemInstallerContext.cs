@@ -1,11 +1,11 @@
-using System;
-using System.Collections.Generic;
+using HereticalSolutions.Repositories;
 
 namespace HereticalSolutions.Systems
 {
-	public interface IRootSystemInstaller<TSystem>
-		: ISystemInstaller<TSystem>
+	public interface ISystemInstallerContext<TSystem>
 	{
+		IRepository<string, ISystemBuilder<TSystem>> Builders { get; }
+
 		#region Has
 
 		bool HasInstaller(
@@ -26,5 +26,8 @@ namespace HereticalSolutions.Systems
 			string installerName);
 
 		#endregion
+
+		//Sort by dependencies, validate then run the ones that have reported CanInstall == true
+		bool RunAllInstallers();
 	}
 }

@@ -9,9 +9,9 @@ namespace HereticalSolutions.Systems
 		IEnumerable<string> Dependencies { get; }
 
 		bool CanInstall(
-			ISystemBuilder<TSystem> systemBuilder);
+			ISystemInstallerContext<TSystem> context);
 
 		void Install(
-			ISystemBuilder<TSystem> systemBuilder);
+			ISystemInstallerContext<TSystem> context);
 	}
 }

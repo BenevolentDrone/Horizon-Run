@@ -5,6 +5,7 @@ using DefaultEcs.System;
 
 namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 {
+	/*
 	public class Wheel3DSystem : AEntitySetSystem<float>
 	{
 		private readonly RaycastHit[] raycastHits;
@@ -150,4 +151,5 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 				ref physicsBodyComponent);
 		}
 	}
+	*/
 }

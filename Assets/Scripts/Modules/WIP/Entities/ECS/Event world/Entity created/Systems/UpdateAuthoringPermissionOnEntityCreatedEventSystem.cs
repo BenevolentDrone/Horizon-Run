@@ -4,13 +4,12 @@ using HereticalSolutions.Entities;
 
 using HereticalSolutions.Networking.ECS;
 
-using HereticalSolutions.Templates.Universal.Networking;
-
 using DefaultEcs;
 using DefaultEcs.System;
 
 namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Networking
 {
+	/*
 	public class UpdateAuthoringPermissionOnEntityCreatedEventSystem
 		: AEntitySetSystem<float>
 	{
@@ -71,4 +70,5 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Networking
 				});
 		}
 	}
+	*/
 }

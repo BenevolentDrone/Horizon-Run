@@ -9,6 +9,7 @@ using DefaultEcs.System;
 
 namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 {
+	/*
 	public class Suspension3DSystem : AEntitySetSystem<float>
 	{
 		private readonly DefaultECSEntityHierarchyManager entityHierarchyManager;
@@ -117,18 +118,6 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 				springJointWorldPosition
 				+ suspensionDirectionNormalizedRotated * currentSpringLength;
 			
-			/*
-			UnityEngine.Debug.DrawLine(
-				expectedSuspensionWorldPosition + parentTRSMatrix.rotation * Vector3.left,
-				expectedSuspensionWorldPosition + parentTRSMatrix.rotation * Vector3.right,
-				Color.white);
-
-			UnityEngine.Debug.DrawLine(
-				springAttachmentWorldPosition + parentTRSMatrix.rotation * Vector3.left,
-				springAttachmentWorldPosition + parentTRSMatrix.rotation * Vector3.right,
-				Color.green);
-			*/
-
 			Vector3 suspensionLatteralError = springAttachmentWorldPosition - expectedSuspensionWorldPosition;
 
 			UnityEngine.Debug.Log($"LATTERAL ERROR: {suspensionLatteralError}");
@@ -207,4 +196,5 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 			//	ref physicsBodyComponent);
 		}
 	}
+	*/
 }

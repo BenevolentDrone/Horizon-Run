@@ -1,13 +1,12 @@
 using DefaultEcs;
 
-using HereticalSolutions.Templates.Universal.Networking;
-
 using LiteNetLib.Utils;
 
 using UnityEngine;
 
 namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Networking
 {
+    /*
     public class QuaternionSerializer
         : IComponentSerializer
     {
@@ -75,4 +74,5 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Networking
             Quaternion = default;
         }
     }
+    */
 }

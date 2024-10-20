@@ -9,6 +9,7 @@ using DefaultEcs.System;
 
 namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 {
+	/*
 	public class CollectForcesFromSuspensionsSystem : AEntitySetSystem<float>
 	{
 		private readonly UniversalTemplateEntityManager entityManager;
@@ -106,4 +107,5 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 				ref physicsBody3DComponent);
 		}
 	}
+	*/
 }

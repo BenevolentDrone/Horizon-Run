@@ -49,8 +49,12 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Networking
             var entityID = entity.Get<GUIDComponent>().GUID;
 
 
-            var registryEntity = entityManager.GetRegistryEntity(
-                entityID);
+            if (!entityManager.TryGetRegistryEntity(
+                entityID,
+                out var registryEntity))
+            {
+                return;
+            }
 
             if (!registryEntity.Has<NetworkEntityComponent>())
             {

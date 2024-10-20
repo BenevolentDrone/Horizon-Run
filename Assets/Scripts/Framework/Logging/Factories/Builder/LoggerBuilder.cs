@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+
 using HereticalSolutions.Logging.Factories;
 using HereticalSolutions.Repositories;
 
@@ -87,7 +88,7 @@ namespace HereticalSolutions.Logging
 
 			IEnumerable<ILogger> innerLoggers = null;
 
-			if (siblingLoggers is ICollection<ILogger> siblingsList)
+			if (siblingLoggers is List<ILogger> siblingsList)
 			{
 				siblingsList.Add(currentLogger);
 

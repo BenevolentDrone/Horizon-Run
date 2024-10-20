@@ -9,6 +9,7 @@ using DefaultEcs.System;
 
 namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 {
+	/*
 	public class Suspension3DDebugPresenterSystem : AEntitySetSystem<float>
 	{
 		private readonly DefaultECSEntityHierarchyManager entityHierarchyManager;
@@ -211,4 +212,5 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 			suspension3DDebugViewComponent.SpringCompressionNormalized = springCompressionNormalized;
 		}
 	}
+	*/
 }

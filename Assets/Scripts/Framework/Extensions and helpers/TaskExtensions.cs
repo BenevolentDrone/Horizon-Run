@@ -13,7 +13,11 @@ namespace HereticalSolutions
 {
 	public static class TaskExtensions
 	{
-		private const bool AWAIT_IN_THE_SAME_THREAD = true;
+		private const string TASK_EXCEPTION_PREFIX = "TASK WAS TERMINATED WITH EXCEPTION: ";
+
+		private const string INNER_EXCEPTIONS_SUFFIX = "\nINNER EXCEPTIONS:\n";
+
+		private const string INNER_EXCEPTION_DELIMITER = "-------------------------------------";
 
 		//For some reason the previous version I used (that utilized ContinueWith(..., TaskContinuationOptions.OnlyOnFaulted) method chain) would throw a TaskCanceledException in random places in the code
 		//As stated over here, it was because TaskContinuationOptions.OnlyOnFaulted is not valid for multi-task continuations
@@ -23,7 +27,9 @@ namespace HereticalSolutions
 
 		#region Task
 
-		public static ConfiguredTaskAwaitable LogExceptions(this Task task)
+		public static ConfiguredTaskAwaitable LogExceptions(
+			this Task task,
+			bool awaitInSameContext = true)
 		{
 			return task
 				.ContinueWith(
@@ -36,18 +42,34 @@ namespace HereticalSolutions
 
 						StringBuilder stringBuilder = new StringBuilder();
 
+						stringBuilder.Append(TASK_EXCEPTION_PREFIX);
+
+						stringBuilder.Append(targetTask.Exception.Message);
+
+						stringBuilder.Append(INNER_EXCEPTIONS_SUFFIX);
+
+						stringBuilder.Append(INNER_EXCEPTION_DELIMITER);
+
 						foreach (var innerException in targetTask.Exception.InnerExceptions)
 						{
 							stringBuilder.Append(innerException.ToString());
+
+							stringBuilder.Append('\n');
+
+							stringBuilder.Append(INNER_EXCEPTION_DELIMITER);
+
 							stringBuilder.Append('\n');
 						}
 
-						Console.WriteLine($"{targetTask.Exception.Message} INNER EXCEPTIONS:\n{stringBuilder.ToString()}");
+						Console.WriteLine(
+							stringBuilder.ToString());
 					})
-				.ConfigureAwait(AWAIT_IN_THE_SAME_THREAD);
+				.ConfigureAwait(awaitInSameContext);
 		}
 
-		public static ConfiguredTaskAwaitable ThrowExceptions(this Task task)
+		public static ConfiguredTaskAwaitable ThrowExceptions(
+			this Task task,
+			bool awaitInSameContext = true)
 		{
 			return task
 				.ContinueWith(
@@ -60,20 +82,35 @@ namespace HereticalSolutions
 
 						StringBuilder stringBuilder = new StringBuilder();
 
+						stringBuilder.Append(TASK_EXCEPTION_PREFIX);
+
+						stringBuilder.Append(targetTask.Exception.Message);
+
+						stringBuilder.Append(INNER_EXCEPTIONS_SUFFIX);
+
+						stringBuilder.Append(INNER_EXCEPTION_DELIMITER);
+
 						foreach (var innerException in targetTask.Exception.InnerExceptions)
 						{
 							stringBuilder.Append(innerException.ToString());
+
+							stringBuilder.Append('\n');
+
+							stringBuilder.Append(INNER_EXCEPTION_DELIMITER);
+
 							stringBuilder.Append('\n');
 						}
 
-						throw new Exception($"{targetTask.Exception.Message} INNER EXCEPTIONS:\n{stringBuilder.ToString()}");
+						throw new Exception(
+							stringBuilder.ToString());
 					})
-				.ConfigureAwait(AWAIT_IN_THE_SAME_THREAD);
+				.ConfigureAwait(awaitInSameContext);
 		}
 
 		public static ConfiguredTaskAwaitable LogExceptions<TSource>(
 			this Task task,
-			ILogger logger)
+			ILogger logger,
+			bool awaitInSameContext = true)
 		{
 			return task
 				.ContinueWith(
@@ -86,21 +123,35 @@ namespace HereticalSolutions
 
 						StringBuilder stringBuilder = new StringBuilder();
 
+						stringBuilder.Append(TASK_EXCEPTION_PREFIX);
+
+						stringBuilder.Append(targetTask.Exception.Message);
+
+						stringBuilder.Append(INNER_EXCEPTIONS_SUFFIX);
+
+						stringBuilder.Append(INNER_EXCEPTION_DELIMITER);
+
 						foreach (var innerException in targetTask.Exception.InnerExceptions)
 						{
 							stringBuilder.Append(innerException.ToString());
+
+							stringBuilder.Append('\n');
+
+							stringBuilder.Append(INNER_EXCEPTION_DELIMITER);
+
 							stringBuilder.Append('\n');
 						}
 
 						logger?.LogError<TSource>(
-							$"{targetTask.Exception.Message} INNER EXCEPTIONS:\n{stringBuilder.ToString()}");
+							stringBuilder.ToString());
 					})
-				.ConfigureAwait(AWAIT_IN_THE_SAME_THREAD);
+				.ConfigureAwait(awaitInSameContext);
 		}
 
 		public static ConfiguredTaskAwaitable ThrowExceptions<TSource>(
 			this Task task,
-			ILogger logger)
+			ILogger logger,
+			bool awaitInSameContext = true)
 		{
 			return task
 				.ContinueWith(
@@ -113,23 +164,37 @@ namespace HereticalSolutions
 
 						StringBuilder stringBuilder = new StringBuilder();
 
+						stringBuilder.Append(TASK_EXCEPTION_PREFIX);
+
+						stringBuilder.Append(targetTask.Exception.Message);
+
+						stringBuilder.Append(INNER_EXCEPTIONS_SUFFIX);
+
+						stringBuilder.Append(INNER_EXCEPTION_DELIMITER);
+
 						foreach (var innerException in targetTask.Exception.InnerExceptions)
 						{
 							stringBuilder.Append(innerException.ToString());
+
+							stringBuilder.Append('\n');
+
+							stringBuilder.Append(INNER_EXCEPTION_DELIMITER);
+
 							stringBuilder.Append('\n');
 						}
 
 						throw new Exception(
 							logger.TryFormatException<TSource>(
-								$"{targetTask.Exception.Message} INNER EXCEPTIONS:\n{stringBuilder.ToString()}"));
+								stringBuilder.ToString()));
 					})
-				.ConfigureAwait(AWAIT_IN_THE_SAME_THREAD);
+				.ConfigureAwait(awaitInSameContext);
 		}
 
 		public static ConfiguredTaskAwaitable LogExceptions(
 			this Task task,
 			Type logSource,
-			ILogger logger)
+			ILogger logger,
+			bool awaitInSameContext = true)
 		{
 			return task
 				.ContinueWith(
@@ -142,23 +207,37 @@ namespace HereticalSolutions
 
 						StringBuilder stringBuilder = new StringBuilder();
 
+						stringBuilder.Append(TASK_EXCEPTION_PREFIX);
+
+						stringBuilder.Append(targetTask.Exception.Message);
+
+						stringBuilder.Append(INNER_EXCEPTIONS_SUFFIX);
+
+						stringBuilder.Append(INNER_EXCEPTION_DELIMITER);
+
 						foreach (var innerException in targetTask.Exception.InnerExceptions)
 						{
 							stringBuilder.Append(innerException.ToString());
+
+							stringBuilder.Append('\n');
+
+							stringBuilder.Append(INNER_EXCEPTION_DELIMITER);
+
 							stringBuilder.Append('\n');
 						}
 
 						logger?.LogError(
 							logSource,
-							$"{targetTask.Exception.Message} INNER EXCEPTIONS:\n{stringBuilder.ToString()}");
+							stringBuilder.ToString());
 					})
-				.ConfigureAwait(AWAIT_IN_THE_SAME_THREAD);
+				.ConfigureAwait(awaitInSameContext);
 		}
 
 		public static ConfiguredTaskAwaitable ThrowExceptions(
 			this Task task,
 			Type logSource,
-			ILogger logger)
+			ILogger logger,
+			bool awaitInSameContext = true)
 		{
 			return task
 				.ContinueWith(
@@ -171,25 +250,40 @@ namespace HereticalSolutions
 
 						StringBuilder stringBuilder = new StringBuilder();
 
+						stringBuilder.Append(TASK_EXCEPTION_PREFIX);
+
+						stringBuilder.Append(targetTask.Exception.Message);
+
+						stringBuilder.Append(INNER_EXCEPTIONS_SUFFIX);
+
+						stringBuilder.Append(INNER_EXCEPTION_DELIMITER);
+
 						foreach (var innerException in targetTask.Exception.InnerExceptions)
 						{
 							stringBuilder.Append(innerException.ToString());
+
+							stringBuilder.Append('\n');
+
+							stringBuilder.Append(INNER_EXCEPTION_DELIMITER);
+
 							stringBuilder.Append('\n');
 						}
 
 						throw new Exception(
 							logger.TryFormatException(
 								logSource,
-								$"{targetTask.Exception.Message} INNER EXCEPTIONS:\n{stringBuilder.ToString()}"));
+								stringBuilder.ToString()));
 					})
-				.ConfigureAwait(AWAIT_IN_THE_SAME_THREAD);
+				.ConfigureAwait(awaitInSameContext);
 		}
 
 		#endregion
 
 		#region Task<T>
 
-		public static ConfiguredTaskAwaitable<T> LogExceptions<T>(this Task<T> task)
+		public static ConfiguredTaskAwaitable<T> LogExceptions<T>(
+			this Task<T> task,
+			bool awaitInSameContext = true)
 		{
 			return task
 				.ContinueWith<T>(
@@ -202,20 +296,36 @@ namespace HereticalSolutions
 
 						StringBuilder stringBuilder = new StringBuilder();
 
+						stringBuilder.Append(TASK_EXCEPTION_PREFIX);
+
+						stringBuilder.Append(targetTask.Exception.Message);
+
+						stringBuilder.Append(INNER_EXCEPTIONS_SUFFIX);
+
+						stringBuilder.Append(INNER_EXCEPTION_DELIMITER);
+
 						foreach (var innerException in targetTask.Exception.InnerExceptions)
 						{
 							stringBuilder.Append(innerException.ToString());
+
+							stringBuilder.Append('\n');
+
+							stringBuilder.Append(INNER_EXCEPTION_DELIMITER);
+
 							stringBuilder.Append('\n');
 						}
 
-						Console.WriteLine($"{targetTask.Exception.Message} INNER EXCEPTIONS:\n{stringBuilder.ToString()}");
+						Console.WriteLine(
+							stringBuilder.ToString());
 
 						return default;
 					})
-				.ConfigureAwait(AWAIT_IN_THE_SAME_THREAD);
+				.ConfigureAwait(awaitInSameContext);
 		}
 
-		public static ConfiguredTaskAwaitable<T> ThrowExceptions<T>(this Task<T> task)
+		public static ConfiguredTaskAwaitable<T> ThrowExceptions<T>(
+			this Task<T> task,
+			bool awaitInSameContext = true)
 		{
 			return task
 				.ContinueWith<T>(
@@ -228,20 +338,35 @@ namespace HereticalSolutions
 
 						StringBuilder stringBuilder = new StringBuilder();
 
+						stringBuilder.Append(TASK_EXCEPTION_PREFIX);
+
+						stringBuilder.Append(targetTask.Exception.Message);
+
+						stringBuilder.Append(INNER_EXCEPTIONS_SUFFIX);
+
+						stringBuilder.Append(INNER_EXCEPTION_DELIMITER);
+
 						foreach (var innerException in targetTask.Exception.InnerExceptions)
 						{
 							stringBuilder.Append(innerException.ToString());
+
+							stringBuilder.Append('\n');
+
+							stringBuilder.Append(INNER_EXCEPTION_DELIMITER);
+
 							stringBuilder.Append('\n');
 						}
 
-						throw new Exception($"{targetTask.Exception.Message} INNER EXCEPTIONS:\n{stringBuilder.ToString()}");
+						throw new Exception(
+							stringBuilder.ToString());
 					})
-				.ConfigureAwait(AWAIT_IN_THE_SAME_THREAD);
+				.ConfigureAwait(awaitInSameContext);
 		}
 
 		public static ConfiguredTaskAwaitable<T> LogExceptions<T, TSource>(
 			this Task<T> task,
-			ILogger logger)
+			ILogger logger,
+			bool awaitInSameContext = true)
 		{
 			return task
 				.ContinueWith<T>(
@@ -254,23 +379,37 @@ namespace HereticalSolutions
 
 						StringBuilder stringBuilder = new StringBuilder();
 
+						stringBuilder.Append(TASK_EXCEPTION_PREFIX);
+
+						stringBuilder.Append(targetTask.Exception.Message);
+
+						stringBuilder.Append(INNER_EXCEPTIONS_SUFFIX);
+
+						stringBuilder.Append(INNER_EXCEPTION_DELIMITER);
+
 						foreach (var innerException in targetTask.Exception.InnerExceptions)
 						{
 							stringBuilder.Append(innerException.ToString());
+
+							stringBuilder.Append('\n');
+
+							stringBuilder.Append(INNER_EXCEPTION_DELIMITER);
+
 							stringBuilder.Append('\n');
 						}
 
 						logger?.LogError<TSource>(
-							$"{targetTask.Exception.Message} INNER EXCEPTIONS:\n{stringBuilder.ToString()}");
+							stringBuilder.ToString());
 
 						return default;
 					})
-				.ConfigureAwait(AWAIT_IN_THE_SAME_THREAD);
+				.ConfigureAwait(awaitInSameContext);
 		}
 
 		public static ConfiguredTaskAwaitable<T> ThrowExceptions<T, TSource>(
 			this Task<T> task,
-			ILogger logger)
+			ILogger logger,
+			bool awaitInSameContext = true)
 		{
 			return task
 				.ContinueWith<T>(
@@ -283,23 +422,37 @@ namespace HereticalSolutions
 
 						StringBuilder stringBuilder = new StringBuilder();
 
+						stringBuilder.Append(TASK_EXCEPTION_PREFIX);
+
+						stringBuilder.Append(targetTask.Exception.Message);
+
+						stringBuilder.Append(INNER_EXCEPTIONS_SUFFIX);
+
+						stringBuilder.Append(INNER_EXCEPTION_DELIMITER);
+
 						foreach (var innerException in targetTask.Exception.InnerExceptions)
 						{
 							stringBuilder.Append(innerException.ToString());
+
+							stringBuilder.Append('\n');
+
+							stringBuilder.Append(INNER_EXCEPTION_DELIMITER);
+
 							stringBuilder.Append('\n');
 						}
 
 						throw new Exception(
 							logger.TryFormatException<TSource>(
-								$"{targetTask.Exception.Message} INNER EXCEPTIONS:\n{stringBuilder.ToString()}"));
+								stringBuilder.ToString()));
 					})
-				.ConfigureAwait(AWAIT_IN_THE_SAME_THREAD);
+				.ConfigureAwait(awaitInSameContext);
 		}
 
 		public static ConfiguredTaskAwaitable<T> LogExceptions<T>(
 			this Task<T> task,
 			Type logSource,
-			ILogger logger)
+			ILogger logger,
+			bool awaitInSameContext = true)
 		{
 			return task
 				.ContinueWith<T>(
@@ -312,25 +465,39 @@ namespace HereticalSolutions
 
 						StringBuilder stringBuilder = new StringBuilder();
 
+						stringBuilder.Append(TASK_EXCEPTION_PREFIX);
+
+						stringBuilder.Append(targetTask.Exception.Message);
+
+						stringBuilder.Append(INNER_EXCEPTIONS_SUFFIX);
+
+						stringBuilder.Append(INNER_EXCEPTION_DELIMITER);
+
 						foreach (var innerException in targetTask.Exception.InnerExceptions)
 						{
 							stringBuilder.Append(innerException.ToString());
+
+							stringBuilder.Append('\n');
+
+							stringBuilder.Append(INNER_EXCEPTION_DELIMITER);
+
 							stringBuilder.Append('\n');
 						}
 
 						logger?.LogError(
 							logSource,
-							$"{targetTask.Exception.Message} INNER EXCEPTIONS:\n{stringBuilder.ToString()}");
+							stringBuilder.ToString());
 
 						return default;
 					})
-				.ConfigureAwait(AWAIT_IN_THE_SAME_THREAD);
+				.ConfigureAwait(awaitInSameContext);
 		}
 
 		public static ConfiguredTaskAwaitable<T> ThrowExceptions<T>(
 			this Task<T> task,
 			Type logSource,
-			ILogger logger)
+			ILogger logger,
+			bool awaitInSameContext = true)
 		{
 			return task
 				.ContinueWith<T>(
@@ -343,18 +510,31 @@ namespace HereticalSolutions
 
 						StringBuilder stringBuilder = new StringBuilder();
 
+						stringBuilder.Append(TASK_EXCEPTION_PREFIX);
+
+						stringBuilder.Append(targetTask.Exception.Message);
+
+						stringBuilder.Append(INNER_EXCEPTIONS_SUFFIX);
+
+						stringBuilder.Append(INNER_EXCEPTION_DELIMITER);
+
 						foreach (var innerException in targetTask.Exception.InnerExceptions)
 						{
 							stringBuilder.Append(innerException.ToString());
+
+							stringBuilder.Append('\n');
+
+							stringBuilder.Append(INNER_EXCEPTION_DELIMITER);
+
 							stringBuilder.Append('\n');
 						}
 
 						throw new Exception(
 							logger.TryFormatException(
 								logSource,
-								$"{targetTask.Exception.Message} INNER EXCEPTIONS:\n{stringBuilder.ToString()}"));
+								stringBuilder.ToString()));
 					})
-				.ConfigureAwait(AWAIT_IN_THE_SAME_THREAD);
+				.ConfigureAwait(awaitInSameContext);
 		}
 
 		#endregion
@@ -395,6 +575,7 @@ namespace HereticalSolutions
 			SynchronizationContext.SetSynchronizationContext(oldContext);
 		}
 
+		//Courtesy of https://stackoverflow.com/questions/5095183/how-would-i-run-an-async-taskt-method-synchronously
 		/// <summary>
 		/// Synchronously execute's an async Task<T> method which has a T return type.
 		/// </summary>

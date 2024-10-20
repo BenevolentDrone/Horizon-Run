@@ -6,8 +6,6 @@ using HereticalSolutions.Messaging;
 
 using HereticalSolutions.Networking;
 
-using HereticalSolutions.Templates.Universal.Networking;
-
 using HereticalSolutions.Logging;
 using ILogger = HereticalSolutions.Logging.ILogger;
 
@@ -17,6 +15,7 @@ using UnityEngine;
 
 namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Networking
 {
+    /*
     public class ServerQuaternionReadSystem : AServerReadSystem<
         QuaternionComponent,
         ServerQuaternionComponent,
@@ -100,4 +99,5 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Networking
             };
         }
     }
+    */
 }

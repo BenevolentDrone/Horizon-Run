@@ -1,11 +1,10 @@
-using HereticalSolutions.Templates.Universal.Networking;
-
 using LiteNetLib.Utils;
 
 using UnityEngine;
 
 namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Networking
 {
+    /*
     //10 bytes
     public struct IDPosition2DPair : INetSerializable
     {
@@ -29,4 +28,5 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Networking
             Position = reader.GetVector2();
         }
     }
+    */
 }

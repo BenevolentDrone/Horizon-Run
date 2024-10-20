@@ -5,6 +5,7 @@ using DefaultEcs.System;
 
 namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 {
+	/*
 	public class PhysicsBody3DSystem : AEntitySetSystem<float>
 	{
 		public PhysicsBody3DSystem(
@@ -38,28 +39,26 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 
 
 			//Courtesy of https://github.com/notgiven688/jitterphysics2/blob/main/src/Jitter2/World.Step.cs
-			/*
-			rigidBody.AngularVelocity *= body.angularDampingMultiplier;
-			rigidBody.Velocity *= body.linearDampingMultiplier;
-
-			rigidBody.DeltaVelocity = body.Force * rigidBody.InverseMass * substep_dt;
-			rigidBody.DeltaAngularVelocity = JVector.Transform(body.Torque, rigidBody.InverseInertiaWorld) * substep_dt;
-
-			if (body.AffectedByGravity)
-			{
-				rigidBody.DeltaVelocity += gravity * substep_dt;
-			}
-
-			body.Force = JVector.Zero;
-			body.Torque = JVector.Zero;
-
-			var bodyOrientation = JMatrix.CreateFromQuaternion(rigidBody.Orientation);
-
-			JMatrix.Multiply(bodyOrientation, body.inverseInertia, out rigidBody.InverseInertiaWorld);
-			JMatrix.MultiplyTransposed(rigidBody.InverseInertiaWorld, bodyOrientation, out rigidBody.InverseInertiaWorld);
-
-			rigidBody.InverseMass = body.inverseMass;
-			*/
+			//rigidBody.AngularVelocity *= body.angularDampingMultiplier;
+			//rigidBody.Velocity *= body.linearDampingMultiplier;
+			//
+			//rigidBody.DeltaVelocity = body.Force * rigidBody.InverseMass * substep_dt;
+			//rigidBody.DeltaAngularVelocity = JVector.Transform(body.Torque, rigidBody.InverseInertiaWorld) * substep_dt;
+			//
+			//if (body.AffectedByGravity)
+			//{
+			//	rigidBody.DeltaVelocity += gravity * substep_dt;
+			//}
+			//
+			//body.Force = JVector.Zero;
+			//body.Torque = JVector.Zero;
+			//
+			//var bodyOrientation = JMatrix.CreateFromQuaternion(rigidBody.Orientation);
+			//
+			//JMatrix.Multiply(bodyOrientation, body.inverseInertia, out rigidBody.InverseInertiaWorld);
+			//JMatrix.MultiplyTransposed(rigidBody.InverseInertiaWorld, bodyOrientation, out rigidBody.InverseInertiaWorld);
+			//
+			//rigidBody.InverseMass = body.inverseMass;
 
 			if (physicsBodyComponent.LinearDragScalar > MathHelpers.EPSILON)
 			{
@@ -77,11 +76,9 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 					deltaTime);
 			}
 
-			/*
-			rigidBody.AngularVelocity += rigidBody.DeltaAngularVelocity;
-
-			rigidBody.Velocity += rigidBody.DeltaVelocity;
-			*/
+			//rigidBody.AngularVelocity += rigidBody.DeltaAngularVelocity;
+			//
+			//rigidBody.Velocity += rigidBody.DeltaVelocity;
 
 
 			if (physicsBodyComponent.ConstraintForceThisFrame.magnitude > MathHelpers.EPSILON)
@@ -200,39 +197,37 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 			}
 
 			//Courtesy of https://github.com/notgiven688/jitterphysics2/blob/main/src/Jitter2/World.Step.cs
-			/*
-			JVector lvel = rigidBody.Velocity;
-			JVector avel = rigidBody.AngularVelocity;
-
-			rigidBody.Position += lvel * substep_dt;
-
-			float angle = avel.Length();
-			JVector axis;
-
-			if (angle < 0.001f)
-			{
-				// use Taylor's expansions of sync function
-				// axis = body.angularVelocity * (0.5f * timestep - (timestep * timestep * timestep) * (0.020833333333f) * angle * angle);
-				JVector.Multiply(avel,
-					0.5f * substep_dt - substep_dt * substep_dt * substep_dt * 0.020833333333f * angle * angle,
-					out axis);
-			}
-			else
-			{
-				// sync(fAngle) = sin(c*fAngle)/t
-				JVector.Multiply(avel, (float)Math.Sin(0.5f * angle * substep_dt) / angle, out axis);
-			}
-
-			JQuaternion dorn = new(axis.X, axis.Y, axis.Z, (float)Math.Cos(angle * substep_dt * 0.5f));
-			//JQuaternion.CreateFromMatrix(rigidBody.Orientation, out JQuaternion ornA);
-			JQuaternion ornA = rigidBody.Orientation;
-
-			JQuaternion.Multiply(dorn, ornA, out dorn);
-
-			dorn.Normalize();
-			//JMatrix.CreateFromQuaternion(dorn, out rigidBody.Orientation);
-			rigidBody.Orientation = dorn;
-			*/
+			//JVector lvel = rigidBody.Velocity;
+			//JVector avel = rigidBody.AngularVelocity;
+			//
+			//rigidBody.Position += lvel * substep_dt;
+			//
+			//float angle = avel.Length();
+			//JVector axis;
+			//
+			//if (angle < 0.001f)
+			//{
+			//	// use Taylor's expansions of sync function
+			//	// axis = body.angularVelocity * (0.5f * timestep - (timestep * timestep * timestep) * (0.020833333333f) * angle * angle);
+			//	JVector.Multiply(avel,
+			//		0.5f * substep_dt - substep_dt * substep_dt * substep_dt * 0.020833333333f * angle * angle,
+			//		out axis);
+			//}
+			//else
+			//{
+			//	// sync(fAngle) = sin(c*fAngle)/t
+			//	JVector.Multiply(avel, (float)Math.Sin(0.5f * angle * substep_dt) / angle, out axis);
+			//}
+			//
+			//JQuaternion dorn = new(axis.X, axis.Y, axis.Z, (float)Math.Cos(angle * substep_dt * 0.5f));
+			////JQuaternion.CreateFromMatrix(rigidBody.Orientation, out JQuaternion ornA);
+			//JQuaternion ornA = rigidBody.Orientation;
+			//
+			//JQuaternion.Multiply(dorn, ornA, out dorn);
+			//
+			//dorn.Normalize();
+			////JMatrix.CreateFromQuaternion(dorn, out rigidBody.Orientation);
+			//rigidBody.Orientation = dorn;
 
 			//var worldPosition = TransformHelpers.GetWorldPosition3D(
 			//	transformComponent.TRSMatrix);
@@ -361,4 +356,5 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 			rotation = (deltaRotation * rotation).normalized;
 		}
 	}
+	*/
 }

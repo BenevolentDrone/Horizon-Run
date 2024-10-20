@@ -9,6 +9,7 @@ using DefaultEcs.System;
 
 namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 {
+	/*
 	public class Transform3DUpdateSystem : AEntitySetSystem<float>
 	{
 		private readonly DefaultECSEntityHierarchyManager entityHierarchyManager;
@@ -49,23 +50,6 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 
 				worldRotation = transformComponent.TRSMatrix.rotation;
 
-				/*
-				UnityEngine.Debug.DrawLine(
-					worldPosition,
-					worldPosition + worldRotation * (Vector3.right * (1f / 3f)),
-					Color.red);
-
-				UnityEngine.Debug.DrawLine(
-					worldPosition,
-					worldPosition + worldRotation * (Vector3.up * (1f / 3f)),
-					Color.green);
-
-				UnityEngine.Debug.DrawLine(
-					worldPosition,
-					worldPosition + worldRotation * (Vector3.forward * (1f / 3f)),
-					Color.blue);
-				*/
-
 				return;
 			}
 
@@ -80,22 +64,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 
 			worldRotation = transformComponent.TRSMatrix.rotation;
 
-			/*
-			UnityEngine.Debug.DrawLine(
-				worldPosition,
-				worldPosition + worldRotation * (Vector3.right * (1f / 3f)),
-				Color.red);
-
-			UnityEngine.Debug.DrawLine(
-				worldPosition,
-				worldPosition + worldRotation * (Vector3.up * (1f / 3f)),
-				Color.green);
-
-			UnityEngine.Debug.DrawLine(
-				worldPosition,
-				worldPosition + worldRotation * (Vector3.forward * (1f / 3f)),
-				Color.blue);
-			*/
 		}
 	}
+	*/
 }

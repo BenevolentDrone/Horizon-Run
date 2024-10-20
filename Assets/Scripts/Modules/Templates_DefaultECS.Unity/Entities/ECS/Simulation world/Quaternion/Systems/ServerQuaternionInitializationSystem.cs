@@ -6,6 +6,7 @@ using DefaultEcs;
 
 namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Networking
 {
+    /*
     public class ServerQuaternionInitializationSystem
         : IEntityInitializationSystem
     {
@@ -71,4 +72,5 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Networking
         {
         }
     }
+    */
 }

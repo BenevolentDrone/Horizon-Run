@@ -20,8 +20,6 @@ using HereticalSolutions.Networking;
 using HereticalSolutions.Networking.ECS;
 using HereticalSolutions.Networking.LiteNetLib;
 
-using HereticalSolutions.Templates.Universal.Networking;
-
 using HereticalSolutions.Logging;
 
 using LiteNetLib;
@@ -33,6 +31,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Networking.Factories
 {
     public static class NetworkFactory
     {
+        /*
         private const int INITIAL_SERIALIZER_POOL_CAPACITY = 5;
         
         private const int ADDITIONAL_SERIALIZER_POOL_CAPACITY = 5;
@@ -373,5 +372,6 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Networking.Factories
                 new QuaternionDeltaProcessor()
             };
         }
+        */
     }
 }

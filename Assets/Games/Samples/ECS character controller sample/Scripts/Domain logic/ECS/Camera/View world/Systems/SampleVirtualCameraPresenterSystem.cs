@@ -1,6 +1,7 @@
 using DefaultEcs;
 using DefaultEcs.System;
-using HereticalSolutions.Entities;
+
+using HereticalSolutions.Modules.Core_DefaultECS;
 
 namespace HereticalSolutions.Samples.ECSCharacterControllerSample
 {

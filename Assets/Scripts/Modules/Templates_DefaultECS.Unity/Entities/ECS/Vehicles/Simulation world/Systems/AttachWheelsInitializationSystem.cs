@@ -6,6 +6,7 @@ using DefaultEcs;
 
 namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 {
+	/*
 	public class AttachWheelsInitializationSystem
 		: IEntityInitializationSystem
 	{
@@ -177,4 +178,5 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 		{
 		}
 	}
+	*/
 }

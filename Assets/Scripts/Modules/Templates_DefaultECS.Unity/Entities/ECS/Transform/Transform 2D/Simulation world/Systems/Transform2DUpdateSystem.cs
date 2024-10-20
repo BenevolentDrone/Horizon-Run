@@ -7,6 +7,7 @@ using DefaultEcs.System;
 
 namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 {
+	/*
 	public class Transform2DUpdateSystem : AEntitySetSystem<float>
 	{
 		private readonly DefaultECSEntityHierarchyManager entityHierarchyManager;
@@ -45,4 +46,5 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 				logger);
 		}
 	}
+	*/
 }

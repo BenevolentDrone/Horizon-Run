@@ -1,13 +1,9 @@
-using System;
-
-using HereticalSolutions.Entities;
+using HereticalSolutions.Modules.Core_DefaultECS;
 
 using HereticalSolutions.Logging;
 using ILogger = HereticalSolutions.Logging.ILogger;
 
 using UnityEngine;
-
-using DefaultEcs;
 
 using Zenject;
 
@@ -19,7 +15,7 @@ namespace HereticalSolutions.Samples.ECSCharacterControllerSample
 		private ILoggerResolver loggerResolver;
 
 		[Inject]
-		private SampleEntityManager entityManager;
+		private EntityManager entityManager;
 
 		[SerializeField]
 		private string playerEntityPrototypeID;
@@ -33,7 +29,9 @@ namespace HereticalSolutions.Samples.ECSCharacterControllerSample
 
 		public void Start()
 		{
-			var guid = entityManager.SpawnEntity(playerEntityPrototypeID);
+			entityManager.SpawnEntity(
+				out var guid,
+				playerEntityPrototypeID);
 
 			logger?.Log<SampleSceneManager>(
 				$"SPAWNED PLAYER ENTITY WITH GUID: {guid}");

@@ -516,7 +516,7 @@ namespace HereticalSolutions.ResourceManagement
 			{
 				progress?.Report(0.5f);
 
-				IProgress<float> localProgress = progress.CreateLocalProgress(
+				IProgress<float> localProgress = progress.CreateLocalProgressWithRange(
 					0.5f,
 					1f);
 
@@ -570,7 +570,7 @@ namespace HereticalSolutions.ResourceManagement
 			{
 				progress?.Report(0.5f);
 
-				IProgress<float> localProgress = progress.CreateLocalProgress(
+				IProgress<float> localProgress = progress.CreateLocalProgressWithRange(
 					0.5f,
 					1f);
 
@@ -657,7 +657,7 @@ namespace HereticalSolutions.ResourceManagement
 
 				for (int i = 0; i < variantsToFree.Length; i++)
 				{
-					IProgress<float> localProgress = progress.CreateLocalProgress(
+					IProgress<float> localProgress = progress.CreateLocalProgressForStep(
 						(1f / (float)totalStepsCount),
 						1f,
 						i,
@@ -761,7 +761,7 @@ namespace HereticalSolutions.ResourceManagement
 			{
 				progress?.Report(0.5f);
 
-				IProgress<float> localProgress = progress.CreateLocalProgress(
+				IProgress<float> localProgress = progress.CreateLocalProgressWithRange(
 					0.5f,
 					1f);
 
@@ -830,7 +830,7 @@ namespace HereticalSolutions.ResourceManagement
 
 					nestedResource.ParentResource = null;
 
-					IProgress<float> localProgress = progress.CreateLocalProgress(
+					IProgress<float> localProgress = progress.CreateLocalProgressForStep(
 						(1f / (float)totalStepsCount),
 						1f,
 						i,
@@ -855,7 +855,7 @@ namespace HereticalSolutions.ResourceManagement
 		{
 			progress?.Report(0f);
 
-			IProgress<float> localProgress = progress.CreateLocalProgress(
+			IProgress<float> localProgress = progress.CreateLocalProgressWithRange(
 				0f,
 				0.5f);
 
@@ -866,7 +866,7 @@ namespace HereticalSolutions.ResourceManagement
 
 			progress?.Report(0.5f);
 
-			localProgress = progress.CreateLocalProgress(
+			localProgress = progress.CreateLocalProgressWithRange(
 				0.5f,
 				1f);
 

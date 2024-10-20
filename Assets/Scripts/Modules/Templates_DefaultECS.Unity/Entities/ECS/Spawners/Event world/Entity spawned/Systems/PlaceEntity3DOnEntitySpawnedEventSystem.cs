@@ -9,6 +9,7 @@ using DefaultEcs.System;
 
 namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 {
+	/*
 	public class PlaceEntity3DOnEntitySpawnedEventSystem : AEntitySetSystem<float>
 	{
 		private readonly UniversalTemplateEntityManager entityManager;
@@ -82,30 +83,6 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 				targetPosition = sourceEntity.Get<Position3DComponent>().Position;
 			}
 
-			//TODO
-			/*
-			if (sourceEntity.Has<CircleShapeComponent>())
-			{
-				var circleShapeComponent = sourceEntity.Get<CircleShapeComponent>();
-
-				//Courtesy of https://stackoverflow.com/questions/5837572/generate-a-random-point-within-a-circle-uniformly/50746409#50746409
-				float distanceFromCenter = circleShapeComponent.Radius
-					* Mathf.Sqrt( //sqrt to get a uniform distribution, check the link above for more info
-						UnityEngine.Random.Range(0.0f, 1.0f));
-						
-				float theta = UnityEngine.Random.Range(0.0f, 1.0f) * 2f * Mathf.PI;
-
-				float distanceX = distanceFromCenter * Mathf.Cos(theta);
-				float distanceY = distanceFromCenter * Mathf.Sin(theta);
-
-				targetPosition += new Vector3(
-					distanceX,
-					0f,
-					distanceY);
-			}
-			*/
-
-
 			targetEntityPosition.Position = targetPosition;
 
 			if (targetEntity.Has<Transform3DComponent>())
@@ -116,4 +93,5 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 			}
 		}
 	}
+	*/
 }

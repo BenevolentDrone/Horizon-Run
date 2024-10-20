@@ -4,8 +4,6 @@ using HereticalSolutions.Repositories.Factories;
 
 using HereticalSolutions.Logging;
 
-using HereticalSolutions.Templates.Universal.Unity.Factories;
-
 using UnityEngine;
 
 using Zenject;
@@ -27,6 +25,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.DI
 
 		public override void InstallBindings()
 		{
+			/*
 			var physicsBodiesPool = UniversalTemplateUnityGameObjectPoolsFactory.BuildPool(
 				Container,
 				physicsBodiesPoolsSettings,
@@ -43,6 +42,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.DI
 				.Bind<UnityPhysicsManager>()
 				.FromInstance(physicsManager)
 				.AsCached();
+			*/
 		}
 	}
 }

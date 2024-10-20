@@ -7,9 +7,6 @@ using HereticalSolutions.Synchronization;
 
 using HereticalSolutions.Entities;
 
-using HereticalSolutions.Templates.Universal;
-using HereticalSolutions.Templates.Universal.Unity;
-
 using HereticalSolutions.Logging;
 
 using UnityEngine;
@@ -23,6 +20,7 @@ namespace HereticalSolutions.HorizonRun.DI
 {
 	public class SystemsInstaller : MonoInstaller
 	{
+		/*
 		private const string LOCK_ENTITY_PROTOTYPE_ID = "Lock";
 
 		[Inject]
@@ -75,16 +73,17 @@ namespace HereticalSolutions.HorizonRun.DI
 
 		[Inject]
 		private IManagedPool<GameObject> gameObjectPool;
+		*/
 
-
-        [SerializeField]
-        private UniversalTemplateSimulationBehaviour simulationBehaviour;
+        //[SerializeField]
+        //private UniversalTemplateSimulationBehaviour simulationBehaviour;
 
 		[SerializeField]
 		private Transform hudCanvasTransform;
         
 		public override void InstallBindings()
 		{
+			/*
 			var logger = loggerResolver?.GetLogger<SystemsInstaller>();
 
 			var authoringPreset = entityAuthoringSettings.AuthoringPreset;
@@ -250,6 +249,7 @@ namespace HereticalSolutions.HorizonRun.DI
 				loggerResolver?.GetLogger<UniversalTemplateSimulationBehaviour>());
 
 			simulationBehaviour.StartSimulation();
+			*/
 		}
 	}
 }

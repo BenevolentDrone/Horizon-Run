@@ -6,7 +6,6 @@ using HereticalSolutions.Allocations.Factories;
 using HereticalSolutions.Repositories.Factories;
 
 using HereticalSolutions.Entities;
-using HereticalSolutions.Entities.Factories;
 
 using HereticalSolutions.Logging;
 
@@ -16,6 +15,7 @@ namespace HereticalSolutions.Samples.ECSCharacterControllerSample.Factories
 {
 	public static class SampleEntityFactory
 	{
+		/*
 		public static SampleEntityManager BuildSampleEntityManager(
 			ILoggerResolver loggerResolver = null)
 		{
@@ -123,5 +123,6 @@ namespace HereticalSolutions.Samples.ECSCharacterControllerSample.Factories
 				childEntityWorlds,
 				logger);
 		}
+		*/
 	}
 }

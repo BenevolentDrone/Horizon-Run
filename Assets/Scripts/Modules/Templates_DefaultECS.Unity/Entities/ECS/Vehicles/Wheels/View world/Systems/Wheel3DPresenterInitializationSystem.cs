@@ -6,6 +6,7 @@ using DefaultEcs;
 
 namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 {
+	/*
 	public class Wheel3DPresenterInitializationSystem
 		: IEntityInitializationSystem
 	{
@@ -56,4 +57,5 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 		{
 		}
 	}
+	*/
 }

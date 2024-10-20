@@ -20,6 +20,10 @@ namespace HereticalSolutions.Systems
 
 		protected byte freeThreadIndex;
 
+		protected bool dirty;
+
+		protected bool validated;
+
 		public ASystemBuilder(
 			HashSet<IProcedureNode<TProcedure>> allProcedureNodes,
 			IRepository<string, IStageNode<TProcedure>> stageRepository,
@@ -46,6 +50,11 @@ namespace HereticalSolutions.Systems
 			FinishNode = finishNode;
 
 			this.freeThreadIndex = freeThreadIndex;
+
+
+			dirty = true;
+
+			validated = false;
 		}
 
 		#region ISystemBuilder
@@ -478,6 +487,15 @@ namespace HereticalSolutions.Systems
 					successorAsProcedureNode.ParallelPrevious = parallelPrevious;
 				}
 
+				if (parallelPrevious.Contains(predecessorAsProcedureNode))
+				{
+					logger?.LogError(
+						GetType(),
+						$"NODE {predecessor} ALREADY LINKED TO {successor}");
+
+					return false;
+				}
+
 				parallelPrevious.Add(predecessorAsProcedureNode);
 
 
@@ -488,6 +506,15 @@ namespace HereticalSolutions.Systems
 					parallelNext = new List<IProcedureNode<TProcedure>>();
 
 					predecessorAsProcedureNode.ParallelNext = parallelNext;
+				}
+
+				if (parallelNext.Contains(successorAsProcedureNode))
+				{
+					logger?.LogError(
+						GetType(),
+						$"NODE {successor} ALREADY LINKED TO {predecessor}");
+
+					return false;
 				}
 
 				parallelNext.Add(successorAsProcedureNode);
@@ -529,10 +556,16 @@ namespace HereticalSolutions.Systems
 
 		public bool ValidateSystem()
 		{
-			return
+			dirty = false;
+
+			var result =
 				ValidateAllNodesShouldHaveStartAndFinish()
 				&& ValidateDAG()
 				&& ValidateProcessFlowFromStartToFinish();
+
+			validated = result;
+
+			return result;
 		}
 
 		#endregion
@@ -870,7 +903,7 @@ namespace HereticalSolutions.Systems
 				}
 
 				//Cannot insert nodes before invalid nodes
-				if (successorCandidate.SequentialPrevious != currentSuccessor)
+				if (successorCandidate.SequentialNext != currentSuccessor)
 				{
 					logger?.LogError(
 						GetType(),
@@ -1418,6 +1451,10 @@ namespace HereticalSolutions.Systems
 
 			node.IsDetached = false;
 
+			dirty = true;
+
+			validated = false;
+
 			return true;
 		}
 
@@ -1521,6 +1558,10 @@ namespace HereticalSolutions.Systems
 			allProcedureNodes.Add(node);
 
 			node.IsDetached = false;
+
+			dirty = true;
+
+			validated = false;
 
 			return true;
 		}
@@ -1643,6 +1684,10 @@ namespace HereticalSolutions.Systems
 			node.IsDetached = true;
 
 			node.ExpectedThread = 0;
+
+			dirty = true;
+
+			validated = false;
 
 			return true;
 		}

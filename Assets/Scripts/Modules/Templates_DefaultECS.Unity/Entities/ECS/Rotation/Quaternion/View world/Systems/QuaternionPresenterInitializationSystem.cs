@@ -9,12 +9,12 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
     public class QuaternionPresenterInitializationSystem
         : IEntityInitializationSystem
     {
-        private readonly UniversalTemplateEntityManager entityManager;
+        private readonly EntityManager entityManager;
 
         private readonly ILogger logger;
 
         public QuaternionPresenterInitializationSystem(
-            UniversalTemplateEntityManager entityManager,
+            EntityManager entityManager,
             ILogger logger = null)
         {
             this.entityManager = entityManager;
@@ -37,9 +37,16 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 
             var guid = entity.Get<GUIDComponent>().GUID;
 
-            var simulationEntity = entityManager.GetEntity(
+            if (!entityManager.TryGetEntity(
                 guid,
-                WorldConstants.SIMULATION_WORLD_ID);
+                WorldConstants.SIMULATION_WORLD_ID,
+                out var simulationEntity))
+            {
+                logger?.LogError<QuaternionPresenterInitializationSystem>(
+                    $"ENTITY {guid} HAS NO SIMULATION ENTITY");
+
+                return;
+            }
 
             if (!simulationEntity.IsAlive)
             {

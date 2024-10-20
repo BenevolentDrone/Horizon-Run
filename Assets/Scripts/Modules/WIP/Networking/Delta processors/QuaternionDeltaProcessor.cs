@@ -5,10 +5,9 @@ using HereticalSolutions.Repositories;
 using HereticalSolutions.Networking;
 using HereticalSolutions.Networking.LiteNetLib;
 
-using HereticalSolutions.Templates.Universal.Networking;
-
 namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Networking
 {
+	/*
 	public class QuaternionDeltaProcessor
 		: IDeltaPacketProcessor
 	{
@@ -56,4 +55,5 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Networking
 			return true;
 		}
 	}
+	*/
 }

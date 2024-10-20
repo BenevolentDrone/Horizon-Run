@@ -6,6 +6,7 @@ using DefaultEcs;
 
 namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 {
+	/*
 	public class UniformRotationPresenterInitializationSystem
 		: IEntityInitializationSystem
 	{
@@ -56,4 +57,5 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 		{
 		}
 	}
+	*/
 }

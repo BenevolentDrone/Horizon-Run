@@ -79,7 +79,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
 
 			systemBuilder.TryAddBeforeNode(
 				despawnSystemNode,
-				SystemFactory.BuildSystemNode<TProcedure>(
+				SystemFactory.BuildProcedureNode<TProcedure>(
 					new DisposeProcessedEventsSystem<float>(
 						eventWorld)),
 				false);

@@ -53,7 +53,7 @@ namespace HereticalSolutions.AssetImport
                     logger?.Log<ResourceImporterFromScriptable>(
                         $"IMPORTING {resourceID} INITIATED");
 
-                    IProgress<float> localProgress = progress.CreateLocalProgress(
+                    IProgress<float> localProgress = progress.CreateLocalProgressForStep(
                         0f,
                         1f,
                         resourcesLoaded,

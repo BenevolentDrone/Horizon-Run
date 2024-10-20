@@ -4,8 +4,6 @@ using HereticalSolutions.Time;
 
 using HereticalSolutions.Messaging;
 
-using HereticalSolutions.Templates.Universal.Networking;
-
 using HereticalSolutions.Logging;
 using ILogger = HereticalSolutions.Logging.ILogger;
 
@@ -16,6 +14,7 @@ using UnityEngine;
 
 namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Networking
 {
+    /*
     public class ServerUniformRotationReadSystem : AServerReadSystem<
         UniformRotationComponent,
         ServerUniformRotationComponent,
@@ -98,4 +97,5 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Networking
             };
         }
     }
+    */
 }

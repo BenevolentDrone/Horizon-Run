@@ -4,6 +4,7 @@ using DefaultEcs;
 
 namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 {
+    /*
     public class CreateSensorEntityListInitializationSystem
         : IEntityInitializationSystem
     {
@@ -39,4 +40,5 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
         {
         }
     }
+    */
 }

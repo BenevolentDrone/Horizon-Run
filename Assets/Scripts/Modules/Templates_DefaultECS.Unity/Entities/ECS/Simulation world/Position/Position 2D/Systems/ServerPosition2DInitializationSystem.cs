@@ -8,6 +8,7 @@ using DefaultEcs;
 
 namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Networking
 {
+    /*
     public class ServerPosition2DInitializationSystem
         : IEntityInitializationSystem
     {
@@ -78,4 +79,5 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Networking
         {
         }
     }
+    */
 }

@@ -1,13 +1,12 @@
 using DefaultEcs;
 
-using HereticalSolutions.Templates.Universal.Networking;
-
 using LiteNetLib.Utils;
 
 using UnityEngine;
 
 namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Networking
 {
+	/*
 	public class Position3DSerializer
 		: IComponentSerializer
 	{
@@ -75,4 +74,5 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Networking
 			Position = default;
 		}
 	}
+	*/
 }

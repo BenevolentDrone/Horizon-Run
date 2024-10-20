@@ -6,8 +6,6 @@ using HereticalSolutions.Messaging;
 
 using HereticalSolutions.Networking;
 
-using HereticalSolutions.Templates.Universal.Networking;
-
 using HereticalSolutions.Logging;
 using ILogger = HereticalSolutions.Logging.ILogger;
 
@@ -15,6 +13,7 @@ using DefaultEcs;
 
 namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Networking
 {
+    /*
     public class ServerPosition3DReadSystem : AServerReadSystem<
         Position3DComponent,
         ServerPosition3DComponent,
@@ -96,4 +95,5 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Networking
             };
         }
     }
+    */
 }

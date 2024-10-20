@@ -319,7 +319,7 @@ namespace HereticalSolutions.ResourceManagement
 				{
 					if (free)
 					{
-						IProgress<float> localProgress = progress.CreateLocalProgress(
+						IProgress<float> localProgress = progress.CreateLocalProgressForStep(
 							0f,
 							1f,
 							counter,
@@ -432,7 +432,7 @@ namespace HereticalSolutions.ResourceManagement
 				{
 					((IResourceData)nestedResource).ParentResource = null;
 
-					IProgress<float> localProgress = progress.CreateLocalProgress(
+					IProgress<float> localProgress = progress.CreateLocalProgressForStep(
 						0f,
 						1f,
 						counter,
@@ -463,7 +463,7 @@ namespace HereticalSolutions.ResourceManagement
 		{
 			progress?.Report(0f);
 
-			IProgress<float> localProgress = progress.CreateLocalProgress(
+			IProgress<float> localProgress = progress.CreateLocalProgressWithRange(
 				0f,
 				0.5f);
 
@@ -474,7 +474,7 @@ namespace HereticalSolutions.ResourceManagement
 
 			progress?.Report(0.5f);
 
-			localProgress = progress.CreateLocalProgress(
+			localProgress = progress.CreateLocalProgressWithRange(
 				0.5f,
 				1f);
 

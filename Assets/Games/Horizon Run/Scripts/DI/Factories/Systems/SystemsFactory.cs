@@ -14,9 +14,6 @@ using HereticalSolutions.Time;
 
 using HereticalSolutions.Entities;
 
-using HereticalSolutions.Templates.Universal;
-using HereticalSolutions.Templates.Universal.Unity;
-
 using HereticalSolutions.Logging;
 
 using UnityEngine;
@@ -28,6 +25,7 @@ namespace HereticalSolutions.HorizonRun.DI
 {
 	public static class SystemsFactory
 	{
+		/*
 		#region View world systems
 
 		public static void InitializeViewWorldSystemsContainer(
@@ -784,5 +782,6 @@ namespace HereticalSolutions.HorizonRun.DI
 		}
 
 		#endregion
+		*/
 	}
 }

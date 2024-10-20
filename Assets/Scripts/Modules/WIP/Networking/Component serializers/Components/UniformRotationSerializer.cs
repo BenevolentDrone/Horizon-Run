@@ -1,11 +1,10 @@
 using DefaultEcs;
 
-using HereticalSolutions.Templates.Universal.Networking;
-
 using LiteNetLib.Utils;
 
 namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Networking
 {
+    /*
     public class UniformRotationSerializer
         : IComponentSerializer
     {
@@ -73,4 +72,5 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Networking
             Angle = default;
         }
     }
+    */
 }

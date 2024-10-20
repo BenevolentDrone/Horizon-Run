@@ -17,6 +17,7 @@ namespace HereticalSolutions.Samples.ECSCharacterControllerSample.Installers
 
         public override void InstallBindings()
         {
+            /*
             var entityManager = SampleEntityFactory.BuildSampleEntityManager(
                 loggerResolver);
 
@@ -30,6 +31,7 @@ namespace HereticalSolutions.Samples.ECSCharacterControllerSample.Installers
                 .Bind<DefaultECSEntityManager<Guid>>()
                 .FromInstance(entityManager)
                 .AsCached();
+            */
         }
     }
 }

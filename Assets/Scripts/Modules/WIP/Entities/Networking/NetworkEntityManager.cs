@@ -17,8 +17,6 @@ using HereticalSolutions.Networking;
 using HereticalSolutions.Networking.ECS;
 using HereticalSolutions.Networking.LiteNetLib;
 
-using HereticalSolutions.Templates.Universal.Networking;
-
 using HereticalSolutions.Logging;
 using ILogger = HereticalSolutions.Logging.ILogger;
 
@@ -29,6 +27,7 @@ using DefaultEcs;
 
 namespace HereticalSolutions.Modules.Core_DefaultECS.Networking
 {
+    /*
     public class NetworkEntityManager
         : INetworkEntityManager<Guid, Entity>
     {
@@ -847,12 +846,6 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Networking
                     entityID);
             }
 
-            /*
-            PopulateNetworkEntity(
-                packet,
-                entityID);
-            */
-
             //Memorize entity as networked entity
             networkIDToEntityIDMap.TryAdd(
                 packet.NetworkID,
@@ -1170,29 +1163,6 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Networking
                     .SendImmediately<ServerSendPacketMessage>(
                         sendPacketMessage);
             }
-
-            /*
-            networkBusAsSender
-                .PopMessage<ServerSendPacketMessage>(
-                    out var sendPacketMessage)
-                .Write<ServerSendPacketMessage>(
-                    sendPacketMessage,
-                    new object[]
-                    {
-                        message.PlayerSlot,
-                        typeof(NetworkEntityRollCallPacket),
-                        new NetworkEntityRollCallPacket
-                        {
-                            ServerTick = networkHost.Tick,
-
-                            NetworkIDs = networkIDs
-                        },
-                        null,
-                        DeliveryMethod.ReliableUnordered
-                    })
-                .SendImmediately<ServerSendPacketMessage>(
-                    sendPacketMessage);
-            */
 
             return true;
         }
@@ -1671,4 +1641,5 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Networking
                     sendPacketMessage);
         }
     }
+    */
 }

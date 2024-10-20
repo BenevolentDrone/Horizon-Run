@@ -17,6 +17,10 @@ namespace HereticalSolutions.Systems
 			Procedure = procedure;
 
 			Priority = priority;
+
+			IsDetached = true;
+
+			ExpectedThread = 0;
 		}
 
 		#region IProcedureNode

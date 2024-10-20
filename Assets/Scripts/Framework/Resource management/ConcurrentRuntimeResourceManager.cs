@@ -610,7 +610,7 @@ namespace HereticalSolutions.ResourceManagement
 			{
 				progress?.Report(0.5f);
 
-				IProgress<float> localProgress = progress.CreateLocalProgress(
+				IProgress<float> localProgress = progress.CreateLocalProgressWithRange(
 					0.5f,
 					1f);
 
@@ -671,7 +671,7 @@ namespace HereticalSolutions.ResourceManagement
 				{
 					IResourceData rootResource = (IResourceData)rootResourcesToFree[i];
 
-					IProgress<float> localProgress = progress.CreateLocalProgress(
+					IProgress<float> localProgress = progress.CreateLocalProgressForStep(
 						(1f / (float)totalStepsCount),
 						1f,
 						i,
@@ -843,7 +843,7 @@ namespace HereticalSolutions.ResourceManagement
 
 			if (!dependencyStorageHandle.Allocated)
 			{
-				IProgress<float> localProgress = progress.CreateLocalProgress(
+				IProgress<float> localProgress = progress.CreateLocalProgressWithRange(
 					0.5f,
 					1f);
 

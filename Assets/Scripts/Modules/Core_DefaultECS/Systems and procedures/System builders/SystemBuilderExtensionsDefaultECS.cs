@@ -17,7 +17,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
 				predecessorStageID,
 				parallel);
 
-			var lifetimeSystemNode = SystemFactory.BuildSystemNode<TProcedure>(
+			var lifetimeSystemNode = SystemFactory.BuildProcedureNode<TProcedure>(
 				system);
 
 			systemBuilder.TryAddBeforeStage(
@@ -40,7 +40,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
 				predecessorStageID,
 				parallel);
 
-			var lifetimeSystemNode = SystemFactory.BuildSystemNode<TProcedure>(
+			var lifetimeSystemNode = SystemFactory.BuildProcedureNode<TProcedure>(
 				system);
 
 			systemBuilder.TryAddBeforeStage(

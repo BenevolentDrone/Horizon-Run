@@ -1,4 +1,4 @@
-using HereticalSolutions.Entities;
+using HereticalSolutions.Modules.Core_DefaultECS;
 
 using UnityEngine;
 

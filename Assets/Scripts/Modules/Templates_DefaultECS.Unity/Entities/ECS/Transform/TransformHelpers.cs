@@ -8,6 +8,7 @@ using UnityEngine;
 
 namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 {
+	/*
 	public static class TransformHelpers
 	{
 		#region World position
@@ -460,4 +461,5 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 
 		#endregion
 	}
+	*/
 }

@@ -46,7 +46,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.DI
 
             string dateTimeNow = DateTime.UtcNow.ToString("s", CultureInfo.InvariantCulture);
 
-            dateTimeNow = dateTimeNow.Replace('T', '_');
+            dateTimeNow = dateTimeNow.Replace('T', ' ');
 
             dateTimeNow = dateTimeNow.Replace(':', '-');
 

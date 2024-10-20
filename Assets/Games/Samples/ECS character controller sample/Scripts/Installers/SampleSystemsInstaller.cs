@@ -6,6 +6,8 @@ using HereticalSolutions.Synchronization;
 
 using HereticalSolutions.Entities;
 
+using HereticalSolutions.Modules.Core_DefaultECS;
+
 using HereticalSolutions.Logging;
 
 using UnityEngine;
@@ -23,7 +25,7 @@ namespace HereticalSolutions.Samples.ECSCharacterControllerSample.Installers
 		private ILoggerResolver loggerResolver;
 
 		[Inject]
-		private SampleEntityManager entityManager;
+		private EntityManager entityManager;
 
 		[Inject(Id = "Update time manager")]
 		private ITimeManager updateTimeManager;
@@ -42,6 +44,7 @@ namespace HereticalSolutions.Samples.ECSCharacterControllerSample.Installers
 
 		public override void InstallBindings()
 		{
+			/*
 			//var logger = loggerResolver.GetLogger<SampleEntityPrototypeImportInstaller>();
 
 			#region Resolve and initialization systems
@@ -155,6 +158,8 @@ namespace HereticalSolutions.Samples.ECSCharacterControllerSample.Installers
 				lateUpdateSystems);
 
 			#endregion
+
+			*/
 		}
 	}
 }

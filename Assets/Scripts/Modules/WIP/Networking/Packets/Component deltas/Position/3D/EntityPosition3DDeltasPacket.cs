@@ -4,6 +4,7 @@ using LiteNetLib.Utils;
 
 namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Networking
 {
+    /*
     [Packet]
     public struct EntityPosition3DDeltasPacket : INetSerializable
     {
@@ -39,4 +40,5 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Networking
                 Positions[i].Deserialize(reader);
         }
     }
+    */
 }

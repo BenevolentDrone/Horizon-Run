@@ -408,7 +408,7 @@ namespace HereticalSolutions.ResourceManagement
                     key,
                     out var rootResource))
                 {
-                    IProgress<float> localProgress = progress.CreateLocalProgress(
+                    IProgress<float> localProgress = progress.CreateLocalProgressForStep(
                         0f,
                         1f,
                         counter,
@@ -458,7 +458,7 @@ namespace HereticalSolutions.ResourceManagement
 
             if (!dependencyStorageHandle.Allocated)
             {
-                IProgress<float> localProgress = progress.CreateLocalProgress(
+                IProgress<float> localProgress = progress.CreateLocalProgressWithRange(
                     0.5f,
                     1f);
 

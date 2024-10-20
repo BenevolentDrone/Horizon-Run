@@ -1,5 +1,7 @@
 using HereticalSolutions.Entities;
 
+using HereticalSolutions.Modules.Core_DefaultECS;
+
 using DefaultEcs;
 using DefaultEcs.System;
 
@@ -7,21 +9,21 @@ namespace HereticalSolutions.Samples.ECSCharacterControllerSample
 {
 	public class SampleVirtualCameraPresenterInitializationSystem : AEntitySetSystem<float>
 	{
-		private SampleEntityManager sampleEntityManager;
+		private EntityManager entityManager;
 
 		private EntitySet playerSet;
 
 		public SampleVirtualCameraPresenterInitializationSystem(
 			World world,
 			World simulationWorld,
-			SampleEntityManager sampleEntityManager)
+			EntityManager entityManager)
 			: base(
 				world
 					.GetEntities()
 					.With<SampleVirtualCameraPresenterComponent>()
 					.AsSet())
 		{
-			this.sampleEntityManager = sampleEntityManager;
+			this.entityManager = entityManager;
 
 			playerSet = simulationWorld
 				.GetEntities()
@@ -50,9 +52,13 @@ namespace HereticalSolutions.Samples.ECSCharacterControllerSample
 					continue;
 				}
 
-				var playerViewEntity = sampleEntityManager.GetEntity(
+				if (!entityManager.TryGetEntity(
 					playerEntity.Get<GUIDComponent>().GUID,
-					WorldConstants.VIEW_WORLD_ID);
+					WorldConstants.VIEW_WORLD_ID,
+					out var playerViewEntity))
+				{
+					continue;
+				}
 
 				sampleVirtualCameraPresenterComponent.TargetEntity = playerViewEntity;
 

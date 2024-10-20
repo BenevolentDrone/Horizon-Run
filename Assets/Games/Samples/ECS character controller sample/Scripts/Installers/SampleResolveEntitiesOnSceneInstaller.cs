@@ -1,4 +1,4 @@
-using HereticalSolutions.Entities;
+using HereticalSolutions.Modules.Core_DefaultECS;
 
 using HereticalSolutions.Logging;
 using ILogger = HereticalSolutions.Logging.ILogger;
@@ -15,7 +15,7 @@ namespace HereticalSolutions.Samples.ECSCharacterControllerSample.Installers
 		private ILoggerResolver loggerResolver;
 
 		[Inject]
-		private SampleEntityManager entityManager;
+		private EntityManager entityManager;
 
 		public override void InstallBindings()
 		{
@@ -68,6 +68,7 @@ namespace HereticalSolutions.Samples.ECSCharacterControllerSample.Installers
 						logger);
 
 					entityManager.ResolveWorldLocalEntity(
+						out _,
 						worldLocalSceneEntity.PrototypeID,
 						gameObjectWithTag,
 						worldLocalSceneEntity.WorldID);
@@ -116,6 +117,7 @@ namespace HereticalSolutions.Samples.ECSCharacterControllerSample.Installers
 						logger);
 
 					entityManager.ResolveWorldLocalEntity(
+						out _,
 						childWorldLocalSceneEntity.PrototypeID,
 						childWorldLocalSceneEntity.gameObject,
 						childWorldLocalSceneEntity.WorldID);

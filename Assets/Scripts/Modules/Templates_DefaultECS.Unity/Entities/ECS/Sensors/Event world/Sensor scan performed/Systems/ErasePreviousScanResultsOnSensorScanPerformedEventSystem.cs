@@ -10,6 +10,7 @@ using DefaultEcs.System;
 
 namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 {
+    /*
     public class ErasePreviousScanResultsOnSensorScanPerformedEventSystem : AEntitySetSystem<float>
     {
         private readonly DefaultECSEntityListManager entityListManager;
@@ -55,4 +56,5 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
             scanResults.Clear();
         }
     }
+    */
 }

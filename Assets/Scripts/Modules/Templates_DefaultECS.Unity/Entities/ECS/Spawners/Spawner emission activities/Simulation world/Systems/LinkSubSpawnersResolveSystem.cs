@@ -8,6 +8,7 @@ using DefaultEcs;
 
 namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 {
+	/*
 	public class LinkSubSpawnersResolveSystem<TSceneEntity>
 		: IEntityInitializationSystem
 		  where TSceneEntity : MonoBehaviour
@@ -96,4 +97,5 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 		{
 		}
 	}
+	*/
 }

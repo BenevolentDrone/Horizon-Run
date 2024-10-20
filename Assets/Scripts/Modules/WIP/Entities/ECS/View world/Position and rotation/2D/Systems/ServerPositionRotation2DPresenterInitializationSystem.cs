@@ -6,6 +6,7 @@ using DefaultEcs;
 
 namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Networking
 {
+    /*
     public class ServerPositionRotationPresenter2DInitializationSystem
         : IEntityInitializationSystem
     {
@@ -68,4 +69,5 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Networking
         {
         }
     }
+    */
 }

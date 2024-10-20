@@ -4,13 +4,11 @@ using HereticalSolutions.AssetImport;
 
 using HereticalSolutions.ResourceManagement;
 
-using HereticalSolutions.Entities;
+using HereticalSolutions.Modules.Core_DefaultECS;
 
 using HereticalSolutions.Logging;
 
 using UnityEngine;
-
-using DefaultEcs;
 
 using Zenject;
 
@@ -34,13 +32,14 @@ namespace HereticalSolutions.Samples.ECSCharacterControllerSample.Installers
 		private IRuntimeResourceManager runtimeResourceManager;
 
 		[Inject]
-		private SampleEntityManager entityManager;
+		private EntityManager entityManager;
 
 		[SerializeField]
 		private ResourcesSettings settings;
 
 		public override void InstallBindings()
 		{
+			/*
 			var logger = loggerResolver.GetLogger<SampleEntityPrototypeImportInstaller>();
 
 			TaskExtensions.RunSync(
@@ -186,6 +185,7 @@ namespace HereticalSolutions.Samples.ECSCharacterControllerSample.Installers
 							}
 						}
 					));
+			*/
 		}
 	}
 }

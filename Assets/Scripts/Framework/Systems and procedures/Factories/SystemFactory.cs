@@ -11,7 +11,7 @@ namespace HereticalSolutions.Systems.Factories
 {
 	public static class SystemFactory
 	{
-		public static ProcedureNode<TProcedure> BuildSystemNode<TProcedure>(
+		public static ProcedureNode<TProcedure> BuildProcedureNode<TProcedure>(
 			TProcedure system,
 			sbyte priority = 0)
 		{
@@ -45,9 +45,18 @@ namespace HereticalSolutions.Systems.Factories
 				SystemConsts.START_NODE_ID,
 				default(TProcedure));
 
+			((StageNode<TProcedure>)startNode).IsDetached = false;
+
+			((StageNode<TProcedure>)startNode).ExpectedThread = 1;
+
 			finishNode = BuildStageNode<TProcedure>(
 				SystemConsts.FINISH_NODE_ID,
 				default(TProcedure));
+
+			((StageNode<TProcedure>)finishNode).IsDetached = false;
+
+			((StageNode<TProcedure>)finishNode).ExpectedThread = 1;
+			
 
 			allProcedureNodes = new HashSet<IProcedureNode<TProcedure>>();
 
@@ -75,17 +84,30 @@ namespace HereticalSolutions.Systems.Factories
 			stages.Add(
 				finishNode.Stage,
 				finishNode);
+		}
 
+		public static DelegateSystemBuilder BuildDelegateSystemBuilder(
+			ILoggerResolver loggerResolver = null)
+		{
+			PrepareSystemBuilderDependencies<Action, Action>(
+				out HashSet<IProcedureNode<Action>> allProcedureNodes,
+				out IRepository<string, IStageNode<Action>> stages,
+				out IRepository<Type, IList<IProcedureNode<Action>>> procedures,
 
-			//return new SystemBuilder<TProcedure>(
-			//	allProcedureNodes,
-			//	stages,
-			//	systems,
-			//
-			//	startNode,
-			//	finishNode,
-			//
-			//	logger: loggerResolver?.GetLogger<SystemBuilder<TProcedure>>());
+				out IStageNode<Action> startNode,
+				out IStageNode<Action> finishNode,
+
+				loggerResolver);
+
+			return new DelegateSystemBuilder(
+				allProcedureNodes,
+				stages,
+				procedures,
+
+				startNode,
+				finishNode,
+
+				logger: loggerResolver?.GetLogger<DelegateSystemBuilder>());
 		}
 	}
 }

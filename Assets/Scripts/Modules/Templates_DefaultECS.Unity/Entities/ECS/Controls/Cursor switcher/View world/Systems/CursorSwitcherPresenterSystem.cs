@@ -7,11 +7,11 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 {
     public class CursorSwitcherPresenterSystem : AEntitySetSystem<float>
     {
-        private readonly UniversalTemplateEntityManager entityManager;
+        private readonly EntityManager entityManager;
         
         public CursorSwitcherPresenterSystem(
             World world,
-            UniversalTemplateEntityManager entityManager)
+            EntityManager entityManager)
             : base(
                 world
                     .GetEntities()

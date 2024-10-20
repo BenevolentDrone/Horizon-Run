@@ -7,13 +7,13 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 {
 	public class CreateEntityOnEntitySpawnedEventSystem : AEntitySetSystem<float>
 	{
-		private readonly UniversalTemplateEntityManager entityManager;
+		private readonly EntityManager entityManager;
 
 		private readonly EEntityAuthoringPresets authoringPreset;
 
 		public CreateEntityOnEntitySpawnedEventSystem(
 			World world,
-			UniversalTemplateEntityManager entityManager,
+			EntityManager entityManager,
 			EEntityAuthoringPresets authoringPreset)
 			: base(
 				world
@@ -41,7 +41,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 						entitySpawnedEventComponent.PrototypeID,
 						new[]
 						{
-							new WorldOverrideDescriptor<Entity>
+							new WorldOverrideDescriptor<string, Entity>
 							{
 								WorldID = WorldConstants.SIMULATION_WORLD_ID,
 

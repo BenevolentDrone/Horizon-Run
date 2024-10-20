@@ -1,5 +1,7 @@
 using HereticalSolutions.Entities;
 
+using HereticalSolutions.Modules.Core_DefaultECS;
+
 using ILogger = HereticalSolutions.Logging.ILogger;
 
 using DefaultEcs;
@@ -9,15 +11,15 @@ namespace HereticalSolutions.Samples.ECSCharacterControllerSample
 	public class SamplePositionPresenterInitializationSystem
 		: IEntityInitializationSystem
 	{
-		private readonly SampleEntityManager sampleEntityManager;
+		private readonly EntityManager entityManager;
 
 		private readonly ILogger logger;
 
 		public SamplePositionPresenterInitializationSystem(
-			SampleEntityManager sampleEntityManager,
+			EntityManager entityManager,
 			ILogger logger = null)
 		{
-			this.sampleEntityManager = sampleEntityManager;
+			this.entityManager = entityManager;
 
 			this.logger = logger;
 		}
@@ -37,9 +39,16 @@ namespace HereticalSolutions.Samples.ECSCharacterControllerSample
 
 			var guid = entity.Get<GUIDComponent>().GUID;
 
-			var simulationEntity = sampleEntityManager.GetEntity(
+			if (!entityManager.TryGetEntity(
 				guid,
-				WorldConstants.SIMULATION_WORLD_ID);
+				WorldConstants.SIMULATION_WORLD_ID,
+				out var simulationEntity))
+			{
+				logger?.LogError<SamplePositionPresenterInitializationSystem>(
+					$"ENTITY {guid} HAS NO SIMULATION ENTITY");
+
+				return;
+			}
 
 			if (!simulationEntity.IsAlive)
 			{

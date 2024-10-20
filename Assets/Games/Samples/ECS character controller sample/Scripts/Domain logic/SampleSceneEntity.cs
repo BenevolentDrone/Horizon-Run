@@ -1,6 +1,6 @@
 using System;
 
-using HereticalSolutions.Entities;
+using HereticalSolutions.Modules.Core_DefaultECS;
 
 using HereticalSolutions.Allocations.Factories;
 

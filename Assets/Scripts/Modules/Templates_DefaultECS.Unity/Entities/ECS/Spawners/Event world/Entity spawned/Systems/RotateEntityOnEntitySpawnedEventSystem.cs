@@ -5,6 +5,7 @@ using DefaultEcs.System;
 
 namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 {
+	/*
 	public class RotateEntityOnEntitySpawnedEventSystem : AEntitySetSystem<float>
 	{
 		private readonly UniversalTemplateEntityManager entityManager;
@@ -63,4 +64,5 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 			}
 		}
 	}
+	*/
 }

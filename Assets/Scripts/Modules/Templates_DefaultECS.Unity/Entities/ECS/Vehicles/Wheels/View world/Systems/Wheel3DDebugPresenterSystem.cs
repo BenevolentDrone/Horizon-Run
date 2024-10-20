@@ -5,6 +5,7 @@ using DefaultEcs.System;
 
 namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 {
+	/*
 	public class Wheel3DDebugPresenterSystem : AEntitySetSystem<float>
 	{
 		public Wheel3DDebugPresenterSystem(
@@ -54,4 +55,5 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 			wheel3DDebugViewComponent.WheelWidth = wheelComponent.Width;
 		}
 	}
+	*/
 }

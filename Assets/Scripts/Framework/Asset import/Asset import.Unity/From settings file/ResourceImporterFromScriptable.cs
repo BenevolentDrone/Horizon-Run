@@ -50,7 +50,8 @@ namespace HereticalSolutions.AssetImport
                 {
                     string variantID = resourceVariantDataSettings.VariantID;
 
-                    logger?.Log<ResourceImporterFromScriptable>(
+                    logger?.Log(
+                        GetType(),
                         $"IMPORTING {resourceID} INITIATED");
 
                     IProgress<float> localProgress = progress.CreateLocalProgressForStep(
@@ -59,10 +60,20 @@ namespace HereticalSolutions.AssetImport
                         resourcesLoaded,
                         totalResources);
 
-                    var localResult = await AddAssetAsResourceVariant(
-                        await GetOrCreateResourceData(
-                            resourceID)
-                            .ThrowExceptions<IResourceData, ResourceImporterFromScriptable>(logger),
+                    var getOrCreateResourceTask = GetOrCreateResourceData(
+                        resourceID);
+
+                    var resource = await getOrCreateResourceTask;
+                        //.ConfigureAwait(false);
+
+                    await getOrCreateResourceTask
+                        .ThrowExceptionsIfAny(
+                            GetType(),
+                            logger);
+
+
+                    var addAsVariantTask = AddAssetAsResourceVariant(
+                        resource,
                         new ResourceVariantDescriptor()
                         {
                             VariantID = variantID,
@@ -84,10 +95,18 @@ namespace HereticalSolutions.AssetImport
                             loggerResolver),
 #endif
                         true,
-                        localProgress)
-                        .ThrowExceptions<IResourceVariantData, ResourceImporterFromScriptable>(logger);
+                        localProgress);
 
-                    logger?.Log<ResourceImporterFromScriptable>(
+                    var localResult = await addAsVariantTask;
+                        //.ConfigureAwait(false);
+
+                    await addAsVariantTask
+                        .ThrowExceptionsIfAny(
+                            GetType(),
+                            logger);
+
+                    logger?.Log(
+                        GetType(),
                         $"IMPORTING {resourceID} FINISHED");
 
                     resourcesLoaded++;

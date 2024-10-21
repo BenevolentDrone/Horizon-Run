@@ -68,9 +68,14 @@ namespace HereticalSolutions.ResourceManagement
 					GetType(),
 					$"ALLOCATING");
 
-				resource = await AllocateResource(
-					progress)
-					.ThrowExceptions(
+				var task = AllocateResource(
+					progress);
+
+				resource = await task;
+					//.ConfigureAwait(false);
+
+				await task
+					.ThrowExceptionsIfAny(
 						GetType(),
 						logger);
 
@@ -108,10 +113,15 @@ namespace HereticalSolutions.ResourceManagement
 					GetType(),
 					$"FREEING");
 
-				await FreeResource(
+				var task = FreeResource(
 					resource,
-					progress)
-					.ThrowExceptions(
+					progress);
+
+				await task;
+					//.ConfigureAwait(false);
+
+				await task
+					.ThrowExceptionsIfAny(
 						GetType(),
 						logger);
 

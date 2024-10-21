@@ -9,6 +9,8 @@ namespace HereticalSolutions.Systems
 
 		new byte ExpectedThread { get; set; }
 
+		new TProcedure Procedure { get; set; }
+
 		#region In
 
 		new IReadOnlyProcedureNode<TProcedure> SequentialPrevious { get; set; }

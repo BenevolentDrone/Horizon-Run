@@ -75,18 +75,32 @@ namespace HereticalSolutions.AssetImport
 			IProgress<float> progress = null)
 			where TImporter : AAssetImporter
 		{
-			logger?.Log<ConcurrentAssetImportManager>($"IMPORTING {typeof(TImporter).Name} INITIATED");
+			logger?.Log(
+				GetType(),
+				$"IMPORTING {typeof(TImporter).Name} INITIATED");
 
-			var importer = await PopImporter<TImporter>()
-				.ThrowExceptions< IPoolElementFacade<AAssetImporter>, AssetImportManager>(
+			var popImporterTask = PopImporter<TImporter>();
+
+			var importer = await popImporterTask;
+				//.ConfigureAwait(false);
+
+			await popImporterTask
+				.ThrowExceptionsIfAny(
+					GetType(),
 					logger);
 
 			initializationDelegate?.Invoke(
 				importer.Value as TImporter);
 
-			var result = await importer.Value.Import(
-				progress)
-				.ThrowExceptions<IResourceVariantData, AssetImportManager>(
+			var importTask = importer.Value.Import(
+				progress);
+
+			var result = await importTask;
+				//.ConfigureAwait(false);
+
+			await importTask
+				.ThrowExceptionsIfAny(
+					GetType(),
 					logger);
 
 			AAssetImportPostProcessor[] postProcessors = null;
@@ -116,17 +130,25 @@ namespace HereticalSolutions.AssetImport
 					//Imagine one post processor adding 10 exrta vertices to the mesh while the other one substracts 20
 					//Why? For any fucking reason. PostProcessors are exposed as API and I have zero idea what kind of shit
 					//would a user come up with its usage
-					await postProcessors[i].OnImport(
+					var postProcessorTask = postProcessors[i].OnImport(
 						result,
-						progress)
-						.ThrowExceptions<AssetImportManager>(
+						progress);
+
+					await postProcessorTask;
+						//.ConfigureAwait(false);
+
+					await postProcessorTask
+						.ThrowExceptionsIfAny(
+							GetType(),
 							logger);
 				}
 			}
 
 			await PushImporter(importer);
 
-			logger?.Log<ConcurrentAssetImportManager>($"IMPORTING {typeof(TImporter).Name} FINISHED");
+			logger?.Log(
+				GetType(),
+				$"IMPORTING {typeof(TImporter).Name} FINISHED");
 
 			return result;
 		}

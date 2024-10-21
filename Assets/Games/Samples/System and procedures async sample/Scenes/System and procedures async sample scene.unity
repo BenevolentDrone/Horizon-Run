@@ -212,17 +212,17 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'This is a sample scene showing a system operation
+  m_text: 'This is a sample scene showing an async system operation
 
 
-    Expected behaviour:
+    Expected
+    behaviour:
 
-    *
-    Once the scene is started the system is composed from a set of procedures and
-    started
+    * Once the scene is started the system is composed from a set
+    of procedures and started
 
-    * Procedures should be executed in either sequential or parallel
-    manner based on the setup'
+    * Procedures should be executed in either sequential
+    or parallel manner based on the setup'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -831,7 +831,7 @@ GameObject:
   - component: {fileID: 1153088984}
   - component: {fileID: 1153088985}
   m_Layer: 0
-  m_Name: System and procedures sample
+  m_Name: System and procedures async sample
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -861,7 +861,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1153088983}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1b54aba751aa810bb8b52d5b5b3371ba, type: 3}
+  m_Script: {fileID: 11500000, guid: e0fc0c0be6900c80b84ecc4b95b4d48f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1001 &1810595696

@@ -229,10 +229,19 @@ namespace HereticalSolutions.ResourceManagement
 			UpdateDefaultVariant();
 
 			if (allocate)
-				await variant
+			{
+				var task = variant
 					.StorageHandle
-					.Allocate(progress)
-					.ThrowExceptions<ResourceData>(logger);
+					.Allocate(progress);
+
+				await task;
+					//.ConfigureAwait(false);
+
+				await task
+					.ThrowExceptionsIfAny(
+						GetType(),
+						logger);
+			}
 
 			progress?.Report(1f);
 		}
@@ -260,10 +269,19 @@ namespace HereticalSolutions.ResourceManagement
 			UpdateDefaultVariant();
 
 			if (free)
-				await variant
+			{
+				var task = variant
 					.StorageHandle
-					.Free(progress)
-					.ThrowExceptions<ResourceData>(logger);
+					.Free(progress);
+
+				await task;
+					//.ConfigureAwait(false);
+
+				await task
+					.ThrowExceptionsIfAny(
+						GetType(),
+						logger);
+			}
 
 			progress?.Report(1f);
 		}
@@ -273,11 +291,18 @@ namespace HereticalSolutions.ResourceManagement
 			bool free = true,
 			IProgress<float> progress = null)
 		{
-			await RemoveVariant(
+			var task = RemoveVariant(
 				variantID.AddressToHash(),
 				free,
-				progress)
-				.ThrowExceptions<ResourceData>(logger);
+				progress);
+
+			await task;
+				//.ConfigureAwait(false);
+
+			await task
+				.ThrowExceptionsIfAny(
+					GetType(),
+					logger);
 		}
 
 		private void UpdateDefaultVariant()
@@ -325,10 +350,17 @@ namespace HereticalSolutions.ResourceManagement
 							counter,
 							totalVariantsCount);
 					
-						await variant
+						var task = variant
 							.StorageHandle
-							.Free(localProgress)
-							.ThrowExceptions<ResourceData>(logger);
+							.Free(localProgress);
+
+						await task;
+							//.ConfigureAwait(false);
+
+						await task
+							.ThrowExceptionsIfAny(
+								GetType(),
+								logger);
 					}
 				}
 
@@ -393,11 +425,20 @@ namespace HereticalSolutions.ResourceManagement
 			nestedResourcesRepository.TryRemove(nestedResourceIDHash);
 
 			if (free)
-				await ((IResourceData)nestedResource)
+			{
+				var task = ((IResourceData)nestedResource)
 					.Clear(
 						free,
-						progress)
-					.ThrowExceptions<ResourceData>(logger);
+						progress);
+
+				await task;
+					//.ConfigureAwait(false);
+
+				await task
+					.ThrowExceptionsIfAny(
+						GetType(),
+						logger);
+			}
 
 			progress?.Report(1f);
 		}
@@ -407,11 +448,18 @@ namespace HereticalSolutions.ResourceManagement
 			bool free = true,
 			IProgress<float> progress = null)
 		{
-			await RemoveNestedResource(
+			var task = RemoveNestedResource(
 				nestedResourceID.AddressToHash(),
 				free,
-				progress)
-				.ThrowExceptions<ResourceData>(logger);
+				progress);
+
+			await task;
+				//.ConfigureAwait(false);
+
+			await task
+				.ThrowExceptionsIfAny(
+					GetType(),
+					logger);
 		}
 
 		public async Task ClearAllNestedResources(
@@ -438,11 +486,18 @@ namespace HereticalSolutions.ResourceManagement
 						counter,
 						totalNestedResourcesCount);
 
-					await ((IResourceData)nestedResource)
+					var task = ((IResourceData)nestedResource)
 						.Clear(
 							free,
-							localProgress)
-						.ThrowExceptions<ResourceData>(logger);
+							localProgress);
+
+					await task;
+						//.ConfigureAwait(false);
+
+					await task
+						.ThrowExceptionsIfAny(
+							GetType(),
+							logger);
 				}
 
 				counter++;
@@ -467,10 +522,17 @@ namespace HereticalSolutions.ResourceManagement
 				0f,
 				0.5f);
 
-			await ClearAllVariants(
+			var clearAllVariantsTask = ClearAllVariants(
 				free,
-				localProgress)
-				.ThrowExceptions<ResourceData>(logger);
+				localProgress);
+
+			await clearAllVariantsTask;
+				//.ConfigureAwait(false);
+
+			await clearAllVariantsTask
+				.ThrowExceptionsIfAny(
+					GetType(),
+					logger);
 
 			progress?.Report(0.5f);
 
@@ -478,10 +540,17 @@ namespace HereticalSolutions.ResourceManagement
 				0.5f,
 				1f);
 
-			await ClearAllNestedResources(
+			var clearAllNestedResourcesTask = ClearAllNestedResources(
 				free,
-				localProgress)
-				.ThrowExceptions<ResourceData>(logger);
+				localProgress);
+
+			await clearAllNestedResourcesTask;
+				//.ConfigureAwait(false);
+
+			await clearAllNestedResourcesTask
+				.ThrowExceptionsIfAny(
+					GetType(),
+					logger);
 
 			defaultVariant = null;
 
@@ -510,7 +579,8 @@ namespace HereticalSolutions.ResourceManagement
 
 			if (dependencyResourceVariant == null)
 				throw new Exception(
-					logger.TryFormatException<ResourceData>(
+					logger.TryFormatException(
+						GetType(),
 						$"VARIANT {(string.IsNullOrEmpty(variantID) ? "NULL" : variantID)} DOES NOT EXIST"));
 
 			return dependencyResourceVariant;

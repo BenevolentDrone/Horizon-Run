@@ -5,6 +5,7 @@ using HereticalSolutions.Repositories;
 using HereticalSolutions.Repositories.Factories;
 
 using HereticalSolutions.Logging;
+using System.Threading.Tasks;
 
 
 namespace HereticalSolutions.Systems.Factories
@@ -108,6 +109,30 @@ namespace HereticalSolutions.Systems.Factories
 				finishNode,
 
 				logger: loggerResolver?.GetLogger<DelegateSystemBuilder>());
+		}
+
+		public static AsyncSystemBuilder BuildAsyncSystemBuilder(
+			ILoggerResolver loggerResolver = null)
+		{
+			PrepareSystemBuilderDependencies<Func<Task>, Func<Task>>(
+				out HashSet<IProcedureNode<Func<Task>>> allProcedureNodes,
+				out IRepository<string, IStageNode<Func<Task>>> stages,
+				out IRepository<Type, IList<IProcedureNode<Func<Task>>>> procedures,
+
+				out IStageNode<Func<Task>> startNode,
+				out IStageNode<Func<Task>> finishNode,
+
+				loggerResolver);
+
+			return new AsyncSystemBuilder(
+				allProcedureNodes,
+				stages,
+				procedures,
+
+				startNode,
+				finishNode,
+
+				logger: loggerResolver?.GetLogger<AsyncSystemBuilder>());
 		}
 	}
 }

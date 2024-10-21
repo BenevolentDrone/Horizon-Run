@@ -70,14 +70,21 @@ namespace HereticalSolutions.ResourceManagement
 			string variantID = null,
 			IProgress<float> progress = null)
 		{
-			return await ((IContainsDependencyResources)runtimeResourceManager)
+			var task = ((IContainsDependencyResources)runtimeResourceManager)
 				.LoadDependency(
 					path,
 					variantID,
-					progress)
-				.ThrowExceptions<IReadOnlyResourceStorageHandle>(
+					progress);
+
+			var result = await task;
+				//.ConfigureAwait(false);
+
+			await task
+				.ThrowExceptionsIfAny<IReadOnlyResourceStorageHandle>(
 					GetType(),
 					logger);
+
+			return result;
 		}
 
 		protected async Task ExecuteOnMainThread(

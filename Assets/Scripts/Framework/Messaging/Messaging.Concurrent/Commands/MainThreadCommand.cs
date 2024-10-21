@@ -78,7 +78,7 @@ namespace HereticalSolutions.Messaging.Concurrent
 				status = ECommandStatus.IN_PROGRESS;
 			}
 
-			//TODO: .ThrowExceptions() here
+			//TODO: .ThrowExceptionsIfAny() here
 			await AsyncDelegateToPerform?
 				.Invoke();
 

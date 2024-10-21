@@ -371,11 +371,20 @@ namespace HereticalSolutions.ResourceManagement
             rootResourceIDHashToID.TryRemove(rootResourceIDHash);
 
             if (free)
-                await ((IResourceData)resource)
+            {
+                var task = ((IResourceData)resource)
                     .Clear(
                         free,
-                        progress)
-                    .ThrowExceptions<RuntimeResourceManager>(logger);
+                        progress);
+
+                await task;
+                    //.ConfigureAwait(false);
+
+                await task
+                    .ThrowExceptionsIfAny(
+                        GetType(),
+                        logger);
+            }
 
             progress?.Report(1f);
         }
@@ -385,11 +394,18 @@ namespace HereticalSolutions.ResourceManagement
             bool free = true,
             IProgress<float> progress = null)
         {
-            await RemoveRootResource(
+            var task = RemoveRootResource(
                 rootResourceID.AddressToHash(),
                 free,
-                progress)
-                .ThrowExceptions<RuntimeResourceManager>(logger);
+                progress);
+
+            await task;
+                //.ConfigureAwait(false);
+
+            await task
+                .ThrowExceptionsIfAny(
+                    GetType(),
+                    logger);
         }
 
         public async Task ClearAllRootResources(
@@ -414,11 +430,18 @@ namespace HereticalSolutions.ResourceManagement
                         counter,
                         totalRootResourcesCount);
 
-                    await ((IResourceData)rootResource)
+                    var task = ((IResourceData)rootResource)
                         .Clear(
                             free,
-                            localProgress)
-                        .ThrowExceptions<RuntimeResourceManager>(logger);
+                            localProgress);
+
+                    await task;
+                        //.ConfigureAwait(false);
+
+                    await task
+                        .ThrowExceptionsIfAny(
+                            GetType(),
+                            logger);
                 }
 
                 counter++;
@@ -443,13 +466,26 @@ namespace HereticalSolutions.ResourceManagement
             string variantID = null,
             IProgress<float> progress = null)
         {
-            IReadOnlyResourceData dependencyResource = await GetDependencyResource(path)
-                .ThrowExceptions<IReadOnlyResourceData, RuntimeResourceManager>(
+            var getDependencyResourceTask = GetDependencyResource(path);
+
+            IReadOnlyResourceData dependencyResource = await getDependencyResourceTask;
+                //.ConfigureAwait(false);
+
+            await getDependencyResourceTask
+                .ThrowExceptionsIfAny(
+                    GetType(),
                     logger);
 
-            IResourceVariantData dependencyVariantData = await ((IContainsDependencyResourceVariants)dependencyResource)
-                .GetDependencyResourceVariant(variantID)
-                .ThrowExceptions<IResourceVariantData, RuntimeResourceManager>(
+            var getDependencyVariantTask = ((IContainsDependencyResourceVariants)dependencyResource)
+                .GetDependencyResourceVariant(variantID);
+
+
+            IResourceVariantData dependencyVariantData = await getDependencyVariantTask;
+                //.ConfigureAwait(false);
+
+            await getDependencyVariantTask
+                .ThrowExceptionsIfAny(
+                    GetType(),
                     logger);
 
             progress?.Report(0.5f);
@@ -462,10 +498,16 @@ namespace HereticalSolutions.ResourceManagement
                     0.5f,
                     1f);
 
-                await dependencyStorageHandle
+                var allocateTask = dependencyStorageHandle
                     .Allocate(
-                        localProgress)
-                    .ThrowExceptions<RuntimeResourceManager>(
+                        localProgress);
+
+                await allocateTask;
+                    //.ConfigureAwait(false);
+
+                await allocateTask
+                    .ThrowExceptionsIfAny(
+                        GetType(),
                         logger);
             }
 
@@ -482,7 +524,8 @@ namespace HereticalSolutions.ResourceManagement
 
             if (dependencyResource == null)
                 throw new Exception(
-                    logger.TryFormatException<RuntimeResourceManager>(
+                    logger.TryFormatException(
+                        GetType(),
                         $"RESOURCE {path} DOES NOT EXIST"));
 
             return dependencyResource;

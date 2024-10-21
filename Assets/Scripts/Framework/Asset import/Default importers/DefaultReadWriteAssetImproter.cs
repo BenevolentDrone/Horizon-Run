@@ -39,15 +39,26 @@ namespace HereticalSolutions.AssetImport
 		public override async Task<IResourceVariantData> Import(
 			IProgress<float> progress = null)
 		{
-			logger?.Log<DefaultReadWriteAssetImporter<TAsset>>(
+			logger?.Log(
+				GetType(),
 				$"IMPORTING {resourcePath} INITIATED");
 
 			progress?.Report(0f);
 
-			var result = await AddAssetAsResourceVariant(
-				await GetOrCreateResourceData(
-					resourcePath)
-					.ThrowExceptions<IResourceData, DefaultReadWriteAssetImporter<TAsset>>(logger),
+			var getOrCreateResourceTask = GetOrCreateResourceData(
+				resourcePath);
+
+			var resource = await getOrCreateResourceTask;
+				//.ConfigureAwait(false);
+
+			await getOrCreateResourceTask
+				.ThrowExceptionsIfAny(
+					GetType(),
+					logger);
+
+
+			var addAsVariantTask = AddAssetAsResourceVariant(
+				resource,
 				new ResourceVariantDescriptor()
 				{
 					VariantID = string.Empty,
@@ -69,12 +80,20 @@ namespace HereticalSolutions.AssetImport
 					loggerResolver),
 #endif
 				true,
-				progress)
-				.ThrowExceptions<IResourceVariantData, DefaultReadWriteAssetImporter<TAsset>>(logger);
+				progress);
+
+			var result = await addAsVariantTask;
+				//.ConfigureAwait(false);
+
+			await addAsVariantTask
+				.ThrowExceptionsIfAny(
+					GetType(),
+					logger);
 
 			progress?.Report(1f);
 
-			logger?.Log<DefaultReadWriteAssetImporter<TAsset>>(
+			logger?.Log(
+				GetType(),
 				$"IMPORTING {resourcePath} FINISHED");
 
 			return result;

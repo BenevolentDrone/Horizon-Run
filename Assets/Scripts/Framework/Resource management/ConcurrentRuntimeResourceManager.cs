@@ -614,11 +614,18 @@ namespace HereticalSolutions.ResourceManagement
 					0.5f,
 					1f);
 
-				await ((IResourceData)resource)
+				var task = ((IResourceData)resource)
 					.Clear(
 						free,
-						localProgress)
-					.ThrowExceptions<ConcurrentRuntimeResourceManager>(logger);
+						localProgress);
+
+				await task;
+					//.ConfigureAwait(false);
+
+				await task
+					.ThrowExceptionsIfAny(
+						GetType(),
+						logger);
 			}
 
 			progress?.Report(1f);
@@ -629,11 +636,18 @@ namespace HereticalSolutions.ResourceManagement
 			bool free = true,
 			IProgress<float> progress = null)
 		{
-			await RemoveRootResource(
+			var task = RemoveRootResource(
 				rootResourceID.AddressToHash(),
 				free,
-				progress)
-				.ThrowExceptions<ConcurrentRuntimeResourceManager>(logger);
+				progress);
+
+			await task;
+				//.ConfigureAwait(false);
+
+			await task
+				.ThrowExceptionsIfAny(
+					GetType(),
+					logger);
 		}
 
 		public async Task ClearAllRootResources(
@@ -677,11 +691,18 @@ namespace HereticalSolutions.ResourceManagement
 						i,
 						rootResourcesToFreeCount);
 
-					await rootResource
+					var task = rootResource
 						.Clear(
 							free,
-							localProgress)
-						.ThrowExceptions<ConcurrentRuntimeResourceManager>(logger);
+							localProgress);
+
+					await task;
+						//.ConfigureAwait(false);
+
+					await task
+						.ThrowExceptionsIfAny(
+							GetType(),
+							logger);
 
 					progress?.Report((float)(i + 2) / (float)totalStepsCount); // +1 for clearing the repo, +1 because the step is actually finished
 				}
@@ -702,7 +723,9 @@ namespace HereticalSolutions.ResourceManagement
 
 			semaphore.Wait();
 
-			//logger?.Log<ConcurrentResourceData>($"GetRootResourceWhenAvailable SEMAPHORE ACQUIRED");
+			logger?.Log(
+				GetType(),
+				$"GetRootResourceWhenAvailable SEMAPHORE ACQUIRED");
 
 			try
 			{
@@ -713,62 +736,121 @@ namespace HereticalSolutions.ResourceManagement
 					return result;
 				}
 
-				waitForNotificationTask = await rootResourceAddedNotifier
-					.GetWaitForNotificationTask(rootResourceIDHash)
-					.ThrowExceptions<Task<IReadOnlyResourceData>, ConcurrentRuntimeResourceManager>(logger);
+				var getWaitForNotificationTask = rootResourceAddedNotifier
+					.GetWaitForNotificationTask(rootResourceIDHash);
+
+				waitForNotificationTask = await getWaitForNotificationTask;
+					//.ConfigureAwait(false);
+					
+				await waitForNotificationTask
+					.ThrowExceptionsIfAny(
+						GetType(),
+						logger);
 			}
 			finally
 			{
 				semaphore.Release();
 
-				//logger?.Log<ConcurrentResourceData>($"GetRootResourceWhenAvailable SEMAPHORE RELEASED");
+				logger?.Log(
+					GetType(),
+					$"GetRootResourceWhenAvailable SEMAPHORE RELEASED");
 			}
 
 			/*
 			return await rootResourceAddedNotifier
-				.GetValueWhenNotified(resourceIDHash)
-				.ThrowExceptions<IReadOnlyResourceData, ConcurrentRuntimeResourceManager>(logger);
+				.GetValueWhenNotified(resourceIDHash);
 			*/
 
-			//logger?.Log<ConcurrentResourceData>($"GetRootResourceWhenAvailable AWAITING INITIATED");
+			logger?.Log(
+				GetType(),
+				$"GetRootResourceWhenAvailable AWAITING INITIATED");
 
-			var awaitedResult = await waitForNotificationTask
-				.ThrowExceptions<IReadOnlyResourceData, ConcurrentRuntimeResourceManager>(logger);
+			var awaitedResult = await waitForNotificationTask;
+				//.ConfigureAwait(false);
 
-			//logger?.Log<ConcurrentResourceData>($"GetRootResourceWhenAvailable AWAITING FINISHED");
+			await waitForNotificationTask
+				.ThrowExceptionsIfAny(
+					GetType(),
+					logger);
+
+			logger?.Log(
+				GetType(),
+				$"GetRootResourceWhenAvailable AWAITING FINISHED");
 
 			return awaitedResult;
 		}
 
-		public async Task<IReadOnlyResourceData> GetRootResourceWhenAvailable(string rootResourceID)
+		public async Task<IReadOnlyResourceData> GetRootResourceWhenAvailable(
+			string rootResourceID)
 		{
-			return await GetRootResourceWhenAvailable(
-				rootResourceID.AddressToHash())
-				.ThrowExceptions<IReadOnlyResourceData, ConcurrentRuntimeResourceManager>(logger);
+			var task = GetRootResourceWhenAvailable(
+				rootResourceID.AddressToHash());
+
+			var result = await task;
+				//.ConfigureAwait(false);
+
+			await task
+				.ThrowExceptionsIfAny(
+					GetType(),
+					logger);
+
+			return result;
 		}
 
 		public async Task<IReadOnlyResourceData> GetResourceWhenAvailable(int[] resourcePathPartHashes)
 		{
-			var result = await GetRootResourceWhenAvailable(
-				resourcePathPartHashes[0])
-				.ThrowExceptions<IReadOnlyResourceData, ConcurrentRuntimeResourceManager>(logger);
+			var getRootResourceTask = GetRootResourceWhenAvailable(
+				resourcePathPartHashes[0]);
 
-			return await GetNestedResourceWhenAvailableRecursive(
-				result,
-				resourcePathPartHashes)
-				.ThrowExceptions<IReadOnlyResourceData, ConcurrentRuntimeResourceManager>(logger);
+			var rootResource = await getRootResourceTask;
+				//.ConfigureAwait(false);
+
+			await getRootResourceTask
+				.ThrowExceptionsIfAny(
+					GetType(),
+					logger);
+
+			var getNestedResourceTask = GetNestedResourceWhenAvailableRecursive(
+				rootResource,
+				resourcePathPartHashes);
+
+			var result = await getNestedResourceTask;
+				//.ConfigureAwait(false);
+
+			await getNestedResourceTask
+				.ThrowExceptionsIfAny(
+					GetType(),
+					logger);
+
+			return result;
 		}
 
 		public async Task<IReadOnlyResourceData> GetResourceWhenAvailable(string[] resourcePathParts)
 		{
-			var result = await GetRootResourceWhenAvailable(
-				resourcePathParts[0])
-				.ThrowExceptions<IReadOnlyResourceData, ConcurrentRuntimeResourceManager>(logger);
+			var getRootResourceTask = GetRootResourceWhenAvailable(
+				resourcePathParts[0]);
 
-			return await GetNestedResourceWhenAvailableRecursive(
-				result,
-				resourcePathParts)
-				.ThrowExceptions<IReadOnlyResourceData, ConcurrentRuntimeResourceManager>(logger);
+			var rootResource = await getRootResourceTask;
+				//.ConfigureAwait(false);
+
+			await getRootResourceTask
+				.ThrowExceptionsIfAny(
+					GetType(),
+					logger);
+
+			var getNestedResourceTask = GetNestedResourceWhenAvailableRecursive(
+				rootResource,
+				resourcePathParts);
+
+			var result = await getNestedResourceTask;
+				//.ConfigureAwait(false);
+
+			await getNestedResourceTask
+				.ThrowExceptionsIfAny(
+					GetType(),
+					logger);
+
+			return result;
 		}
 
 		#endregion
@@ -777,42 +859,86 @@ namespace HereticalSolutions.ResourceManagement
 
 		public async Task<IResourceVariantData> GetDefaultRootResourceWhenAvailable(int rootResourceIDHash)
 		{
-			var rootResource = await GetRootResourceWhenAvailable(rootResourceIDHash)
-				.ThrowExceptions<IReadOnlyResourceData, ConcurrentRuntimeResourceManager>(logger);
+			var task = GetRootResourceWhenAvailable(rootResourceIDHash);
+
+			var rootResource = await task;
+				//.ConfigureAwait(false);
+
+			await task
+				.ThrowExceptionsIfAny(
+					GetType(),
+					logger);
 
 			return rootResource.DefaultVariant;
 		}
 
 		public async Task<IResourceVariantData> GetDefaultRootResourceWhenAvailable(string rootResourceID)
 		{
-			var rootResource = await GetRootResourceWhenAvailable(rootResourceID)
-				.ThrowExceptions<IReadOnlyResourceData, ConcurrentRuntimeResourceManager>(logger);
+			var task = GetRootResourceWhenAvailable(rootResourceID);
+
+			var rootResource = await task;
+				//.ConfigureAwait(false);
+
+			await task
+				.ThrowExceptionsIfAny(
+					GetType(),
+					logger);
 
 			return rootResource.DefaultVariant;
 		}
 
-		public async Task<IResourceVariantData> GetDefaultResourceWhenAvailable(int[] resourcePathPartHashes)
+		public async Task<IResourceVariantData> GetDefaultResourceWhenAvailable(
+			int[] resourcePathPartHashes)
 		{
-			var result = await GetRootResourceWhenAvailable(resourcePathPartHashes[0])
-				.ThrowExceptions<IReadOnlyResourceData, ConcurrentRuntimeResourceManager>(logger);
+			var getRootResourceTask = GetRootResourceWhenAvailable(resourcePathPartHashes[0]);
 
-			result = await GetNestedResourceWhenAvailableRecursive(
-				result,
-				resourcePathPartHashes)
-				.ThrowExceptions<IReadOnlyResourceData, ConcurrentRuntimeResourceManager>(logger);
+			var rootResource = await getRootResourceTask;
+				//.ConfigureAwait(false);
+
+			await getRootResourceTask
+				.ThrowExceptionsIfAny(
+					GetType(),
+					logger);
+
+			var getNestedResourceTask = GetNestedResourceWhenAvailableRecursive(
+				rootResource,
+				resourcePathPartHashes);
+
+			var result = await getNestedResourceTask;
+				//.ConfigureAwait(false);
+
+			await getNestedResourceTask
+				.ThrowExceptionsIfAny(
+					GetType(),
+					logger);
 
 			return result.DefaultVariant;
 		}
 
-		public async Task<IResourceVariantData> GetDefaultResourceWhenAvailable(string[] resourcePathParts)
+		public async Task<IResourceVariantData> GetDefaultResourceWhenAvailable(
+			string[] resourcePathParts)
 		{
-			var result = await GetRootResourceWhenAvailable(resourcePathParts[0])
-				.ThrowExceptions<IReadOnlyResourceData, ConcurrentRuntimeResourceManager>(logger);
+			var getRootResourceTask = GetRootResourceWhenAvailable(resourcePathParts[0]);
 
-			result = await GetNestedResourceWhenAvailableRecursive(
-				result,
-				resourcePathParts)
-				.ThrowExceptions<IReadOnlyResourceData, ConcurrentRuntimeResourceManager>(logger);
+			var rootResource = await getRootResourceTask;
+				//.ConfigureAwait(false);
+
+			await getRootResourceTask
+				.ThrowExceptionsIfAny(
+					GetType(),
+					logger);
+
+			var getNestedResourceTask = GetNestedResourceWhenAvailableRecursive(
+				rootResource,
+				resourcePathParts);
+
+			var result = await getNestedResourceTask;
+				//.ConfigureAwait(false);
+
+			await getNestedResourceTask
+				.ThrowExceptionsIfAny(
+					GetType(),
+					logger);
 
 			return result.DefaultVariant;
 		}
@@ -828,14 +954,27 @@ namespace HereticalSolutions.ResourceManagement
 			string variantID = null,
 			IProgress<float> progress = null)
 		{
-			IReadOnlyResourceData dependencyResource = await GetDependencyResource(path)
-				.ThrowExceptions<IReadOnlyResourceData, ConcurrentRuntimeResourceManager>(
+			var getDependencyResourceTask = GetDependencyResource(path);
+
+			IReadOnlyResourceData dependencyResource = await getDependencyResourceTask;
+				//.ConfigureAwait(false);
+
+			await getDependencyResourceTask
+				.ThrowExceptionsIfAny(
+					GetType(),
 					logger);
 
-			IResourceVariantData dependencyVariantData = await ((IContainsDependencyResourceVariants)dependencyResource)
-				.GetDependencyResourceVariant(variantID)
-				.ThrowExceptions<IResourceVariantData, ConcurrentRuntimeResourceManager>(
+			var getDependencyVariantTask = ((IContainsDependencyResourceVariants)dependencyResource)
+				.GetDependencyResourceVariant(variantID);
+
+			IResourceVariantData dependencyVariantData = await getDependencyVariantTask;
+				//.ConfigureAwait(false);
+
+			await getDependencyVariantTask
+				.ThrowExceptionsIfAny(
+					GetType(),
 					logger);
+
 
 			progress?.Report(0.5f);
 
@@ -847,10 +986,16 @@ namespace HereticalSolutions.ResourceManagement
 					0.5f,
 					1f);
 
-				await dependencyStorageHandle
+				var allocateTask = dependencyStorageHandle
 					.Allocate(
-						localProgress)
-					.ThrowExceptions<ConcurrentRuntimeResourceManager>(
+						localProgress);
+
+				await allocateTask;
+					//.ConfigureAwait(false);
+
+				await allocateTask	
+					.ThrowExceptionsIfAny(
+						GetType(),
 						logger);
 			}
 
@@ -862,10 +1007,18 @@ namespace HereticalSolutions.ResourceManagement
 		public async Task<IReadOnlyResourceData> GetDependencyResource(
 			string path)
 		{
-			return await GetResourceWhenAvailable(
-				path.SplitAddressBySeparator())
-				.ThrowExceptions<IReadOnlyResourceData, ConcurrentRuntimeResourceManager>(
+			var task = GetResourceWhenAvailable(
+				path.SplitAddressBySeparator());
+
+			var result = await task;
+				//.ConfigureAwait(false);
+
+			await task
+				.ThrowExceptionsIfAny(
+					GetType(),
 					logger);
+
+			return result;
 		}
 
 		#endregion
@@ -946,13 +1099,21 @@ namespace HereticalSolutions.ResourceManagement
 
 				if (concurrentCurrentData == null)
 					throw new Exception(
-						logger.TryFormatException<ConcurrentRuntimeResourceManager>(
+						logger.TryFormatException(
+							GetType(),
 							$"RESOURCE DATA {currentData.Descriptor.ID} IS NOT CONCURRENT"));
 
-				currentData = await concurrentCurrentData
+				var task = concurrentCurrentData
 					.GetNestedResourceWhenAvailable(
-						resourcePathPartHashes[i])
-					.ThrowExceptions<IReadOnlyResourceData, ConcurrentRuntimeResourceManager>(logger);
+						resourcePathPartHashes[i]);
+
+				currentData = await task;
+					//.ConfigureAwait(false);
+
+				await task
+					.ThrowExceptionsIfAny(
+						GetType(),
+						logger);
 			}
 
 			return currentData;
@@ -968,13 +1129,21 @@ namespace HereticalSolutions.ResourceManagement
 
 				if (concurrentCurrentData == null)
 					throw new Exception(
-						logger.TryFormatException<ConcurrentRuntimeResourceManager>(
+						logger.TryFormatException(
+							GetType(),
 							$"RESOURCE DATA {currentData.Descriptor.ID} IS NOT CONCURRENT"));
 
-				currentData = await concurrentCurrentData
+				var task = concurrentCurrentData
 					.GetNestedResourceWhenAvailable(
-						resourcePathParts[i])
-					.ThrowExceptions<IReadOnlyResourceData, ConcurrentRuntimeResourceManager>(logger);
+						resourcePathParts[i]);
+
+				currentData = await task;
+					//.ConfigureAwait(false);
+
+				await task
+					.ThrowExceptionsIfAny(
+						GetType(),
+						logger);
 			}
 
 			return currentData;

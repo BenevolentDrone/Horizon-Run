@@ -31,7 +31,7 @@ namespace HereticalSolutions.Systems
 
 		public byte ExpectedThread { get; set; }
 
-		public TProcedure Procedure { get; private set; }
+		public TProcedure Procedure { get; set; }
 
 		public Type ProcedureType
 		{

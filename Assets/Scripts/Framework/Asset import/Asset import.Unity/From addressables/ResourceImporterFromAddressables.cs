@@ -56,13 +56,15 @@ namespace HereticalSolutions.AssetImport
                     if (!resourceAssetReference.RuntimeKeyIsValid())
                     {
                         // Log an error if the runtime key is invalid for the asset
-                        logger?.LogError<ResourceImporterFromAddressables>(
+                        logger?.LogError(
+                            GetType(),
                             $"RUNTIME KEY IS INVALID FOR ASSET {resourceDataSettings.ResourceID} VARIANT {resourceVariantDataSettings.VariantID}");
 
                         continue;
                     }
 
-                    logger?.Log<ResourceImporterFromAddressables>(
+                    logger?.Log(
+                        GetType(),
                         $"IMPORTING {resourceID} INITIATED");
 
                     IProgress<float> localProgress = progress.CreateLocalProgressForStep(
@@ -71,10 +73,21 @@ namespace HereticalSolutions.AssetImport
                         resourcesLoaded,
                         totalResources);
 
-                    var localResult = await AddAssetAsResourceVariant(
-                        await GetOrCreateResourceData(
-                            resourceID)
-                            .ThrowExceptions<IResourceData, ResourceImporterFromAddressables>(logger),
+
+                    var getOrCreateResourceTask = GetOrCreateResourceData(
+                        resourceID);
+
+                    var resource = await getOrCreateResourceTask;
+                        //.ConfigureAwait(false);
+
+                    await getOrCreateResourceTask
+                        .ThrowExceptionsIfAny(
+                            GetType(),
+                            logger);
+
+
+                    var addAsVariantTask = AddAssetAsResourceVariant(
+                        resource,
                         new ResourceVariantDescriptor()
                         {
                             VariantID = variantID,
@@ -89,10 +102,19 @@ namespace HereticalSolutions.AssetImport
                             runtimeResourceManager,
                             loggerResolver),
                         true,
-                        localProgress)
-                        .ThrowExceptions<IResourceVariantData, ResourceImporterFromAddressables>(logger);
+                        localProgress);
 
-                    logger?.Log<ResourceImporterFromAddressables>(
+                    await addAsVariantTask;
+                        //.ConfigureAwait(false);
+
+                    await addAsVariantTask
+                        .ThrowExceptionsIfAny(
+                            GetType(),
+                            logger);
+                            
+
+                    logger?.Log(
+                        GetType(),
                         $"IMPORTING {resourceID} FINISHED");
 
                     resourcesLoaded++;

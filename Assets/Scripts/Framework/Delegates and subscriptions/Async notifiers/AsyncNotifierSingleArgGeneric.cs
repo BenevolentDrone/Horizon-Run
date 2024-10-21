@@ -59,11 +59,18 @@ namespace HereticalSolutions.Delegates.Notifiers
 				$"GetValueWhenNotified SEMAPHORE RELEASED");
 
 
-			await completionSource
-				.Task
-				.ThrowExceptions<TValue, AsyncNotifierSingleArgGeneric<TArgument, TValue>>(logger);
+			var task = completionSource
+				.Task;
 
-			return completionSource.Task.Result;
+			await task;
+				//.ConfigureAwait(false);
+
+			await task
+				.ThrowExceptionsIfAny(
+					GetType(),
+					logger);
+
+			return task.Result;
 		}
 
 		public async Task<Task<TValue>> GetWaitForNotificationTask(
@@ -99,11 +106,18 @@ namespace HereticalSolutions.Delegates.Notifiers
 		private async Task<TValue> GetValueFromCompletionSource(
 			TaskCompletionSource<TValue> completionSource)
 		{
-			await completionSource
-				.Task
-				.ThrowExceptions<TValue, AsyncNotifierSingleArgGeneric<TArgument, TValue>>(logger);
+			var task = completionSource
+				.Task;
 
-			return completionSource.Task.Result;
+			await task;
+				//.ConfigureAwait(false);
+
+			await task
+				.ThrowExceptionsIfAny(
+					GetType(),
+					logger);
+
+			return task.Result;
 		}
 
 		public async Task Notify(

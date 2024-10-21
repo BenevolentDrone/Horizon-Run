@@ -80,9 +80,14 @@ namespace HereticalSolutions.AssetImport
 						loggerResolver);
 #endif
 
-				await runtimeResourceManager.AddRootResource(
-					currentData)
-					.ThrowExceptions(
+				var addRootResourceTask = runtimeResourceManager.AddRootResource(
+					currentData);
+
+				await addRootResourceTask;
+					//.ConfigureAwait(false);
+
+				await addRootResourceTask
+					.ThrowExceptionsIfAny(
 						GetType(),
 						logger);
 			}
@@ -120,10 +125,15 @@ namespace HereticalSolutions.AssetImport
 							loggerResolver);
 #endif
 
-					await ((IResourceData)currentData)
+					var addNestedResourceTask = ((IResourceData)currentData)
 						.AddNestedResource(
-							newCurrentData)
-						.ThrowExceptions(
+							newCurrentData);
+
+					await addNestedResourceTask;
+						//.ConfigureAwait(false);
+
+					await addNestedResourceTask
+						.ThrowExceptionsIfAny(
 							GetType(),
 							logger);
 
@@ -138,9 +148,14 @@ namespace HereticalSolutions.AssetImport
 			string parentResourcePath,
 			string nestedResourceID)
 		{
-			var parent = await GetOrCreateResourceData(
-				parentResourcePath)
-				.ThrowExceptions(
+			var getOrCreateResourceTask = GetOrCreateResourceData(
+				parentResourcePath);
+
+			var parent = await getOrCreateResourceTask;
+				//.ConfigureAwait(false);
+
+			await getOrCreateResourceTask
+				.ThrowExceptionsIfAny(
 					GetType(),
 					logger);
 
@@ -164,10 +179,15 @@ namespace HereticalSolutions.AssetImport
 					loggerResolver);
 #endif
 
-			await parent
+			var addNestedResourceTask = parent
 				.AddNestedResource(
-					child)
-				.ThrowExceptions(
+					child);
+
+			await addNestedResourceTask;
+				//.ConfigureAwait(false);
+
+			await addNestedResourceTask
+				.ThrowExceptionsIfAny(
 					GetType(),
 					logger);
 
@@ -188,12 +208,17 @@ namespace HereticalSolutions.AssetImport
 				resourceStorageHandle,
 				resourceData);
 
-			await resourceData
+			var task = resourceData
 				.AddVariant(
 					variantData,
 					allocate,
-					progress)
-				.ThrowExceptions(
+					progress);
+
+			await task;
+				//.ConfigureAwait(false);
+
+			await task
+				.ThrowExceptionsIfAny(
 					GetType(),
 					logger);
 
@@ -215,14 +240,21 @@ namespace HereticalSolutions.AssetImport
 						"RUNTIME RESOURCE MANAGER IS NOT INITIALIZED"));
 			}
 
-			return await ((IContainsDependencyResources)runtimeResourceManager)
+			var task = ((IContainsDependencyResources)runtimeResourceManager)
 				.LoadDependency(
 					path,
 					variantID,
-					progress)
-				.ThrowExceptions<IReadOnlyResourceStorageHandle>(
+					progress);
+
+			var result = await task;
+				//.ConfigureAwait(false);
+
+			await task
+				.ThrowExceptionsIfAny(
 					GetType(),
 					logger);
+
+			return result;
 		}
 	}
 }

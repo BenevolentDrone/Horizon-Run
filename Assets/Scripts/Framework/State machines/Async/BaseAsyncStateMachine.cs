@@ -400,15 +400,20 @@ namespace HereticalSolutions.StateMachines
             {
                 try
                 {
-                    await PerformTransition(
+                    var task = PerformTransition(
                         previousState,
                         newState,
                         defaultAsyncTransitionRules,
                         transitToImmediatelyCancellationTokenSource.Token,
                         stateExitProgress,
                         stateEnterProgress,
-                        protocol)
-                        .ThrowExceptions(
+                        protocol);
+
+                    await task;
+                        //.ConfigureAwait(false);
+
+                    await task
+                        .ThrowExceptionsIfAny(
                             GetType(),
                             logger);
                 }
@@ -451,15 +456,20 @@ namespace HereticalSolutions.StateMachines
             {
                 try
                 {
-                    await PerformTransition(
+                    var task = PerformTransition(
                         previousState,
                         newState,
                         defaultAsyncTransitionRules,
                         transitToImmediatelyCancellationTokenSource.Token,
                         stateExitProgress,
                         stateEnterProgress,
-                        protocol)
-                        .ThrowExceptions(
+                        protocol);
+
+                    await task;
+                        //.ConfigureAwait(false);
+
+                    await task
+                        .ThrowExceptionsIfAny(
                             GetType(),
                             logger);
                 }
@@ -503,15 +513,20 @@ namespace HereticalSolutions.StateMachines
             {
                 try
                 {
-                    await PerformTransition(
+                    var task = PerformTransition(
                         previousState,
                         newState,
                         defaultAsyncTransitionRules,
                         transitToImmediatelyCancellationTokenSource.Token,
                         stateExitProgress,
                         stateEnterProgress,
-                        protocol)
-                        .ThrowExceptions(
+                        protocol);
+
+                    await task;
+                        //.ConfigureAwait(false);
+
+                    await task
+                        .ThrowExceptionsIfAny(
                             GetType(),
                             logger);
                 }
@@ -556,15 +571,20 @@ namespace HereticalSolutions.StateMachines
             {
                 try
                 {
-                    await PerformTransition(
+                    var task = PerformTransition(
                         previousState,
                         newState,
                         defaultAsyncTransitionRules,
                         transitToImmediatelyCancellationTokenSource.Token,
                         stateExitProgress,
                         stateEnterProgress,
-                        protocol)
-                        .ThrowExceptions(
+                        protocol);
+
+                    await task;
+                        //.ConfigureAwait(false);
+
+                    await task
+                        .ThrowExceptionsIfAny(
                             GetType(),
                             logger);
                 }
@@ -604,13 +624,18 @@ namespace HereticalSolutions.StateMachines
                 {
                     try
                     {
-                        await PerformTransition(
+                        var task = PerformTransition(
                             nextRequest.Event,
                             nextRequest.CancellationTokenSource.Token,
                             nextRequest.StateExitProgress,
                             nextRequest.StateEnterProgress,
-                            nextRequest.TransitionProtocol)
-                            .ThrowExceptions(
+                            nextRequest.TransitionProtocol);
+
+                        await task;
+                            //.ConfigureAwait(false);
+
+                        await task
+                            .ThrowExceptionsIfAny(
                                 GetType(),
                                 logger);
                     }
@@ -693,15 +718,20 @@ namespace HereticalSolutions.StateMachines
             if (@event is TransitionEventWithRules<TBaseState>)
                 rules = ((TransitionEventWithRules<TBaseState>)@event).Rules;
 
-            await PerformTransition(
+            var task = PerformTransition(
                 previousState,
                 newState,
                 rules,
                 cancellationToken,
                 stateExitProgress,
                 stateEnterProgress,
-                protocol)
-                .ThrowExceptions(
+                protocol);
+
+            await task;
+                //.ConfigureAwait(false);
+
+            await task
+                .ThrowExceptionsIfAny(
                     GetType(),
                     logger);
         }
@@ -725,12 +755,17 @@ namespace HereticalSolutions.StateMachines
                             previousState,
                             newState);
 
-                        await ExitState(
+                        var exitStateTask1 = ExitState(
                             previousState,
                             cancellationToken,
                             stateExitProgress,
-                            protocol)
-                            .ThrowExceptions(
+                            protocol);
+
+                        await exitStateTask1;
+                            //.ConfigureAwait(false);
+
+                        await exitStateTask1
+                            .ThrowExceptionsIfAny(
                                 GetType(),
                                 logger);
 
@@ -741,12 +776,17 @@ namespace HereticalSolutions.StateMachines
 
                         CurrentState = newState;
 
-                        await EnterState(
+                        var enterStateTask1 = EnterState(
                             newState,
                             cancellationToken,
                             stateEnterProgress,
-                            protocol)
-                            .ThrowExceptions(
+                            protocol);
+
+                        await enterStateTask1;
+                            //.ConfigureAwait(false);
+
+                        await enterStateTask1
+                            .ThrowExceptionsIfAny(
                                 GetType(),
                                 logger);
 
@@ -765,12 +805,17 @@ namespace HereticalSolutions.StateMachines
                             previousState,
                             newState);
 
-                        await EnterState(
+                        var enterStateTask2 = EnterState(
                             newState,
                             cancellationToken,
                             stateEnterProgress,
-                            protocol)
-                            .ThrowExceptions(
+                            protocol);
+
+                        await enterStateTask2;
+                            //.ConfigureAwait(false);
+
+                        await enterStateTask2
+                            .ThrowExceptionsIfAny(
                                 GetType(),
                                 logger);
 
@@ -781,12 +826,17 @@ namespace HereticalSolutions.StateMachines
                         
                         CurrentState = newState;
 
-                        await ExitState(
+                        var exitStateTask2 = ExitState(
                             previousState,
                             cancellationToken,
                             stateExitProgress,
-                            protocol)
-                            .ThrowExceptions(
+                            protocol);
+
+                        await exitStateTask2;
+                            //.ConfigureAwait(false);
+
+                        await exitStateTask2
+                            .ThrowExceptionsIfAny(
                                 GetType(),
                                 logger);
 
@@ -803,7 +853,7 @@ namespace HereticalSolutions.StateMachines
 
                         OnCurrentStateChangeStarted?.Invoke(previousState, newState);
 
-                        await Task
+                        var enterExitStateTask = Task
                             .WhenAll(
                                 EnterState(
                                     newState,
@@ -814,8 +864,13 @@ namespace HereticalSolutions.StateMachines
                                     previousState,
                                     cancellationToken,
                                     stateExitProgress,
-                                    protocol))
-                            .ThrowExceptions(
+                                    protocol));
+
+                        await enterExitStateTask;
+                            //.ConfigureAwait(false);
+
+                        await enterExitStateTask
+                            .ThrowExceptionsIfAny(
                                 GetType(),
                                 logger);
 
@@ -856,11 +911,16 @@ namespace HereticalSolutions.StateMachines
                 }
             }
 
-            await transitionController.ExitState(
+            var task = transitionController.ExitState(
                 previousState,
                 cancellationToken,
-                stateExitProgress)
-                .ThrowExceptions(
+                stateExitProgress);
+
+            await task;
+                //.ConfigureAwait(false);
+
+            await task
+                .ThrowExceptionsIfAny(
                     GetType(),
                     logger);
 
@@ -906,11 +966,16 @@ namespace HereticalSolutions.StateMachines
                 }
             }
                         
-            await transitionController.EnterState(
+            var task = transitionController.EnterState(
                 newState,
                 cancellationToken,
-                stateEnterProgress)
-                .ThrowExceptions(
+                stateEnterProgress);
+
+            await task;
+                //.ConfigureAwait(false);
+
+            await task
+                .ThrowExceptionsIfAny(
                     GetType(),
                     logger);
 

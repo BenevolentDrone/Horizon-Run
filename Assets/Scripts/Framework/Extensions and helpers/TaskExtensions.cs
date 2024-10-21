@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-using System.Runtime.CompilerServices;
-
 using System.Text;
 
 using HereticalSolutions.Logging;
@@ -25,516 +23,162 @@ namespace HereticalSolutions
 		//So I've changed it to the option provided here:
 		//https://stackoverflow.com/a/58469206
 
+		//Courtesy of https://blog.stephencleary.com/2015/01/a-tour-of-task-part-7-continuations.html
+
 		#region Task
 
-		public static ConfiguredTaskAwaitable LogExceptions(
-			this Task task,
-			bool awaitInSameContext = true)
+		public static async Task LogExceptionsIfAny(
+			this Task task)
 		{
-			return task
-				.ContinueWith(
-					targetTask =>
-					{
-						if (!targetTask.IsFaulted)
-						{
-							return;
-						}
+			await task;
 
-						StringBuilder stringBuilder = new StringBuilder();
-
-						stringBuilder.Append(TASK_EXCEPTION_PREFIX);
-
-						stringBuilder.Append(targetTask.Exception.Message);
-
-						stringBuilder.Append(INNER_EXCEPTIONS_SUFFIX);
-
-						stringBuilder.Append(INNER_EXCEPTION_DELIMITER);
-
-						foreach (var innerException in targetTask.Exception.InnerExceptions)
-						{
-							stringBuilder.Append(innerException.ToString());
-
-							stringBuilder.Append('\n');
-
-							stringBuilder.Append(INNER_EXCEPTION_DELIMITER);
-
-							stringBuilder.Append('\n');
-						}
-
-						Console.WriteLine(
-							stringBuilder.ToString());
-					})
-				.ConfigureAwait(awaitInSameContext);
+			LookForExceptions(
+				task,
+				Console.WriteLine);
 		}
 
-		public static ConfiguredTaskAwaitable ThrowExceptions(
-			this Task task,
-			bool awaitInSameContext = true)
+		public static async Task ThrowExceptionsIfAny(
+			this Task task)
 		{
-			return task
-				.ContinueWith(
-					targetTask =>
-					{
-						if (!targetTask.IsFaulted)
-						{
-							return;
-						}
+			await task;
 
-						StringBuilder stringBuilder = new StringBuilder();
-
-						stringBuilder.Append(TASK_EXCEPTION_PREFIX);
-
-						stringBuilder.Append(targetTask.Exception.Message);
-
-						stringBuilder.Append(INNER_EXCEPTIONS_SUFFIX);
-
-						stringBuilder.Append(INNER_EXCEPTION_DELIMITER);
-
-						foreach (var innerException in targetTask.Exception.InnerExceptions)
-						{
-							stringBuilder.Append(innerException.ToString());
-
-							stringBuilder.Append('\n');
-
-							stringBuilder.Append(INNER_EXCEPTION_DELIMITER);
-
-							stringBuilder.Append('\n');
-						}
-
-						throw new Exception(
-							stringBuilder.ToString());
-					})
-				.ConfigureAwait(awaitInSameContext);
+			LookForExceptions(
+				task,
+				exception => throw new Exception(
+					exception));
 		}
 
-		public static ConfiguredTaskAwaitable LogExceptions<TSource>(
+		public static async Task LogExceptionsIfAny<TSource>(
 			this Task task,
-			ILogger logger,
-			bool awaitInSameContext = true)
+			ILogger logger)
 		{
-			return task
-				.ContinueWith(
-					targetTask =>
-					{
-						if (!targetTask.IsFaulted)
-						{
-							return;
-						}
+			await task;
 
-						StringBuilder stringBuilder = new StringBuilder();
-
-						stringBuilder.Append(TASK_EXCEPTION_PREFIX);
-
-						stringBuilder.Append(targetTask.Exception.Message);
-
-						stringBuilder.Append(INNER_EXCEPTIONS_SUFFIX);
-
-						stringBuilder.Append(INNER_EXCEPTION_DELIMITER);
-
-						foreach (var innerException in targetTask.Exception.InnerExceptions)
-						{
-							stringBuilder.Append(innerException.ToString());
-
-							stringBuilder.Append('\n');
-
-							stringBuilder.Append(INNER_EXCEPTION_DELIMITER);
-
-							stringBuilder.Append('\n');
-						}
-
-						logger?.LogError<TSource>(
-							stringBuilder.ToString());
-					})
-				.ConfigureAwait(awaitInSameContext);
+			LookForExceptions(
+				task,
+				exception => logger?.LogError<TSource>(
+					exception));
 		}
 
-		public static ConfiguredTaskAwaitable ThrowExceptions<TSource>(
+		public static async Task ThrowExceptionsIfAny<TSource>(
 			this Task task,
-			ILogger logger,
-			bool awaitInSameContext = true)
+			ILogger logger)
 		{
-			return task
-				.ContinueWith(
-					targetTask =>
-					{
-						if (!targetTask.IsFaulted)
-						{
-							return;
-						}
+			await task;
 
-						StringBuilder stringBuilder = new StringBuilder();
-
-						stringBuilder.Append(TASK_EXCEPTION_PREFIX);
-
-						stringBuilder.Append(targetTask.Exception.Message);
-
-						stringBuilder.Append(INNER_EXCEPTIONS_SUFFIX);
-
-						stringBuilder.Append(INNER_EXCEPTION_DELIMITER);
-
-						foreach (var innerException in targetTask.Exception.InnerExceptions)
-						{
-							stringBuilder.Append(innerException.ToString());
-
-							stringBuilder.Append('\n');
-
-							stringBuilder.Append(INNER_EXCEPTION_DELIMITER);
-
-							stringBuilder.Append('\n');
-						}
-
-						throw new Exception(
-							logger.TryFormatException<TSource>(
-								stringBuilder.ToString()));
-					})
-				.ConfigureAwait(awaitInSameContext);
+			LookForExceptions(
+				task,
+				exception => throw new Exception(
+					logger.TryFormatException<TSource>(
+						exception)));
 		}
 
-		public static ConfiguredTaskAwaitable LogExceptions(
+		public static async Task LogExceptionsIfAny(
 			this Task task,
 			Type logSource,
-			ILogger logger,
-			bool awaitInSameContext = true)
+			ILogger logger)
 		{
-			return task
-				.ContinueWith(
-					targetTask =>
-					{
-						if (!targetTask.IsFaulted)
-						{
-							return;
-						}
+			await task;
 
-						StringBuilder stringBuilder = new StringBuilder();
-
-						stringBuilder.Append(TASK_EXCEPTION_PREFIX);
-
-						stringBuilder.Append(targetTask.Exception.Message);
-
-						stringBuilder.Append(INNER_EXCEPTIONS_SUFFIX);
-
-						stringBuilder.Append(INNER_EXCEPTION_DELIMITER);
-
-						foreach (var innerException in targetTask.Exception.InnerExceptions)
-						{
-							stringBuilder.Append(innerException.ToString());
-
-							stringBuilder.Append('\n');
-
-							stringBuilder.Append(INNER_EXCEPTION_DELIMITER);
-
-							stringBuilder.Append('\n');
-						}
-
-						logger?.LogError(
-							logSource,
-							stringBuilder.ToString());
-					})
-				.ConfigureAwait(awaitInSameContext);
+			LookForExceptions(
+				task,
+				exception => logger?.LogError(
+					logSource,
+					exception));
 		}
 
-		public static ConfiguredTaskAwaitable ThrowExceptions(
+		public static async Task ThrowExceptionsIfAny(
 			this Task task,
 			Type logSource,
-			ILogger logger,
-			bool awaitInSameContext = true)
+			ILogger logger)
 		{
-			return task
-				.ContinueWith(
-					targetTask =>
-					{
-						if (!targetTask.IsFaulted)
-						{
-							return;
-						}
+			await task;
 
-						StringBuilder stringBuilder = new StringBuilder();
-
-						stringBuilder.Append(TASK_EXCEPTION_PREFIX);
-
-						stringBuilder.Append(targetTask.Exception.Message);
-
-						stringBuilder.Append(INNER_EXCEPTIONS_SUFFIX);
-
-						stringBuilder.Append(INNER_EXCEPTION_DELIMITER);
-
-						foreach (var innerException in targetTask.Exception.InnerExceptions)
-						{
-							stringBuilder.Append(innerException.ToString());
-
-							stringBuilder.Append('\n');
-
-							stringBuilder.Append(INNER_EXCEPTION_DELIMITER);
-
-							stringBuilder.Append('\n');
-						}
-
-						throw new Exception(
-							logger.TryFormatException(
-								logSource,
-								stringBuilder.ToString()));
-					})
-				.ConfigureAwait(awaitInSameContext);
+			LookForExceptions(
+				task,
+				exception => throw new Exception(
+					logger.TryFormatException(
+						logSource,
+						exception)));
 		}
 
 		#endregion
 
 		#region Task<T>
 
-		public static ConfiguredTaskAwaitable<T> LogExceptions<T>(
-			this Task<T> task,
-			bool awaitInSameContext = true)
+		public static async Task LogExceptionsIfAny<T>(
+			this Task<T> task)
 		{
-			return task
-				.ContinueWith<T>(
-					targetTask =>
-					{
-						if (!targetTask.IsFaulted)
-						{
-							return targetTask.Result;
-						}
+			await task;
 
-						StringBuilder stringBuilder = new StringBuilder();
-
-						stringBuilder.Append(TASK_EXCEPTION_PREFIX);
-
-						stringBuilder.Append(targetTask.Exception.Message);
-
-						stringBuilder.Append(INNER_EXCEPTIONS_SUFFIX);
-
-						stringBuilder.Append(INNER_EXCEPTION_DELIMITER);
-
-						foreach (var innerException in targetTask.Exception.InnerExceptions)
-						{
-							stringBuilder.Append(innerException.ToString());
-
-							stringBuilder.Append('\n');
-
-							stringBuilder.Append(INNER_EXCEPTION_DELIMITER);
-
-							stringBuilder.Append('\n');
-						}
-
-						Console.WriteLine(
-							stringBuilder.ToString());
-
-						return default;
-					})
-				.ConfigureAwait(awaitInSameContext);
+			LookForExceptions(
+				task,
+				Console.WriteLine);
 		}
 
-		public static ConfiguredTaskAwaitable<T> ThrowExceptions<T>(
-			this Task<T> task,
-			bool awaitInSameContext = true)
+		public static async Task ThrowExceptionsIfAny<T>(
+			this Task<T> task)
 		{
-			return task
-				.ContinueWith<T>(
-					targetTask =>
-					{
-						if (!targetTask.IsFaulted)
-						{
-							return targetTask.Result;
-						}
+			await task;
 
-						StringBuilder stringBuilder = new StringBuilder();
-
-						stringBuilder.Append(TASK_EXCEPTION_PREFIX);
-
-						stringBuilder.Append(targetTask.Exception.Message);
-
-						stringBuilder.Append(INNER_EXCEPTIONS_SUFFIX);
-
-						stringBuilder.Append(INNER_EXCEPTION_DELIMITER);
-
-						foreach (var innerException in targetTask.Exception.InnerExceptions)
-						{
-							stringBuilder.Append(innerException.ToString());
-
-							stringBuilder.Append('\n');
-
-							stringBuilder.Append(INNER_EXCEPTION_DELIMITER);
-
-							stringBuilder.Append('\n');
-						}
-
-						throw new Exception(
-							stringBuilder.ToString());
-					})
-				.ConfigureAwait(awaitInSameContext);
+			LookForExceptions(
+				task,
+				exception => throw new Exception(
+					exception));
 		}
 
-		public static ConfiguredTaskAwaitable<T> LogExceptions<T, TSource>(
+		public static async Task LogExceptionsIfAny<T, TSource>(
 			this Task<T> task,
-			ILogger logger,
-			bool awaitInSameContext = true)
+			ILogger logger)
 		{
-			return task
-				.ContinueWith<T>(
-					targetTask =>
-					{
-						if (!targetTask.IsFaulted)
-						{
-							return targetTask.Result;
-						}
+			await task;
 
-						StringBuilder stringBuilder = new StringBuilder();
-
-						stringBuilder.Append(TASK_EXCEPTION_PREFIX);
-
-						stringBuilder.Append(targetTask.Exception.Message);
-
-						stringBuilder.Append(INNER_EXCEPTIONS_SUFFIX);
-
-						stringBuilder.Append(INNER_EXCEPTION_DELIMITER);
-
-						foreach (var innerException in targetTask.Exception.InnerExceptions)
-						{
-							stringBuilder.Append(innerException.ToString());
-
-							stringBuilder.Append('\n');
-
-							stringBuilder.Append(INNER_EXCEPTION_DELIMITER);
-
-							stringBuilder.Append('\n');
-						}
-
-						logger?.LogError<TSource>(
-							stringBuilder.ToString());
-
-						return default;
-					})
-				.ConfigureAwait(awaitInSameContext);
+			LookForExceptions(
+				task,
+				exception => logger?.LogError<TSource>(
+					exception));
 		}
 
-		public static ConfiguredTaskAwaitable<T> ThrowExceptions<T, TSource>(
+		public static async Task ThrowExceptionsIfAny<T, TSource>(
 			this Task<T> task,
-			ILogger logger,
-			bool awaitInSameContext = true)
+			ILogger logger)
 		{
-			return task
-				.ContinueWith<T>(
-					targetTask =>
-					{
-						if (!targetTask.IsFaulted)
-						{
-							return targetTask.Result;
-						}
+			await task;
 
-						StringBuilder stringBuilder = new StringBuilder();
-
-						stringBuilder.Append(TASK_EXCEPTION_PREFIX);
-
-						stringBuilder.Append(targetTask.Exception.Message);
-
-						stringBuilder.Append(INNER_EXCEPTIONS_SUFFIX);
-
-						stringBuilder.Append(INNER_EXCEPTION_DELIMITER);
-
-						foreach (var innerException in targetTask.Exception.InnerExceptions)
-						{
-							stringBuilder.Append(innerException.ToString());
-
-							stringBuilder.Append('\n');
-
-							stringBuilder.Append(INNER_EXCEPTION_DELIMITER);
-
-							stringBuilder.Append('\n');
-						}
-
-						throw new Exception(
-							logger.TryFormatException<TSource>(
-								stringBuilder.ToString()));
-					})
-				.ConfigureAwait(awaitInSameContext);
+			LookForExceptions(
+				task,
+				exception => throw new Exception(
+					logger.TryFormatException<TSource>(
+						exception)));
 		}
 
-		public static ConfiguredTaskAwaitable<T> LogExceptions<T>(
+		public static async Task LogExceptionsIfAny<T>(
 			this Task<T> task,
 			Type logSource,
-			ILogger logger,
-			bool awaitInSameContext = true)
+			ILogger logger)
 		{
-			return task
-				.ContinueWith<T>(
-					targetTask =>
-					{
-						if (!targetTask.IsFaulted)
-						{
-							return targetTask.Result;
-						}
+			await task;
 
-						StringBuilder stringBuilder = new StringBuilder();
-
-						stringBuilder.Append(TASK_EXCEPTION_PREFIX);
-
-						stringBuilder.Append(targetTask.Exception.Message);
-
-						stringBuilder.Append(INNER_EXCEPTIONS_SUFFIX);
-
-						stringBuilder.Append(INNER_EXCEPTION_DELIMITER);
-
-						foreach (var innerException in targetTask.Exception.InnerExceptions)
-						{
-							stringBuilder.Append(innerException.ToString());
-
-							stringBuilder.Append('\n');
-
-							stringBuilder.Append(INNER_EXCEPTION_DELIMITER);
-
-							stringBuilder.Append('\n');
-						}
-
-						logger?.LogError(
-							logSource,
-							stringBuilder.ToString());
-
-						return default;
-					})
-				.ConfigureAwait(awaitInSameContext);
+			LookForExceptions(
+				task,
+				exception => logger?.LogError(
+					logSource,
+					exception));
 		}
 
-		public static ConfiguredTaskAwaitable<T> ThrowExceptions<T>(
+		public static async Task ThrowExceptionsIfAny<T>(
 			this Task<T> task,
 			Type logSource,
-			ILogger logger,
-			bool awaitInSameContext = true)
+			ILogger logger)
 		{
-			return task
-				.ContinueWith<T>(
-					targetTask =>
-					{
-						if (!targetTask.IsFaulted)
-						{
-							return targetTask.Result;
-						}
+			await task;
 
-						StringBuilder stringBuilder = new StringBuilder();
-
-						stringBuilder.Append(TASK_EXCEPTION_PREFIX);
-
-						stringBuilder.Append(targetTask.Exception.Message);
-
-						stringBuilder.Append(INNER_EXCEPTIONS_SUFFIX);
-
-						stringBuilder.Append(INNER_EXCEPTION_DELIMITER);
-
-						foreach (var innerException in targetTask.Exception.InnerExceptions)
-						{
-							stringBuilder.Append(innerException.ToString());
-
-							stringBuilder.Append('\n');
-
-							stringBuilder.Append(INNER_EXCEPTION_DELIMITER);
-
-							stringBuilder.Append('\n');
-						}
-
-						throw new Exception(
-							logger.TryFormatException(
-								logSource,
-								stringBuilder.ToString()));
-					})
-				.ConfigureAwait(awaitInSameContext);
+			LookForExceptions(
+				task,
+				exception => throw new Exception(
+					logger.TryFormatException(
+						logSource,
+						exception)));
 		}
 
 		#endregion
@@ -677,5 +321,39 @@ namespace HereticalSolutions
 		}
 
 		#endregion
+	
+		public static void LookForExceptions(
+			Task targetTask,
+			Action<string> exceptionAction)
+		{
+			if (!targetTask.IsFaulted)
+			{
+				return;
+			}
+
+			StringBuilder stringBuilder = new StringBuilder();
+
+			stringBuilder.Append(TASK_EXCEPTION_PREFIX);
+
+			stringBuilder.Append(targetTask.Exception.Message);
+
+			stringBuilder.Append(INNER_EXCEPTIONS_SUFFIX);
+
+			stringBuilder.Append(INNER_EXCEPTION_DELIMITER);
+
+			foreach (var innerException in targetTask.Exception.InnerExceptions)
+			{
+				stringBuilder.Append(innerException.ToString());
+
+				stringBuilder.Append('\n');
+
+				stringBuilder.Append(INNER_EXCEPTION_DELIMITER);
+
+				stringBuilder.Append('\n');
+			}
+
+			exceptionAction?.Invoke(
+				stringBuilder.ToString());
+		}
 	}
 }

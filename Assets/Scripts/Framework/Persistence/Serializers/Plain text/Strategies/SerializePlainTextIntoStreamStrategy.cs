@@ -32,6 +32,8 @@ namespace HereticalSolutions.Persistence.Serializers
 				out StreamWriter streamWriter,
 				logger))
 				return false;
+
+			streamWriter.AutoFlush = true;
 			
 			streamArgument.Writer = streamWriter;
 

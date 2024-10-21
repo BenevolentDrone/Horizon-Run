@@ -276,7 +276,7 @@ namespace HereticalSolutions.Systems
 
 					innerActions.Add(
 						() => CommonProcedures.WaitForAllSync(
-							CommonProcedures.CreateTasksListFromCompletionTasks(
+							CommonProcedures.CreateCompletionTasksSublist(
 								completionTasks,
 								indexes)));
 				}
@@ -314,16 +314,9 @@ namespace HereticalSolutions.Systems
 						threadIndexes[i] = threadsToStart[i] - 1;
 					}
 
-					//innerActions.Add(
-					//	() => CommonProcedures.FireAndForgetTasksInParallelSync(
-					//		CommonProcedures.CreateTaskFactoriesFromActions(
-					//			CommonProcedures.CreateActionInvokationList(
-					//				threadDelegates,
-					//				threadIndexes))));
-
 					innerActions.Add(
 						() => CommonProcedures.FireAndForgetActionsInParallelSync(
-							CommonProcedures.CreateActionInvokationList(
+							CommonProcedures.CreateActionSublist(
 								threadDelegates,
 								threadIndexes)));
 				}

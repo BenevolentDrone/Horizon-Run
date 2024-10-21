@@ -64,16 +64,24 @@ namespace HereticalSolutions.AssetImport
 			IProgress<float> progress = null)
 			where TImporter : AAssetImporter
 		{
-			logger?.Log<AssetImportManager>($"IMPORTING {typeof(TImporter).Name} INITIATED");
+			logger?.Log(
+				GetType(),
+				$"IMPORTING {typeof(TImporter).Name} INITIATED");
 
 			var pooledImporter = PopImporterSync<TImporter>();
 
 			initializationDelegate?.Invoke(
 				pooledImporter.Value as TImporter);
 
-			var result = await pooledImporter.Value.Import(
-				progress)
-				.ThrowExceptions<IResourceVariantData, AssetImportManager>(
+			var importTask = pooledImporter.Value.Import(
+				progress);
+
+			var result = await importTask;
+				//.ConfigureAwait(false);
+
+			await importTask
+				.ThrowExceptionsIfAny(
+					GetType(),
 					logger);
 
 			if (postProcessorRepository.Has(typeof(TImporter)))
@@ -87,10 +95,16 @@ namespace HereticalSolutions.AssetImport
 					//Imagine one post processor adding 10 exrta vertices to the mesh while the other one substracts 20
 					//Why? For any fucking reason. PostProcessors are exposed as API and I have zero idea what kind of shit
 					//would a user come up with its usage
-					await postProcessors[i].OnImport(
+					var postProcessorTask = postProcessors[i].OnImport(
 						result,
-						progress)
-						.ThrowExceptions<AssetImportManager>(
+						progress);
+
+					await postProcessorTask;
+						//.ConfigureAwait(false);
+
+					await postProcessorTask
+						.ThrowExceptionsIfAny(
+							GetType(),
 							logger);
 				}
 			}
@@ -99,7 +113,9 @@ namespace HereticalSolutions.AssetImport
 
 			pooledImporter.Push();
 
-			logger?.Log<AssetImportManager>($"IMPORTING {typeof(TImporter).Name} FINISHED");
+			logger?.Log(
+				GetType(),
+				$"IMPORTING {typeof(TImporter).Name} FINISHED");
 
 			return result;
 		}

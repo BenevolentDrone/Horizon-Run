@@ -62,11 +62,16 @@ namespace HereticalSolutions.AssetImport
 				dto,
 				out var asset);
 
-			var result = await AddAssetAsResourceToManager(
+			var task = AddAssetAsResourceToManager(
 				asset,
 				true,
-				progress)
-				.ThrowExceptions<IResourceVariantData>(
+				progress);
+
+			var result = await task;
+				//.ConfigureAwait(false);
+
+			await task
+				.ThrowExceptionsIfAny<IResourceVariantData>(
 					GetType(),
 					logger);
 
@@ -93,11 +98,19 @@ namespace HereticalSolutions.AssetImport
 		{
 			progress?.Report(0f);
 
-			var result = await AddAssetAsResourceVariant(
-				await GetOrCreateResourceData(resourcePath)
-					.ThrowExceptions<IResourceData>(
-						GetType(),
-						logger),
+			var getOrCreateResourceTask = GetOrCreateResourceData(resourcePath);
+
+			var resource = await getOrCreateResourceTask;
+				//.ConfigureAwait(false);
+
+			await getOrCreateResourceTask
+				.ThrowExceptionsIfAny<IResourceData>(
+					GetType(),
+					logger);
+
+
+			var addAsVariantTask = AddAssetAsResourceVariant(
+				resource,
 				new ResourceVariantDescriptor()
 				{
 					VariantID = string.Empty,
@@ -121,8 +134,13 @@ namespace HereticalSolutions.AssetImport
 						loggerResolver),
 #endif
 				allocate,
-				progress)
-				.ThrowExceptions<IResourceVariantData>(
+				progress);
+
+			var result = await addAsVariantTask;
+				//.ConfigureAwait(false);
+
+			await addAsVariantTask
+				.ThrowExceptionsIfAny<IResourceVariantData>(
 					GetType(),
 					logger);
 

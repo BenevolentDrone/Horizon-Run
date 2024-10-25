@@ -17,64 +17,28 @@ namespace HereticalSolutions.Persistence.Serializers
 		{
 			this.logger = logger;
 		}
-		
-		public bool StartSerialization(ISerializationArgument argument)
-		{
-			StreamArgument streamArgument = (StreamArgument)argument;
-			
-			if (streamArgument.Writer != null)
-				return true;
-            
-			FilePathSettings filePathSettings = streamArgument.Settings;
-            
-			if (!StreamIO.OpenWriteStream(
-				filePathSettings,
-				out StreamWriter streamWriter,
-				logger))
-				return false;
 
-			streamWriter.AutoFlush = true;
-			
-			streamArgument.Writer = streamWriter;
-
-			return true;
-		}
+		#region IPlainTextSerializationStrategy
 
 		public bool Serialize(
 			ISerializationArgument argument,
 			string text)
 		{
-			if (!StartSerialization(argument))
-				return false;
-			
 			StreamArgument streamArgument = (StreamArgument)argument;
-			
+
 			if (streamArgument.Writer == null)
 			{
-				return false;
+				if (!StartSerialization(streamArgument))
+					return false;
 			}
 
 			streamArgument.Writer.Write(text);
 
 			if (streamArgument.KeepOpen)
 				return true;
-			
-			if (!FinishSerialization(argument))
+
+			if (!FinishSerialization(streamArgument))
 				return false;
-
-			return true;
-		}
-		
-		public bool FinishSerialization(ISerializationArgument argument)
-		{
-			StreamArgument streamArgument = (StreamArgument)argument;
-
-			if (streamArgument.Writer == null)
-				return true;
-			
-			StreamIO.CloseStream(streamArgument.Writer);
-            
-			streamArgument.Writer = null;
 
 			return true;
 		}
@@ -88,23 +52,53 @@ namespace HereticalSolutions.Persistence.Serializers
 			text = string.Empty;
 
 			if (!StreamIO.OpenReadStream(
-				filePathSettings,
-				out StreamReader streamReader,
-				logger))
+					filePathSettings,
+					out StreamReader streamReader,
+					logger))
 				return false;
 
 			text = streamReader.ReadToEnd();
 
-			StreamIO.CloseStream(streamReader);
+			StreamIO.CloseStream(
+				streamReader);
 
 			return true;
 		}
 
-		public void Erase(ISerializationArgument argument)
+		public void Erase(
+			ISerializationArgument argument)
 		{
 			FilePathSettings filePathSettings = ((StreamArgument)argument).Settings;
 
 			StreamIO.Erase(filePathSettings);
+		}
+
+		#endregion
+
+		private bool StartSerialization(
+			StreamArgument streamArgument)
+		{
+			FilePathSettings filePathSettings = streamArgument.Settings;
+
+			if (!StreamIO.OpenWriteStream(
+					filePathSettings,
+					out StreamWriter streamWriter,
+					logger))
+				return false;
+
+			streamArgument.Writer = streamWriter;
+
+			return true;
+		}
+
+		private bool FinishSerialization(
+			StreamArgument streamArgument)
+		{
+			StreamIO.CloseStream(streamArgument.Writer);
+
+			streamArgument.Writer = null;
+
+			return true;
 		}
 	}
 }

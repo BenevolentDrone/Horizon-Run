@@ -3821,7 +3821,7 @@
             Allows a piece of custom metadata to be set on the item.
             </summary>
             <param name="metadataName">The name of the metadata to set.</param>
-            <param name="BlackboardValue">The metadata value.</param>
+            <param name="metadataValue">The metadata value.</param>
         </member>
         <member name="M:Microsoft.Build.Framework.ITaskItem.RemoveMetadata(System.String)">
             <summary>
@@ -3866,7 +3866,7 @@
             make it obvious it's an improvement on ItemSpec.
             </remarks>
         </member>
-        <member name="M:Microsoft.Build.Framework.ITaskItem2.GetBlackboardValueEscaped(System.String)">
+        <member name="M:Microsoft.Build.Framework.ITaskItem2.GetMetadataValueEscaped(System.String)">
             <summary>
             Allows the values of metadata on the item to be queried.
             </summary>
@@ -3875,7 +3875,7 @@
             make it obvious it's an improvement on GetMetadata.
             </remarks>
         </member>
-        <member name="M:Microsoft.Build.Framework.ITaskItem2.SetBlackboardValueLiteral(System.String,System.String)">
+        <member name="M:Microsoft.Build.Framework.ITaskItem2.SetMetadataValueLiteral(System.String,System.String)">
             <summary>
             Allows a piece of custom metadata to be set on the item.  Assumes that the value passed
             in is unescaped, and escapes the value as necessary in order to maintain its value. 

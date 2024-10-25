@@ -2059,7 +2059,7 @@
             Assumes that the value being passed in is in its escaped form. 
             </comments>
             <param name="metadataName">Name of metadata to set or change.</param>
-            <param name="BlackboardValue">Value of metadata.</param>
+            <param name="metadataValue">Value of metadata.</param>
         </member>
         <member name="M:Microsoft.Build.Utilities.TaskItem.GetMetadata(System.String)">
             <summary>
@@ -2112,12 +2112,12 @@
             <param name="taskItemToCast">The item to operate on.</param>
             <returns>The item-spec of the item.</returns>
         </member>
-        <member name="M:Microsoft.Build.Utilities.TaskItem.Microsoft#Build#Framework#ITaskItem2#GetBlackboardValueEscaped(System.String)">
+        <member name="M:Microsoft.Build.Utilities.TaskItem.Microsoft#Build#Framework#ITaskItem2#GetMetadataValueEscaped(System.String)">
             <summary>
             Returns the escaped value of the metadata with the specified key.
             </summary>
         </member>
-        <member name="M:Microsoft.Build.Utilities.TaskItem.Microsoft#Build#Framework#ITaskItem2#SetBlackboardValueLiteral(System.String,System.String)">
+        <member name="M:Microsoft.Build.Utilities.TaskItem.Microsoft#Build#Framework#ITaskItem2#SetMetadataValueLiteral(System.String,System.String)">
             <summary>
             Sets the escaped value of the metadata with the specified name.
             </summary>

@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>Antlr4BuildTasks</id>
+    <version>12.8.0</version>
+    <authors>Ken Domino</authors>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <license type="expression">MIT</license>
+    <licenseUrl>https://licenses.nuget.org/MIT</licenseUrl>
+    <projectUrl>https://github.com/kaby76/Antlr4BuildTasks</projectUrl>
+    <description>Derivative of Harwell's Antrl4cs: contains "ITask" wrapper for Msbuild, schemas for setting Antlr4 file properties, and a separately installed official Antlr4 java tool at antlr.org downloads.</description>
+    <releaseNotes>12.8</releaseNotes>
+    <tags>antlr antlr4 parsing</tags>
+    <repository type="Git" url="https://github.com/kaby76/Antlr4BuildTasks" commit="f8c50d69d12b41904e7169190fe41d54c6fd8108" />
+    <dependencies>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="Microsoft.Build.Framework" version="17.8.3" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Build.Utilities.Core" version="17.8.3" exclude="Build,Analyzers" />
+        <dependency id="System.Net.Http" version="4.3.4" exclude="Build,Analyzers" />
+        <dependency id="System.Threading" version="4.3.0" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+</package>

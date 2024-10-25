@@ -74,8 +74,17 @@ crashlytics-build.properties
 # SerializedBuildInfo
 *.ahbuildinfo
 
+# DO NOT INCLUDE PROTOTYPING ASSETS UNLESS THEY'RE FROM UNITY ASSET STORE
+/Assets/Games/Prototyping assets/CC0 Assets/
+/Assets/Games/Prototyping assets/Mixamo/
+/Assets/Games/Prototyping assets/Sketchfab/
+
 # DO NOT INCLUDE PAID ASSETS
 Paid/
 
 # DO NOT INCLUDE RUNTIME LOGS
 /[Rr]untime [Ll]ogs/
+
+# DO NOT INCLUDE ASSETS USED WAY BEFORE
+/Assets/Plugins/Tools/Humanizer/Assets (old)/
+/Assets/Plugins/Tools/Humanizer/Generated (old)/

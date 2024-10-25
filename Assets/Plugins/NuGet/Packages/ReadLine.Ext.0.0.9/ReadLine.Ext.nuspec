@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>ReadLine.Ext</id>
+    <version>0.0.9</version>
+    <title>ReadLine</title>
+    <authors>Toni Solarin-Sodara, Tore Fuglestad, .NET Foundation and Contributors</authors>
+    <license type="file">LICENSE</license>
+    <licenseUrl>https://aka.ms/deprecateLicenseUrl</licenseUrl>
+    <readme>README.md</readme>
+    <projectUrl>https://github.com/rafntor/readline.ext</projectUrl>
+    <description>Package Description</description>
+    <tags>readline gnu console shell terminal ansi vt100 keyparser consolekeyinfo autocomplete command-history prompt</tags>
+    <repository url="https://github.com/rafntor/readline.ext" />
+    <dependencies>
+      <group targetFramework="net7.0" />
+    </dependencies>
+  </metadata>
+</package>

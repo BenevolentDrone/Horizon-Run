@@ -44,7 +44,9 @@ public static class EditorUtils
         }
     }
 
-    public static void ColumnsSameWidth(Rect rect, Action<float>[] drawers)
+    public static void ColumnsSameWidth(
+        Rect rect,
+        Action<float>[] drawers)
     {
         var width = rect.width;
 

@@ -1,5 +1,5 @@
 using System;
-//using System.Globalization;
+using System.Threading.Tasks;
 
 using HereticalSolutions.Systems;
 using HereticalSolutions.Systems.Factories;
@@ -9,7 +9,6 @@ using HereticalSolutions.Logging.Factories;
 using ILogger = HereticalSolutions.Logging.ILogger;
 
 using UnityEngine;
-using System.Threading.Tasks;
 
 namespace HereticalSolutions.Samples.SystemAndProceduresAsyncSample
 {
@@ -20,6 +19,8 @@ namespace HereticalSolutions.Samples.SystemAndProceduresAsyncSample
 		private ILoggerResolver loggerResolver;
 
 		private ILogger logger;
+
+		private Func<Task> delegateSystem;
 
 
 		void Start()
@@ -305,7 +306,7 @@ namespace HereticalSolutions.Samples.SystemAndProceduresAsyncSample
 
 			//Build the system
 			if (!asyncSystemBuilder.BuildSystem(
-				out var delegateSystem))
+				out delegateSystem))
 			{
 				logger.LogError(
 					GetType(),
@@ -314,6 +315,12 @@ namespace HereticalSolutions.Samples.SystemAndProceduresAsyncSample
 				return;
 			}
 
+			Perform();
+		}
+
+		[ContextMenu("Perform")]
+		private void Perform()
+		{
 			logger.Log(
 				"START");
 

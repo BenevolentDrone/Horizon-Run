@@ -1,5 +1,4 @@
 using System;
-//using System.Globalization;
 
 using HereticalSolutions.Systems;
 using HereticalSolutions.Systems.Factories;
@@ -19,6 +18,8 @@ namespace HereticalSolutions.Samples.SystemAndProceduresSequentialSample
 		private ILoggerResolver loggerResolver;
 
 		private ILogger logger;
+
+		private Action delegateSystem;
 
 		void Start()
 		{
@@ -303,8 +304,20 @@ namespace HereticalSolutions.Samples.SystemAndProceduresSequentialSample
 				return;
 			}
 
+			Perform();
+		}
+
+		[ContextMenu("Perform")]
+		private void Perform()
+		{
+			logger.Log(
+				"START");
+
 			//Run the system
 			delegateSystem?.Invoke();
+
+			logger.Log(
+				"FINISH");
 		}
 
 		private void ReceivedLog(

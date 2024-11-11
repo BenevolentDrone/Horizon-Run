@@ -6,6 +6,7 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 	{
 		BONE,
 		LOCATOR,
-		IK_TARGET
+		IK_TARGET,
+		SANITATION
 	}
 }

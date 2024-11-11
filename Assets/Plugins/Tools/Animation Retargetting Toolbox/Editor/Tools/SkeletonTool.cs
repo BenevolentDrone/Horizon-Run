@@ -58,7 +58,38 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 
 		private const float BONE_FORWARD_HANDLES_LENGTH = 0.05f;
 
+		private const float MIN_BONE_LENGTH = 0.1f;
+
+		private const float BONE_CUSTOM_EPSILON = 0.01f;
+
+		private static readonly Color BONE_DOTTED_LINE_COLOR = new Color(1f, 1f, 1f, 0.8f);
+
+		private const float BONE_DOTTED_LINE_LENGTH = 5;
+
 		private const int START_BONE_HANDLE_INDEX = 1000;
+
+		private static readonly Quaternion[] ROTATION_1_AXIS_PERMUTATIONS = new Quaternion[]
+		{
+			Quaternion.identity,
+			Quaternion.Euler(0, 0, 0),
+			Quaternion.Euler(0, 0, 90),
+			Quaternion.Euler(0, 0, -90),
+			Quaternion.Euler(0, 0, 180)
+		};
+
+		private static readonly Quaternion[] ROTATION_3_AXIS_PERMUTATIONS = new Quaternion[]
+		{
+			Quaternion.identity,
+			Quaternion.Euler(90, 0, 0),
+			Quaternion.Euler(-90, 0, 0),
+			Quaternion.Euler(0, 90, 0),
+			Quaternion.Euler(0, -90, 0),
+			Quaternion.Euler(0, 0, 90),
+			Quaternion.Euler(0, 0, -90),
+			Quaternion.Euler(180, 0, 0),
+			Quaternion.Euler(0, 180, 0),
+			Quaternion.Euler(0, 0, 180)
+		};
 
 		#endregion
 
@@ -262,11 +293,17 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 				selectedSkeletonDonor,
 				rootNode);
 
+			SanitizeBones(
+				skeleton,
+				selectedSkeletonDonor.transform);
+
 			context.AddOrUpdate(
 				KEY_SKELETON,
 				skeleton);
+			
 
 			var currentPose = SamplePose(skeleton);
+
 
 			context.AddOrUpdate(
 				KEY_SKELETON_CURRENT_POSE,
@@ -380,6 +417,170 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 			}
 		}
 
+		private void SanitizeBones(
+			SkeletonWrapper skeleton,
+			Transform origin)
+		{
+			SanitizeBone(
+				skeleton.RootNode,
+				origin);
+		}
+
+		private void SanitizeBone(
+			IReadOnlyHierarchyNode<BoneWrapper> boneNode,
+			Transform origin)
+		{
+			TrySanitizePose(
+				boneNode,
+				origin);
+
+			foreach (var child in boneNode.Children)
+			{
+				SanitizeBone(
+					child,
+					origin);
+			}
+		}
+
+		private void TrySanitizePose(
+			IReadOnlyHierarchyNode<BoneWrapper> boneNode,
+			Transform origin)
+		{
+			var poseSnapshot = boneNode.Contents.PoseSnapshot;
+
+			//if (poseSnapshot.BoneMode != EBoneMode.BONE)
+			//{
+			//	return;
+			//}
+
+			Vector3 desiredDirection = Vector3.zero;
+
+			if (boneNode.ChildCount != 0)
+			{
+				Vector3 averageChildPosition = Vector3.zero;
+
+				foreach (var child in boneNode.Children)
+				{
+					averageChildPosition += child.Contents.PoseSnapshot.Position;
+				}
+
+				averageChildPosition /= boneNode.ChildCount;
+
+				var positionDistance = averageChildPosition - poseSnapshot.Position;
+
+				if (!(positionDistance.magnitude < MathHelpers.EPSILON))
+				{
+					desiredDirection = positionDistance.normalized;
+				}
+			}
+			
+			if (desiredDirection.magnitude < MathHelpers.EPSILON
+				&& boneNode.Parent != null)
+			{
+				var parentPosition = boneNode.Parent.Contents.PoseSnapshot.Position;
+
+				var positionDistance = poseSnapshot.Position - parentPosition;
+
+				if (positionDistance.magnitude < MathHelpers.EPSILON)
+				{
+					return;
+				}
+
+				desiredDirection = positionDistance.normalized;
+			}
+
+			var closiestRotation = GetClosiestRotationWithPermutations(
+				poseSnapshot.Rotation,
+				desiredDirection);
+
+			closiestRotation = RotateAroundZToMatchDirectionWithPermutations(
+				closiestRotation,
+				origin.forward);
+
+			//I like this one more. Why?
+			//Because the blue arrow is pointed away from the parent bone
+			//And once the character is stretching their arm forward, the blue arrow points forward,
+			//The green arrow points upward, and the red arrow points to the right
+			//Just as expected
+			closiestRotation *= Quaternion.Euler(0, 0, -90);
+
+			var rotationDifference = Quaternion.Inverse(poseSnapshot.Rotation) * closiestRotation;
+
+			//var rotationDifference = Quaternion.Inverse(poseSnapshot.Rotation) * rotationFromParent;
+
+			boneNode.Contents.SanitationSnapshot = new BoneSnapshot
+			{
+				Position = Vector3.zero,
+				Rotation = rotationDifference,
+				BoneMode = EBoneMode.SANITATION
+			};
+		}
+
+		private Quaternion GetClosiestRotationWithPermutations(
+			Quaternion boneRotation,
+			Vector3 desiredDirection)
+		{
+			Quaternion bestRotation = boneRotation;
+
+			float bestAlignment = float.MinValue;
+
+			// Iterate through all possible rotations
+			foreach (var rotationPermutation in ROTATION_3_AXIS_PERMUTATIONS)
+			{
+				// Apply the rotation to the bone's quaternion
+				Quaternion rotatedBone = boneRotation * rotationPermutation;
+
+				// Calculate the alignment with the desired direction
+				Vector3 boneForward = rotatedBone * Vector3.forward;
+
+				float alignment = Vector3.Dot(
+					boneForward.normalized,
+					desiredDirection.normalized);
+
+				// Select the rotation with the best alignment
+				if (alignment > bestAlignment)
+				{
+					bestAlignment = alignment;
+
+					bestRotation = rotatedBone;
+				}
+			}
+
+			return bestRotation;
+		}
+
+		private Quaternion RotateAroundZToMatchDirectionWithPermutations(
+			Quaternion boneRotation,
+			Vector3 desiredDirection)
+		{
+			Quaternion bestRotation = boneRotation;
+
+			float bestAlignment = float.MinValue;
+
+			// Iterate through all possible rotations
+			foreach (var rotationPermutation in ROTATION_1_AXIS_PERMUTATIONS)
+			{
+				// Apply the rotation to the bone's quaternion
+				Quaternion rotatedBone = boneRotation * rotationPermutation;
+
+				// Calculate the alignment with the desired direction
+				Vector3 boneForward = rotatedBone * Vector3.forward;
+				Vector3 boneRight = rotatedBone * Vector3.right;
+
+				float alignment = Vector3.Dot(boneForward.normalized, desiredDirection.normalized) +
+								  Vector3.Dot(boneRight.normalized, desiredDirection.normalized);
+
+				// Select the rotation with the best alignment
+				if (alignment > bestAlignment)
+				{
+					bestAlignment = alignment;
+					bestRotation = rotatedBone;
+				}
+			}
+
+			return bestRotation;
+		}
+
 		//Courtesy of https://adroit-things.com/game-engine/exploring-unity-editor-handle-caps/
 		private void DrawSkeletonHandles(
 			IARToolboxContext context,
@@ -409,8 +610,6 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 			if (currentEvent.type == EventType.Layout)
 			{
 				DrawBoneHandles(
-					context,
-
 					ref currentFreeHandle,
 					handleToBoneMap,
 					EventType.Layout,
@@ -422,8 +621,6 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 			if (currentEvent.type == EventType.Repaint)
 			{
 				DrawBoneHandles(
-					context,
-
 					ref currentFreeHandle,
 					handleToBoneMap,
 					EventType.Repaint,
@@ -441,8 +638,6 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 		}
 
 		private void DrawBoneHandles(
-			IARToolboxContext context,
-
 			ref int currentFreeHandle,
 			IRepository<int, BoneWrapper> handleToBoneMap,
 			EventType eventType,
@@ -450,84 +645,200 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 			IReadOnlyHierarchyNode<BoneWrapper> boneNode,
 			PoseSnapshot currentPose)
 		{
-			if (boneNode.Parent != null)
-			{
-				if (currentPose.BoneSnapshots.TryGet(
-					boneNode.Contents,
-					out var boneSnapshot))
-				{
-					var parentPosition = boneNode.Parent.Contents.BoneTransform.position;
+			TryDrawBoneHandles(
+				ref currentFreeHandle,
+				handleToBoneMap,
+				eventType,
 
-					var positionDistance = boneSnapshot.Position - parentPosition;
-
-					if (positionDistance.magnitude > 0f)
-					{
-						var rotationFromParent = Quaternion.LookRotation(
-							positionDistance,
-							Vector3.up);
-	
-						var previousHandlesColor = Handles.color;
-	
-						switch (boneSnapshot.BoneMode)
-						{
-							case EBoneMode.BONE:
-								Handles.color = Color.white;
-								break;
-	
-							case EBoneMode.LOCATOR:
-								Handles.color = Color.magenta;
-								break;
-	
-							case EBoneMode.IK_TARGET:
-								Handles.color = Color.cyan;
-								break;
-						}
-
-
-						var handle = currentFreeHandle;
-
-						handleToBoneMap.AddOrUpdate(
-							handle,
-							boneNode.Contents);
-
-						currentFreeHandle++;
-
-
-						Handles.ArrowHandleCap(
-							handle,
-							parentPosition,
-							rotationFromParent,
-							positionDistance.magnitude * ARToolboxEditorHelpers.HANDLES_LENGTH_FACTOR,
-							eventType);
-
-						Handles.color = previousHandlesColor;
-
-						if (eventType == EventType.Repaint)
-						{
-							ARToolboxEditorHelpers.DrawAdjustablePositionHandle(
-								boneSnapshot.Position,
-								boneSnapshot.Rotation,
-								BONE_FORWARD_HANDLES_LENGTH);
-						}
-
-						//Handles.PositionHandle(
-						//	boneSnapshot.Position,
-						//	boneSnapshot.Rotation);
-					}
-				}
-			}
+				boneNode,
+				currentPose);
 
 			foreach (var child in boneNode.Children)
 			{
 				DrawBoneHandles(
-					context,
-
 					ref currentFreeHandle,
 					handleToBoneMap,
 					eventType,
 
 					child,
 					currentPose);
+			}
+		}
+
+		private void TryDrawBoneHandles(
+			ref int currentFreeHandle,
+			IRepository<int, BoneWrapper> handleToBoneMap,
+			EventType eventType,
+
+			IReadOnlyHierarchyNode<BoneWrapper> boneNode,
+			PoseSnapshot currentPose)
+		{
+			if (!currentPose.BoneSnapshots.TryGet(
+				boneNode.Contents,
+				out var boneSnapshot))
+			{
+				return;
+			}
+
+
+			Color previousHandlesColor;
+
+			
+			//Get bone data
+			var bonePosition = boneSnapshot.Position;
+
+			var boneSanitizedRotation = boneSnapshot.Rotation * boneNode.Contents.SanitationSnapshot.Rotation;
+
+			var boneForward = boneSanitizedRotation * Vector3.forward;
+
+			float boneLength = MIN_BONE_LENGTH;
+
+			//Calculate bone length
+			if (boneNode.ChildCount != 0)
+			{
+				float averageDot = 0f;
+
+				int count = 0;
+
+				bool bestFitFound = false;
+
+				foreach (var child in boneNode.Children)
+				{
+					//Ignore children that are not in the current pose
+					if (!currentPose
+						.BoneSnapshots
+						.TryGet(
+							child.Contents,
+							out var childSnapshot))
+					{
+						continue;
+					}
+
+					Vector3 childPosition = childSnapshot.Position;
+
+					Vector3 positionDistance = childPosition - bonePosition;
+
+					var positionDistanceMagnitude = positionDistance.magnitude;
+
+					float dot = Vector3.Dot(
+						positionDistance,
+						boneForward);
+
+					dot = Mathf.Clamp(
+						dot,
+						-positionDistanceMagnitude,
+						positionDistanceMagnitude);
+
+					averageDot += dot;
+
+					count++;
+
+
+					//Account for best fit (i.e. when a child starts at the bone tip's position)
+					if ((1f - (dot / positionDistanceMagnitude)) < BONE_CUSTOM_EPSILON
+						&& dot > 0)
+					{
+						boneLength = dot;
+
+						bestFitFound = true;
+
+						break;
+					}
+				}
+
+				//If no best fit found, bone tip shall be at the average of the children's bone positions projected on the bone's forward vector
+				if (!bestFitFound && count > 0)
+				{
+					averageDot /= count;
+
+					if (averageDot > 0)
+					{
+						boneLength = averageDot;
+					}
+				}
+			}
+
+			var boneTipPosition = bonePosition + boneForward * boneLength;
+
+			//For each child bone draw a dotted line in case the child bone is not properly joined to the bone's tip
+			foreach (var child in boneNode.Children)
+			{
+				//Ignore children that are not in the current pose
+				if (!currentPose
+					.BoneSnapshots
+					.TryGet(
+						child.Contents,
+						out var childSnapshot))
+				{
+					continue;
+				}
+
+				Vector3 childPosition = childSnapshot.Position;
+
+
+				//Set the bone color
+				previousHandlesColor = Handles.color;
+
+				Handles.color = BONE_DOTTED_LINE_COLOR;
+
+				Handles.DrawDottedLine(
+					//bonePosition,
+					boneTipPosition,
+					childPosition,
+					BONE_DOTTED_LINE_LENGTH);
+
+				Handles.color = previousHandlesColor;
+			}
+
+			//Allocate handle
+			var handle = currentFreeHandle;
+
+			handleToBoneMap.AddOrUpdate(
+				handle,
+				boneNode.Contents);
+
+			currentFreeHandle++;
+
+
+			//Set the bone color
+			previousHandlesColor = Handles.color;
+
+			switch (boneSnapshot.BoneMode)
+			{
+				case EBoneMode.BONE:
+					Handles.color = Color.white;
+					break;
+
+				case EBoneMode.LOCATOR:
+					Handles.color = Color.magenta;
+					break;
+
+				case EBoneMode.IK_TARGET:
+					Handles.color = Color.cyan;
+					break;
+			}
+
+			//Draw the bone
+			Handles.ArrowHandleCap(
+				handle,
+				bonePosition,
+				boneSanitizedRotation,
+				boneLength * ARToolboxEditorHelpers.HANDLES_LENGTH_FACTOR,
+				eventType);
+
+			Handles.color = previousHandlesColor;
+
+
+			if (eventType == EventType.Repaint)
+			{
+				ARToolboxEditorHelpers.DrawAdjustablePositionHandle(
+					boneSnapshot.Position,
+					boneSanitizedRotation,
+					BONE_FORWARD_HANDLES_LENGTH);
+
+				//Handles.PositionHandle(
+				//	boneSnapshot.Position,
+				//	boneSnapshot.Rotation * boneNode.Contents.SanitationSnapshot.Rotation);
 			}
 		}
 

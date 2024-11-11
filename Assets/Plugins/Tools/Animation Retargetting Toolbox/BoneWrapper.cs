@@ -14,6 +14,13 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 			BoneTransform = boneTransform;
 
 			PoseSnapshot = poseSnapshot;
+
+			SanitationSnapshot = new BoneSnapshot
+			{
+				Position = Vector3.zero,
+				Rotation = Quaternion.identity,
+				BoneMode = EBoneMode.SANITATION
+			};
 		}
 
 		public string BoneName { get; private set; }
@@ -21,5 +28,7 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 		public Transform BoneTransform { get; private set; }
 
 		public BoneSnapshot PoseSnapshot { get; private set; }
+
+		public BoneSnapshot SanitationSnapshot { get; set; }
 	}
 }

@@ -15,9 +15,9 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 
 		#region UI consts
 
-		private const string UI_TEXT_ENABLED = "Enabled";
+		private const string UI_TEXT_ENABLED = "[ Enabled ]";
 
-		private const string UI_TEXT_DISNABLED = "Disabled";
+		private const string UI_TEXT_DISNABLED = "[ Disabled ]";
 
 		private const string UI_TEXT_ADD_PATTERN = "Add {0}";
 
@@ -334,7 +334,9 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 
 		#region Subcontext
 
-		public static void BeginSubcontextBoxWithTitle(
+		public static bool BeginSubcontextBoxWithTitle(
+			IARToolboxContext context,
+			string toolPrefix,
 			string subcontextTitlePrefix,
 			int subcontextIndex)
 		{
@@ -348,7 +350,13 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 					subcontextIndex + 1),
 				LabelStyleTitleBold);
 
+			bool result = BeginEnabledCheck(
+				context,
+				toolPrefix);
+
 			EditorGUILayout.Separator();
+
+			return result;
 		}
 
 		public static void EndSubcontextBox()
@@ -393,18 +401,9 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 			int totalSubcontextsCount,
 			string subcontextKeyPrefix)
 		{
-			bool ctrlPressed = false;
+			bool ctrlPressed = Event.current.control;
 
-			bool shiftPressed = false;
-
-			if (Event.current.shift)
-			{
-				shiftPressed = true;
-			}
-			else if (Event.current.control)
-			{
-				ctrlPressed = true;
-			}
+			bool shiftPressed = Event.current.shift;
 
 			EditorGUILayout.BeginHorizontal();
 

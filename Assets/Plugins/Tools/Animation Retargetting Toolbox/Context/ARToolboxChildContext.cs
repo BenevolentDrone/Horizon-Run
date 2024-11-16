@@ -43,17 +43,17 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 			switch (result)
 			{
 				case TValue typedValue:
-					{
-						value = typedValue;
+				{
+					value = typedValue;
 
-						return true;
-					}
+					return true;
+				}
 				default:
-					{
-						value = default;
+				{
+					value = default;
 
-						return false;
-					}
+					return false;
+				}
 			}
 		}
 

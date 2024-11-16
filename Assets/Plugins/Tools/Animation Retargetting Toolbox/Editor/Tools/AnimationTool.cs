@@ -129,13 +129,6 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 
 		public void SceneUpdate(IARToolboxContext context)
 		{
-			//if (!ARToolboxEditorHelpers.GetEnabled(
-			//	context,
-			//	KEY_TOOL_PREFIX))
-			//{
-			//	return;
-			//}
-
 			if (!context.TryGet<List<IARToolboxContext>>(
 				KEY_TRACKS,
 				out var tracks))
@@ -156,9 +149,24 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 			int trackIndex,
 			int totalTracksCount)
 		{
-			ARToolboxEditorHelpers.BeginSubcontextBoxWithTitle(
+			bool enabled = ARToolboxEditorHelpers.BeginSubcontextBoxWithTitle(
+				context,
+				KEY_TRACK_PREFIX,
 				UI_TEXT_TRACK_CAMELCASE,
 				trackIndex);
+
+			if (!enabled)
+			{
+				ARToolboxEditorHelpers.DrawSubcontextControls(
+					context,
+					trackIndex,
+					totalTracksCount,
+					KEY_TRACK_PREFIX);
+
+				ARToolboxEditorHelpers.EndSubcontextBox();
+
+				return;
+			}
 
 
 			bool playAnimationConditionsMet = true;
@@ -238,6 +246,7 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 
 				context.TryRemove(KEY_SELECTED_ANIMATABLE_CPLAYABLE);
 			}
+
 
 			ARToolboxEditorHelpers.DrawSubcontextControls(
 				context,

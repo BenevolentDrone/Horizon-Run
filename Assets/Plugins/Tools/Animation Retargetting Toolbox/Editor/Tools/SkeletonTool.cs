@@ -28,6 +28,10 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 
 		private const string UI_TEXT_TARGET_SKELETON_DONOR = "Target skeleton donor:";
 
+		private const string UI_TEXT_SANITIZE = "Sanitize";
+
+		private const string UI_TEXT_SHOW_DIRECTION = "Show direction";
+
 		private const string UI_TEXT_NO_SMESHRENDERER = "No SkinnedMeshRenderer found in the selected skeleton donor";
 
 		private const string UI_TEXT_SAMPLE = "Sample";
@@ -46,11 +50,15 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 
 		private const string KEY_SELECTED_SKELETON_DONOR = "Skeleton_SelectedSkeletonDonor";
 
+		private const string KEY_SANITIZE = "Skeleton_Sanitize";
+
+		private const string KEY_DRAW_BONE_DIRECTION_GIZMO = "Skeleton_DrawBoneDirectionGizmo";
+
 		private const string KEY_SKELETON = "Skeleton_Skeleton";
 
 		private const string KEY_SKELETON_CURRENT_POSE = "Skeleton_CurrentPose";
 
-		private const string KEY_SKELETON_SELECTED_BONE = "Skeleton_SelectedBone";
+		private const string KEY_SKELETON_SELECTED_BONES = "Skeleton_SelectedBones";
 
 		private const string KEY_HANDLE_TO_BONE_MAP = "HandleToBoneMap";
 
@@ -63,6 +71,8 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 		private const float BONE_CUSTOM_EPSILON = 0.01f;
 
 		private static readonly Color BONE_DOTTED_LINE_COLOR = new Color(1f, 1f, 1f, 0.8f);
+
+		private static readonly Color BONE_UNSELECTED_COLOR_MULTIPLICATIVE = new Color(0.6f, 0.6f, 0.6f, 1f);
 
 		private const float BONE_DOTTED_LINE_LENGTH = 5;
 
@@ -143,13 +153,13 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 				return;
 			}
 
-			if (!context.TryGet<IRepository<int, BoneWrapper>>(
+			if (!context.TryGet<IRepository<int, IReadOnlyHierarchyNode<BoneWrapper>>>(
 				KEY_HANDLE_TO_BONE_MAP,
 				out var handleToBoneMap))
 			{
-				handleToBoneMap = RepositoriesFactory.BuildDictionaryRepository<int, BoneWrapper>();
+				handleToBoneMap = RepositoriesFactory.BuildDictionaryRepository<int, IReadOnlyHierarchyNode<BoneWrapper>>();
 
-				context.AddOrUpdate<IRepository<int, BoneWrapper>>(
+				context.AddOrUpdate<IRepository<int, IReadOnlyHierarchyNode<BoneWrapper>>>(
 					KEY_HANDLE_TO_BONE_MAP,
 					handleToBoneMap);
 			}
@@ -176,11 +186,29 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 			int skeletonIndex,
 			int totalSkeletonsCount)
 		{
-			ARToolboxEditorHelpers.BeginSubcontextBoxWithTitle(
+			bool enabled = ARToolboxEditorHelpers.BeginSubcontextBoxWithTitle(
+				context,
+				KEY_SKELETON_PREFIX,
 				UI_TEXT_SKELETON_CAMELCASE,
 				skeletonIndex);
 
+			if (!enabled)
+			{
+				ARToolboxEditorHelpers.DrawSubcontextControls(
+					context,
+					skeletonIndex,
+					totalSkeletonsCount,
+					KEY_SKELETON_PREFIX);
+
+				ARToolboxEditorHelpers.EndSubcontextBox();
+
+				return;
+			}
+
 			DrawCurrentSelectedSkeletonDonor(
+				context);
+
+			DrawSanitize(
 				context);
 
 			DrawSampleSkeleton(
@@ -188,8 +216,9 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 
 			EditorGUILayout.Separator();
 
-			DrawCurrentSelectedBone(
+			DrawBoneDirectionGizmo(
 				context);
+
 
 			ARToolboxEditorHelpers.DrawSubcontextControls(
 				context,
@@ -242,6 +271,33 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 			}
 		}
 
+		private void DrawSanitize(
+			IARToolboxContext context)
+		{
+			if (!context.TryGet<bool>(
+				KEY_SANITIZE,
+				out var previousSanitize))
+			{
+				//Initialize to default value
+				previousSanitize = true;
+
+				context.AddOrUpdate(
+					KEY_SANITIZE,
+					previousSanitize);
+			}
+
+			var currentSanitize = EditorGUILayout.Toggle(
+				UI_TEXT_SANITIZE,
+				previousSanitize);
+
+			if (currentSanitize != previousSanitize)
+			{
+				context.AddOrUpdate(
+					KEY_SANITIZE,
+					currentSanitize);
+			}
+		}
+
 		private void DrawSampleSkeleton(
 			IARToolboxContext context)
 		{
@@ -259,10 +315,31 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 			}
 		}
 
-		private void DrawCurrentSelectedBone(
+		private void DrawBoneDirectionGizmo(
 			IARToolboxContext context)
 		{
-			
+			if (!context.TryGet<bool>(
+				KEY_DRAW_BONE_DIRECTION_GIZMO,
+				out var previousDrawGizmo))
+			{
+				//Initialize to default value
+				previousDrawGizmo = true;
+
+				context.AddOrUpdate(
+					KEY_DRAW_BONE_DIRECTION_GIZMO,
+					previousDrawGizmo);
+			}
+
+			var currentDrawGizmo = EditorGUILayout.Toggle(
+				UI_TEXT_SHOW_DIRECTION,
+				previousDrawGizmo);
+
+			if (currentDrawGizmo != previousDrawGizmo)
+			{
+				context.AddOrUpdate(
+					KEY_DRAW_BONE_DIRECTION_GIZMO,
+					currentDrawGizmo);
+			}
 		}
 
 		private void SampleSkeleton(
@@ -284,7 +361,8 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 				.transform
 				.GetComponentInChildren<SkinnedMeshRenderer>();
 
-			SampleBoneTransform(
+			//Create a skeleton
+			SampleBoneTransformRecursively(
 				selectedSkeletonDonor.transform,
 				skinnedMeshRenderer,
 				out var rootNode);
@@ -293,24 +371,48 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 				selectedSkeletonDonor,
 				rootNode);
 
-			SanitizeBones(
-				skeleton,
-				selectedSkeletonDonor.transform);
+			if (context.TryGet<bool>(
+				KEY_SANITIZE,
+				out var sanitize)
+				&& sanitize)
+			{
+				SanitizeBones(
+					skeleton,
+					selectedSkeletonDonor.transform);
+			}
 
 			context.AddOrUpdate(
 				KEY_SKELETON,
 				skeleton);
 			
 
+			//Create a current pose snapshot
 			var currentPose = SamplePose(skeleton);
-
 
 			context.AddOrUpdate(
 				KEY_SKELETON_CURRENT_POSE,
 				currentPose);
+
+			//Select all bones of the skeleton
+			if (!context.TryGet<List<IReadOnlyHierarchyNode<BoneWrapper>>>(
+				KEY_SKELETON_SELECTED_BONES,
+				out var selectedBones))
+			{
+				selectedBones = new List<IReadOnlyHierarchyNode<BoneWrapper>>();
+
+				context.AddOrUpdate(
+					KEY_SKELETON_SELECTED_BONES,
+					selectedBones);
+			}
+
+			SelectAllBones(
+				skeleton,
+				selectedBones);
 		}
 
-		private void SampleBoneTransform(
+		#region Sample bone transform
+
+		private void SampleBoneTransformRecursively(
 			Transform boneTransform,
 			SkinnedMeshRenderer skinnedMeshRenderer,
 			out IHierarchyNode<BoneWrapper> boneNode)
@@ -334,7 +436,7 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 
 			foreach (Transform child in boneTransform)
 			{
-				SampleBoneTransform(
+				SampleBoneTransformRecursively(
 					child,
 					skinnedMeshRenderer,
 					out var childNode);
@@ -343,6 +445,10 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 					childNode);
 			}
 		}
+
+		#endregion
+
+		#region Sample pose
 
 		private PoseSnapshot SamplePose(
 			SkeletonWrapper skeleton)
@@ -394,6 +500,41 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 			}
 		}
 
+		#endregion
+
+		#region Selecting bones
+
+		private void SelectAllBones(
+			SkeletonWrapper skeleton,
+			List<IReadOnlyHierarchyNode<BoneWrapper>> selectedBones)
+		{
+			selectedBones.Clear();
+
+			SelectBoneRecursively(
+				skeleton.RootNode,
+				selectedBones);
+		}
+
+		private void SelectBoneRecursively(
+			IReadOnlyHierarchyNode<BoneWrapper> boneNode,
+			List<IReadOnlyHierarchyNode<BoneWrapper>> selectedBones)
+		{
+			if (boneNode.Contents != null)
+			{
+				selectedBones.Add(
+					boneNode);
+			}
+
+			foreach (var child in boneNode.Children)
+			{
+				SelectBoneRecursively(
+					child,
+					selectedBones);
+			}
+		}
+
+		#endregion
+
 		private void UpdatePose(
 			SkeletonWrapper skeleton,
 			PoseSnapshot pose)
@@ -417,16 +558,18 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 			}
 		}
 
+		#region Sanitizing
+
 		private void SanitizeBones(
 			SkeletonWrapper skeleton,
 			Transform origin)
 		{
-			SanitizeBone(
+			SanitizeBoneRecursively(
 				skeleton.RootNode,
 				origin);
 		}
 
-		private void SanitizeBone(
+		private void SanitizeBoneRecursively(
 			IReadOnlyHierarchyNode<BoneWrapper> boneNode,
 			Transform origin)
 		{
@@ -436,7 +579,7 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 
 			foreach (var child in boneNode.Children)
 			{
-				SanitizeBone(
+				SanitizeBoneRecursively(
 					child,
 					origin);
 			}
@@ -581,11 +724,15 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 			return bestRotation;
 		}
 
+		#endregion
+
+		#region Drawing handles
+
 		//Courtesy of https://adroit-things.com/game-engine/exploring-unity-editor-handle-caps/
 		private void DrawSkeletonHandles(
 			IARToolboxContext context,
 			ref int currentFreeHandle,
-			IRepository<int, BoneWrapper> handleToBoneMap)
+			IRepository<int, IReadOnlyHierarchyNode<BoneWrapper>> handleToBoneMap)
 		{
 			if (!context.TryGet<SkeletonWrapper>(
 				KEY_SKELETON,
@@ -605,73 +752,104 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 				skeleton,
 				currentPose);
 
+			if (!context.TryGet<List<IReadOnlyHierarchyNode<BoneWrapper>>>(
+				KEY_SKELETON_SELECTED_BONES,
+				out var selectedBones))
+			{
+				selectedBones = new List<IReadOnlyHierarchyNode<BoneWrapper>>();
+
+				context.AddOrUpdate(
+					KEY_SKELETON_SELECTED_BONES,
+					selectedBones);
+			}
+
+			bool drawBoneDirectionGizmo =
+				context.TryGet<bool>(
+					KEY_DRAW_BONE_DIRECTION_GIZMO,
+					out var drawGizmo)
+				&& drawGizmo;
+
 			var currentEvent = Event.current;
 
 			if (currentEvent.type == EventType.Layout)
 			{
-				DrawBoneHandles(
+				DrawBoneHandlesRecursively(
 					ref currentFreeHandle,
 					handleToBoneMap,
 					EventType.Layout,
+					drawBoneDirectionGizmo,
 
 					skeleton.RootNode,
-					currentPose);
+					currentPose,
+					selectedBones);
 			}
 
 			if (currentEvent.type == EventType.Repaint)
 			{
-				DrawBoneHandles(
+				DrawBoneHandlesRecursively(
 					ref currentFreeHandle,
 					handleToBoneMap,
 					EventType.Repaint,
+					drawBoneDirectionGizmo,
 
 					skeleton.RootNode,
-					currentPose);
+					currentPose,
+					selectedBones);
 			}
 
 			if (currentEvent.type == EventType.MouseDown
 				&& currentEvent.button == 0)
 			{
 				SelectClickedBone(
-					handleToBoneMap);
+					skeleton,
+					handleToBoneMap,
+					selectedBones);
 			}
 		}
 
-		private void DrawBoneHandles(
+		private void DrawBoneHandlesRecursively(
 			ref int currentFreeHandle,
-			IRepository<int, BoneWrapper> handleToBoneMap,
+			IRepository<int, IReadOnlyHierarchyNode<BoneWrapper>> handleToBoneMap,
 			EventType eventType,
+			bool drawBoneDirectionGizmo,
 
 			IReadOnlyHierarchyNode<BoneWrapper> boneNode,
-			PoseSnapshot currentPose)
+			PoseSnapshot currentPose,
+			List<IReadOnlyHierarchyNode<BoneWrapper>> selectedBones = null)
 		{
 			TryDrawBoneHandles(
 				ref currentFreeHandle,
 				handleToBoneMap,
 				eventType,
+				drawBoneDirectionGizmo,
 
 				boneNode,
-				currentPose);
+				currentPose,
+				selectedBones);
 
 			foreach (var child in boneNode.Children)
 			{
-				DrawBoneHandles(
+				DrawBoneHandlesRecursively(
 					ref currentFreeHandle,
 					handleToBoneMap,
 					eventType,
+					drawBoneDirectionGizmo,
 
 					child,
-					currentPose);
+					currentPose,
+					selectedBones);
 			}
 		}
 
 		private void TryDrawBoneHandles(
 			ref int currentFreeHandle,
-			IRepository<int, BoneWrapper> handleToBoneMap,
+			IRepository<int, IReadOnlyHierarchyNode<BoneWrapper>> handleToBoneMap,
 			EventType eventType,
+			bool drawBoneDirectionGizmo,
 
 			IReadOnlyHierarchyNode<BoneWrapper> boneNode,
-			PoseSnapshot currentPose)
+			PoseSnapshot currentPose,
+			List<IReadOnlyHierarchyNode<BoneWrapper>> selectedBones = null)
 		{
 			if (!currentPose.BoneSnapshots.TryGet(
 				boneNode.Contents,
@@ -795,28 +973,40 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 
 			handleToBoneMap.AddOrUpdate(
 				handle,
-				boneNode.Contents);
+				boneNode);
 
 			currentFreeHandle++;
+
+
+			bool selected = selectedBones.Contains(boneNode);
 
 
 			//Set the bone color
 			previousHandlesColor = Handles.color;
 
+			Color boneColor = Color.white;
+
 			switch (boneSnapshot.BoneMode)
 			{
 				case EBoneMode.BONE:
-					Handles.color = Color.white;
+					boneColor = Color.white;
 					break;
 
 				case EBoneMode.LOCATOR:
-					Handles.color = Color.magenta;
+					boneColor = Color.magenta;
 					break;
 
 				case EBoneMode.IK_TARGET:
-					Handles.color = Color.cyan;
+					boneColor = Color.cyan;
 					break;
 			}
+
+			if (!selected)
+			{
+				boneColor *= BONE_UNSELECTED_COLOR_MULTIPLICATIVE;
+			}
+
+			Handles.color = boneColor;
 
 			//Draw the bone
 			Handles.ArrowHandleCap(
@@ -831,20 +1021,21 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 
 			if (eventType == EventType.Repaint)
 			{
-				ARToolboxEditorHelpers.DrawAdjustablePositionHandle(
-					boneSnapshot.Position,
-					boneSanitizedRotation,
-					BONE_FORWARD_HANDLES_LENGTH);
-
-				//Handles.PositionHandle(
-				//	boneSnapshot.Position,
-				//	boneSnapshot.Rotation * boneNode.Contents.SanitationSnapshot.Rotation);
+				if (selected && drawBoneDirectionGizmo)
+				{
+					ARToolboxEditorHelpers.DrawAdjustablePositionHandle(
+						boneSnapshot.Position,
+						boneSanitizedRotation,
+						BONE_FORWARD_HANDLES_LENGTH);
+				}
 			}
 		}
 
 		//Courtesy of https://discussions.unity.com/t/how-to-drag-and-select-multiple-handles-in-editor-script/830359/3
 		private void SelectClickedBone(
-			IRepository<int, BoneWrapper> handleToBoneMap)
+			SkeletonWrapper skeleton,
+			IRepository<int, IReadOnlyHierarchyNode<BoneWrapper>> handleToBoneMap,
+			List<IReadOnlyHierarchyNode<BoneWrapper>> selectedBones)
 		{
 			var handle = HandleUtility.nearestControl;
 
@@ -852,9 +1043,42 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 				handle,
 				out var bone))
 			{
-				UnityEngine.Debug.Log(
-					$"Selected bone: {bone.BoneTransform.gameObject.name} control: {handle}");
+				bool ctrlPressed = Event.current.control;
+
+				bool shiftPressed = Event.current.shift;
+
+				if (ctrlPressed && shiftPressed)
+				{
+					SelectAllBones(
+						skeleton,
+						selectedBones);
+				}
+				else if (ctrlPressed)
+				{
+					SelectBoneRecursively(
+						bone,
+						selectedBones);
+				}
+				else if (shiftPressed)
+				{
+					if (selectedBones.Contains(bone))
+					{
+						selectedBones.Remove(bone);
+					}
+					else
+					{
+						selectedBones.Add(bone);
+					}
+				}
+				else
+				{
+					selectedBones.Clear();
+
+					selectedBones.Add(bone);
+				}
 			}
 		}
+
+		#endregion
 	}
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Linq;
 
 using HereticalSolutions.Repositories;
@@ -10,6 +11,15 @@ using HereticalSolutions.Hierarchy;
 using UnityEngine;
 
 using UnityEditor;
+
+using ChangeParentRequest = System.Tuple<
+	HereticalSolutions.Hierarchy.IReadOnlyHierarchyNode<HereticalSolutions.Tools.AnimationRetargettingToolbox.BoneWrapper>,
+	HereticalSolutions.Hierarchy.IReadOnlyHierarchyNode<HereticalSolutions.Tools.AnimationRetargettingToolbox.BoneWrapper>[]>;
+
+using RemoveBoneRequest = System.Tuple<
+	HereticalSolutions.Hierarchy.IReadOnlyHierarchyNode<HereticalSolutions.Tools.AnimationRetargettingToolbox.BoneWrapper>,
+	bool>;
+using Codice.Client.Common.TreeGrouper;
 
 namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 {
@@ -30,7 +40,25 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 
 		private const string UI_TEXT_SANITIZE = "Sanitize";
 
-		private const string UI_TEXT_SHOW_DIRECTION = "Show direction";
+		private const string UI_TEXT_SHOW_BONE_DIRECTION = "Show bone direction";
+
+		private const string UI_TEXT_HIERARCHY = "Hierarchy";
+
+		private const string UI_TEXT_SELECT_ALL = "Select all";
+
+		private const string UI_TEXT_DESELECT_ALL = "Deselect all";
+
+		private const string UI_TEXT_HIERARCHY_CHILD_PREFIX = "└";
+
+		private const string UI_TEXT_HIERARCHY_PASSTHROUGH_PREFIX = "│";
+
+		private const string UI_TEXT_SELECT = "Select";
+
+		private const string UI_TEXT_SELECTED = "Selected";
+
+		private const string UI_TEXT_SET_PARENT = "Set parent";
+
+		private const string UI_TEXT_REMOVE = "Remove";
 
 		private const string UI_TEXT_NO_SMESHRENDERER = "No SkinnedMeshRenderer found in the selected skeleton donor";
 
@@ -50,15 +78,21 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 
 		private const string KEY_SELECTED_SKELETON_DONOR = "Skeleton_SelectedSkeletonDonor";
 
-		private const string KEY_SANITIZE = "Skeleton_Sanitize";
+		private const string KEY_SKELETON_SANITIZE = "Skeleton_Sanitize";
 
-		private const string KEY_DRAW_BONE_DIRECTION_GIZMO = "Skeleton_DrawBoneDirectionGizmo";
+		private const string KEY_SKELETON_DRAW_BONE_DIRECTION_GIZMO = "Skeleton_DrawBoneDirectionGizmo";
+
+		private const string KEY_SKELETON_DRAW_HIERARCHY = "Skeleton_DrawHierarchy";
 
 		private const string KEY_SKELETON = "Skeleton_Skeleton";
 
 		private const string KEY_SKELETON_CURRENT_POSE = "Skeleton_CurrentPose";
 
 		private const string KEY_SKELETON_SELECTED_BONES = "Skeleton_SelectedBones";
+
+		private const string KEY_SKELETON_BONES_CHANGE_PARENT_REQUEST = "Skeleton_BonesChangeParentRequest";
+
+		private const string KEY_SKELETON_BONE_REMOVE_REQUEST = "Skeleton_BoneRemoveRequest";
 
 		private const string KEY_HANDLE_TO_BONE_MAP = "HandleToBoneMap";
 
@@ -139,13 +173,6 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 
 		public void DrawHandles(IARToolboxContext context)
 		{
-			//if (!ARToolboxEditorHelpers.GetEnabled(
-			//	context,
-			//	KEY_TOOL_PREFIX))
-			//{
-			//	return;
-			//}
-
 			if (!context.TryGet<List<IARToolboxContext>>(
 				KEY_SKELETONS,
 				out var skeletons))
@@ -216,9 +243,11 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 
 			EditorGUILayout.Separator();
 
-			DrawBoneDirectionGizmo(
+			DrawHierarchy(
 				context);
 
+			DrawBoneDirectionGizmo(
+				context);
 
 			ARToolboxEditorHelpers.DrawSubcontextControls(
 				context,
@@ -275,14 +304,14 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 			IARToolboxContext context)
 		{
 			if (!context.TryGet<bool>(
-				KEY_SANITIZE,
+				KEY_SKELETON_SANITIZE,
 				out var previousSanitize))
 			{
 				//Initialize to default value
 				previousSanitize = true;
 
 				context.AddOrUpdate(
-					KEY_SANITIZE,
+					KEY_SKELETON_SANITIZE,
 					previousSanitize);
 			}
 
@@ -293,7 +322,7 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 			if (currentSanitize != previousSanitize)
 			{
 				context.AddOrUpdate(
-					KEY_SANITIZE,
+					KEY_SKELETON_SANITIZE,
 					currentSanitize);
 			}
 		}
@@ -318,27 +347,330 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 		private void DrawBoneDirectionGizmo(
 			IARToolboxContext context)
 		{
+			if (!context.TryGet<SkeletonWrapper>(
+				KEY_SKELETON,
+				out var _))
+			{
+				return;
+			}
+
 			if (!context.TryGet<bool>(
-				KEY_DRAW_BONE_DIRECTION_GIZMO,
+				KEY_SKELETON_DRAW_BONE_DIRECTION_GIZMO,
 				out var previousDrawGizmo))
 			{
 				//Initialize to default value
 				previousDrawGizmo = true;
 
 				context.AddOrUpdate(
-					KEY_DRAW_BONE_DIRECTION_GIZMO,
+					KEY_SKELETON_DRAW_BONE_DIRECTION_GIZMO,
 					previousDrawGizmo);
 			}
 
 			var currentDrawGizmo = EditorGUILayout.Toggle(
-				UI_TEXT_SHOW_DIRECTION,
+				UI_TEXT_SHOW_BONE_DIRECTION,
 				previousDrawGizmo);
 
 			if (currentDrawGizmo != previousDrawGizmo)
 			{
 				context.AddOrUpdate(
-					KEY_DRAW_BONE_DIRECTION_GIZMO,
+					KEY_SKELETON_DRAW_BONE_DIRECTION_GIZMO,
 					currentDrawGizmo);
+			}
+		}
+
+		private void DrawHierarchy(
+			IARToolboxContext context)
+		{
+			if (!context.TryGet<SkeletonWrapper>(
+				KEY_SKELETON,
+				out var skeleton))
+			{
+				return;
+			}
+
+
+			if (!context.TryGet<List<IReadOnlyHierarchyNode<BoneWrapper>>>(
+				KEY_SKELETON_SELECTED_BONES,
+				out var selectedBones))
+			{
+				selectedBones = new List<IReadOnlyHierarchyNode<BoneWrapper>>();
+
+				context.AddOrUpdate(
+					KEY_SKELETON_SELECTED_BONES,
+					selectedBones);
+			}
+
+
+			if (!context.TryGet<bool>(
+				KEY_SKELETON_DRAW_HIERARCHY,
+				out var previousDrawHierarchy))
+			{
+				//Initialize to default value
+				previousDrawHierarchy = true;
+
+				context.AddOrUpdate(
+					KEY_SKELETON_DRAW_HIERARCHY,
+					previousDrawHierarchy);
+			}
+
+			bool currentDrawHierarchy = ARToolboxEditorHelpers.DrawFoldout(
+				UI_TEXT_HIERARCHY,
+				previousDrawHierarchy);
+
+			if (currentDrawHierarchy != previousDrawHierarchy)
+			{
+				context.AddOrUpdate(
+					KEY_SKELETON_DRAW_HIERARCHY,
+					currentDrawHierarchy);
+			}
+
+			if (!currentDrawHierarchy)
+			{
+				return;
+			}
+
+			DrawSelectionControls(
+				skeleton,
+				selectedBones);
+
+
+			DrawBoneInHierarchyRecursively(
+				context,
+				skeleton,
+				skeleton.RootNode,
+				selectedBones);
+
+			if (context.TryGet<ChangeParentRequest>(
+				KEY_SKELETON_BONES_CHANGE_PARENT_REQUEST,
+				out var changeParentRequest))
+			{
+				var parentBone = changeParentRequest.Item1 as IHierarchyNode<BoneWrapper>;
+
+				foreach (var boneChild in changeParentRequest.Item2)
+				{
+					parentBone.AddChild(boneChild);	
+				}
+
+				context.TryRemove(KEY_SKELETON_BONES_CHANGE_PARENT_REQUEST);
+			}
+
+			if (context.TryGet<RemoveBoneRequest>(
+				KEY_SKELETON_BONE_REMOVE_REQUEST,
+				out var boneRemoveRequest))
+			{
+				var boneNode = boneRemoveRequest.Item1 as IHierarchyNode<BoneWrapper>;
+
+				var removeRecursively = boneRemoveRequest.Item2;
+
+				if (boneNode.IsRoot)
+				{
+					skeleton.RootNode = null;
+
+					selectedBones.Clear();
+				}
+				else
+				{
+					if (removeRecursively)
+					{
+						var parentBone = boneNode.Parent as IHierarchyNode<BoneWrapper>;
+
+						RemoveBoneRecursively(
+							boneNode,
+							selectedBones);
+
+						parentBone.RemoveChild(boneNode);
+					}
+					else
+					{
+						var parentBone = boneNode.Parent as IHierarchyNode<BoneWrapper>;
+	
+						foreach (var childBone in boneNode.Children.ToArray())
+						{
+							parentBone.AddChild(childBone);
+						}
+	
+						parentBone.RemoveChild(boneNode);
+
+						selectedBones.Remove(boneNode);
+					}
+				}
+
+				context.TryRemove(KEY_SKELETON_BONE_REMOVE_REQUEST);
+			}
+		}
+
+		private void DrawSelectionControls(
+			SkeletonWrapper skeleton,
+			List<IReadOnlyHierarchyNode<BoneWrapper>> selectedBones)
+		{
+			EditorGUILayout.BeginHorizontal();
+
+			if (GUILayout.Button(UI_TEXT_SELECT_ALL))
+			{
+				SelectAllBones(
+					skeleton,
+					selectedBones);
+			}
+
+			if (GUILayout.Button(UI_TEXT_DESELECT_ALL))
+			{
+				selectedBones.Clear();
+			}
+
+			EditorGUILayout.EndHorizontal();
+		}
+
+		private void RemoveBoneRecursively(
+			IReadOnlyHierarchyNode<BoneWrapper> boneNode,
+			List<IReadOnlyHierarchyNode<BoneWrapper>> selectedBones)
+		{
+			foreach (var child in boneNode.Children.ToArray())
+			{
+				RemoveBoneRecursively(
+					child,
+					selectedBones);
+			}
+
+			var boneNodeCasted = boneNode as IHierarchyNode<BoneWrapper>;
+
+			boneNodeCasted.RemoveAllChildren();
+
+			selectedBones.Remove(boneNode);
+		}
+
+		private void DrawBoneInHierarchyRecursively(
+			IARToolboxContext context,
+			SkeletonWrapper skeleton,
+			IReadOnlyHierarchyNode<BoneWrapper> boneNode,
+			List<IReadOnlyHierarchyNode<BoneWrapper>> selectedBones,
+			int depth = 0)
+		{
+			if (boneNode == null)
+			{
+				return;
+			}
+
+			if (boneNode.Contents != null)
+			{
+				EditorGUILayout.BeginHorizontal();
+
+				StringBuilder stringBuilder = new StringBuilder();
+
+				for (int i = 0; i < depth - 1; i++)
+					stringBuilder.Append(UI_TEXT_HIERARCHY_PASSTHROUGH_PREFIX);
+
+				if (depth > 0)
+					stringBuilder.Append(UI_TEXT_HIERARCHY_CHILD_PREFIX);
+
+				bool selected = selectedBones.Contains(boneNode);
+
+				EditorGUILayout.LabelField(
+					$"{stringBuilder.ToString()}{boneNode.Contents.BoneName}");
+
+				if (selected)
+				{
+					if (ARToolboxEditorHelpers.DrawButtonTight(
+						UI_TEXT_SELECTED))
+					{
+						selectedBones.Remove(boneNode);
+					}
+				}
+				else
+				{
+					if (ARToolboxEditorHelpers.DrawButtonTight(
+						UI_TEXT_SELECT))
+					{
+						selectedBones.Add(boneNode);
+					}
+				}
+
+				bool anySelected = selectedBones.Count > 0;
+
+				//There is no sence to set current bone to parent if there's noone to be parent to
+				//There is no sence to set current bone to parent if it's already selected to be a child
+				bool setParentActive = anySelected && !selected;
+
+				//There is no sence to set current bone to parent if it is a descendant of any selected bone
+				//Otherwise it will create a cycle which violates the tree structure and it also creates an island
+				//which is not connected to the rest of the tree
+				if (setParentActive)
+				{
+					var currentBone = boneNode;
+
+					while (!currentBone.IsRoot)
+					{
+						if (selectedBones.Contains(currentBone))
+						{
+							setParentActive = false;
+
+							break;
+						}
+
+						currentBone = currentBone.Parent;
+					}
+				}
+
+				//There is no sence to set current bone to parent if it is already a parent of any selected bone
+				//
+				//Actually there is. It may be required to be a parent for some distant bone hierarchy
+				//that is selected as well
+				//
+				//if (setParentActive)
+				//{
+				//	foreach (var selectedBone in selectedBones)
+				//	{
+				//		if (selectedBone.Parent == boneNode)
+				//		{
+				//			setParentActive = false;
+				//
+				//			break;
+				//		}
+				//	}
+				//}
+
+				if (!setParentActive)
+					GUI.enabled = false;
+
+				if (ARToolboxEditorHelpers.DrawButtonTight(
+					UI_TEXT_SET_PARENT))
+				{
+					context.AddOrUpdate(
+						KEY_SKELETON_BONES_CHANGE_PARENT_REQUEST,
+						new ChangeParentRequest
+						(
+							boneNode,
+							selectedBones.ToArray()
+						));
+				}
+
+				if (!setParentActive)
+					GUI.enabled = true;
+
+				bool ctrlPressed = Event.current.control;
+
+				if (ARToolboxEditorHelpers.DrawButtonTight(
+					UI_TEXT_REMOVE))
+				{
+					context.AddOrUpdate(
+						KEY_SKELETON_BONE_REMOVE_REQUEST,
+						new RemoveBoneRequest(
+							boneNode,
+							ctrlPressed));
+				}
+
+				EditorGUILayout.EndHorizontal();
+			}
+
+			depth++;
+
+			foreach (var child in boneNode.Children)
+			{
+				DrawBoneInHierarchyRecursively(
+					context,
+					skeleton,
+					child,
+					selectedBones,
+					depth);
 			}
 		}
 
@@ -372,7 +704,7 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 				rootNode);
 
 			if (context.TryGet<bool>(
-				KEY_SANITIZE,
+				KEY_SKELETON_SANITIZE,
 				out var sanitize)
 				&& sanitize)
 			{
@@ -765,7 +1097,7 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 
 			bool drawBoneDirectionGizmo =
 				context.TryGet<bool>(
-					KEY_DRAW_BONE_DIRECTION_GIZMO,
+					KEY_SKELETON_DRAW_BONE_DIRECTION_GIZMO,
 					out var drawGizmo)
 				&& drawGizmo;
 
@@ -817,6 +1149,11 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 			PoseSnapshot currentPose,
 			List<IReadOnlyHierarchyNode<BoneWrapper>> selectedBones = null)
 		{
+			if (boneNode == null)
+			{
+				return;
+			}
+
 			TryDrawBoneHandles(
 				ref currentFreeHandle,
 				handleToBoneMap,
@@ -851,6 +1188,11 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 			PoseSnapshot currentPose,
 			List<IReadOnlyHierarchyNode<BoneWrapper>> selectedBones = null)
 		{
+			if (boneNode == null)
+			{
+				return;
+			}
+
 			if (!currentPose.BoneSnapshots.TryGet(
 				boneNode.Contents,
 				out var boneSnapshot))

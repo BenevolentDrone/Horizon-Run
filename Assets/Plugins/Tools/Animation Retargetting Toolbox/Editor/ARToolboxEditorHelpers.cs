@@ -19,6 +19,10 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 
 		private const string UI_TEXT_DISNABLED = "[ Disabled ]";
 
+		private const string UI_TEXT_SHOW = "[ Show ]";
+
+		private const string UI_TEXT_HIDE = "[ Hide ]";
+
 		private const string UI_TEXT_ADD_PATTERN = "Add {0}";
 
 		private const string UI_TEXT_SUBCONTEXT_HEADER_PATTERN = "{0} {1}";
@@ -252,6 +256,23 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 
 		#endregion
 
+		#region Foldouts
+
+		public static bool DrawFoldout(
+			string labelText,
+			bool previousValue)
+		{
+			//DrawLabelTight(labelText);
+
+			var newValue = EditorGUILayout.Foldout(
+				previousValue,
+				labelText);
+
+			return newValue;
+		}
+
+		#endregion
+
 		#region Inner box
 
 		public static void BeginInnerBoxWithTitle(
@@ -299,8 +320,8 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 			bool currentEnabled = EditorGUILayout.Foldout(
 				previousEnabled,
 				(previousEnabled)
-					? UI_TEXT_ENABLED
-					: UI_TEXT_DISNABLED);
+					? UI_TEXT_HIDE
+					: UI_TEXT_SHOW);
 
 			if (currentEnabled != previousEnabled)
 			{

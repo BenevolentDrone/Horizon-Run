@@ -19,7 +19,6 @@ using ChangeParentRequest = System.Tuple<
 using RemoveBoneRequest = System.Tuple<
 	HereticalSolutions.Hierarchy.IReadOnlyHierarchyNode<HereticalSolutions.Tools.AnimationRetargettingToolbox.BoneWrapper>,
 	bool>;
-using Codice.Client.Common.TreeGrouper;
 
 namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 {
@@ -464,9 +463,22 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 
 				if (boneNode.IsRoot)
 				{
-					skeleton.RootNode = null;
+					if (!removeRecursively && boneNode.ChildCount == 1)
+					{
+						var childBone = boneNode.Children.First() as IHierarchyNode<BoneWrapper>;
 
-					selectedBones.Clear();
+						skeleton.RootNode = childBone;
+
+						childBone.SetParent(null);
+
+						selectedBones.Remove(boneNode);
+					}
+					else
+					{
+						skeleton.RootNode = null;
+	
+						selectedBones.Clear();
+					}
 				}
 				else
 				{
@@ -1382,8 +1394,11 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 			var handle = HandleUtility.nearestControl;
 
 			if (handleToBoneMap.TryGet(
-				handle,
-				out var bone))
+					handle,
+					out var bone)
+				&& BoneBelongsToSkeleton(
+					skeleton,
+					bone))
 			{
 				bool ctrlPressed = Event.current.control;
 
@@ -1419,6 +1434,25 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 					selectedBones.Add(bone);
 				}
 			}
+		}
+
+		private bool BoneBelongsToSkeleton(
+			SkeletonWrapper skeleton,
+			IReadOnlyHierarchyNode<BoneWrapper> bone)
+		{
+			var currentBone = bone;
+
+			while (!currentBone.IsRoot)
+			{
+				if (currentBone.Parent == null)
+				{
+					return false;
+				}
+
+				currentBone = currentBone.Parent;
+			}
+
+			return currentBone == skeleton.RootNode;
 		}
 
 		#endregion

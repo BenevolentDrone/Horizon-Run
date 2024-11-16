@@ -127,6 +127,28 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 			}
 		}
 
+		private static GUIStyle labelStyleBigTitleBold;
+
+		public static GUIStyle LabelStyleBigTitleBold
+		{
+			get
+			{
+				if (labelStyleBigTitleBold == null)
+				{
+					labelStyleBigTitleBold = new GUIStyle(
+						GUI.skin.label);
+
+					labelStyleBigTitleBold.fontSize = 18;
+
+					labelStyleBigTitleBold.alignment = TextAnchor.MiddleCenter;
+
+					labelStyleBigTitleBold.fontStyle = FontStyle.Bold;
+				}
+
+				return labelStyleBigTitleBold;
+			}
+		}
+
 		private static GUIStyle boxStyleInner;
 
 		public static GUIStyle BoxStyleInner
@@ -283,7 +305,7 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 
 			GUILayout.Label(
 				title,
-				LabelStyleTitleBold);
+				LabelStyleBigTitleBold);
 		}
 
 		public static void EndInnerBox()
@@ -364,12 +386,18 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 			GUILayout.BeginVertical(
 				BoxStyleInner);
 
+			string title = string.Format(
+				UI_TEXT_SUBCONTEXT_HEADER_PATTERN,
+				subcontextTitlePrefix,
+				subcontextIndex + 1);
+
+			var titleWidth = LabelStyleTitleBold.CalcSize(
+				new GUIContent(title)).x;
+
 			EditorGUILayout.LabelField(
-				string.Format(
-					UI_TEXT_SUBCONTEXT_HEADER_PATTERN,
-					subcontextTitlePrefix,
-					subcontextIndex + 1),
-				LabelStyleTitleBold);
+				title,
+				LabelStyleTitleBold,
+				GUILayout.Width(titleWidth));
 
 			bool result = BeginEnabledCheck(
 				context,

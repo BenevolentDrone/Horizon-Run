@@ -59,9 +59,13 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 
 		private const string UI_TEXT_REMOVE = "Remove";
 
+		private const string UI_TEXT_TRANSFORM = "Transform";
+
 		private const string UI_TEXT_NO_SMESHRENDERER = "No SkinnedMeshRenderer found in the selected skeleton donor";
 
 		private const string UI_TEXT_SAMPLE = "Sample";
+
+		private const float UI_BONE_MODE_DROPDOWN_WIDTH = 110;
 
 		#endregion
 
@@ -433,11 +437,14 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 				selectedBones);
 
 
+			string[] allBoneModes = Enum.GetNames(typeof(EBoneMode));
+
 			DrawBoneInHierarchyRecursively(
 				context,
 				skeleton,
 				skeleton.RootNode,
-				selectedBones);
+				selectedBones,
+				allBoneModes);
 
 			if (context.TryGet<ChangeParentRequest>(
 				KEY_SKELETON_BONES_CHANGE_PARENT_REQUEST,
@@ -555,6 +562,7 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 			SkeletonWrapper skeleton,
 			IReadOnlyHierarchyNode<BoneWrapper> boneNode,
 			List<IReadOnlyHierarchyNode<BoneWrapper>> selectedBones,
+			string[] allBoneModes,
 			int depth = 0)
 		{
 			if (boneNode == null)
@@ -578,6 +586,27 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 
 				EditorGUILayout.LabelField(
 					$"{stringBuilder.ToString()}{boneNode.Contents.BoneName}");
+
+
+				var poseSnapshot = boneNode.Contents.PoseSnapshot;
+
+				int previousSelectedBoneModeIndex = Array.IndexOf(
+					allBoneModes,
+					poseSnapshot.BoneMode.ToString());
+
+				int currentSelectedBoneModeIndex = EditorGUILayout.Popup(
+					previousSelectedBoneModeIndex,
+					allBoneModes,
+					GUILayout.Width(UI_BONE_MODE_DROPDOWN_WIDTH));
+					
+				if (currentSelectedBoneModeIndex != previousSelectedBoneModeIndex)
+				{
+					poseSnapshot.BoneMode = Enum.Parse<EBoneMode>(
+						allBoneModes[currentSelectedBoneModeIndex]);
+
+					boneNode.Contents.PoseSnapshot = poseSnapshot;
+				}
+
 
 				if (selected)
 				{
@@ -670,6 +699,12 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 							ctrlPressed));
 				}
 
+				if (ARToolboxEditorHelpers.DrawButtonTight(
+					UI_TEXT_TRANSFORM))
+				{
+					Selection.activeGameObject = boneNode.Contents.BoneTransform.gameObject;
+				}
+
 				EditorGUILayout.EndHorizontal();
 			}
 
@@ -682,6 +717,7 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 					skeleton,
 					child,
 					selectedBones,
+					allBoneModes,
 					depth);
 			}
 		}
@@ -999,7 +1035,7 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 			{
 				Position = Vector3.zero,
 				Rotation = rotationDifference,
-				BoneMode = EBoneMode.SANITATION
+				BoneMode = EBoneMode.ADDITIVE
 			};
 		}
 

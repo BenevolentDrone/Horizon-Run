@@ -19,7 +19,7 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 			{
 				Position = Vector3.zero,
 				Rotation = Quaternion.identity,
-				BoneMode = EBoneMode.SANITATION
+				BoneMode = EBoneMode.ADDITIVE
 			};
 		}
 
@@ -27,7 +27,7 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 
 		public Transform BoneTransform { get; private set; }
 
-		public BoneSnapshot PoseSnapshot { get; private set; }
+		public BoneSnapshot PoseSnapshot { get; set; }
 
 		public BoneSnapshot SanitationSnapshot { get; set; }
 	}

@@ -1,5 +1,8 @@
+using System;
+using System.Linq;
+using System.Text;
 using HereticalSolutions.Repositories.Factories;
-
+using Newtonsoft.Json;
 using UnityEditor;
 
 using UnityEngine;
@@ -10,6 +13,12 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 	{
 		private const string WINDOW_TITLE = "ARToolbox"; //"Animation Retargetting Toolbox";
 
+		private const bool SINGLE_INSTANCE = false;
+
+		private const string KEY_PREFS_SAVED_EDITOR_STATES = "ARToolbox_SavedEditors";
+
+		private  const string KEY_PREFS_EDITOR_STATE_SAVE_PREFIX = "ARToolbox_Save_{0}";
+
 		private static IARToolboxToolWindow[] toolWindows;
 
 		private IARToolboxContext context;
@@ -18,36 +27,47 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 
 		private Vector2 scrollPos;
 
-		#region EditorWindow
+		private bool savedToEditorPrefs = false;
+
+		#region EditorWindow callbacks
 
 		[MenuItem("Tools/Animation/Animation retargetting tool")]
 		static void Init()
 		{
-			StaticLazyInitialization();
+			//UnityEngine.Debug.Log("[ARToolboxWindow] Init");
 
-			// Get existing open window or if none, make a new one:
-			ARToolboxWindow window = (ARToolboxWindow)EditorWindow.GetWindow(
-				typeof(ARToolboxWindow),
-				false,
-				WINDOW_TITLE);
+			//StaticLazyInitialization();
+
+			ARToolboxWindow window = null;
+
+			if (SINGLE_INSTANCE)
+			{
+				// Get existing open window or if none, make a new one:
+				window = (ARToolboxWindow)EditorWindow.GetWindow(
+					typeof(ARToolboxWindow),
+					false,
+					WINDOW_TITLE);
+			}
+			else
+			{
+				window = (ARToolboxWindow)EditorWindow.CreateWindow<ARToolboxWindow>(
+					WINDOW_TITLE);
+			}
 		}
 
-		// Window has been selected
 		void OnFocus()
 		{
-			StaticLazyInitialization();
+			//UnityEngine.Debug.Log($"[ARToolboxWindow] OnFocus {this.GetInstanceID()}");
+		}
 
-			LazyInitialization();
+		//OnEnable and OnFocus are inconsistent on which one is called first
+		//But OnFocus is called every time the window is selected
+		//So it's OnEnable from now
+		void OnEnable()
+		{
+			//UnityEngine.Debug.Log($"[ARToolboxWindow] OnEnable {this.GetInstanceID()}");
 
-			// Remove delegate listener if it has previously
-			// been assigned.
-			SceneView.duringSceneGui -= this.OnSceneGUI;
-			// Add (or re-add) the delegate.
-			SceneView.duringSceneGui += this.OnSceneGUI;
-
-
-			EditorApplication.update -= this.OnSceneUpdate;
-			EditorApplication.update += this.OnSceneUpdate;
+			Initialize();
 		}
 
 		void OnGUI()
@@ -66,13 +86,17 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 		}
 
 		// Window has been destroyed
+		//void OnDestroy()
+		void OnDisable()
+		{
+			//UnityEngine.Debug.Log($"[ARToolboxWindow] OnDisable {this.GetInstanceID()}");
+
+			Cleanup();
+		}
+
 		void OnDestroy()
 		{
-			// When the window is destroyed, remove the delegate
-			// so that it will no longer do any drawing.
-			SceneView.duringSceneGui -= this.OnSceneGUI;
-
-			EditorApplication.update -= this.OnSceneUpdate;
+			//UnityEngine.Debug.Log($"[ARToolboxWindow] OnDestroy {this.GetInstanceID()}");
 		}
 
 		#endregion
@@ -81,9 +105,12 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 		{
 			if (toolWindows == null)
 			{
+				//UnityEngine.Debug.Log("[ARToolboxWindow] StaticLazyInitialization");
+
 				toolWindows = new IARToolboxToolWindow[]
 				{
 					 new SkeletonTool(),
+					 new MappingTool(),
 					 new AnimationTool()
 				};
 			}
@@ -93,6 +120,8 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 		{
 			if (context == null)
 			{
+				//UnityEngine.Debug.Log("[ARToolboxWindow] LazyInitialization");
+
 				context = new ARToolboxRootContext(
 					RepositoriesFactory.BuildDictionaryRepository<string, object>());
 			}
@@ -101,6 +130,186 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 			{
 				lastEditorUpdateTime = EditorApplication.timeSinceStartup;
 			}
+		}
+
+		void OnBeforeAssemblyReload()
+		{
+			//Debug.Log($"[ARToolboxWindow] OnBeforeAssemblyReload {this.GetInstanceID()}");
+
+			var saves = GetSavedEditorStates();
+
+			SerializeState<object>(
+				saves,
+				null);
+
+			savedToEditorPrefs = true;
+
+			//Debug.Log($"[ARToolboxWindow] SAVED");
+		}
+
+		void OnAfterAssemblyReload()
+		{
+			//Debug.Log($"[ARToolboxWindow] OnAfterAssemblyReload {this.GetInstanceID()}");
+
+			var saves = GetSavedEditorStates();
+
+			if (saves.Length != 0)
+			{
+				if (TryDeserializeState<object>(
+					saves,
+					out _))
+				{
+					//Debug.Log($"[ARToolboxWindow] RESTORED");
+				}
+			}
+		}
+
+		private string[] GetSavedEditorStates()
+		{
+			if (!EditorPrefs.HasKey(KEY_PREFS_SAVED_EDITOR_STATES))
+			{
+				return new string[0];
+			}
+
+			var savesListJson = EditorPrefs.GetString(KEY_PREFS_SAVED_EDITOR_STATES);
+
+			string[] result = null;
+
+			try
+			{
+				result = JsonConvert.DeserializeObject<string[]>(savesListJson);
+			}
+			catch (Exception e)
+			{
+				UnityEngine.Debug.LogError(e);
+			}
+
+			if (result == null)
+			{
+				result = new string[0];
+			}
+
+
+			//StringBuilder stringBuilder = new StringBuilder();
+			//
+			//for (int i = 0; i < result.Length; i++)
+			//{
+			//	stringBuilder.Append(result[i]);
+			//
+			//	if (i < result.Length - 1)
+			//		stringBuilder.Append(", ");
+			//}
+			//
+			//UnityEngine.Debug.Log($"[ARToolboxWindow] Retrieved state saves list: [{stringBuilder.ToString()}]");
+
+			return result;
+		}
+
+		private void SerializeState<TState>(
+			string[] savesList,
+			TState state)
+		{
+			//serialize
+			string saveJson = "{}";
+
+			string key = String.Format(
+				KEY_PREFS_EDITOR_STATE_SAVE_PREFIX,
+				this.GetInstanceID());
+
+			EditorPrefs.SetString(
+				key,
+				saveJson);
+
+			var newSavesList = savesList.Append(key).ToArray();
+
+
+			//StringBuilder stringBuilder = new StringBuilder();
+			//
+			//for (int i = 0; i < savesList.Length; i++)
+			//{
+			//	stringBuilder.Append(savesList[i]);
+			//
+			//	if (i < savesList.Length - 1)
+			//		stringBuilder.Append(", ");
+			//}
+			//
+			//UnityEngine.Debug.Log($"[ARToolboxWindow] Saving state saves list: [{stringBuilder.ToString()}]");
+
+
+			string savesListJson = string.Empty;
+
+			try
+			{
+				savesListJson = JsonConvert.SerializeObject(newSavesList);
+			}
+			catch (Exception e)
+			{
+				UnityEngine.Debug.LogError(e);
+			}
+
+			EditorPrefs.SetString(
+				KEY_PREFS_SAVED_EDITOR_STATES,
+				savesListJson);
+		}
+
+		private bool TryDeserializeState<TState>(
+			string[] savesList,
+			out TState state)
+		{
+			bool success = false;
+
+			state = default;
+
+			string key = String.Format(
+				KEY_PREFS_EDITOR_STATE_SAVE_PREFIX,
+				this.GetInstanceID());
+
+			if (savesList.Contains(key))
+			{
+				if (EditorPrefs.HasKey(key))
+				{
+					var saveJson = EditorPrefs.GetString(key);
+
+					//deserialize
+
+					success = true;
+				}
+
+				EditorPrefs.DeleteKey(key);
+
+				var newSavesList = savesList.Where(x => x != key).ToArray();
+
+
+				//StringBuilder stringBuilder = new StringBuilder();
+				//
+				//for (int i = 0; i < newSavesList.Length; i++)
+				//{
+				//	stringBuilder.Append(newSavesList[i]);
+				//
+				//	if (i < newSavesList.Length - 1)
+				//		stringBuilder.Append(", ");
+				//}
+				//
+				//UnityEngine.Debug.Log($"[ARToolboxWindow] Saving state saves list: [{stringBuilder.ToString()}]");
+
+
+				string savesListJson = string.Empty;
+
+				try
+				{
+					savesListJson = JsonConvert.SerializeObject(newSavesList);
+				}
+				catch (Exception e)
+				{
+					UnityEngine.Debug.LogError(e);
+				}
+
+				EditorPrefs.SetString(
+					KEY_PREFS_SAVED_EDITOR_STATES,
+					savesListJson);
+			}
+
+			return success;
 		}
 
 		void OnSceneGUI(
@@ -139,6 +348,41 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 			{
 				toolWindow.SceneUpdate(context);
 			}
+		}
+
+		void Initialize()
+		{
+			StaticLazyInitialization();
+
+			LazyInitialization();
+
+			AssemblyReloadEvents.beforeAssemblyReload -= OnBeforeAssemblyReload;
+			AssemblyReloadEvents.beforeAssemblyReload += OnBeforeAssemblyReload;
+
+			AssemblyReloadEvents.afterAssemblyReload -= OnAfterAssemblyReload;
+			AssemblyReloadEvents.afterAssemblyReload += OnAfterAssemblyReload;
+
+			SceneView.duringSceneGui -= this.OnSceneGUI;
+			SceneView.duringSceneGui += this.OnSceneGUI;
+
+
+			EditorApplication.update -= this.OnSceneUpdate;
+			EditorApplication.update += this.OnSceneUpdate;
+		}
+
+		void Cleanup()
+		{
+			SceneView.duringSceneGui -= this.OnSceneGUI;
+
+			EditorApplication.update -= this.OnSceneUpdate;
+
+			AssemblyReloadEvents.beforeAssemblyReload -= OnBeforeAssemblyReload;
+			AssemblyReloadEvents.afterAssemblyReload -= OnAfterAssemblyReload;
+
+			//if (!savedToEditorPrefs)
+			//{
+			//	UnityEngine.Debug.Log($"[ARToolboxWindow] NOT SAVED");
+			//}
 		}
 	}
 }

@@ -129,7 +129,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
 		{
 			if (componentTypes == null)
 			{
-				TypeHelpers.GetTypesWithAttribute<ComponentAttribute>(
+				TypeHelpers.GetTypesWithAttributeInAllAssemblies<ComponentAttribute>(
 					out componentTypes);
 			}
 

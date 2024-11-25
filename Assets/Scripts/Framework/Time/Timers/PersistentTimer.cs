@@ -350,7 +350,7 @@ namespace HereticalSolutions.Time.Timers
             get => typeof(PersistentTimerDTO);
         }
 
-        public bool Accept<TDTO>(
+        public bool AcceptSave<TDTO>(
             ISaveVisitor visitor,
             out TDTO DTO)
         {
@@ -385,7 +385,7 @@ namespace HereticalSolutions.Time.Timers
         /// <param name="visitor">The save visitor.</param>
         /// <param name="DTO">The data transfer object.</param>
         /// <returns>True if the visit was successful, false otherwise.</returns>
-        public bool Accept(ISaveVisitor visitor, out object DTO)
+        public bool AcceptSave(ISaveVisitor visitor, out object DTO)
         {
             var result = visitor.Save<IPersistentTimer, PersistentTimerDTO>(this, out PersistentTimerDTO persistentTimerDTO);
 
@@ -394,7 +394,7 @@ namespace HereticalSolutions.Time.Timers
             return result;
         }
 
-        public bool Accept<TDTO>(
+        public bool AcceptLoad<TDTO>(
             ILoadVisitor visitor,
             TDTO DTO)
         {
@@ -421,7 +421,7 @@ namespace HereticalSolutions.Time.Timers
         /// <param name="visitor">The load visitor.</param>
         /// <param name="DTO">The data transfer object.</param>
         /// <returns>True if the visit was successful, false otherwise.</returns>
-        public bool Accept(ILoadVisitor visitor, object DTO)
+        public bool AcceptLoad(ILoadVisitor visitor, object DTO)
         {
             return visitor.Load<IPersistentTimer, PersistentTimerDTO>((PersistentTimerDTO)DTO, this);
         }

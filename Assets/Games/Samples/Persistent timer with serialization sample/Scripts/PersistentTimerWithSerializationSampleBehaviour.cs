@@ -220,7 +220,7 @@ namespace HereticalSolutions.Samples.PersistentTimerWithSerializationSample
 		private void Save()
 		{
 			//Visit
-			persistentTimerAsVisitable.Accept(saveVisitor, out var dto);
+			persistentTimerAsVisitable.AcceptSave(saveVisitor, out var dto);
 
 			//Serialize
 			binarySerializer.Serialize(binaryStreamArgument, persistentTimerAsVisitable.DTOType, dto);
@@ -284,7 +284,7 @@ namespace HereticalSolutions.Samples.PersistentTimerWithSerializationSample
 				return false;
 
 			//Visit
-			bool result = persistentTimerAsVisitable.Accept(loadVisitor, dto);
+			bool result = persistentTimerAsVisitable.AcceptLoad(loadVisitor, dto);
 
 			//Debug
 			if (result)

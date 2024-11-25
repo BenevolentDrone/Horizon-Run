@@ -3,7 +3,7 @@ using System.Runtime.Serialization;
 
 using Newtonsoft.Json;
 
-namespace HereticalSolutions.Persistence.Serializers
+namespace HereticalSolutions.Persistence
 {
 	//Courtesy of https://stackoverflow.com/questions/39383098/ignore-missing-types-during-deserialization-of-list
 	public class JsonSerializationBinderException : JsonSerializationException

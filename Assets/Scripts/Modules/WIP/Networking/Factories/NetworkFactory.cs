@@ -334,7 +334,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Networking.Factories
 
         public static PacketRepository BuildPacketRepository()
         {
-            TypeHelpers.GetTypesWithAttribute<PacketAttribute>(
+            TypeHelpers.GetTypesWithAttributeInAllAssemblies<PacketAttribute>(
                 out var packetTypes);
             
             Array.Sort(

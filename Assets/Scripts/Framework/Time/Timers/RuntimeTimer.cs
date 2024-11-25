@@ -295,7 +295,7 @@ namespace HereticalSolutions.Time.Timers
         /// </summary>
         public Type DTOType => typeof(RuntimeTimerDTO);
 
-        public bool Accept<TDTO>(
+        public bool AcceptSave<TDTO>(
             ISaveVisitor visitor,
             out TDTO DTO)
         {
@@ -330,7 +330,7 @@ namespace HereticalSolutions.Time.Timers
         /// <param name="visitor">The save visitor to accept.</param>
         /// <param name="DTO">The converted DTO object.</param>
         /// <returns>A value indicating whether the conversion was successful.</returns>
-        public bool Accept(ISaveVisitor visitor, out object DTO)
+        public bool AcceptSave(ISaveVisitor visitor, out object DTO)
         {
             var result = visitor.Save<IRuntimeTimer, RuntimeTimerDTO>(this, out RuntimeTimerDTO runtimeTimerDTO);
 
@@ -339,7 +339,7 @@ namespace HereticalSolutions.Time.Timers
             return result;
         }
 
-        public bool Accept<TDTO>(
+        public bool AcceptLoad<TDTO>(
             ILoadVisitor visitor,
             TDTO DTO)
         {
@@ -366,7 +366,7 @@ namespace HereticalSolutions.Time.Timers
         /// <param name="visitor">The load visitor to accept.</param>
         /// <param name="DTO">The DTO object containing the values to apply.</param>
         /// <returns>A value indicating whether the application of values was successful.</returns>
-        public bool Accept(ILoadVisitor visitor, object DTO)
+        public bool AcceptLoad(ILoadVisitor visitor, object DTO)
         {
             return visitor.Load<IRuntimeTimer, RuntimeTimerDTO>((RuntimeTimerDTO)DTO, this);
         }

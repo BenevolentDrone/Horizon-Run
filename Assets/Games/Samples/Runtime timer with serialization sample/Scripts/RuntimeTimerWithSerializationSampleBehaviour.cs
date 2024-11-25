@@ -218,7 +218,7 @@ namespace HereticalSolutions.Samples.RuntimeTimerWithSerializationSample
 		private void Save()
 		{
 			//Visit
-			runtimeTimerAsVisitable.Accept(saveVisitor, out var dto);
+			runtimeTimerAsVisitable.AcceptSave(saveVisitor, out var dto);
 
 			//Serialize
 			binarySerializer.Serialize(binaryStreamArgument, runtimeTimerAsVisitable.DTOType, dto);
@@ -282,7 +282,7 @@ namespace HereticalSolutions.Samples.RuntimeTimerWithSerializationSample
 				return false;
 
 			//Visit
-			bool result = runtimeTimerAsVisitable.Accept(loadVisitor, dto);
+			bool result = runtimeTimerAsVisitable.AcceptLoad(loadVisitor, dto);
 
 			//Debug
 			if (result)

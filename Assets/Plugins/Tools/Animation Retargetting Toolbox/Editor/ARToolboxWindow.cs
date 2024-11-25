@@ -1,8 +1,5 @@
-using System;
-using System.Linq;
-using System.Text;
 using HereticalSolutions.Repositories.Factories;
-using Newtonsoft.Json;
+
 using UnityEditor;
 
 using UnityEngine;
@@ -26,8 +23,6 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 		private double lastEditorUpdateTime;
 
 		private Vector2 scrollPos;
-
-		private bool savedToEditorPrefs = false;
 
 		#region EditorWindow callbacks
 
@@ -136,13 +131,15 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 		{
 			//Debug.Log($"[ARToolboxWindow] OnBeforeAssemblyReload {this.GetInstanceID()}");
 
-			var saves = GetSavedEditorStates();
+			var saves = ARToolboxEditorHelpers.GetSavedEditorStatesFromEditorPrefs(
+				KEY_PREFS_SAVED_EDITOR_STATES);
 
-			SerializeState<object>(
+			ARToolboxEditorHelpers.SerializeStateToEditorPrefs<object>(
+				KEY_PREFS_SAVED_EDITOR_STATES,
+				KEY_PREFS_EDITOR_STATE_SAVE_PREFIX,
+				this.GetInstanceID(),
 				saves,
 				null);
-
-			savedToEditorPrefs = true;
 
 			//Debug.Log($"[ARToolboxWindow] SAVED");
 		}
@@ -151,165 +148,21 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 		{
 			//Debug.Log($"[ARToolboxWindow] OnAfterAssemblyReload {this.GetInstanceID()}");
 
-			var saves = GetSavedEditorStates();
+			var saves = ARToolboxEditorHelpers.GetSavedEditorStatesFromEditorPrefs(
+				KEY_PREFS_SAVED_EDITOR_STATES);
 
 			if (saves.Length != 0)
 			{
-				if (TryDeserializeState<object>(
+				if (ARToolboxEditorHelpers.TryDeserializeStateFromEditorPrefs<object>(
+					KEY_PREFS_SAVED_EDITOR_STATES,
+					KEY_PREFS_EDITOR_STATE_SAVE_PREFIX,
+					this.GetInstanceID(),
 					saves,
 					out _))
 				{
 					//Debug.Log($"[ARToolboxWindow] RESTORED");
 				}
 			}
-		}
-
-		private string[] GetSavedEditorStates()
-		{
-			if (!EditorPrefs.HasKey(KEY_PREFS_SAVED_EDITOR_STATES))
-			{
-				return new string[0];
-			}
-
-			var savesListJson = EditorPrefs.GetString(KEY_PREFS_SAVED_EDITOR_STATES);
-
-			string[] result = null;
-
-			try
-			{
-				result = JsonConvert.DeserializeObject<string[]>(savesListJson);
-			}
-			catch (Exception e)
-			{
-				UnityEngine.Debug.LogError(e);
-			}
-
-			if (result == null)
-			{
-				result = new string[0];
-			}
-
-
-			//StringBuilder stringBuilder = new StringBuilder();
-			//
-			//for (int i = 0; i < result.Length; i++)
-			//{
-			//	stringBuilder.Append(result[i]);
-			//
-			//	if (i < result.Length - 1)
-			//		stringBuilder.Append(", ");
-			//}
-			//
-			//UnityEngine.Debug.Log($"[ARToolboxWindow] Retrieved state saves list: [{stringBuilder.ToString()}]");
-
-			return result;
-		}
-
-		private void SerializeState<TState>(
-			string[] savesList,
-			TState state)
-		{
-			//serialize
-			string saveJson = "{}";
-
-			string key = String.Format(
-				KEY_PREFS_EDITOR_STATE_SAVE_PREFIX,
-				this.GetInstanceID());
-
-			EditorPrefs.SetString(
-				key,
-				saveJson);
-
-			var newSavesList = savesList.Append(key).ToArray();
-
-
-			//StringBuilder stringBuilder = new StringBuilder();
-			//
-			//for (int i = 0; i < savesList.Length; i++)
-			//{
-			//	stringBuilder.Append(savesList[i]);
-			//
-			//	if (i < savesList.Length - 1)
-			//		stringBuilder.Append(", ");
-			//}
-			//
-			//UnityEngine.Debug.Log($"[ARToolboxWindow] Saving state saves list: [{stringBuilder.ToString()}]");
-
-
-			string savesListJson = string.Empty;
-
-			try
-			{
-				savesListJson = JsonConvert.SerializeObject(newSavesList);
-			}
-			catch (Exception e)
-			{
-				UnityEngine.Debug.LogError(e);
-			}
-
-			EditorPrefs.SetString(
-				KEY_PREFS_SAVED_EDITOR_STATES,
-				savesListJson);
-		}
-
-		private bool TryDeserializeState<TState>(
-			string[] savesList,
-			out TState state)
-		{
-			bool success = false;
-
-			state = default;
-
-			string key = String.Format(
-				KEY_PREFS_EDITOR_STATE_SAVE_PREFIX,
-				this.GetInstanceID());
-
-			if (savesList.Contains(key))
-			{
-				if (EditorPrefs.HasKey(key))
-				{
-					var saveJson = EditorPrefs.GetString(key);
-
-					//deserialize
-
-					success = true;
-				}
-
-				EditorPrefs.DeleteKey(key);
-
-				var newSavesList = savesList.Where(x => x != key).ToArray();
-
-
-				//StringBuilder stringBuilder = new StringBuilder();
-				//
-				//for (int i = 0; i < newSavesList.Length; i++)
-				//{
-				//	stringBuilder.Append(newSavesList[i]);
-				//
-				//	if (i < newSavesList.Length - 1)
-				//		stringBuilder.Append(", ");
-				//}
-				//
-				//UnityEngine.Debug.Log($"[ARToolboxWindow] Saving state saves list: [{stringBuilder.ToString()}]");
-
-
-				string savesListJson = string.Empty;
-
-				try
-				{
-					savesListJson = JsonConvert.SerializeObject(newSavesList);
-				}
-				catch (Exception e)
-				{
-					UnityEngine.Debug.LogError(e);
-				}
-
-				EditorPrefs.SetString(
-					KEY_PREFS_SAVED_EDITOR_STATES,
-					savesListJson);
-			}
-
-			return success;
 		}
 
 		void OnSceneGUI(
@@ -372,12 +225,12 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 
 		void Cleanup()
 		{
+			AssemblyReloadEvents.beforeAssemblyReload -= OnBeforeAssemblyReload;
+			AssemblyReloadEvents.afterAssemblyReload -= OnAfterAssemblyReload;
+
 			SceneView.duringSceneGui -= this.OnSceneGUI;
 
 			EditorApplication.update -= this.OnSceneUpdate;
-
-			AssemblyReloadEvents.beforeAssemblyReload -= OnBeforeAssemblyReload;
-			AssemblyReloadEvents.afterAssemblyReload -= OnAfterAssemblyReload;
 
 			//if (!savedToEditorPrefs)
 			//{

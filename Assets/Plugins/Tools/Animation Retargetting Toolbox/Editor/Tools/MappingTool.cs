@@ -6,6 +6,9 @@ using System.Linq;
 using HereticalSolutions.Repositories;
 using HereticalSolutions.Repositories.Factories;
 
+using HereticalSolutions.Persistence.Factories;
+using HereticalSolutions.Persistence.Arguments;
+
 using HereticalSolutions.Hierarchy;
 
 using UnityEngine;
@@ -109,6 +112,10 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 				return;
 			}
 
+			if (GUILayout.Button("Experiment"))
+			{
+				EXPERIMENT();
+			}
 
 			ARToolboxEditorHelpers.DrawSubcontextControls(
 				context,
@@ -117,6 +124,48 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 				KEY_MAP_PREFIX);
 
 			ARToolboxEditorHelpers.EndSubcontextBox();
+		}
+
+		private void EXPERIMENT()
+		{
+			var jsonSerializer = PersistenceFactory.BuildSimpleJSONSerializer();
+
+			var serializationArgument = new StringArgument();
+
+			var dto = new ExperimentClass()
+			{
+				StringValue = "Hello, world!",
+				IntValue = 42,
+				FloatValue = 3.14f,
+				BoolValue = true,
+				Vector3Value = new Vector3(1, 2, 3)
+			};
+
+			jsonSerializer.Serialize<ExperimentClass>(
+				serializationArgument,
+				dto);
+
+			UnityEngine.Debug.Log($" STEP 1: {serializationArgument.Value}");
+
+			jsonSerializer.Deserialize<ExperimentClass>(
+				serializationArgument,
+				out var dto2);
+
+			UnityEngine.Debug.Log($" STEP 2: {dto2.StringValue} {dto2.IntValue} {dto2.FloatValue} {dto2.BoolValue} {dto2.Vector3Value}");
+		}
+
+		[System.Serializable]
+		public class ExperimentClass
+		{
+			public string StringValue;
+
+			public int IntValue;
+
+			public float FloatValue;
+
+			public bool BoolValue;
+
+			public Vector3 Vector3Value;
 		}
 	}
 }

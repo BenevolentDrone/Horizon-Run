@@ -68,5 +68,10 @@ namespace HereticalSolutions
         {
             return type.GetElementType();
         }
+
+        public static TResult CastFromTo<TSource, TResult>(this TSource source)
+        {
+            return (TResult)Convert.ChangeType(source, typeof(TResult));
+        }
     }
 }

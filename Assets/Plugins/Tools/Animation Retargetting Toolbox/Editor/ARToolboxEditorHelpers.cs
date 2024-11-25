@@ -1,11 +1,14 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using HereticalSolutions.Repositories.Factories;
 
 using UnityEditor;
 
 using UnityEngine;
+
+using Newtonsoft.Json;
 
 namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 {
@@ -887,6 +890,156 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 				}
 			}
 		}
+
+		#endregion
+
+		#region Persistence
+
+		#region EditorPrefs
+
+		public static string[] GetSavedEditorStatesFromEditorPrefs(
+			string keyPrefsSavedEditorStates)
+		{
+			if (!EditorPrefs.HasKey(keyPrefsSavedEditorStates))
+			{
+				return new string[0];
+			}
+
+			var savesListJson = EditorPrefs.GetString(keyPrefsSavedEditorStates);
+
+			string[] result = null;
+
+			try
+			{
+				result = JsonConvert.DeserializeObject<string[]>(savesListJson);
+			}
+			catch (Exception e)
+			{
+				UnityEngine.Debug.LogError(e);
+			}
+
+			if (result == null)
+			{
+				result = new string[0];
+			}
+
+			return result;
+		}
+		
+		public static void SerializeStateToEditorPrefs<TState>(
+			string keyPrefsSavedEditorStates,
+			string keyPrefsEditorStateSavePrefix,
+			int instanceID,
+			string[] savesList,
+			TState state)
+		{
+			//serialize
+			string saveJson = "{}";
+
+			string key = String.Format(
+				keyPrefsEditorStateSavePrefix,
+				instanceID);
+
+			EditorPrefs.SetString(
+				key,
+				saveJson);
+
+			var newSavesList = savesList.Append(key).ToArray();
+
+
+			//StringBuilder stringBuilder = new StringBuilder();
+			//
+			//for (int i = 0; i < savesList.Length; i++)
+			//{
+			//	stringBuilder.Append(savesList[i]);
+			//
+			//	if (i < savesList.Length - 1)
+			//		stringBuilder.Append(", ");
+			//}
+			//
+			//UnityEngine.Debug.Log($"[ARToolboxWindow] Saving state saves list: [{stringBuilder.ToString()}]");
+
+
+			string savesListJson = string.Empty;
+
+			try
+			{
+				savesListJson = JsonConvert.SerializeObject(newSavesList);
+			}
+			catch (Exception e)
+			{
+				UnityEngine.Debug.LogError(e);
+			}
+
+			EditorPrefs.SetString(
+				keyPrefsSavedEditorStates,
+				savesListJson);
+		}
+
+		public static bool TryDeserializeStateFromEditorPrefs<TState>(
+			string keyPrefsSavedEditorStates,
+			string keyPrefsEditorStateSavePrefix,
+			int instanceID,
+			string[] savesList,
+			out TState state)
+		{
+			bool success = false;
+
+			state = default;
+
+			string key = String.Format(
+				keyPrefsEditorStateSavePrefix,
+				instanceID);
+
+			if (savesList.Contains(key))
+			{
+				if (EditorPrefs.HasKey(key))
+				{
+					var saveJson = EditorPrefs.GetString(key);
+
+					//deserialize
+
+					success = true;
+				}
+
+				EditorPrefs.DeleteKey(key);
+
+				var newSavesList = savesList.Where(x => x != key).ToArray();
+
+
+				//StringBuilder stringBuilder = new StringBuilder();
+				//
+				//for (int i = 0; i < newSavesList.Length; i++)
+				//{
+				//	stringBuilder.Append(newSavesList[i]);
+				//
+				//	if (i < newSavesList.Length - 1)
+				//		stringBuilder.Append(", ");
+				//}
+				//
+				//UnityEngine.Debug.Log($"[ARToolboxWindow] Saving state saves list: [{stringBuilder.ToString()}]");
+
+
+				string savesListJson = string.Empty;
+
+				try
+				{
+					savesListJson = JsonConvert.SerializeObject(newSavesList);
+				}
+				catch (Exception e)
+				{
+					UnityEngine.Debug.LogError(e);
+				}
+
+				EditorPrefs.SetString(
+					keyPrefsSavedEditorStates,
+					savesListJson);
+			}
+
+			return success;
+		}
+
+		#endregion
 
 		#endregion
 	}

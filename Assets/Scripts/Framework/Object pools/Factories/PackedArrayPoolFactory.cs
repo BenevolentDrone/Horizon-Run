@@ -99,7 +99,7 @@ namespace HereticalSolutions.Pools.Factories
                 loggerResolver?.GetLogger<PackedArrayManagedPool<T>>()
                 ?? null;
             
-            Func<IPoolElementFacade<T> > facadeAllocationDelegate = 
+            Func<IPoolElementFacade<T>> facadeAllocationDelegate = 
                 () => ObjectPoolsAllocationFactory.BuildPoolElementFacadeWithArrayIndex<T>(
                     metadataAllocationDescriptors);
 

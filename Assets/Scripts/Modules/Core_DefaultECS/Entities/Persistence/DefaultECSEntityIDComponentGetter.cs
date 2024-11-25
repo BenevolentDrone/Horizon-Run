@@ -50,7 +50,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
 		{
 			if (idComponentTypes == null)
 			{
-				TypeHelpers.GetTypesWithAttribute<EntityIDComponentAttribute>(
+				TypeHelpers.GetTypesWithAttributeInAllAssemblies<EntityIDComponentAttribute>(
 					out idComponentTypes);
 			}
 

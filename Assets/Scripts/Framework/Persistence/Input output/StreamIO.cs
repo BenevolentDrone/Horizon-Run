@@ -4,7 +4,7 @@ using System.Text;
 
 using HereticalSolutions.Logging;
 
-namespace HereticalSolutions.Persistence.IO
+namespace HereticalSolutions.Persistence
 {
     public static class StreamIO
     {

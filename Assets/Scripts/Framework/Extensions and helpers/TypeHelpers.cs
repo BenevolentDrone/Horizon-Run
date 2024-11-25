@@ -13,7 +13,7 @@ namespace HereticalSolutions
     /// </summary>
     public static class TypeHelpers
     {
-        public static void GetTypesWithAttribute<TAttribute>(
+        public static void GetTypesWithAttributeInAllAssemblies<TAttribute>(
             out Type[] result)
             where TAttribute : System.Attribute
         {
@@ -33,7 +33,7 @@ namespace HereticalSolutions
             result = resultList.ToArray();
         }
         
-        public static void GetTypesWithAttribute<TAttribute>(
+        public static void GetTypesWithAttributeInAllAssemblies<TAttribute>(
             out Type[] result,
             out IReadOnlyRepository<int, Type> hashToType,
             out IReadOnlyRepository<Type, int> typeToHash)

@@ -2,7 +2,7 @@ using System;
 
 using Newtonsoft.Json.Serialization;
 
-namespace HereticalSolutions.Persistence.Serializers
+namespace HereticalSolutions.Persistence
 {
 	//Courtesy of https://stackoverflow.com/questions/39383098/ignore-missing-types-during-deserialization-of-list
 	public class JsonSerializationBinder : ISerializationBinder
@@ -13,6 +13,7 @@ namespace HereticalSolutions.Persistence.Serializers
 		{
 			if (binder == null)
 				throw new ArgumentNullException();
+				
 			this.binder = binder;
 		}
 

@@ -32,7 +32,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
 		{
 			if (viewComponentTypes == null)
 			{
-				TypeHelpers.GetTypesWithAttribute<ViewComponentAttribute>(
+				TypeHelpers.GetTypesWithAttributeInAllAssemblies<ViewComponentAttribute>(
 					out viewComponentTypes);
 			}
 

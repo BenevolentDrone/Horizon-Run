@@ -2,6 +2,8 @@ using System;
 
 using HereticalSolutions.Repositories;
 
+using HereticalSolutions.Metadata;
+
 namespace HereticalSolutions.Persistence
 {
     public interface ISerializer
@@ -10,7 +12,7 @@ namespace HereticalSolutions.Persistence
 
         ISerializationStrategy SerializationStrategy { get; }
 
-        IReadOnlyObjectRepository Arguments { get; }
+        IStronglyTypedMetadata Arguments { get; }
 
         #region Serialize
 
@@ -18,7 +20,7 @@ namespace HereticalSolutions.Persistence
             TValue value);
         
         bool Serialize(
-            Type ValueType,
+            Type valueType,
             object valueObject);
 
         #endregion
@@ -29,7 +31,7 @@ namespace HereticalSolutions.Persistence
             out TValue value);
 
         bool Deserialize(
-            Type ValueType,
+            Type valueType,
             out object valueObject);
 
         #endregion
@@ -40,7 +42,7 @@ namespace HereticalSolutions.Persistence
             ref TValue value);
 
         bool Populate(
-            Type ValueType,
+            Type valueType,
             ref object valueObject);
 
         #endregion

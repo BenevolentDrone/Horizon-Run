@@ -1,6 +1,6 @@
 using System;
 
-using HereticalSolutions.Persistence.Visitors;
+using HereticalSolutions.Persistence;
 using HereticalSolutions.Persistence.Factories;
 
 using HereticalSolutions.Repositories;

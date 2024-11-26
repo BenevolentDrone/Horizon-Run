@@ -1,134 +1,388 @@
 using System;
+using System.Text;
+using System.IO;
 
-using System.Xml.Serialization;
-
-using HereticalSolutions.Repositories;
+using HereticalSolutions.Metadata;
 
 using HereticalSolutions.Logging;
 
-namespace HereticalSolutions.Persistence.Serializers
-{
-    public class XMLSerializer : ISerializer
-    {
-        private readonly IReadOnlyObjectRepository strategyRepository;
+using System.Xml.Serialization;
 
+namespace HereticalSolutions.Persistence
+{
+    [FormatSerializer]
+    public class XMLSerializer
+        : IFormatSerializer
+    {
         private readonly ILogger logger;
 
         public XMLSerializer(
-            IReadOnlyObjectRepository strategyRepository,
             ILogger logger = null)
         {
-            this.strategyRepository = strategyRepository;
-
             this.logger = logger;
         }
-        
+
         #region ISerializer
-        
+
         public bool Serialize<TValue>(
-            ISerializationArgument argument,
-            TValue DTO)
+            ISerializationStrategy strategy,
+            IStronglyTypedMetadata arguments,
+            TValue value)
         {
-            var serializer = new XmlSerializer(typeof(TValue));
-            
-            if (!strategyRepository.TryGet(
-                argument.GetType(),
-                out var strategyObject))
-                throw new Exception(
-                    logger.TryFormatException<XMLSerializer>(
-                        $"COULD NOT RESOLVE STRATEGY BY ARGUMENT: {argument.GetType().Name}"));
+            PersistenceHelpers.EnsureStrategyInitializedForWriteOrAppend(
+                strategy,
+                arguments);
 
-            var concreteStrategy = (IXmlSerializationStrategy)strategyObject;
+            var xmlSerializer = new XmlSerializer(typeof(TValue));
 
-            return concreteStrategy.Serialize(
-                argument,
-                serializer,
-                DTO);
+            if (strategy is TextStreamStrategy textStreamStrategy)
+            {
+                SerializeWithTextWriter<TValue>(
+                    textStreamStrategy,
+                    xmlSerializer,
+                    value);
+
+                return true;
+            }
+
+            string xml = SerializeToString<TValue>(
+                xmlSerializer,
+                value);
+
+            return PersistenceHelpers.TryWriteOrAppendPersistently<string>(
+                strategy,
+                arguments,
+                Encoding.UTF8.GetBytes,
+                xml);
         }
 
         public bool Serialize(
-            ISerializationArgument argument,
-            Type DTOType,
-            object DTO)
+            ISerializationStrategy strategy,
+            IStronglyTypedMetadata arguments,
+            Type valueType,
+            object valueObject)
         {
-            var serializer = new XmlSerializer(DTOType);
-            
-            if (!strategyRepository.TryGet(
-                argument.GetType(),
-                out var strategyObject))
-                throw new Exception(
-                    logger.TryFormatException<XMLSerializer>(
-                        $"COULD NOT RESOLVE STRATEGY BY ARGUMENT: {argument.GetType().Name}"));
+            PersistenceHelpers.EnsureStrategyInitializedForWriteOrAppend(
+                strategy,
+                arguments);
 
-            var concreteStrategy = (IXmlSerializationStrategy)strategyObject;
+            var xmlSerializer = new XmlSerializer(valueType);
 
-            return concreteStrategy.Serialize(
-                argument,
-                serializer,
-                DTO);
+            if (strategy is TextStreamStrategy textStreamStrategy)
+            {
+                SerializeWithTextWriter(
+                    textStreamStrategy,
+                    xmlSerializer,
+                    valueType,
+                    valueObject);
+
+                return true;
+            }
+
+            string xml = SerializeToString(
+                xmlSerializer,
+                valueType,
+                valueObject);
+
+            return PersistenceHelpers.TryWriteOrAppendPersistently<string>(
+                strategy,
+                arguments,
+                Encoding.UTF8.GetBytes,
+                xml);
         }
 
         public bool Deserialize<TValue>(
-            ISerializationArgument argument,
-            out TValue DTO)
+            ISerializationStrategy strategy,
+            IStronglyTypedMetadata arguments,
+            out TValue value)
         {
-            if (!strategyRepository.TryGet(
-                argument.GetType(),
-                out var strategyObject))
-                throw new Exception(
-                    logger.TryFormatException<XMLSerializer>(
-                        $"COULD NOT RESOLVE STRATEGY BY ARGUMENT: {argument.GetType().Name}"));
+            PersistenceHelpers.EnsureStrategyInitializedForRead(
+                strategy,
+                arguments);
 
-            var concreteStrategy = (IXmlSerializationStrategy)strategyObject;
+            var xmlSerializer = new XmlSerializer(typeof(TValue));
 
-            var serializer = new XmlSerializer(typeof(TValue));
-            
-            var result = concreteStrategy.Deserialize(
-                argument,
-                serializer,
-                out object dtoObject);
+            if (strategy is TextStreamStrategy textStreamStrategy)
+            {
+                return DeserializeWithTextReader<TValue>(
+                    textStreamStrategy,
+                    xmlSerializer,
+                    out value);
+            }
 
-            DTO = (TValue)dtoObject;
+            if (!PersistenceHelpers.TryReadPersistently<string>(
+                strategy,
+                arguments,
+                Encoding.UTF8.GetString,
+                out string xml))
+            {
+                value = default(TValue);
+
+                return false;
+            }
+
+            return DeserializeFromString<TValue>(
+                xmlSerializer,
+                xml,
+                out value);
+        }
+
+        public bool Deserialize(
+            ISerializationStrategy strategy,
+            IStronglyTypedMetadata arguments,
+            Type valueType,
+            out object valueObject)
+        {
+            PersistenceHelpers.EnsureStrategyInitializedForRead(
+                strategy,
+                arguments);
+
+            var xmlSerializer = new XmlSerializer(valueType);
+
+            if (strategy is TextStreamStrategy textStreamStrategy)
+            {
+                return DeserializeWithTextReader(
+                    textStreamStrategy,
+                    xmlSerializer,
+                    valueType,
+                    out valueObject);
+            }
+
+            if (!PersistenceHelpers.TryReadPersistently<string>(
+                strategy,
+                arguments,
+                Encoding.UTF8.GetString,
+                out string xml))
+            {
+                valueObject = default(object);
+
+                return false;
+            }
+
+            return DeserializeFromString(
+                xmlSerializer,
+                xml,
+                valueType,
+                out valueObject);
+        }
+
+        public bool Populate<TValue>(
+            ISerializationStrategy strategy,
+            IStronglyTypedMetadata arguments,
+            ref TValue value)
+        {
+            PersistenceHelpers.EnsureStrategyInitializedForRead(
+                strategy,
+                arguments);
+
+            var xmlSerializer = new XmlSerializer(typeof(TValue));
+
+            bool result = false;
+
+            if (strategy is TextStreamStrategy textStreamStrategy)
+            {
+                result = DeserializeWithTextReader<TValue>(
+                    textStreamStrategy,
+                    xmlSerializer,
+                    out TValue newValue1);
+
+                if (result)
+                {
+                    value = newValue1;
+                }
+
+                return result;
+            }
+
+            if (!PersistenceHelpers.TryReadPersistently<string>(
+                strategy,
+                arguments,
+                Encoding.UTF8.GetString,
+                out string xml))
+            {
+                return false;
+            }
+
+            result = DeserializeFromString<TValue>(
+                xmlSerializer,
+                xml,
+                out TValue newValue2);
+
+            if (result)
+            {
+                value = newValue2;
+            }
 
             return result;
         }
 
-        public bool Deserialize(
-            ISerializationArgument argument,
-            Type DTOType,
-            out object DTO)
+        public bool Populate(
+            ISerializationStrategy strategy,
+            IStronglyTypedMetadata arguments,
+            Type valueType,
+            ref object valueObject)
         {
-            if (!strategyRepository.TryGet(
-                argument.GetType(),
-                out var strategyObject))
-                throw new Exception(
-                    logger.TryFormatException<XMLSerializer>(
-                        $"COULD NOT RESOLVE STRATEGY BY ARGUMENT: {argument.GetType().Name}"));
+            PersistenceHelpers.EnsureStrategyInitializedForRead(
+                strategy,
+                arguments);
 
-            var concreteStrategy = (IXmlSerializationStrategy)strategyObject;
+            var xmlSerializer = new XmlSerializer(valueType);
 
-            var serializer = new XmlSerializer(DTOType);
-            
-            return concreteStrategy.Deserialize(
-                argument,
-                serializer,
-                out DTO);
+            bool result = false;
+
+            if (strategy is TextStreamStrategy textStreamStrategy)
+            {
+                result = DeserializeWithTextReader(
+                    textStreamStrategy,
+                    xmlSerializer,
+                    valueType,
+                    out var newValueObject1);
+
+                if (result)
+                {
+                    valueObject = newValueObject1;
+                }
+
+                return result;
+            }
+
+            if (!PersistenceHelpers.TryReadPersistently<string>(
+                strategy,
+                arguments,
+                Encoding.UTF8.GetString,
+                out string xml))
+            {
+                return false;
+            }
+
+            result = DeserializeFromString(
+                xmlSerializer,
+                xml,
+                valueType,
+                out var newValueObject2);
+
+            if (result)
+            {
+                valueObject = newValueObject2;
+            }
+
+            return result;
         }
 
-        public void Erase(ISerializationArgument argument)
-        {
-            if (!strategyRepository.TryGet(
-                argument.GetType(),
-                out var strategyObject))
-                throw new Exception(
-                    logger.TryFormatException<XMLSerializer>(
-                        $"COULD NOT RESOLVE STRATEGY BY ARGUMENT: {argument.GetType().Name}"));
-
-            var concreteStrategy = (IXmlSerializationStrategy)strategyObject;
-			
-            concreteStrategy.Erase(argument);
-        }
-        
         #endregion
+
+        private void SerializeWithTextWriter<TValue>(
+            TextStreamStrategy textStreamStrategy,
+            XmlSerializer xmlSerializer,
+            TValue value)
+        {
+            xmlSerializer.Serialize(
+                textStreamStrategy.StreamWriter,
+                value);
+        }
+
+        private void SerializeWithTextWriter(
+            TextStreamStrategy textStreamStrategy,
+            XmlSerializer xmlSerializer,
+            Type valueType,
+            object valueObject)
+        {
+            xmlSerializer.Serialize(
+                textStreamStrategy.StreamWriter,
+                valueObject);
+        }
+
+        private bool DeserializeWithTextReader<TValue>(
+            TextStreamStrategy textStreamStrategy,
+            XmlSerializer xmlSerializer,
+            out TValue value)
+        {
+            var valueObject = xmlSerializer.Deserialize(
+                textStreamStrategy.StreamReader);
+
+            value = valueObject.CastFromTo<object, TValue>();
+
+            return true;
+        }
+
+        private bool DeserializeWithTextReader(
+            TextStreamStrategy textStreamStrategy,
+            XmlSerializer xmlSerializer,
+            Type valueType,
+            out object valueObject)
+        {
+            valueObject = xmlSerializer.Deserialize(
+                textStreamStrategy.StreamReader);
+
+            return true;
+        }
+
+        private string SerializeToString<TValue>(
+            XmlSerializer xmlSerializer,
+            TValue value)
+        {
+            string xml;
+
+            using (StringWriter stringWriter = new StringWriter())
+            {
+                xmlSerializer.Serialize(
+                    stringWriter,
+                    value);
+
+                xml = stringWriter.ToString();
+            }
+
+            return xml;
+        }
+
+        private string SerializeToString(
+            XmlSerializer xmlSerializer,
+            Type valueType,
+            object valueObject)
+        {
+            string xml;
+
+            using (StringWriter stringWriter = new StringWriter())
+            {
+                xmlSerializer.Serialize(
+                    stringWriter,
+                    valueObject);
+
+                xml = stringWriter.ToString();
+            }
+
+            return xml;
+        }
+
+        private bool DeserializeFromString<TValue>(
+            XmlSerializer xmlSerializer,
+            string xml,
+            out TValue value)
+        {
+            object valueObject = default(object);
+
+            using (StringReader stringReader = new StringReader(xml))
+            {
+                valueObject = xmlSerializer.Deserialize(stringReader);
+            }
+
+            value = valueObject.CastFromTo<object, TValue>();
+
+            return true;
+        }
+
+        private bool DeserializeFromString(
+            XmlSerializer xmlSerializer,
+            string xml,
+            Type valueType,
+            out object valueObject)
+        {
+            using (StringReader stringReader = new StringReader(xml))
+            {
+                valueObject = xmlSerializer.Deserialize(stringReader);
+            }
+
+            return true;
+        }
     }
 }

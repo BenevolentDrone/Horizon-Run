@@ -5,6 +5,7 @@ namespace HereticalSolutions.Persistence
 {
 	[Serializable]
 	public class FileAtRelativePathSettings
+		: IPathSettings
 	{
 		public string AbsoluteFolderPath; //PRAISE THE ABSOLUTE
 

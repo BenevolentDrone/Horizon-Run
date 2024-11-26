@@ -1,5 +1,7 @@
 using HereticalSolutions.Repositories;
 
+using HereticalSolutions.Metadata;
+
 namespace HereticalSolutions.Pools
 {
     public interface IPoolElementFacadeWithMetadata<T>
@@ -8,6 +10,6 @@ namespace HereticalSolutions.Pools
         /// <summary>
         /// Gets the metadata of the pool element.
         /// </summary>
-        IReadOnlyObjectRepository Metadata { get; }
+        StronglyTypedMetadata Metadata { get; }
     }
 }

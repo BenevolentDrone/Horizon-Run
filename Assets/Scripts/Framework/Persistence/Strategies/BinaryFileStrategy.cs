@@ -145,7 +145,7 @@ namespace HereticalSolutions.Persistence
 		}
 
 		public bool Append(
-			Type ValueType,
+			Type valueType,
 			object value)
 		{
 			//https://learn.microsoft.com/en-us/dotnet/api/system.io.file.appendallbytes?view=net-9.0

@@ -9,7 +9,13 @@ namespace HereticalSolutions.Metadata.Factories
 {
 	public static class MetadataFactory
 	{
-		public static IReadOnlyObjectRepository BuildTypeToObjectMetadataRepository(
+		public static StronglyTypedMetadata BuildStronglyTypedMetadata()
+		{
+			return new StronglyTypedMetadata(
+				RepositoriesFactory.BuildDictionaryObjectRepository());
+		}
+
+		public static StronglyTypedMetadata BuildStronglyTypedMetadata(
 			MetadataAllocationDescriptor[] metadataDescriptors)
 		{
 			var repository = RepositoriesFactory.BuildDictionaryObjectRepository();
@@ -27,6 +33,12 @@ namespace HereticalSolutions.Metadata.Factories
 				}
 
 			return repository;
+		}
+
+		public static WeaklyTypedMetadata BuildWeaklyTypedMetadata()
+		{
+			return new WeaklyTypedMetadata(
+				RepositoriesFactory.BuildDictionaryRepository<string, object>());
 		}
 	}
 }

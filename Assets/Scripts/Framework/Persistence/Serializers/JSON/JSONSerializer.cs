@@ -4,6 +4,8 @@ using System.Collections.Generic;
 
 using System.Linq;
 
+using HereticalSolutions.Metadata;
+
 using HereticalSolutions.Logging;
 
 using Newtonsoft.Json;
@@ -68,15 +70,15 @@ namespace HereticalSolutions.Persistence
 
         public bool Serialize<TValue>(
             ISerializationStrategy strategy,
-            IReadOnlyObjectRepository arguments,
-            TValue DTO)
+            IStronglyTypedMetadata arguments,
+            TValue value)
         {
             PersistenceHelpers.EnsureStrategyInitializedForWriteOrAppend(
                 strategy,
                 arguments);
 
             string json = JsonConvert.SerializeObject(
-                DTO,
+                value,
                 Formatting.Indented,
                 writeSerializerSettings);
 
@@ -89,16 +91,16 @@ namespace HereticalSolutions.Persistence
 
         public bool Serialize(
             ISerializationStrategy strategy,
-            IReadOnlyObjectRepository arguments,
-            Type DTOType,
-            object DTO)
+            IStronglyTypedMetadata arguments,
+            Type valueType,
+            object valueObject)
         {
             PersistenceHelpers.EnsureStrategyInitializedForWriteOrAppend(
                 strategy,
                 arguments);
 
             string json = JsonConvert.SerializeObject(
-                DTO,
+                valueObject,
                 Formatting.Indented,
                 writeSerializerSettings);
 
@@ -111,13 +113,9 @@ namespace HereticalSolutions.Persistence
 
         public bool Deserialize<TValue>(
             ISerializationStrategy strategy,
-            IReadOnlyObjectRepository arguments,
-            out TValue DTO)
+            IStronglyTypedMetadata arguments,
+            out TValue value)
         {
-            PersistenceHelpers.EnsureStrategyInitializedForRead(
-                strategy,
-                arguments);
-
             PersistenceHelpers.EnsureStrategyInitializedForRead(
                 strategy,
                 arguments);
@@ -128,12 +126,12 @@ namespace HereticalSolutions.Persistence
                 Encoding.UTF8.GetString,
                 out string json))
             {
-                DTO = default(TValue);
+                value = default(TValue);
 
                 return false;
             }
 
-            DTO = JsonConvert.DeserializeObject<TValue>(
+            value = JsonConvert.DeserializeObject<TValue>(
                 json,
                 readSerializerSettings);
 
@@ -152,9 +150,9 @@ namespace HereticalSolutions.Persistence
         //TODO: fix deserialize as <GENERIC> is NOT working at all - the value does NOT get populated properly
         public bool Deserialize(
             ISerializationStrategy strategy,
-            IReadOnlyObjectRepository arguments,
-            Type DTOType,
-            out object DTO)
+            IStronglyTypedMetadata arguments,
+            Type valueType,
+            out object valueObject)
         {
             //DTO = Activator.CreateInstance(DTOType);
             //
@@ -173,14 +171,14 @@ namespace HereticalSolutions.Persistence
                 Encoding.UTF8.GetString,
                 out string json))
             {
-                DTO = default(object);
+                valueObject = default(object);
 
                 return false;
             }
 
-            DTO = JsonConvert.DeserializeObject(
+            valueObject = JsonConvert.DeserializeObject(
                 json,
-                DTOType,
+                valueType,
                 readSerializerSettings);
 
             return true;
@@ -188,13 +186,9 @@ namespace HereticalSolutions.Persistence
 
         public bool Populate<TValue>(
             ISerializationStrategy strategy,
-            IReadOnlyObjectRepository arguments,
+            IStronglyTypedMetadata arguments,
             ref TValue value)
         {
-            PersistenceHelpers.EnsureStrategyInitializedForRead(
-                strategy,
-                arguments);
-
             PersistenceHelpers.EnsureStrategyInitializedForRead(
                 strategy,
                 arguments);
@@ -205,7 +199,7 @@ namespace HereticalSolutions.Persistence
                 Encoding.UTF8.GetString,
                 out string json))
             {
-                DTO = default(TValue);
+                value = default(TValue);
 
                 return false;
             }
@@ -220,14 +214,10 @@ namespace HereticalSolutions.Persistence
 
         public bool Populate(
             ISerializationStrategy strategy,
-            IReadOnlyObjectRepository arguments,
-            Type ValueType,
+            IStronglyTypedMetadata arguments,
+            Type valueType,
             ref object valueObject)
         {
-            PersistenceHelpers.EnsureStrategyInitializedForRead(
-                strategy,
-                arguments);
-
             PersistenceHelpers.EnsureStrategyInitializedForRead(
                 strategy,
                 arguments);
@@ -238,7 +228,7 @@ namespace HereticalSolutions.Persistence
                 Encoding.UTF8.GetString,
                 out string json))
             {
-                DTO = default(object);
+                valueObject = default(object);
 
                 return false;
             }

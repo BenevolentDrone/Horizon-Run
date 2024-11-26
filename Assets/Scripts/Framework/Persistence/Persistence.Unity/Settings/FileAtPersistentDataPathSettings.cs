@@ -7,6 +7,7 @@ namespace HereticalSolutions.Persistence
 {
 	[Serializable]
 	public class FileAtPersistentDataPathSettings
+		: IPathSettings
 	{
 		public string RelativePath;
 

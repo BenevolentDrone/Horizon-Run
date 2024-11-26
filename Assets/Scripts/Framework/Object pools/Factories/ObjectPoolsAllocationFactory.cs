@@ -8,7 +8,7 @@ namespace HereticalSolutions.Pools.Factories
         public static IPoolElementFacade<T> BuildPoolElementFacade<T>(
             MetadataAllocationDescriptor[] metadataDescriptors = null)
         {
-            var metadata = MetadataFactory.BuildTypeToObjectMetadataRepository(
+            var metadata = MetadataFactory.BuildStronglyTypedMetadata(
                 metadataDescriptors);
                 
             return new PoolElementFacade<T>(
@@ -18,7 +18,7 @@ namespace HereticalSolutions.Pools.Factories
         public static IPoolElementFacade<T> BuildPoolElementFacadeWithArrayIndex<T>(
             MetadataAllocationDescriptor[] metadataDescriptors = null)
         {
-            var metadata = MetadataFactory.BuildTypeToObjectMetadataRepository(
+            var metadata = MetadataFactory.BuildStronglyTypedMetadata(
                 metadataDescriptors);
                 
             return new PoolElementFacadeWithArrayIndex<T>(
@@ -28,7 +28,7 @@ namespace HereticalSolutions.Pools.Factories
         public static IPoolElementFacade<T> BuildPoolElementFacadeWithLinkedList<T>(
             MetadataAllocationDescriptor[] metadataDescriptors = null)
         {
-            var metadata = MetadataFactory.BuildTypeToObjectMetadataRepository(
+            var metadata = MetadataFactory.BuildStronglyTypedMetadata(
                 metadataDescriptors);
                 
             return new PoolElementFacadeWithLinkedListLink<T>(

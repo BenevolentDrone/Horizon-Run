@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using HereticalSolutions.Repositories.Factories;
+using HereticalSolutions.Metadata.Factories;
 
 using UnityEditor;
 
@@ -441,7 +441,7 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 				subcontexts.Add(
 					new ARToolboxChildContext(
 						context,
-						RepositoriesFactory.BuildDictionaryRepository<string, object>()));
+						MetadataFactory.BuildWeaklyTypedMetadata()));
 			}
 
 			return subcontexts;

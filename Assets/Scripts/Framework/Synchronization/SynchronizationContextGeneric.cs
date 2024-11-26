@@ -6,6 +6,8 @@ using HereticalSolutions.Repositories;
 
 using HereticalSolutions.LifetimeManagement;
 
+using HereticalSolutions.Metadata;
+
 namespace HereticalSolutions.Synchronization
 {
 	public class SynchronizationContextGeneric<TDelta>
@@ -14,7 +16,7 @@ namespace HereticalSolutions.Synchronization
 		  ICleanuppable,
 		  IDisposable
 	{
-		private readonly IReadOnlyObjectRepository metadata;
+		private readonly IStronglyTypedMetadata metadata;
 
 		private readonly IPublisherSingleArgGeneric<TDelta> broadcasterAsPublisher;
 
@@ -25,7 +27,7 @@ namespace HereticalSolutions.Synchronization
 
 		public SynchronizationContextGeneric(
 			SynchronizationDescriptor descriptor,
-			IReadOnlyObjectRepository metadata,
+			IStronglyTypedMetadata metadata,
 			IPublisherSingleArgGeneric<TDelta> broadcasterAsPublisher,
 			INonAllocSubscribableSingleArgGeneric<TDelta> broadcasterAsSubscribable)
 		{
@@ -52,7 +54,7 @@ namespace HereticalSolutions.Synchronization
 
 		public SynchronizationDescriptor Descriptor { get => descriptor; }
 
-		public IReadOnlyObjectRepository Metadata { get => metadata; }
+		public IStronglyTypedMetadata Metadata { get => metadata; }
 
 		#endregion
 

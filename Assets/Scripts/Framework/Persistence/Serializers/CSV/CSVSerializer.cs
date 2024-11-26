@@ -1,12 +1,18 @@
-using System;
-using System.Collections.Generic;
+#define CSV_SUPPORT
 
-using System.Linq;
+#if CSV_SUPPORT
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Text;
+using System.IO;
+using System.Globalization;
+
+using HereticalSolutions.Metadata;
 
 using HereticalSolutions.Logging;
 
 using CsvHelper;
-
 
 namespace HereticalSolutions.Persistence
 {
@@ -18,7 +24,7 @@ namespace HereticalSolutions.Persistence
 
         private readonly ILogger logger;
 
-        public JSONSerializer(
+        public CSVSerializer(
             bool includeHeader,
             ILogger logger = null)
         {
@@ -31,8 +37,8 @@ namespace HereticalSolutions.Persistence
 
         public bool Serialize<TValue>(
             ISerializationStrategy strategy,
-            IReadOnlyObjectRepository arguments,
-            TValue DTO)
+            IStronglyTypedMetadata arguments,
+            TValue value)
         {
             PersistenceHelpers.EnsureStrategyInitializedForWriteOrAppend(
                 strategy,
@@ -42,25 +48,26 @@ namespace HereticalSolutions.Persistence
             {
                 SerializeWithTextWriter<TValue>(
                     textStreamStrategy,
-                    DTO);
+                    value);
 
                 return true;
             }
             
             string csv = SerializeToString<TValue>(
-                DTO);
+                value);
 
             return PersistenceHelpers.TryWriteOrAppendPersistently<string>(
                 strategy,
                 arguments,
+                Encoding.UTF8.GetBytes,
                 csv);
         }
 
         public bool Serialize(
             ISerializationStrategy strategy,
-            IReadOnlyObjectRepository arguments,
-            Type DTOType,
-            object DTO)
+            IStronglyTypedMetadata arguments,
+            Type valueType,
+            object valueObject)
         {
             PersistenceHelpers.EnsureStrategyInitializedForWriteOrAppend(
                 strategy,
@@ -70,26 +77,27 @@ namespace HereticalSolutions.Persistence
             {
                 SerializeWithTextWriter(
                     textStreamStrategy,
-                    DTOType,
-                    DTO);
+                    valueType,
+                    valueObject);
 
                 return true;
             }
 
             string csv = SerializeToString(
-                DTOType,
-                DTO);
+                valueType,
+                valueObject);
 
             return PersistenceHelpers.TryWriteOrAppendPersistently<string>(
                 strategy,
                 arguments,
+                Encoding.UTF8.GetBytes,
                 csv);
         }
 
         public bool Deserialize<TValue>(
             ISerializationStrategy strategy,
-            IReadOnlyObjectRepository arguments,
-            out TValue DTO)
+            IStronglyTypedMetadata arguments,
+            out TValue value)
         {
             PersistenceHelpers.EnsureStrategyInitializedForRead(
                 strategy,
@@ -99,29 +107,30 @@ namespace HereticalSolutions.Persistence
             {
                 return DeserializeWithTextReader<TValue>(
                     textStreamStrategy,
-                    out DTO);
+                    out value);
             }
             
-            if (!PersistenceHelpers.Read<string>(
+            if (!PersistenceHelpers.TryReadPersistently<string>(
                 strategy,
                 arguments,
-                out var csv))
+                Encoding.UTF8.GetString,
+                out string csv))
             {
-                DTO = default(object);
+                value = default(TValue);
 
                 return false;
             }
 
             return DeserializeFromString<TValue>(
                 csv,
-                out DTO);
+                out value);
         }
 
         public bool Deserialize(
             ISerializationStrategy strategy,
-            IReadOnlyObjectRepository arguments,
-            Type DTOType,
-            out object DTO)
+            IStronglyTypedMetadata arguments,
+            Type valueType,
+            out object valueObject)
         {
             PersistenceHelpers.EnsureStrategyInitializedForRead(
                 strategy,
@@ -131,55 +140,132 @@ namespace HereticalSolutions.Persistence
             {
                 return DeserializeWithTextReader(
                     textStreamStrategy,
-                    DTOType,
-                    out DTO);
+                    valueType,
+                    out valueObject);
             }
 
-            if (!PersistenceHelpers.Read<string>(
+            if (!PersistenceHelpers.TryReadPersistently<string>(
                 strategy,
                 arguments,
-                out var csv))
+                Encoding.UTF8.GetString,
+                out string csv))
             {
-                DTO = default(object);
+                valueObject = default(object);
 
                 return false;
             }
 
             return DeserializeFromString(
                 csv,
-                DTOType,
-                out DTO);
+                valueType,
+                out valueObject);
         }
 
         public bool Populate<TValue>(
             ISerializationStrategy strategy,
-            IReadOnlyObjectRepository arguments,
+            IStronglyTypedMetadata arguments,
             ref TValue value)
         {
-            //TODO
-            throw new NotImplementedException();
+            PersistenceHelpers.EnsureStrategyInitializedForRead(
+                strategy,
+                arguments);
+
+            bool result = false;
+
+            if (strategy is TextStreamStrategy textStreamStrategy)
+            {
+                result = DeserializeWithTextReader<TValue>(
+                    textStreamStrategy,
+                    out var newValue1);
+
+                if (result)
+                {
+                    value = newValue1;
+                }
+
+                return result;
+            }
+
+            if (!PersistenceHelpers.TryReadPersistently<string>(
+                strategy,
+                arguments,
+                Encoding.UTF8.GetString,
+                out string csv))
+            {
+                return false;
+            }
+
+            result = DeserializeFromString<TValue>(
+                csv,
+                out var newValue2);
+
+            if (result)
+            {
+                value = newValue2;
+            }
+
+            return result;
         }
 
         public bool Populate(
             ISerializationStrategy strategy,
-            IReadOnlyObjectRepository arguments,
-            Type ValueType,
+            IStronglyTypedMetadata arguments,
+            Type valueType,
             ref object valueObject)
         {
-            //TODO
-            throw new NotImplementedException();
+            PersistenceHelpers.EnsureStrategyInitializedForRead(
+                strategy,
+                arguments);
+
+            bool result = false;
+
+            if (strategy is TextStreamStrategy textStreamStrategy)
+            {
+                result = DeserializeWithTextReader(
+                    textStreamStrategy,
+                    valueType,
+                    out var newValueObject1);
+
+                if (result)
+                {
+                    valueObject = newValueObject1;
+                }
+
+                return result;
+            }
+
+            if (!PersistenceHelpers.TryReadPersistently<string>(
+                strategy,
+                arguments,
+                Encoding.UTF8.GetString,
+                out string csv))
+            {
+                return false;
+            }
+
+            result = DeserializeFromString(
+                csv,
+                valueType,
+                out var newValueObject2);
+
+            if (result)
+            {
+                valueObject = newValueObject2;
+            }
+
+            return result;
         }
 
         #endregion
 
         private void SerializeWithTextWriter<TValue>(
             TextStreamStrategy textStreamStrategy,
-            TValue DTO)
+            TValue value)
         {
             //This one is offered by CoPilot
             //using (var writer = new CsvWriter(textStreamStrategy.Stream))
             //{
-            //    writer.WriteRecords(DTO);
+            //    writer.WriteRecords(value);
             //}
 
             //This one is the one I had written some time ago
@@ -191,7 +277,7 @@ namespace HereticalSolutions.Persistence
             {
                 if (includeHeader)
                 {
-                    csvWriter.WriteHeader(valueType);
+                    csvWriter.WriteHeader<TValue>();
 
                     csvWriter.NextRecord();
                 }
@@ -200,22 +286,22 @@ namespace HereticalSolutions.Persistence
                     || valueType.IsTypeEnumerable()
                     || valueType.IsTypeGenericEnumerable())
                 {
-                    csvWriter.WriteRecords((IEnumerable)DTO);
+                    csvWriter.WriteRecords((IEnumerable)value);
                 }
                 else
-                    csvWriter.WriteRecord(DTO);
+                    csvWriter.WriteRecord<TValue>(value);
             }
         }
 
         private void SerializeWithTextWriter(
             TextStreamStrategy textStreamStrategy,
             Type valueType,
-            object DTO)
+            object valueObject)
         {
             //This one is offered by CoPilot
             //using (var writer = new CsvWriter(textStreamStrategy.Stream))
             //{
-            //    writer.WriteRecords(DTO);
+            //    writer.WriteRecords(value);
             //}
 
             //This one is the one I had written some time ago
@@ -234,18 +320,18 @@ namespace HereticalSolutions.Persistence
                     || valueType.IsTypeEnumerable()
                     || valueType.IsTypeGenericEnumerable())
                 {
-                    csvWriter.WriteRecords((IEnumerable)DTO);
+                    csvWriter.WriteRecords((IEnumerable)valueObject);
                 }
                 else
-                    csvWriter.WriteRecord(DTO);
+                    csvWriter.WriteRecord(valueObject);
             }
         }
 
         private bool DeserializeWithTextReader<TValue>(
             TextStreamStrategy textStreamStrategy,
-            out TValue DTO)
+            out TValue value)
         {
-            DTO = default(TValue);
+            value = default(TValue);
 
             var valueType = typeof(TValue);
 
@@ -268,13 +354,14 @@ namespace HereticalSolutions.Persistence
 
                     var records = csvReader.GetRecords(underlyingType);
 
-                    DTO = records;
+                    value = records.CastFromTo<IEnumerable<object>, TValue>();
                 }
                 else
                 {
-                    csvReader.Read();
+                    if (includeHeader)
+                        csvReader.Read();
 
-                    DTO = csvReader.GetRecord(valueType);
+                    value = csvReader.GetRecord<TValue>();
                 }
             }
 
@@ -284,9 +371,9 @@ namespace HereticalSolutions.Persistence
         private bool DeserializeWithTextReader(
             TextStreamStrategy textStreamStrategy,
             Type valueType,
-            out object DTO)
+            out object valueObject)
         {
-            DTO = default(object);
+            valueObject = default(object);
 
             using (var csvReader = new CsvReader(
                 textStreamStrategy.StreamReader,
@@ -307,13 +394,14 @@ namespace HereticalSolutions.Persistence
 
                     var records = csvReader.GetRecords(underlyingType);
 
-                    DTO = records;
+                    valueObject = records;
                 }
                 else
                 {
-                    csvReader.Read();
+                    if (includeHeader)
+                        csvReader.Read();
 
-                    DTO = csvReader.GetRecord(valueType);
+                    valueObject = csvReader.GetRecord(valueType);
                 }
             }
 
@@ -321,7 +409,7 @@ namespace HereticalSolutions.Persistence
         }
 
         private string SerializeToString<TValue>(
-            TValue DTO)
+            TValue value)
         {
             string csv;
 
@@ -335,7 +423,7 @@ namespace HereticalSolutions.Persistence
                 {
                     if (includeHeader)
                     {
-                        csvWriter.WriteHeader(valueType);
+                        csvWriter.WriteHeader<TValue>();
 
                         csvWriter.NextRecord();
                     }
@@ -344,10 +432,10 @@ namespace HereticalSolutions.Persistence
                         || valueType.IsTypeEnumerable()
                         || valueType.IsTypeGenericEnumerable())
                     {
-                        csvWriter.WriteRecords((IEnumerable)DTO);
+                        csvWriter.WriteRecords((IEnumerable)value);
                     }
                     else
-                        csvWriter.WriteRecord(DTO);
+                        csvWriter.WriteRecord<TValue>(value);
                 }
 
                 csv = stringWriter.ToString();
@@ -358,7 +446,7 @@ namespace HereticalSolutions.Persistence
 
         private string SerializeToString(
             Type valueType,
-            object DTO)
+            object valueObject)
         {
             string csv;
 
@@ -379,10 +467,10 @@ namespace HereticalSolutions.Persistence
                         || valueType.IsTypeEnumerable()
                         || valueType.IsTypeGenericEnumerable())
                     {
-                        csvWriter.WriteRecords((IEnumerable)DTO);
+                        csvWriter.WriteRecords((IEnumerable)valueObject);
                     }
                     else
-                        csvWriter.WriteRecord(DTO);
+                        csvWriter.WriteRecord(valueObject);
                 }
 
                 csv = stringWriter.ToString();
@@ -393,9 +481,9 @@ namespace HereticalSolutions.Persistence
 
         private bool DeserializeFromString<TValue>(
             string csv,
-            out TValue DTO)
+            out TValue value)
         {
-            DTO = default(TValue);
+            value = default(TValue);
 
             var valueType = typeof(TValue);
 
@@ -419,13 +507,13 @@ namespace HereticalSolutions.Persistence
 
                         var records = csvReader.GetRecords(underlyingType);
 
-                        DTO = records;
+                        value = records.CastFromTo<IEnumerable<object>, TValue>();
                     }
                     else
                     {
                         csvReader.Read();
 
-                        DTO = csvReader.GetRecord(valueType);
+                        value = csvReader.GetRecord<TValue>();
                     }
                 }
             }
@@ -436,9 +524,9 @@ namespace HereticalSolutions.Persistence
         private bool DeserializeFromString(
             string csv,
             Type valueType,
-            out object DTO)
+            out object valueObject)
         {
-            DTO = default(TValue);
+            valueObject = default(object);
 
             using (StringReader stringReader = new StringReader(csv))
             {
@@ -460,13 +548,13 @@ namespace HereticalSolutions.Persistence
 
                         var records = csvReader.GetRecords(underlyingType);
 
-                        DTO = records;
+                        valueObject = records;
                     }
                     else
                     {
                         csvReader.Read();
 
-                        DTO = csvReader.GetRecord(valueType);
+                        valueObject = csvReader.GetRecord(valueType);
                     }
                 }
             }
@@ -475,3 +563,4 @@ namespace HereticalSolutions.Persistence
         }
     }
 }
+#endif

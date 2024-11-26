@@ -1,4 +1,4 @@
-using HereticalSolutions.Repositories.Factories;
+using HereticalSolutions.Metadata.Factories;
 
 using UnityEditor;
 
@@ -118,7 +118,7 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 				//UnityEngine.Debug.Log("[ARToolboxWindow] LazyInitialization");
 
 				context = new ARToolboxRootContext(
-					RepositoriesFactory.BuildDictionaryRepository<string, object>());
+					MetadataFactory.BuildWeaklyTypedMetadata());
 			}
 
 			if (lastEditorUpdateTime == 0)

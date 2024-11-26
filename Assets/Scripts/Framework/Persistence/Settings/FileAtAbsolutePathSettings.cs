@@ -4,7 +4,10 @@ namespace HereticalSolutions.Persistence
 {
 	[Serializable]
 	public class FileAtAbsolutePathSettings
+		: IPathSettings
 	{
-		public string FullPath;
+		public string Path;
+
+		public string FullPath { get => Path; }
 	}
 }

@@ -1,11 +1,13 @@
 using HereticalSolutions.Repositories;
 
+using HereticalSolutions.Metadata;
+
 namespace HereticalSolutions.Synchronization
 {
     public interface ISynchronizable
     {
         SynchronizationDescriptor Descriptor { get; }
 
-        IReadOnlyObjectRepository Metadata { get; }
+        IStronglyTypedMetadata Metadata { get; }
     }
 }

@@ -5,6 +5,8 @@ using System.Linq;
 
 using HereticalSolutions.Repositories;
 
+using HereticalSolutions.Metadata;
+
 using HereticalSolutions.Logging;
 
 namespace HereticalSolutions.Persistence
@@ -13,7 +15,7 @@ namespace HereticalSolutions.Persistence
 	{
 		public static void EnsureStrategyInitializedForRead(
 			ISerializationStrategy strategy,
-			IReadOnlyObjectRepository arguments)
+			IStronglyTypedMetadata arguments)
 		{
 			IStrategyWithStream strategyWithStream = strategy as IStrategyWithStream;
 
@@ -28,13 +30,11 @@ namespace HereticalSolutions.Persistence
 					strategyWithState.InitializeRead();
 				}
 			}
-
-			return true;
 		}
 
 		public static void EnsureStrategyFinalizedForRead(
 			ISerializationStrategy strategy,
-			IReadOnlyObjectRepository arguments)
+			IStronglyTypedMetadata arguments)
 		{
 			IStrategyWithStream strategyWithStream = strategy as IStrategyWithStream;
 
@@ -48,13 +48,11 @@ namespace HereticalSolutions.Persistence
 					strategyWithState.FinalizeRead();
 				}
 			}
-
-			return true;
 		}
 
 		public static void EnsureStrategyInitializedForWriteOrAppend(
 			ISerializationStrategy strategy,
-			IReadOnlyObjectRepository arguments)
+			IStronglyTypedMetadata arguments)
 		{
 			if (arguments.Get<ISerializationArgument>().Append)
 			{
@@ -70,7 +68,7 @@ namespace HereticalSolutions.Persistence
 
 		public static void EnsureStrategyInitializedForAppend(
 			ISerializationStrategy strategy,
-			IReadOnlyObjectRepository arguments)
+			IStronglyTypedMetadata arguments)
 		{
 			IStrategyWithStream strategyWithStream = strategy as IStrategyWithStream;
 
@@ -89,7 +87,7 @@ namespace HereticalSolutions.Persistence
 
 		public static void EnsureStrategyInitializedForWrite(
 			ISerializationStrategy strategy,
-			IReadOnlyObjectRepository arguments)
+			IStronglyTypedMetadata arguments)
 		{
 			IStrategyWithIODestination strategyWithIODestination = strategy as IStrategyWithIODestination;
 
@@ -123,7 +121,7 @@ namespace HereticalSolutions.Persistence
 
 		public static void EnsureStrategyFinalizedForWriteOrAppend(
 			ISerializationStrategy strategy,
-			IReadOnlyObjectRepository arguments)
+			IStronglyTypedMetadata arguments)
 		{
 			if (arguments.Get<ISerializationArgument>().Append)
 			{
@@ -139,7 +137,7 @@ namespace HereticalSolutions.Persistence
 
 		public static void EnsureStrategyFinalizedForAppend(
 			ISerializationStrategy strategy,
-			IReadOnlyObjectRepository arguments)
+			IStronglyTypedMetadata arguments)
 		{
 			IStrategyWithStream strategyWithStream = strategy as IStrategyWithStream;
 
@@ -157,7 +155,7 @@ namespace HereticalSolutions.Persistence
 
 		public static void EnsureStrategyFinalizedForWrite(
 			ISerializationStrategy strategy,
-			IReadOnlyObjectRepository arguments)
+			IStronglyTypedMetadata arguments)
 		{
 			IStrategyWithIODestination strategyWithIODestination = strategy as IStrategyWithIODestination;
 
@@ -177,7 +175,7 @@ namespace HereticalSolutions.Persistence
 
 		public static bool TryReadPersistently<TValue>(
 			ISerializationStrategy strategy,
-			IReadOnlyObjectRepository arguments,
+			IStronglyTypedMetadata arguments,
 			Func<byte[], TValue> convertFromBytesDelegate,
 			out TValue value)
 		{
@@ -212,7 +210,7 @@ namespace HereticalSolutions.Persistence
 
 		public static bool TryRead<TValue>(
 			ISerializationStrategy strategy,
-			IReadOnlyObjectRepository arguments,
+			IStronglyTypedMetadata arguments,
 			out TValue value)
 		{
 			if (arguments.Has<IBlockSerializationArgument>())
@@ -233,7 +231,7 @@ namespace HereticalSolutions.Persistence
 
 		public static bool TryWriteOrAppendPersistently<TValue>(
 			ISerializationStrategy strategy,
-			IReadOnlyObjectRepository arguments,
+			IStronglyTypedMetadata arguments,
 			Func<TValue, byte[]> convertToBytesDelegate,
 			TValue value)
 		{
@@ -259,7 +257,7 @@ namespace HereticalSolutions.Persistence
 
 		public static bool TryWriteOrAppend<TValue>(
 			ISerializationStrategy strategy,
-			IReadOnlyObjectRepository arguments,
+			IStronglyTypedMetadata arguments,
 			TValue value)
 		{
 			if (arguments.Get<ISerializationArgument>().Append)

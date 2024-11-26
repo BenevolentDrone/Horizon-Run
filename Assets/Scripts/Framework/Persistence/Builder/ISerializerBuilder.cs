@@ -1,7 +1,3 @@
-using System;
-
-using HereticalSolutions.Repositories;
-
 namespace HereticalSolutions.Persistence
 {
 	public interface ISerializerBuilder
@@ -12,10 +8,16 @@ namespace HereticalSolutions.Persistence
 		#region Settings
 
 		ISerializerBuilder FromAbsolutePath(
-			FilAtAbsolutePath filePath);
+			FileAtAbsolutePathSettings filePathSettings);
 
 		ISerializerBuilder FromRelativePath(
-			FileAtRelativePath filePath);
+			FileAtRelativePathSettings filePathSettings);
+
+		ISerializerBuilder FromTempPath(
+			FileAtTempPathSettings filePathSettings);
+
+		ISerializerBuilder From<TPathSettings>(
+			TPathSettings pathSettings);
 
 		#endregion
 
@@ -36,6 +38,8 @@ namespace HereticalSolutions.Persistence
 
 		ISerializerBuilder ToBinary();
 
+		ISerializerBuilder To<TSerializationFormat>();
+
 		#endregion
 
 		#region Serialization strategies
@@ -49,6 +53,10 @@ namespace HereticalSolutions.Persistence
 		ISerializerBuilder AsTextStream();
 
 		ISerializerBuilder AsFileStream();
+
+		ISerializerBuilder AsIsolatedStorageFileStream();
+
+		ISerializerBuilder As<TMedia>();
 
 		#endregion
 

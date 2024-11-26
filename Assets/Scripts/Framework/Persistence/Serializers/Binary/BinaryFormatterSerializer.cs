@@ -1,26 +1,26 @@
-#define PROTOBUF_SUPPORT
-
-#if PROTOBUF_SUPPORT
 using System;
+using System.Runtime.Serialization.Formatters.Binary;
 
 using HereticalSolutions.Metadata;
 
 using HereticalSolutions.Logging;
 
-using ProtoBuf;
-using ProtobufInternalSerializer = ProtoBuf.Serializer;
-
 namespace HereticalSolutions.Persistence
 {
     [FormatSerializer]
-    public class ProtobufSerializer
+    public class BinaryFormatterSerializer
         : IFormatSerializer
     {
+        private readonly BinaryFormatter formatter;
+
         private readonly ILogger logger;
 
-        public ProtobufSerializer(
+        public BinaryFormatterSerializer(
+            BinaryFormatter formatter,
             ILogger logger = null)
         {
+            this.formatter = formatter;
+
             this.logger = logger;
         }
 
@@ -39,12 +39,12 @@ namespace HereticalSolutions.Persistence
             {
                 logger?.LogError(
                     GetType(),
-                    "ProtobufSerializer ONLY SUPPORTS STRATEGIES WITH STREAMS");
+                    "BinaryFormatterSerializer ONLY SUPPORTS STRATEGIES WITH STREAMS");
 
                 return false;
             }
 
-            ProtobufInternalSerializer.Serialize<TValue>(
+            formatter.Serialize(
                 strategyWithStream.Stream,
                 value);
 
@@ -65,12 +65,12 @@ namespace HereticalSolutions.Persistence
             {
                 logger?.LogError(
                     GetType(),
-                    "ProtobufSerializer ONLY SUPPORTS STRATEGIES WITH STREAMS");
+                    "BinaryFormatterSerializer ONLY SUPPORTS STRATEGIES WITH STREAMS");
 
                 return false;
             }
 
-            ProtobufInternalSerializer.NonGeneric.Serialize(
+            formatter.Serialize(
                 strategyWithStream.Stream,
                 valueObject);
 
@@ -90,15 +90,17 @@ namespace HereticalSolutions.Persistence
             {
                 logger?.LogError(
                     GetType(),
-                    "ProtobufSerializer ONLY SUPPORTS STRATEGIES WITH STREAMS");
+                    "BinaryFormatterSerializer ONLY SUPPORTS STRATEGIES WITH STREAMS");
 
                 value = default;
 
                 return false;
             }
 
-            value = ProtobufInternalSerializer.Deserialize<TValue>(
+            var valueObject = formatter.Deserialize(
                 strategyWithStream.Stream);
+
+            value = valueObject.CastFromTo<object, TValue>();
 
             return true;
         }
@@ -117,15 +119,14 @@ namespace HereticalSolutions.Persistence
             {
                 logger?.LogError(
                     GetType(),
-                    "ProtobufSerializer ONLY SUPPORTS STRATEGIES WITH STREAMS");
+                    "BinaryFormatterSerializer ONLY SUPPORTS STRATEGIES WITH STREAMS");
 
                 valueObject = default;
 
                 return false;
             }
 
-            valueObject = ProtobufInternalSerializer.NonGeneric.Deserialize(
-                valueType,
+            valueObject = formatter.Deserialize(
                 strategyWithStream.Stream);
 
             return true;
@@ -144,14 +145,15 @@ namespace HereticalSolutions.Persistence
             {
                 logger?.LogError(
                     GetType(),
-                    "ProtobufSerializer ONLY SUPPORTS STRATEGIES WITH STREAMS");
+                    "BinaryFormatterSerializer ONLY SUPPORTS STRATEGIES WITH STREAMS");
 
                 return false;
             }
 
-            value = ProtobufInternalSerializer.Deserialize<TValue>(
-                strategyWithStream.Stream,
-                value);
+            var valueObject = formatter.Deserialize(
+                strategyWithStream.Stream);
+
+            value = valueObject.CastFromTo<object, TValue>();
 
             return true;
         }
@@ -170,15 +172,13 @@ namespace HereticalSolutions.Persistence
             {
                 logger?.LogError(
                     GetType(),
-                    "ProtobufSerializer ONLY SUPPORTS STRATEGIES WITH STREAMS");
+                    "BinaryFormatterSerializer ONLY SUPPORTS STRATEGIES WITH STREAMS");
 
                 return false;
             }
 
-            valueObject = ProtobufInternalSerializer.NonGeneric.Deserialize(
-                valueType,
-                strategyWithStream.Stream,
-                valueObject);
+            valueObject = formatter.Deserialize(
+                strategyWithStream.Stream);
 
             return true;
         }
@@ -186,4 +186,3 @@ namespace HereticalSolutions.Persistence
         #endregion
     }
 }
-#endif

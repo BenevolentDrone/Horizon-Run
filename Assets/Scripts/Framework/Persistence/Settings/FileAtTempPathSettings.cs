@@ -1,21 +1,20 @@
 using System;
 using System.IO;
 
-using UnityEngine;
-
 namespace HereticalSolutions.Persistence
 {
+	//WORKS ON WINDOWS AND LINUX ONLY
 	[Serializable]
 	public class FileAtApplicationDataPathSettings
 		: IPathSettings
 	{
 		public string RelativePath;
 
-		public string ApplicationDataFolder
+		public string TempFolder
 		{
 			get
 			{
-				return Application.dataPath;
+				return Path.GetTempPath();
 			}
 		}
 

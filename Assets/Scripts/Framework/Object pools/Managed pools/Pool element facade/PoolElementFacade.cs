@@ -4,6 +4,8 @@ using HereticalSolutions.Repositories;
 
 using HereticalSolutions.LifetimeManagement;
 
+using HereticalSolutions.Metadata;
+
 namespace HereticalSolutions.Pools
 {
     public class PoolElementFacade<T>
@@ -11,14 +13,14 @@ namespace HereticalSolutions.Pools
           ICleanuppable,
           IDisposable
     {
-        private readonly IReadOnlyObjectRepository metadata;
+        private readonly StronglyTypedMetadata metadata;
         
         private EPoolElementStatus status;
 
         private IManagedPool<T> pool;
         
         public PoolElementFacade(
-            IReadOnlyObjectRepository metadata)
+            StronglyTypedMetadata metadata)
         {
             Value = default;
 
@@ -55,7 +57,7 @@ namespace HereticalSolutions.Pools
         
         #endregion
         
-        public IReadOnlyObjectRepository Metadata
+        public StronglyTypedMetadata Metadata
         {
             get => metadata;
         }

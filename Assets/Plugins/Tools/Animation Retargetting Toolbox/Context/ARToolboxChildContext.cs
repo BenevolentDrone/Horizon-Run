@@ -7,15 +7,15 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 	{
 		private readonly IARToolboxContext parentContext;
 
-		private readonly IRepository<string, object> metadataRepository;
+		private readonly IWeaklyTypedMetadata metadata;
 
 		public ARToolboxChildContext(
 			IARToolboxContext parentContext,
-			IRepository<string, object> metadataRepository)
+			IWeaklyTypedMetadata metadata)
 		{
 			this.parentContext = parentContext;
 
-			this.metadataRepository = metadataRepository;
+			this.metadata = metadata;
 		}
 
 		#region IARToolboxContext
@@ -24,14 +24,14 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 
 		public bool Has(string key)
 		{
-			return metadataRepository.Has(key);
+			return metadata.Has(key);
 		}
 
 		public bool TryGet<TValue>(
 			string key,
 			out TValue value)
 		{
-			if (!metadataRepository.TryGet(
+			if (!metadata.TryGet(
 				key,
 				out var result))
 			{
@@ -61,7 +61,7 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 			string key,
 			TValue value)
 		{
-			metadataRepository.AddOrUpdate(
+			metadata.AddOrUpdate(
 				key,
 				value);
 		}
@@ -69,12 +69,12 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 		public void TryRemove(
 			string key)
 		{
-			metadataRepository.TryRemove(key);
+			metadata.TryRemove(key);
 		}
 
 		public void Clear()
 		{
-			metadataRepository.Clear();
+			metadata.Clear();
 		}
 
 		#endregion

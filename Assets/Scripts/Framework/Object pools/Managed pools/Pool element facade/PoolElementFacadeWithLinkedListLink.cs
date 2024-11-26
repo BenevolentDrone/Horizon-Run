@@ -2,6 +2,8 @@ using HereticalSolutions.Collections;
 
 using HereticalSolutions.Repositories;
 
+using HereticalSolutions.Metadata;
+
 namespace HereticalSolutions.Pools
 {
     public class PoolElementFacadeWithLinkedListLink<T>
@@ -9,7 +11,7 @@ namespace HereticalSolutions.Pools
           ILinkedListLink<T>
     {
         public PoolElementFacadeWithLinkedListLink(
-            IReadOnlyObjectRepository metadata)
+            IStronglyTypedMetadata metadata)
             : base (metadata)
         {
         }

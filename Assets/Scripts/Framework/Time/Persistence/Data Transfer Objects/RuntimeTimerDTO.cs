@@ -1,71 +1,151 @@
-// Uncomment usings for Protobuf and CSV support
-// using CsvHelper.Configuration.Attributes;
-// using ProtoBuf;
+#define JSON_OPT_IN_SUPPORT
+#define CSV_SUPPORT
+#define PROTOBUF_SUPPORT
+
+#if JSON_OPT_IN_SUPPORT
+using Newtonsoft.Json;
+#endif
+
+#if CSV_SUPPORT
+using CsvHelper.Configuration.Attributes;
+#endif
+
+#if PROTOBUF_SUPPORT
+using ProtoBuf;
+#endif
 
 namespace HereticalSolutions.Time
 {
-    // Uncomment attributes for Protobuf and CSV support
-    // [Delimiter(",")]
-    // [ProtoContract]
-    
+    [System.Serializable]
+#if JSON_OPT_IN_SUPPORT
+    [JsonObject(MemberSerialization.OptIn)]
+#endif
+#if CSV_SUPPORT
+    [Delimiter(HereticalSolutions.Persistence.PersistenceConsts.CSV_DELIMITER)]
+#endif
+#if PROTOBUF_SUPPORT
+    [ProtoContract]
+#endif
     /// <summary>
     /// Represents a data transfer object for the runtime timer
     /// </summary>
-    [System.Serializable]
     public class RuntimeTimerDTO
     {
-        // [Name("ID")]
-        // [ProtoMember(1)]
+#if JSON_OPT_IN_SUPPORT
+        [JsonProperty]
+#endif
+#if CSV_SUPPORT
+        [Name("ID")]
+#endif
+#if PROTOBUF_SUPPORT
+        [ProtoMember(1)]
+#endif
         /// <summary>
         /// Gets or sets the ID of the timer
         /// </summary>
         public string ID { get; set; }
 
-        // [Name("State")]
-        // [ProtoMember(2)]
+#if JSON_OPT_IN_SUPPORT
+        [JsonProperty]
+#endif
+#if CSV_SUPPORT
+        [Name("State")]
+#endif
+#if PROTOBUF_SUPPORT
+        [ProtoMember(2)]
+#endif
         /// <summary>
         /// Gets or sets the current state of the timer
         /// </summary>
         public ETimerState State { get; set; }
 
-        // [Name("CurrentTimeElapsed")]
-        // [ProtoMember(3)]
+#if JSON_OPT_IN_SUPPORT
+        [JsonProperty]
+#endif
+#if CSV_SUPPORT
+        [Name("CurrentTimeElapsed")]
+#endif
+#if PROTOBUF_SUPPORT
+        [ProtoMember(3)]
+#endif
         /// <summary>
         /// Gets or sets the current time elapsed for the timer
         /// </summary>
         public float CurrentTimeElapsed { get; set; }
-        
-        // [Name("Accumulate")]
-        // [ProtoMember(4)]
+
+#if JSON_OPT_IN_SUPPORT
+        [JsonProperty]
+#endif
+#if CSV_SUPPORT
+        [Name("Accumulate")]
+#endif
+#if PROTOBUF_SUPPORT
+        [ProtoMember(4)]
+#endif
         /// <summary>
         /// Gets or sets a value indicating whether the timer should accumulate time
         /// </summary>
         public bool Accumulate { get; set; }
-        
-        // [Name("Repeat")]
-        // [ProtoMember(5)]
+
+#if JSON_OPT_IN_SUPPORT
+        [JsonProperty]
+#endif
+#if CSV_SUPPORT
+        [Name("Repeat")]
+#endif
+#if PROTOBUF_SUPPORT
+        [ProtoMember(5)]
+#endif
         /// <summary>
         /// Gets or sets a value indicating whether the timer should repeat
         /// </summary>
         public bool Repeat { get; set; }
-        
-        //[Name("FlushTimeElapsedOnRepeat")]
-        //[ProtoMember(6)]
+
+#if JSON_OPT_IN_SUPPORT
+        [JsonProperty]
+#endif
+#if CSV_SUPPORT
+        [Name("FlushTimeElapsedOnRepeat")]
+#endif
+#if PROTOBUF_SUPPORT
+        [ProtoMember(6)]
+#endif
         public bool FlushTimeElapsedOnRepeat { get; set; }
-        
-        //[Name("FireRepeatCallbackOnFinish")]
-        //[ProtoMember(7)]
+
+#if JSON_OPT_IN_SUPPORT
+        [JsonProperty]
+#endif
+#if CSV_SUPPORT
+        [Name("FireRepeatCallbackOnFinish")]
+#endif
+#if PROTOBUF_SUPPORT
+        [ProtoMember(7)]
+#endif
         public bool FireRepeatCallbackOnFinish { get; set; }
-        
-        // [Name("CurrentDuration")]
-        // [ProtoMember(8)]
+
+#if JSON_OPT_IN_SUPPORT
+        [JsonProperty]
+#endif
+#if CSV_SUPPORT
+        [Name("CurrentDuration")]
+#endif
+#if PROTOBUF_SUPPORT
+        [ProtoMember(8)]
+#endif
         /// <summary>
         /// Gets or sets the current duration of the timer
         /// </summary>
         public float CurrentDuration { get; set; }
-        
-        // [Name("DefaultDuration")]
-        // [ProtoMember(9)]
+
+#if JSON_OPT_IN_SUPPORT
+        [JsonProperty]
+#endif
+#if CSV_SUPPORT
+        [Name("DefaultDuration")]
+#endif
+#if PROTOBUF_SUPPORT
+        [ProtoMember(9)]
+#endif
         /// <summary>
         /// Gets or sets the default duration of the timer
         /// </summary>

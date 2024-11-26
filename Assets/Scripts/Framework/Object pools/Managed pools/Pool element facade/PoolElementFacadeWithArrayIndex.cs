@@ -2,6 +2,8 @@ using HereticalSolutions.Collections;
 
 using HereticalSolutions.Repositories;
 
+using HereticalSolutions.Metadata;
+
 namespace HereticalSolutions.Pools
 {
     public class PoolElementFacadeWithArrayIndex<T>
@@ -9,7 +11,7 @@ namespace HereticalSolutions.Pools
           IIndexed
     {
         public PoolElementFacadeWithArrayIndex(
-            IReadOnlyObjectRepository metadata)
+            IStronglyTypedMetadata metadata)
             : base (metadata)
         {
         }

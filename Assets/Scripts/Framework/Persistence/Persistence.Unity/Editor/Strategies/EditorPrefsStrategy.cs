@@ -3,12 +3,12 @@ using System;
 using HereticalSolutions.Logging;
 using ILogger = HereticalSolutions.Logging.ILogger;
 
-using UnityEngine;
+using UnityEditor;
 
 namespace HereticalSolutions.Persistence
 {
 	[SerializationStrategy]
-	public class PlayerPrefsStrategy
+	public class EditorPrefsStrategy
 		: ISerializationStrategy,
 		  IStrategyWithIODestination
 	{
@@ -21,7 +21,7 @@ namespace HereticalSolutions.Persistence
 
 		private readonly ILogger logger;
 
-		public PlayerPrefsStrategy(
+		public EditorPrefsStrategy(
 			string keyPrefs,
 			ILogger logger = null)
 		{
@@ -42,9 +42,9 @@ namespace HereticalSolutions.Persistence
 			AssertStrategyIsValid(
 				typeof(TValue));
 
-			if (PlayerPrefs.HasKey(keyPrefs))
+			if (EditorPrefs.HasKey(keyPrefs))
 			{
-				value = PlayerPrefs.GetString(keyPrefs).CastFromTo<string, TValue>();
+				value = EditorPrefs.GetString(keyPrefs).CastFromTo<string, TValue>();
 
 				return true;
 			}
@@ -61,9 +61,9 @@ namespace HereticalSolutions.Persistence
 			AssertStrategyIsValid(
 				valueType);
 
-			if (PlayerPrefs.HasKey(keyPrefs))
+			if (EditorPrefs.HasKey(keyPrefs))
 			{
-				value = PlayerPrefs.GetString(keyPrefs);
+				value = EditorPrefs.GetString(keyPrefs);
 
 				return true;
 			}
@@ -83,7 +83,7 @@ namespace HereticalSolutions.Persistence
 			AssertStrategyIsValid(
 				typeof(TValue));
 
-			PlayerPrefs.SetString(
+			EditorPrefs.SetString(
 				keyPrefs,
 				value.CastFromTo<TValue, string>());
 
@@ -97,7 +97,7 @@ namespace HereticalSolutions.Persistence
 			AssertStrategyIsValid(
 				valueType);
 
-			PlayerPrefs.SetString(
+			EditorPrefs.SetString(
 				keyPrefs,
 				value.CastFromTo<object, string>());
 
@@ -134,7 +134,7 @@ namespace HereticalSolutions.Persistence
 
 		public bool IOTargetExists()
 		{
-			return PlayerPrefs.HasKey(keyPrefs);
+			return EditorPrefs.HasKey(keyPrefs);
 		}
 
 		public void CreateIOTarget()
@@ -144,7 +144,7 @@ namespace HereticalSolutions.Persistence
 
 		public void EraseIOTarget()
 		{
-			PlayerPrefs.DeleteKey(keyPrefs);
+			EditorPrefs.DeleteKey(keyPrefs);
 		}
 
 		#endregion

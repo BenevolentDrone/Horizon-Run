@@ -6,13 +6,9 @@ namespace HereticalSolutions.Persistence
 {
     [SerializationStrategy]
     public class StringStrategy
-        : ISerializationStrategy
+        : ISerializationStrategy,
+          IStrategyWithFilter
     {
-        private static readonly Type[] allowedValueTypes = new Type[]
-        {
-            typeof(string)
-        };
-
         private readonly ILogger logger;
 
         public string Value { get; private set; }
@@ -26,8 +22,6 @@ namespace HereticalSolutions.Persistence
         }
 
         #region ISerializationStrategy
-
-        public Type[] AllowedValueTypes { get => allowedValueTypes; }
 
         #region Read
 
@@ -109,6 +103,21 @@ namespace HereticalSolutions.Persistence
         }
 
         #endregion
+
+        #endregion
+
+        #region IStrategyWithFilter
+
+        public bool AllowsType<TValue>()
+        {
+            return typeof(TValue) == typeof(string);
+        }
+
+        public bool AllowsType(
+            Type valueType)
+        {
+            return valueType == typeof(string);
+        }
 
         #endregion
 

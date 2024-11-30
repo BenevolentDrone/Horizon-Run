@@ -7,10 +7,10 @@ namespace HereticalSolutions.Metadata
 	public class WeaklyTypedMetadata
 		: IWeaklyTypedMetadata
 	{
-		private readonly IReadOnlyRepository<string, object> metadataRepository;
+		private readonly IRepository<string, object> metadataRepository;
 
 		public WeaklyTypedMetadata(
-			IReadOnlyRepository<string, object> metadataRepository)
+			IRepository<string, object> metadataRepository)
 		{
 			this.metadataRepository = metadataRepository;
 		}
@@ -81,6 +81,11 @@ namespace HereticalSolutions.Metadata
 			string key)
 		{
 			return metadataRepository.TryRemove(key);
+		}
+
+		public void Clear()
+		{
+			metadataRepository.Clear();
 		}
 
 		#endregion

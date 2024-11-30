@@ -32,7 +32,8 @@ namespace HereticalSolutions.Metadata.Factories
 							descriptor.ConcreteType));
 				}
 
-			return repository;
+			return new StronglyTypedMetadata(
+				repository);
 		}
 
 		public static WeaklyTypedMetadata BuildWeaklyTypedMetadata()

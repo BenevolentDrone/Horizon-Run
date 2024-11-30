@@ -1,51 +1,32 @@
 using System;
 using System.IO;
-using System.IO.IsolatedStorage;
 using System.Threading.Tasks;
 
 using HereticalSolutions.Logging;
 
 namespace HereticalSolutions.Persistence
 {
-	//Courtesy of https://learn.microsoft.com/en-us/dotnet/api/system.io.isolatedstorage.isolatedstoragefile.createdirectory?view=net-9.0&redirectedfrom=MSDN#System_IO_IsolatedStorage_IsolatedStorageFile_CreateDirectory_System_String_
 	[SerializationStrategy]
-	public class IsolatedStorageStrategy
+	public class MemoryStreamStrategy
 		: ISerializationStrategy,
 		  IAsyncSerializationStrategy,
-		  IStrategyWithIODestination,
 		  IStrategyWithStream,
 		  IStrategyWithState,
 		  IBlockSerializationStrategy,
 		  IAsyncBlockSerializationStrategy,
 		  IStrategyWithFilter
 	{
-		private readonly bool flushAutomatically;
-
 		private readonly ILogger logger;
 
 
-		public string FullPath { get; private set; }
-		
+		private MemoryStream memoryStream;
 
-		private IsolatedStorageFile isolatedStorageFile;
-
-		public IsolatedStorageFile IsolatedStorageFile { get { return isolatedStorageFile; } }
+		public MemoryStream MemoryStream { get { return memoryStream; } }
 
 
-		private IsolatedStorageFileStream fileStream;
-
-		public IsolatedStorageFileStream FileStream { get { return fileStream; } }
-
-
-		public IsolatedStorageStrategy(
-			string fullPath,
-			bool flushAutomatically = true,
+		public MemoryStreamStrategy(
 			ILogger logger = null)
 		{
-			FullPath = fullPath;
-
-			this.flushAutomatically = flushAutomatically;
-
 			this.logger = logger;
 
 
@@ -53,16 +34,7 @@ namespace HereticalSolutions.Persistence
 
 			StreamOpen = false;
 
-			//isolatedStorageFile = default(IsolatedStorageFile);
-
-			fileStream = default(IsolatedStorageFileStream);
-
-
-			//This should be done HERE because the IStrategyWithIODestination methods are all expecting for the storage
-			//to be initialized before they are called
-			//TODO: cleanup on destruction
-			//Courtesy of https://discussions.unity.com/t/isolatedstorage-no-applicationidentity-available-for-appdomain/571104/2
-			isolatedStorageFile = IsolatedStorageFile.GetUserStoreForApplication();
+			memoryStream = default(MemoryStream);
 		}
 
 
@@ -80,16 +52,16 @@ namespace HereticalSolutions.Persistence
 			//Courtesy of https://learn.microsoft.com/en-us/dotnet/api/system.io.filestream.read?view=net-8.0
 
 			// Read the source file into a byte array.
-			byte[] result = new byte[fileStream.Length];
+			byte[] result = new byte[memoryStream.Length];
 
-			int numBytesToRead = (int)fileStream.Length;
+			int numBytesToRead = (int)memoryStream.Length;
 
 			int numBytesRead = 0;
 
 			while (numBytesToRead > 0)
 			{
 				// Read may return anything from 0 to numBytesToRead.
-				int n = fileStream.Read(
+				int n = memoryStream.Read(
 					result,
 					numBytesRead,
 					numBytesToRead);
@@ -121,16 +93,16 @@ namespace HereticalSolutions.Persistence
 			//Courtesy of https://learn.microsoft.com/en-us/dotnet/api/system.io.filestream.read?view=net-8.0
 
 			// Read the source file into a byte array.
-			byte[] result = new byte[fileStream.Length];
+			byte[] result = new byte[memoryStream.Length];
 
-			int numBytesToRead = (int)fileStream.Length;
+			int numBytesToRead = (int)memoryStream.Length;
 
 			int numBytesRead = 0;
 
 			while (numBytesToRead > 0)
 			{
 				// Read may return anything from 0 to numBytesToRead.
-				int n = fileStream.Read(
+				int n = memoryStream.Read(
 					result,
 					numBytesRead,
 					numBytesToRead);
@@ -168,14 +140,11 @@ namespace HereticalSolutions.Persistence
 
 			int numBytesToWrite = contents.Length;
 
-			// Write the byte array to the other FileStream.
-			fileStream.Write(
+			// Write the byte array to the other MemoryStream.
+			memoryStream.Write(
 				contents,
 				0,
 				numBytesToWrite);
-
-			if (flushAutomatically)
-				Flush();
 
 			return true;
 		}
@@ -194,14 +163,11 @@ namespace HereticalSolutions.Persistence
 
 			int numBytesToWrite = contents.Length;
 
-			// Write the byte array to the other FileStream.
-			fileStream.Write(
+			// Write the byte array to the other MemoryStream.
+			memoryStream.Write(
 				contents,
 				0,
 				numBytesToWrite);
-
-			if (flushAutomatically)
-				Flush();
 
 			return true;
 		}
@@ -223,14 +189,11 @@ namespace HereticalSolutions.Persistence
 
 			int numBytesToWrite = contents.Length;
 
-			// Write the byte array to the other FileStream.
-			fileStream.Write(
+			// Write the byte array to the other MemoryStream.
+			memoryStream.Write(
 				contents,
 				0,
 				numBytesToWrite);
-
-			if (flushAutomatically)
-				Flush();
 
 			return true;
 		}
@@ -249,14 +212,11 @@ namespace HereticalSolutions.Persistence
 
 			int numBytesToWrite = contents.Length;
 
-			// Write the byte array to the other FileStream.
-			fileStream.Write(
+			// Write the byte array to the other MemoryStream.
+			memoryStream.Write(
 				contents,
 				0,
 				numBytesToWrite);
-
-			if (flushAutomatically)
-				Flush();
 
 			return true;
 		}
@@ -278,16 +238,16 @@ namespace HereticalSolutions.Persistence
 			//Courtesy of https://learn.microsoft.com/en-us/dotnet/api/system.io.filestream.read?view=net-8.0
 
 			// Read the source file into a byte array.
-			byte[] result = new byte[fileStream.Length];
+			byte[] result = new byte[memoryStream.Length];
 
-			int numBytesToRead = (int)fileStream.Length;
+			int numBytesToRead = (int)memoryStream.Length;
 
 			int numBytesRead = 0;
 
 			while (numBytesToRead > 0)
 			{
 				// Read may return anything from 0 to numBytesToRead.
-				int n = await fileStream.ReadAsync(
+				int n = await memoryStream.ReadAsync(
 					result,
 					numBytesRead,
 					numBytesToRead);
@@ -318,16 +278,16 @@ namespace HereticalSolutions.Persistence
 			//Courtesy of https://learn.microsoft.com/en-us/dotnet/api/system.io.filestream.read?view=net-8.0
 
 			// Read the source file into a byte array.
-			byte[] result = new byte[fileStream.Length];
+			byte[] result = new byte[memoryStream.Length];
 
-			int numBytesToRead = (int)fileStream.Length;
+			int numBytesToRead = (int)memoryStream.Length;
 
 			int numBytesRead = 0;
 
 			while (numBytesToRead > 0)
 			{
 				// Read may return anything from 0 to numBytesToRead.
-				int n = await fileStream.ReadAsync(
+				int n = await memoryStream.ReadAsync(
 					result,
 					numBytesRead,
 					numBytesToRead);
@@ -365,14 +325,11 @@ namespace HereticalSolutions.Persistence
 
 			int numBytesToWrite = contents.Length;
 
-			// Write the byte array to the other FileStream.
-			await fileStream.WriteAsync(
+			// Write the byte array to the other MemoryStream.
+			await memoryStream.WriteAsync(
 				contents,
 				0,
 				numBytesToWrite);
-
-			if (flushAutomatically)
-				await FlushAsync();
 
 			return true;
 		}
@@ -391,14 +348,11 @@ namespace HereticalSolutions.Persistence
 
 			int numBytesToWrite = contents.Length;
 
-			// Write the byte array to the other FileStream.
-			await fileStream.WriteAsync(
+			// Write the byte array to the other MemoryStream.
+			await memoryStream.WriteAsync(
 				contents,
 				0,
 				numBytesToWrite);
-
-			if (flushAutomatically)
-				await FlushAsync();
 
 			return true;
 		}
@@ -420,14 +374,11 @@ namespace HereticalSolutions.Persistence
 
 			int numBytesToWrite = contents.Length;
 
-			// Write the byte array to the other FileStream.
-			await fileStream.WriteAsync(
+			// Write the byte array to the other MemoryStream.
+			await memoryStream.WriteAsync(
 				contents,
 				0,
 				numBytesToWrite);
-
-			if (flushAutomatically)
-				await FlushAsync();
 
 			return true;
 		}
@@ -446,76 +397,16 @@ namespace HereticalSolutions.Persistence
 
 			int numBytesToWrite = contents.Length;
 
-			// Write the byte array to the other FileStream.
-			await fileStream.WriteAsync(
+			// Write the byte array to the other MemoryStream.
+			await memoryStream.WriteAsync(
 				contents,
 				0,
 				numBytesToWrite);
-
-			if (flushAutomatically)
-				await FlushAsync();
 
 			return true;
 		}
 
 		#endregion
-
-		#endregion
-
-		#region IStrategyWithIODestination
-
-		public void EnsureIOTargetDestinationExists()
-		{
-			IOHelpers.EnsureDirectoryInIsolatedStorageExists(
-				FullPath,
-				isolatedStorageFile,
-				logger,
-				GetType());
-		}
-
-		public bool IOTargetExists()
-		{
-			return IOHelpers.FileInIsolatedStorageExists(
-				FullPath,
-				isolatedStorageFile,
-				logger,
-				GetType());
-		}
-
-		public void CreateIOTarget()
-		{
-			string savePath = FullPath;
-
-			IOHelpers.EnsureDirectoryInIsolatedStorageExists(
-				FullPath,
-				isolatedStorageFile,
-				logger,
-				GetType());
-
-			if (!IOHelpers.FileInIsolatedStorageExists(
-				savePath,
-				isolatedStorageFile,
-				logger,
-				GetType()))
-			{
-				isolatedStorageFile.CreateFile(
-					FullPath);
-			}
-		}
-
-		public void EraseIOTarget()
-		{
-			string savePath = FullPath;
-
-			if (IOHelpers.FileInIsolatedStorageExists(
-				savePath,
-				isolatedStorageFile,
-				logger,
-				GetType()))
-			{
-				isolatedStorageFile.DeleteFile(savePath);
-			}
-		}
 
 		#endregion
 
@@ -533,7 +424,7 @@ namespace HereticalSolutions.Persistence
 					case EStreamMode.WRITE:
 					case EStreamMode.APPEND:
 					case EStreamMode.READ_AND_WRITE:
-						return fileStream;
+						return memoryStream;
 
 					default:
 						return null;
@@ -545,16 +436,16 @@ namespace HereticalSolutions.Persistence
 
 		#region Flush
 
-		public bool FlushAutomatically { get => flushAutomatically; }
+		public bool FlushAutomatically { get => false; }
 
 		public void Flush()
 		{
 			if (!StreamOpen)
 				return;
 
-			if (fileStream != null)
+			if (memoryStream != null)
 			{
-				fileStream.Flush(true);
+				memoryStream.Flush();
 			}
 		}
 
@@ -563,9 +454,9 @@ namespace HereticalSolutions.Persistence
 			if (!StreamOpen)
 				return;
 
-			if (fileStream != null)
+			if (memoryStream != null)
 			{
-				await fileStream.FlushAsync();
+				await memoryStream.FlushAsync();
 			}
 		}
 
@@ -582,9 +473,9 @@ namespace HereticalSolutions.Persistence
 					return -1;
 
 				if ((CurrentMode == EStreamMode.READ || CurrentMode == EStreamMode.WRITE || CurrentMode == EStreamMode.APPEND || CurrentMode == EStreamMode.READ_AND_WRITE)
-					&& fileStream != null)
+					&& memoryStream != null)
 				{
-					return fileStream.Position;
+					return memoryStream.Position;
 				}
 
 				return -1;
@@ -599,9 +490,9 @@ namespace HereticalSolutions.Persistence
 					return false;
 
 				if ((CurrentMode == EStreamMode.READ || CurrentMode == EStreamMode.WRITE || CurrentMode == EStreamMode.APPEND || CurrentMode == EStreamMode.READ_AND_WRITE)
-					&& fileStream != null)
+					&& memoryStream != null)
 				{
-					return fileStream.CanSeek;
+					return memoryStream.CanSeek;
 				}
 
 				return false;
@@ -620,9 +511,9 @@ namespace HereticalSolutions.Persistence
 			}
 
 			if ((CurrentMode == EStreamMode.READ || CurrentMode == EStreamMode.WRITE || CurrentMode == EStreamMode.APPEND || CurrentMode == EStreamMode.READ_AND_WRITE)
-				&& fileStream != null)
+				&& memoryStream != null)
 			{
-				position = fileStream.Seek(
+				position = memoryStream.Seek(
 					offset,
 					SeekOrigin.Current);
 
@@ -646,9 +537,9 @@ namespace HereticalSolutions.Persistence
 			}
 
 			if ((CurrentMode == EStreamMode.READ || CurrentMode == EStreamMode.WRITE || CurrentMode == EStreamMode.APPEND || CurrentMode == EStreamMode.READ_AND_WRITE)
-				&& fileStream != null)
+				&& memoryStream != null)
 			{
-				position = fileStream.Seek(
+				position = memoryStream.Seek(
 					offset,
 					SeekOrigin.Begin);
 
@@ -672,9 +563,9 @@ namespace HereticalSolutions.Persistence
 			}
 
 			if ((CurrentMode == EStreamMode.READ || CurrentMode == EStreamMode.WRITE || CurrentMode == EStreamMode.APPEND || CurrentMode == EStreamMode.READ_AND_WRITE)
-				&& fileStream != null)
+				&& memoryStream != null)
 			{
-				position = fileStream.Seek(
+				position = memoryStream.Seek(
 					offset,
 					SeekOrigin.End);
 
@@ -699,14 +590,14 @@ namespace HereticalSolutions.Persistence
 			if (StreamOpen)
 				return;
 
-			StreamOpen = OpenReadStream(
-				out fileStream);
+			StreamOpen = OpenStream(
+				out memoryStream);
 
 			if (!StreamOpen)
 				throw new Exception(
 					logger.TryFormatException(
 						GetType(),
-						$"FAILED TO OPEN STREAM: {FullPath}"));
+						$"FAILED TO OPEN STREAM"));
 
 			CurrentMode = EStreamMode.READ;
 		}
@@ -719,11 +610,11 @@ namespace HereticalSolutions.Persistence
 			if (CurrentMode != EStreamMode.READ)
 				return;
 
-			if (fileStream != null)
+			if (memoryStream != null)
 				CloseStream(
-					fileStream);
+					memoryStream);
 
-			fileStream = default(IsolatedStorageFileStream);
+			memoryStream = default(MemoryStream);
 
 			StreamOpen = false;
 
@@ -735,14 +626,14 @@ namespace HereticalSolutions.Persistence
 			if (StreamOpen)
 				return;
 
-			StreamOpen = OpenWriteStream(
-				out fileStream);
+			StreamOpen = OpenStream(
+				out memoryStream);
 
 			if (!StreamOpen)
 				throw new Exception(
 					logger.TryFormatException(
 						GetType(),
-						$"FAILED TO OPEN STREAM: {FullPath}"));
+						$"FAILED TO OPEN STREAM"));
 
 			CurrentMode = EStreamMode.WRITE;
 		}
@@ -755,11 +646,11 @@ namespace HereticalSolutions.Persistence
 			if (CurrentMode != EStreamMode.WRITE)
 				return;
 
-			if (fileStream != null)
+			if (memoryStream != null)
 				CloseStream(
-					fileStream);
+					memoryStream);
 
-			fileStream = default(IsolatedStorageFileStream);
+			memoryStream = default(MemoryStream);
 
 			StreamOpen = false;
 
@@ -771,14 +662,14 @@ namespace HereticalSolutions.Persistence
 			if (StreamOpen)
 				return;
 
-			StreamOpen = OpenAppendStream(
-				out fileStream);
+			StreamOpen = OpenStream(
+				out memoryStream);
 
 			if (!StreamOpen)
 				throw new Exception(
 					logger.TryFormatException(
 						GetType(),
-						$"FAILED TO OPEN STREAM: {FullPath}"));
+						$"FAILED TO OPEN STREAM"));
 
 			CurrentMode = EStreamMode.APPEND;
 		}
@@ -791,11 +682,11 @@ namespace HereticalSolutions.Persistence
 			if (CurrentMode != EStreamMode.APPEND)
 				return;
 
-			if (fileStream != null)
+			if (memoryStream != null)
 				CloseStream(
-					fileStream);
+					memoryStream);
 
-			fileStream = default(IsolatedStorageFileStream);
+			memoryStream = default(MemoryStream);
 
 			StreamOpen = false;
 
@@ -807,14 +698,14 @@ namespace HereticalSolutions.Persistence
 			if (StreamOpen)
 				return;
 
-			StreamOpen = OpenReadWriteStream(
-				out fileStream);
+			StreamOpen = OpenStream(
+				out memoryStream);
 
 			if (!StreamOpen)
 				throw new Exception(
 					logger.TryFormatException(
 						GetType(),
-						$"FAILED TO OPEN STREAM: {FullPath}"));
+						$"FAILED TO OPEN STREAM"));
 
 			CurrentMode = EStreamMode.READ_AND_WRITE;
 		}
@@ -827,11 +718,11 @@ namespace HereticalSolutions.Persistence
 			if (CurrentMode != EStreamMode.READ_AND_WRITE)
 				return;
 
-			if (fileStream != null)
+			if (memoryStream != null)
 				CloseStream(
-					fileStream);
+					memoryStream);
 
-			fileStream = default(IsolatedStorageFileStream);
+			memoryStream = default(MemoryStream);
 
 			StreamOpen = false;
 
@@ -856,7 +747,7 @@ namespace HereticalSolutions.Persistence
 			// Read the source file into a byte array.
 			byte[] result = new byte[blockSize];
 
-			int resultLength = fileStream.Read(
+			int resultLength = memoryStream.Read(
 				result,
 				0,
 				blockSize);
@@ -891,7 +782,7 @@ namespace HereticalSolutions.Persistence
 			// Read the source file into a byte array.
 			byte[] result = new byte[blockSize];
 
-			int resultLength = fileStream.Read(
+			int resultLength = memoryStream.Read(
 				result,
 				0,
 				blockSize);
@@ -928,13 +819,10 @@ namespace HereticalSolutions.Persistence
 
 			byte[] contents = value.CastFromTo<TValue, byte[]>();
 
-			fileStream.Write(
+			memoryStream.Write(
 				contents,
 				blockOffset,
 				blockSize);
-
-			if (flushAutomatically)
-				Flush();
 
 			return true;
 		}
@@ -951,13 +839,10 @@ namespace HereticalSolutions.Persistence
 
 			byte[] contents = value.CastFromTo<object, byte[]>();
 
-			fileStream.Write(
+			memoryStream.Write(
 				contents,
 				blockOffset,
 				blockSize);
-
-			if (flushAutomatically)
-				Flush();
 
 			return true;
 		}
@@ -981,7 +866,7 @@ namespace HereticalSolutions.Persistence
 			// Read the source file into a byte array.
 			byte[] result = new byte[blockSize];
 
-			int resultLength = await fileStream.ReadAsync(
+			int resultLength = await memoryStream.ReadAsync(
 				result,
 				0,
 				blockSize);
@@ -1015,7 +900,7 @@ namespace HereticalSolutions.Persistence
 			// Read the source file into a byte array.
 			byte[] result = new byte[blockSize];
 
-			int resultLength = await fileStream.ReadAsync(
+			int resultLength = await memoryStream.ReadAsync(
 				result,
 				0,
 				blockSize);
@@ -1052,13 +937,10 @@ namespace HereticalSolutions.Persistence
 
 			byte[] contents = value.CastFromTo<TValue, byte[]>();
 
-			await fileStream.WriteAsync(
+			await memoryStream.WriteAsync(
 				contents,
 				blockOffset,
 				blockSize);
-
-			if (flushAutomatically)
-				await FlushAsync();
 
 			return true;
 		}
@@ -1075,13 +957,10 @@ namespace HereticalSolutions.Persistence
 
 			byte[] contents = value.CastFromTo<object, byte[]>();
 
-			await fileStream.WriteAsync(
+			await memoryStream.WriteAsync(
 				contents,
 				blockOffset,
 				blockSize);
-
-			if (flushAutomatically)
-				await FlushAsync();
 
 			return true;
 		}
@@ -1119,7 +998,7 @@ namespace HereticalSolutions.Persistence
 				throw new Exception(
 					logger.TryFormatException(
 						GetType(),
-						$"STREAM NOT OPEN: {FullPath}"));
+						$"STREAM NOT OPEN"));
 
 			if (CurrentMode != preferredMode && CurrentMode != EStreamMode.READ_AND_WRITE)
 				throw new Exception(
@@ -1127,97 +1006,22 @@ namespace HereticalSolutions.Persistence
 						GetType(),
 						$"INVALID STREAM MODE: {CurrentMode}"));
 
-			if (isolatedStorageFile == null)
+			if (memoryStream == null)
 				throw new Exception(
 					logger.TryFormatException(
 						GetType(),
-						$"ISOLATED STORAGE FILE IS NULL: {FullPath}"));
-
-			if (fileStream == null)
-				throw new Exception(
-					logger.TryFormatException(
-						GetType(),
-						$"FILE STREAM IS NULL: {FullPath}"));
+						$"FILE STREAM IS NULL"));
 		}
 
-		private bool OpenReadStream(
-			out IsolatedStorageFileStream dataStream)
+		private bool OpenStream(
+			out MemoryStream dataStream)
 		{
-			dataStream = default(IsolatedStorageFileStream);
-
-			if (!IOHelpers.FileInIsolatedStorageExists(
-				FullPath,
-				isolatedStorageFile,
-				logger,
-				GetType()))
-			{
-				return false;
-			}
-
-			dataStream = new IsolatedStorageFileStream(
-				FullPath,
-				FileMode.Open,
-				FileAccess.Read);
+			dataStream = new MemoryStream();
 
 			return true;
 		}
 
-		private bool OpenWriteStream(
-			out IsolatedStorageFileStream dataStream)
-		{
-			IOHelpers.EnsureDirectoryInIsolatedStorageExists(
-				FullPath,
-				isolatedStorageFile,
-				logger,
-				GetType());
-
-			//Courtesy of https://learn.microsoft.com/en-us/dotnet/api/system.io.filemode?view=net-8.0
-			dataStream = new IsolatedStorageFileStream(
-				FullPath,
-				FileMode.Create,
-				FileAccess.Write);
-
-			return true;
-		}
-
-		private bool OpenAppendStream(
-			out IsolatedStorageFileStream dataStream)
-		{
-			IOHelpers.EnsureDirectoryInIsolatedStorageExists(
-				FullPath,
-				isolatedStorageFile,
-				logger,
-				GetType());
-
-			//Courtesy of https://stackoverflow.com/questions/7306214/append-lines-to-a-file-using-a-fileStream
-			//Courtesy of https://learn.microsoft.com/en-us/dotnet/api/system.io.filemode?view=net-8.0
-			dataStream = new IsolatedStorageFileStream(
-				FullPath,
-				FileMode.Append,
-				FileAccess.Write);
-
-			return true;
-		}
-
-		private bool OpenReadWriteStream(
-			out IsolatedStorageFileStream dataStream)
-		{
-			IOHelpers.EnsureDirectoryInIsolatedStorageExists(
-				FullPath,
-				isolatedStorageFile,
-				logger,
-				GetType());
-
-			//Courtesy of https://learn.microsoft.com/en-us/dotnet/api/system.io.filemode?view=net-8.0
-			dataStream = new IsolatedStorageFileStream(
-				FullPath,
-				FileMode.OpenOrCreate,
-				FileAccess.ReadWrite);
-
-			return true;
-		}
-
-		private void CloseStream(IsolatedStorageFileStream dataStream)
+		private void CloseStream(MemoryStream dataStream)
 		{
 			dataStream.Close();
 		}

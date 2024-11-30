@@ -6,8 +6,6 @@ namespace HereticalSolutions.Persistence
 	//Courtesy of https://stackoverflow.com/questions/18716928/how-to-write-an-async-method-with-out-parameter
 	public interface IAsyncSerializationStrategy
 	{
-		Type[] AllowedValueTypes { get; }
-
 		#region Read
 
 		Task<(bool, TValue)> ReadAsync<TValue>();

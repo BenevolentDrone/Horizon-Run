@@ -23,6 +23,8 @@ namespace HereticalSolutions.Persistence
 
 		#region Format serializer
 
+		ISerializerBuilder ToObject();
+
 		ISerializerBuilder ToPlainText();
 
 		ISerializerBuilder ToJSON();
@@ -54,9 +56,25 @@ namespace HereticalSolutions.Persistence
 
 		ISerializerBuilder AsFileStream();
 
+		ISerializerBuilder AsMemoryStream();
+
 		ISerializerBuilder AsIsolatedStorageFileStream();
 
 		ISerializerBuilder As<TMedia>();
+
+		#endregion
+
+		#region Arguments
+
+		ISerializerBuilder WithPath();
+
+		ISerializerBuilder WithAppend();
+
+		ISerializerBuilder WithReadWrite();
+
+		ISerializerBuilder WithBlockSerialization();
+
+		ISerializerBuilder With<TArgument>();
 
 		#endregion
 

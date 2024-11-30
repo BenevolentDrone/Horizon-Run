@@ -1,3 +1,4 @@
+using HereticalSolutions.Metadata;
 using HereticalSolutions.Metadata.Factories;
 
 using UnityEditor;

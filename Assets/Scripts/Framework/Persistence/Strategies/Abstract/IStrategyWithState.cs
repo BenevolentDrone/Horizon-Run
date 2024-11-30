@@ -2,6 +2,9 @@ namespace HereticalSolutions.Persistence
 {
 	public interface IStrategyWithState
 	{
+		bool SupportsSimultaneousReadAndWrite { get; }
+		
+
 		void InitializeRead();
 
 		void FinalizeRead();
@@ -15,5 +18,10 @@ namespace HereticalSolutions.Persistence
 		void InitializeAppend();
 
 		void FinalizeAppend();
+
+
+		void InitializeReadAndWrite();
+
+		void FinalizeReadAndWrite();
 	}
 }

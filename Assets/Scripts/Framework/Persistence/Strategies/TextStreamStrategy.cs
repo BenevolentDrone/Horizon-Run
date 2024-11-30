@@ -15,14 +15,9 @@ namespace HereticalSolutions.Persistence
 		  IStrategyWithStream,
 		  IStrategyWithState,
 		  IBlockSerializationStrategy,
-		  IAsyncBlockSerializationStrategy
+		  IAsyncBlockSerializationStrategy,
+		  IStrategyWithFilter
 	{
-		private static readonly Type[] allowedValueTypes = new Type[]
-		{
-			typeof(char[]),
-			typeof(string)
-		};
-
 		private readonly bool flushAutomatically;
 
 		private readonly ILogger logger;
@@ -63,7 +58,7 @@ namespace HereticalSolutions.Persistence
 			this.logger = logger;
 
 
-			CurrentMode = ESreamMode.NONE;
+			CurrentMode = EStreamMode.NONE;
 
 			StreamOpen = false;
 
@@ -73,8 +68,6 @@ namespace HereticalSolutions.Persistence
 		}
 
 		#region ISerializationStrategy
-
-		public Type[] AllowedValueTypes { get => allowedValueTypes; }
 
 		#region Read
 
@@ -89,7 +82,7 @@ namespace HereticalSolutions.Persistence
 				typeof(TValue),
 				resultIsCharArray,
 				resultIsString,
-				ESreamMode.READ,
+				EStreamMode.READ,
 				streamReader);
 
 			if (streamReader.EndOfStream)
@@ -122,7 +115,7 @@ namespace HereticalSolutions.Persistence
 				valueType,
 				resultIsCharArray,
 				resultIsString,
-				ESreamMode.READ,
+				EStreamMode.READ,
 				streamReader);
 
 			if (streamReader.EndOfStream)
@@ -158,7 +151,7 @@ namespace HereticalSolutions.Persistence
 				typeof(TValue),
 				resultIsCharArray,
 				resultIsString,
-				ESreamMode.WRITE,
+				EStreamMode.WRITE,
 				streamWriter);
 
 			string contents = (resultIsCharArray)
@@ -182,7 +175,7 @@ namespace HereticalSolutions.Persistence
 				valueType,
 				resultIsCharArray,
 				resultIsString,
-				ESreamMode.WRITE,
+				EStreamMode.WRITE,
 				streamWriter);
 
 			string contents = (resultIsCharArray)
@@ -209,7 +202,7 @@ namespace HereticalSolutions.Persistence
 				typeof(TValue),
 				resultIsCharArray,
 				resultIsString,
-				ESreamMode.APPEND,
+				EStreamMode.APPEND,
 				streamWriter);
 
 			string contents = (resultIsCharArray)
@@ -233,7 +226,7 @@ namespace HereticalSolutions.Persistence
 				valueType,
 				resultIsCharArray,
 				resultIsString,
-				ESreamMode.APPEND,
+				EStreamMode.APPEND,
 				streamWriter);
 
 			string contents = (resultIsCharArray)
@@ -263,7 +256,7 @@ namespace HereticalSolutions.Persistence
 				typeof(TValue),
 				resultIsCharArray,
 				resultIsString,
-				ESreamMode.READ,
+				EStreamMode.READ,
 				streamReader);
 
 			if (streamReader.EndOfStream)
@@ -295,7 +288,7 @@ namespace HereticalSolutions.Persistence
 				valueType,
 				resultIsCharArray,
 				resultIsString,
-				ESreamMode.READ,
+				EStreamMode.READ,
 				streamReader);
 
 			if (streamReader.EndOfStream)
@@ -331,7 +324,7 @@ namespace HereticalSolutions.Persistence
 				typeof(TValue),
 				resultIsCharArray,
 				resultIsString,
-				ESreamMode.WRITE,
+				EStreamMode.WRITE,
 				streamWriter);
 
 			string contents = (resultIsCharArray)
@@ -355,7 +348,7 @@ namespace HereticalSolutions.Persistence
 				valueType,
 				resultIsCharArray,
 				resultIsString,
-				ESreamMode.WRITE,
+				EStreamMode.WRITE,
 				streamWriter);
 
 			string contents = (resultIsCharArray)
@@ -382,7 +375,7 @@ namespace HereticalSolutions.Persistence
 				typeof(TValue),
 				resultIsCharArray,
 				resultIsString,
-				ESreamMode.APPEND,
+				EStreamMode.APPEND,
 				streamWriter);
 
 			string contents = (resultIsCharArray)
@@ -406,7 +399,7 @@ namespace HereticalSolutions.Persistence
 				valueType,
 				resultIsCharArray,
 				resultIsString,
-				ESreamMode.APPEND,
+				EStreamMode.APPEND,
 				streamWriter);
 
 			string contents = (resultIsCharArray)
@@ -476,7 +469,7 @@ namespace HereticalSolutions.Persistence
 
 		#region IStrategyWithStream
 
-		public ESreamMode CurrentMode { get; private set; }
+		public EStreamMode CurrentMode { get; private set; }
 
 		public Stream Stream
 		{
@@ -484,14 +477,14 @@ namespace HereticalSolutions.Persistence
 			{
 				switch (CurrentMode)
 				{
-					case ESreamMode.READ:
+					case EStreamMode.READ:
 						if (streamReader == null)
 							return null;
 
 						return streamReader.BaseStream;
 
-					case ESreamMode.WRITE:
-					case ESreamMode.APPEND:
+					case EStreamMode.WRITE:
+					case EStreamMode.APPEND:
 						if (streamWriter == null)
 							return null;
 
@@ -543,13 +536,13 @@ namespace HereticalSolutions.Persistence
 				if (!StreamOpen)
 					return -1;
 
-				if (CurrentMode == ESreamMode.READ
+				if (CurrentMode == EStreamMode.READ
 					&& streamReader != null)
 				{
 					return streamReader.BaseStream.Position;
 				}
 
-				if ((CurrentMode == ESreamMode.WRITE || CurrentMode == ESreamMode.APPEND)
+				if ((CurrentMode == EStreamMode.WRITE || CurrentMode == EStreamMode.APPEND)
 					&& streamWriter != null)
 				{
 					return streamWriter.BaseStream.Position;
@@ -566,13 +559,13 @@ namespace HereticalSolutions.Persistence
 				if (!StreamOpen)
 					return false;
 
-				if (CurrentMode == ESreamMode.READ
+				if (CurrentMode == EStreamMode.READ
 					&& streamReader != null)
 				{
 					return streamReader.BaseStream.CanSeek;
 				}
 				
-				if ((CurrentMode == ESreamMode.WRITE || CurrentMode == ESreamMode.APPEND)
+				if ((CurrentMode == EStreamMode.WRITE || CurrentMode == EStreamMode.APPEND)
 					&& streamWriter != null)
 				{
 					return streamWriter.BaseStream.CanSeek;
@@ -593,7 +586,7 @@ namespace HereticalSolutions.Persistence
 				return false;
 			}
 
-			if (CurrentMode == ESreamMode.READ
+			if (CurrentMode == EStreamMode.READ
 				&& streamReader != null)
 			{
 				position = streamReader.BaseStream.Seek(
@@ -603,7 +596,7 @@ namespace HereticalSolutions.Persistence
 				return true;
 			}
 
-			if ((CurrentMode == ESreamMode.WRITE || CurrentMode == ESreamMode.APPEND)
+			if ((CurrentMode == EStreamMode.WRITE || CurrentMode == EStreamMode.APPEND)
 				&& streamWriter != null)
 			{
 				position = streamWriter.BaseStream.Seek(
@@ -629,7 +622,7 @@ namespace HereticalSolutions.Persistence
 				return false;
 			}
 
-			if (CurrentMode == ESreamMode.READ
+			if (CurrentMode == EStreamMode.READ
 				&& streamReader != null)
 			{
 				position = streamReader.BaseStream.Seek(
@@ -639,7 +632,7 @@ namespace HereticalSolutions.Persistence
 				return true;
 			}
 
-			if ((CurrentMode == ESreamMode.WRITE || CurrentMode == ESreamMode.APPEND)
+			if ((CurrentMode == EStreamMode.WRITE || CurrentMode == EStreamMode.APPEND)
 				&& streamWriter != null)
 			{
 				position = streamWriter.BaseStream.Seek(
@@ -665,7 +658,7 @@ namespace HereticalSolutions.Persistence
 				return false;
 			}
 
-			if (CurrentMode == ESreamMode.READ
+			if (CurrentMode == EStreamMode.READ
 				&& streamReader != null)
 			{
 				position = streamReader.BaseStream.Seek(
@@ -675,7 +668,7 @@ namespace HereticalSolutions.Persistence
 				return true;
 			}
 
-			if ((CurrentMode == ESreamMode.WRITE || CurrentMode == ESreamMode.APPEND)
+			if ((CurrentMode == EStreamMode.WRITE || CurrentMode == EStreamMode.APPEND)
 				&& streamWriter != null)
 			{
 				position = streamWriter.BaseStream.Seek(
@@ -696,6 +689,8 @@ namespace HereticalSolutions.Persistence
 
 		#region IStrategyWithState
 
+		public bool SupportsSimultaneousReadAndWrite { get => false; }
+
 		public void InitializeRead()
 		{
 			if (StreamOpen)
@@ -710,7 +705,7 @@ namespace HereticalSolutions.Persistence
 						GetType(),
 						$"FAILED TO OPEN STREAM: {FullPath}"));
 
-			CurrentMode = ESreamMode.READ;
+			CurrentMode = EStreamMode.READ;
 		}
 
 		public void FinalizeRead()
@@ -718,7 +713,7 @@ namespace HereticalSolutions.Persistence
 			if (!StreamOpen)
 				return;
 
-			if (CurrentMode != ESreamMode.READ)
+			if (CurrentMode != EStreamMode.READ)
 				return;
 
 			if (streamReader != null)
@@ -729,7 +724,7 @@ namespace HereticalSolutions.Persistence
 
 			StreamOpen = false;
 
-			CurrentMode = ESreamMode.NONE;
+			CurrentMode = EStreamMode.NONE;
 		}
 
 		public void InitializeWrite()
@@ -746,7 +741,7 @@ namespace HereticalSolutions.Persistence
 						GetType(),
 						$"FAILED TO OPEN STREAM: {FullPath}"));
 
-			CurrentMode = ESreamMode.WRITE;
+			CurrentMode = EStreamMode.WRITE;
 		}
 
 		public void FinalizeWrite()
@@ -754,7 +749,7 @@ namespace HereticalSolutions.Persistence
 			if (!StreamOpen)
 				return;
 
-			if (CurrentMode != ESreamMode.WRITE)
+			if (CurrentMode != EStreamMode.WRITE)
 				return;
 
 			if (streamWriter != null)
@@ -765,7 +760,7 @@ namespace HereticalSolutions.Persistence
 
 			StreamOpen = false;
 
-			CurrentMode = ESreamMode.NONE;
+			CurrentMode = EStreamMode.NONE;
 		}
 
 		public void InitializeAppend()
@@ -782,7 +777,7 @@ namespace HereticalSolutions.Persistence
 						GetType(),
 						$"FAILED TO OPEN STREAM: {FullPath}"));
 
-			CurrentMode = ESreamMode.APPEND;
+			CurrentMode = EStreamMode.APPEND;
 		}
 
 		public void FinalizeAppend()
@@ -790,7 +785,7 @@ namespace HereticalSolutions.Persistence
 			if (!StreamOpen)
 				return;
 
-			if (CurrentMode != ESreamMode.APPEND)
+			if (CurrentMode != EStreamMode.APPEND)
 				return;
 
 			if (streamWriter != null)
@@ -801,7 +796,17 @@ namespace HereticalSolutions.Persistence
 
 			StreamOpen = false;
 
-			CurrentMode = ESreamMode.NONE;
+			CurrentMode = EStreamMode.NONE;
+		}
+
+		public void InitializeReadAndWrite()
+		{
+			throw new NotSupportedException();
+		}
+
+		public void FinalizeReadAndWrite()
+		{
+			throw new NotSupportedException();
 		}
 
 		#endregion
@@ -823,7 +828,7 @@ namespace HereticalSolutions.Persistence
 				typeof(TValue),
 				resultIsCharArray,
 				resultIsString,
-				ESreamMode.READ,
+				EStreamMode.READ,
 				streamReader);
 
 			if (streamReader.EndOfStream)
@@ -875,7 +880,7 @@ namespace HereticalSolutions.Persistence
 				valueType,
 				resultIsCharArray,
 				resultIsString,
-				ESreamMode.READ,
+				EStreamMode.READ,
 				streamReader);
 
 			if (streamReader.EndOfStream)
@@ -930,7 +935,7 @@ namespace HereticalSolutions.Persistence
 				typeof(TValue),
 				resultIsCharArray,
 				resultIsString,
-				ESreamMode.WRITE,
+				EStreamMode.WRITE,
 				streamWriter);
 
 			char[] contentsArray = (resultIsCharArray)
@@ -959,7 +964,7 @@ namespace HereticalSolutions.Persistence
 				valueType,
 				resultIsCharArray,
 				resultIsString,
-				ESreamMode.WRITE,
+				EStreamMode.WRITE,
 				streamWriter);
 
 			char[] contentsArray = (resultIsCharArray)
@@ -994,7 +999,7 @@ namespace HereticalSolutions.Persistence
 				typeof(TValue),
 				resultIsCharArray,
 				resultIsString,
-				ESreamMode.READ,
+				EStreamMode.READ,
 				streamReader);
 
 			if (streamReader.EndOfStream)
@@ -1045,7 +1050,7 @@ namespace HereticalSolutions.Persistence
 				valueType,
 				resultIsCharArray,
 				resultIsString,
-				ESreamMode.READ,
+				EStreamMode.READ,
 				streamReader);
 
 			if (streamReader.EndOfStream)
@@ -1100,7 +1105,7 @@ namespace HereticalSolutions.Persistence
 				typeof(TValue),
 				resultIsCharArray,
 				resultIsString,
-				ESreamMode.WRITE,
+				EStreamMode.WRITE,
 				streamWriter);
 
 			char[] contentsArray = (resultIsCharArray)
@@ -1129,7 +1134,7 @@ namespace HereticalSolutions.Persistence
 				valueType,
 				resultIsCharArray,
 				resultIsString,
-				ESreamMode.WRITE,
+				EStreamMode.WRITE,
 				streamWriter);
 
 			char[] contentsArray = (resultIsCharArray)
@@ -1148,11 +1153,28 @@ namespace HereticalSolutions.Persistence
 
 		#endregion
 
+		#region IStrategyWithFilter
+
+		public bool AllowsType<TValue>()
+		{
+			return typeof(TValue) == typeof(char[])
+				|| typeof(TValue) == typeof(string);
+		}
+
+		public bool AllowsType(
+			Type valueType)
+		{
+			return valueType == typeof(char[])
+				|| valueType == typeof(string);
+		}
+
+		#endregion
+
 		private void AssertStrategyIsValid(
 			Type valueType,
 			bool resultIsCharArray,
 			bool resultIsString,
-			ESreamMode preferredMode,
+			EStreamMode preferredMode,
 			object readerWriter)
 		{
 			if (!resultIsCharArray && !resultIsString)
@@ -1177,7 +1199,7 @@ namespace HereticalSolutions.Persistence
 				throw new Exception(
 					logger.TryFormatException(
 						GetType(),
-						$"STREAM {((preferredMode == ESreamMode.READ) ? "READER" : "WRITER")} IS NULL: {FullPath}"));
+						$"STREAM {((preferredMode == EStreamMode.READ) ? "READER" : "WRITER")} IS NULL: {FullPath}"));
 		}
 
 		private bool OpenReadStream(

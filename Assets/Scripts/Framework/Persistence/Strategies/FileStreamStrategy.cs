@@ -14,13 +14,9 @@ namespace HereticalSolutions.Persistence
           IStrategyWithStream,
           IStrategyWithState,
           IBlockSerializationStrategy,
-          IAsyncBlockSerializationStrategy
+          IAsyncBlockSerializationStrategy,
+          IStrategyWithFilter
     {
-        private static readonly Type[] allowedValueTypes = new Type[]
-        {
-            typeof(byte[])
-        };
-
         private readonly bool flushAutomatically;
 
         private readonly ILogger logger;
@@ -46,7 +42,7 @@ namespace HereticalSolutions.Persistence
             this.logger = logger;
 
 
-            CurrentMode = ESreamMode.NONE;
+            CurrentMode = EStreamMode.NONE;
 
             StreamOpen = false;
 
@@ -56,8 +52,6 @@ namespace HereticalSolutions.Persistence
 
         #region ISerializationStrategy
 
-        public Type[] AllowedValueTypes { get => allowedValueTypes; }
-
         #region Read
 
         public bool Read<TValue>(
@@ -65,7 +59,7 @@ namespace HereticalSolutions.Persistence
         {
             AssertStrategyIsValid(
                 typeof(TValue),
-                ESreamMode.READ);
+                EStreamMode.READ);
 
             //Courtesy of https://learn.microsoft.com/en-us/dotnet/api/system.io.filestream.read?view=net-8.0
 
@@ -106,7 +100,7 @@ namespace HereticalSolutions.Persistence
         {
             AssertStrategyIsValid(
                 valueType,
-                ESreamMode.READ);
+                EStreamMode.READ);
 
             //Courtesy of https://learn.microsoft.com/en-us/dotnet/api/system.io.filestream.read?view=net-8.0
 
@@ -150,7 +144,7 @@ namespace HereticalSolutions.Persistence
         {
             AssertStrategyIsValid(
                 typeof(TValue),
-                ESreamMode.WRITE);
+                EStreamMode.WRITE);
 
             byte[] contents = value.CastFromTo<TValue, byte[]>();
 
@@ -176,7 +170,7 @@ namespace HereticalSolutions.Persistence
         {
             AssertStrategyIsValid(
                 valueType,
-                ESreamMode.WRITE);
+                EStreamMode.WRITE);
 
             byte[] contents = value.CastFromTo<object, byte[]>();
 
@@ -205,7 +199,7 @@ namespace HereticalSolutions.Persistence
         {
             AssertStrategyIsValid(
                 typeof(TValue),
-                ESreamMode.APPEND);
+                EStreamMode.APPEND);
 
             byte[] contents = value.CastFromTo<TValue, byte[]>();
 
@@ -231,7 +225,7 @@ namespace HereticalSolutions.Persistence
         {
             AssertStrategyIsValid(
                 valueType,
-                ESreamMode.READ);
+                EStreamMode.READ);
 
             byte[] contents = value.CastFromTo<object, byte[]>();
 
@@ -263,7 +257,7 @@ namespace HereticalSolutions.Persistence
         {
             AssertStrategyIsValid(
                 typeof(TValue),
-                ESreamMode.READ);
+                EStreamMode.READ);
 
             //Courtesy of https://learn.microsoft.com/en-us/dotnet/api/system.io.filestream.read?view=net-8.0
 
@@ -303,7 +297,7 @@ namespace HereticalSolutions.Persistence
         {
             AssertStrategyIsValid(
                 valueType,
-                ESreamMode.READ);
+                EStreamMode.READ);
 
             //Courtesy of https://learn.microsoft.com/en-us/dotnet/api/system.io.filestream.read?view=net-8.0
 
@@ -347,7 +341,7 @@ namespace HereticalSolutions.Persistence
         {
             AssertStrategyIsValid(
                 typeof(TValue),
-                ESreamMode.WRITE);
+                EStreamMode.WRITE);
 
             byte[] contents = value.CastFromTo<TValue, byte[]>();
 
@@ -373,7 +367,7 @@ namespace HereticalSolutions.Persistence
         {
             AssertStrategyIsValid(
                 valueType,
-                ESreamMode.WRITE);
+                EStreamMode.WRITE);
 
             byte[] contents = value.CastFromTo<object, byte[]>();
 
@@ -402,7 +396,7 @@ namespace HereticalSolutions.Persistence
         {
             AssertStrategyIsValid(
                 typeof(TValue),
-                ESreamMode.APPEND);
+                EStreamMode.APPEND);
 
             byte[] contents = value.CastFromTo<TValue, byte[]>();
 
@@ -428,7 +422,7 @@ namespace HereticalSolutions.Persistence
         {
             AssertStrategyIsValid(
                 valueType,
-                ESreamMode.APPEND);
+                EStreamMode.APPEND);
 
             byte[] contents = value.CastFromTo<object, byte[]>();
 
@@ -506,7 +500,7 @@ namespace HereticalSolutions.Persistence
 
         #region IStrategyWithStream
 
-        public ESreamMode CurrentMode { get; private set; }
+        public EStreamMode CurrentMode { get; private set; }
 
         public Stream Stream
         {
@@ -514,9 +508,10 @@ namespace HereticalSolutions.Persistence
             {
                 switch (CurrentMode)
                 {
-                    case ESreamMode.READ:
-                    case ESreamMode.WRITE:
-                    case ESreamMode.APPEND:
+                    case EStreamMode.READ:
+                    case EStreamMode.WRITE:
+                    case EStreamMode.APPEND:
+                    case EStreamMode.READ_AND_WRITE:
                         return fileStream;
 
                     default:
@@ -565,7 +560,7 @@ namespace HereticalSolutions.Persistence
                 if (!StreamOpen)
                     return -1;
 
-                if ((CurrentMode == ESreamMode.READ || CurrentMode == ESreamMode.WRITE || CurrentMode == ESreamMode.APPEND)
+                if ((CurrentMode == EStreamMode.READ || CurrentMode == EStreamMode.WRITE || CurrentMode == EStreamMode.APPEND || CurrentMode == EStreamMode.READ_AND_WRITE)
                     && fileStream != null)
                 {
                     return fileStream.Position;
@@ -582,7 +577,7 @@ namespace HereticalSolutions.Persistence
                 if (!StreamOpen)
                     return false;
 
-                if ((CurrentMode == ESreamMode.READ ||CurrentMode == ESreamMode.WRITE || CurrentMode == ESreamMode.APPEND)
+                if ((CurrentMode == EStreamMode.READ ||CurrentMode == EStreamMode.WRITE || CurrentMode == EStreamMode.APPEND || CurrentMode == EStreamMode.READ_AND_WRITE)
                     && fileStream != null)
                 {
                     return fileStream.CanSeek;
@@ -603,7 +598,7 @@ namespace HereticalSolutions.Persistence
                 return false;
             }
 
-            if ((CurrentMode == ESreamMode.READ || CurrentMode == ESreamMode.WRITE || CurrentMode == ESreamMode.APPEND)
+            if ((CurrentMode == EStreamMode.READ || CurrentMode == EStreamMode.WRITE || CurrentMode == EStreamMode.APPEND || CurrentMode == EStreamMode.READ_AND_WRITE)
                 && fileStream != null)
             {
                 position = fileStream.Seek(
@@ -629,7 +624,7 @@ namespace HereticalSolutions.Persistence
                 return false;
             }
 
-            if ((CurrentMode == ESreamMode.READ || CurrentMode == ESreamMode.WRITE || CurrentMode == ESreamMode.APPEND)
+            if ((CurrentMode == EStreamMode.READ || CurrentMode == EStreamMode.WRITE || CurrentMode == EStreamMode.APPEND || CurrentMode == EStreamMode.READ_AND_WRITE)
                 && fileStream != null)
             {
                 position = fileStream.Seek(
@@ -655,7 +650,7 @@ namespace HereticalSolutions.Persistence
                 return false;
             }
 
-            if ((CurrentMode == ESreamMode.READ || CurrentMode == ESreamMode.WRITE || CurrentMode == ESreamMode.APPEND)
+            if ((CurrentMode == EStreamMode.READ || CurrentMode == EStreamMode.WRITE || CurrentMode == EStreamMode.APPEND || CurrentMode == EStreamMode.READ_AND_WRITE)
                 && fileStream != null)
             {
                 position = fileStream.Seek(
@@ -676,6 +671,8 @@ namespace HereticalSolutions.Persistence
 
         #region IStrategyWithState
 
+        public bool SupportsSimultaneousReadAndWrite { get => true; }
+
         public void InitializeRead()
         {
             if (StreamOpen)
@@ -690,7 +687,7 @@ namespace HereticalSolutions.Persistence
                         GetType(),
                         $"FAILED TO OPEN STREAM: {FullPath}"));
 
-            CurrentMode = ESreamMode.READ;
+            CurrentMode = EStreamMode.READ;
         }
 
         public void FinalizeRead()
@@ -698,7 +695,7 @@ namespace HereticalSolutions.Persistence
             if (!StreamOpen)
                 return;
 
-            if (CurrentMode != ESreamMode.READ)
+            if (CurrentMode != EStreamMode.READ)
                 return;
 
             if (fileStream != null)
@@ -709,7 +706,7 @@ namespace HereticalSolutions.Persistence
 
             StreamOpen = false;
 
-            CurrentMode = ESreamMode.NONE;
+            CurrentMode = EStreamMode.NONE;
         }
 
         public void InitializeWrite()
@@ -726,7 +723,7 @@ namespace HereticalSolutions.Persistence
                         GetType(),
                         $"FAILED TO OPEN STREAM: {FullPath}"));
 
-            CurrentMode = ESreamMode.WRITE;
+            CurrentMode = EStreamMode.WRITE;
         }
 
         public void FinalizeWrite()
@@ -734,7 +731,7 @@ namespace HereticalSolutions.Persistence
             if (!StreamOpen)
                 return;
 
-            if (CurrentMode != ESreamMode.WRITE)
+            if (CurrentMode != EStreamMode.WRITE)
                 return;
 
             if (fileStream != null)
@@ -745,7 +742,7 @@ namespace HereticalSolutions.Persistence
 
             StreamOpen = false;
 
-            CurrentMode = ESreamMode.NONE;
+            CurrentMode = EStreamMode.NONE;
         }
 
         public void InitializeAppend()
@@ -762,7 +759,7 @@ namespace HereticalSolutions.Persistence
                         GetType(),
                         $"FAILED TO OPEN STREAM: {FullPath}"));
 
-            CurrentMode = ESreamMode.APPEND;
+            CurrentMode = EStreamMode.APPEND;
         }
 
         public void FinalizeAppend()
@@ -770,7 +767,7 @@ namespace HereticalSolutions.Persistence
             if (!StreamOpen)
                 return;
 
-            if (CurrentMode != ESreamMode.APPEND)
+            if (CurrentMode != EStreamMode.APPEND)
                 return;
 
             if (fileStream != null)
@@ -781,7 +778,43 @@ namespace HereticalSolutions.Persistence
 
             StreamOpen = false;
 
-            CurrentMode = ESreamMode.NONE;
+            CurrentMode = EStreamMode.NONE;
+        }
+
+        public void InitializeReadAndWrite()
+        {
+            if (StreamOpen)
+                return;
+
+            StreamOpen = OpenReadWriteStream(
+                out fileStream);
+
+            if (!StreamOpen)
+                throw new Exception(
+                    logger.TryFormatException(
+                        GetType(),
+                        $"FAILED TO OPEN STREAM: {FullPath}"));
+
+            CurrentMode = EStreamMode.READ_AND_WRITE;
+        }
+
+        public void FinalizeReadAndWrite()
+        {
+            if (!StreamOpen)
+                return;
+
+            if (CurrentMode != EStreamMode.READ_AND_WRITE)
+                return;
+
+            if (fileStream != null)
+                CloseStream(
+                    fileStream);
+
+            fileStream = default(FileStream);
+
+            StreamOpen = false;
+
+            CurrentMode = EStreamMode.NONE;
         }
 
         #endregion
@@ -797,7 +830,7 @@ namespace HereticalSolutions.Persistence
         {
             AssertStrategyIsValid(
                 typeof(TValue),
-                ESreamMode.READ);
+                EStreamMode.READ);
 
             // Read the source file into a byte array.
             byte[] result = new byte[blockSize];
@@ -832,7 +865,7 @@ namespace HereticalSolutions.Persistence
         {
             AssertStrategyIsValid(
                 valueType,
-                ESreamMode.READ);
+                EStreamMode.READ);
 
             // Read the source file into a byte array.
             byte[] result = new byte[blockSize];
@@ -870,7 +903,7 @@ namespace HereticalSolutions.Persistence
         {
             AssertStrategyIsValid(
                 typeof(TValue),
-                ESreamMode.WRITE);
+                EStreamMode.WRITE);
 
             byte[] contents = value.CastFromTo<TValue, byte[]>();
 
@@ -893,7 +926,7 @@ namespace HereticalSolutions.Persistence
         {
             AssertStrategyIsValid(
                 valueType,
-                ESreamMode.WRITE);
+                EStreamMode.WRITE);
 
             byte[] contents = value.CastFromTo<object, byte[]>();
 
@@ -922,7 +955,7 @@ namespace HereticalSolutions.Persistence
         {
             AssertStrategyIsValid(
                 typeof(TValue),
-                ESreamMode.READ);
+                EStreamMode.READ);
 
             // Read the source file into a byte array.
             byte[] result = new byte[blockSize];
@@ -956,7 +989,7 @@ namespace HereticalSolutions.Persistence
         {
             AssertStrategyIsValid(
                 valueType,
-                ESreamMode.READ);
+                EStreamMode.READ);
 
             // Read the source file into a byte array.
             byte[] result = new byte[blockSize];
@@ -994,7 +1027,7 @@ namespace HereticalSolutions.Persistence
         {
             AssertStrategyIsValid(
                 typeof(TValue),
-                ESreamMode.WRITE);
+                EStreamMode.WRITE);
 
             byte[] contents = value.CastFromTo<TValue, byte[]>();
 
@@ -1017,7 +1050,7 @@ namespace HereticalSolutions.Persistence
         {
             AssertStrategyIsValid(
                 valueType,
-                ESreamMode.WRITE);
+                EStreamMode.WRITE);
 
             byte[] contents = value.CastFromTo<object, byte[]>();
 
@@ -1036,9 +1069,24 @@ namespace HereticalSolutions.Persistence
 
         #endregion
 
+        #region IStrategyWithFilter
+
+        public bool AllowsType<TValue>()
+        {
+            return typeof(TValue) == typeof(byte[]);
+        }
+
+        public bool AllowsType(
+            Type valueType)
+        {
+            return valueType == typeof(byte[]);
+        }
+
+        #endregion
+
         private void AssertStrategyIsValid(
             Type valueType,
-            ESreamMode preferredMode)
+            EStreamMode preferredMode)
         {
             if (valueType != typeof(byte[]))
                 throw new Exception(
@@ -1052,7 +1100,7 @@ namespace HereticalSolutions.Persistence
                         GetType(),
                         $"STREAM NOT OPEN: {FullPath}"));
 
-            if (CurrentMode != preferredMode)
+            if (CurrentMode != preferredMode && CurrentMode != EStreamMode.READ_AND_WRITE)
                 throw new Exception(
                     logger.TryFormatException(
                         GetType(),
@@ -1080,7 +1128,8 @@ namespace HereticalSolutions.Persistence
 
             dataStream = new FileStream(
                 FullPath,
-                FileMode.Open);
+                FileMode.Open,
+                FileAccess.Read);
 
             return true;
         }
@@ -1116,6 +1165,22 @@ namespace HereticalSolutions.Persistence
                 FullPath,
                 FileMode.Append,
                 FileAccess.Write);
+
+            return true;
+        }
+
+        private bool OpenReadWriteStream(
+            out FileStream dataStream)
+        {
+            IOHelpers.EnsureDirectoryExists(
+                FullPath,
+                logger,
+                GetType());
+
+            dataStream = new FileStream(
+                FullPath,
+                FileMode.OpenOrCreate,
+                FileAccess.ReadWrite);
 
             return true;
         }

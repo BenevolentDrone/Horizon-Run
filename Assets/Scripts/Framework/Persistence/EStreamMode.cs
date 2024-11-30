@@ -2,11 +2,12 @@ using System;
 
 namespace HereticalSolutions.Persistence
 {
-	public enum ESreamMode
+	public enum EStreamMode
 	{
 		NONE,
 		READ,
 		WRITE,
-		APPEND
+		APPEND,
+		READ_AND_WRITE
 	}
 }

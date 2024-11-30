@@ -199,8 +199,6 @@ namespace HereticalSolutions.Persistence
                 Encoding.UTF8.GetString,
                 out string json))
             {
-                value = default(TValue);
-
                 return false;
             }
 
@@ -228,8 +226,6 @@ namespace HereticalSolutions.Persistence
                 Encoding.UTF8.GetString,
                 out string json))
             {
-                valueObject = default(object);
-
                 return false;
             }
 

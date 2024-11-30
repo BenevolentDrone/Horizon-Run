@@ -30,5 +30,7 @@ namespace HereticalSolutions.Metadata
 
 		bool TryRemove(
 			string key);
+
+		void Clear();
 	}
 }

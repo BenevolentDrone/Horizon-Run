@@ -4,8 +4,6 @@ namespace HereticalSolutions.Persistence
 {
 	public interface ISerializationStrategy
 	{
-		Type[] AllowedValueTypes { get; }
-
 		#region Read
 
 		bool Read<TValue>(

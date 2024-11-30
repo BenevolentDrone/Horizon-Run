@@ -5,7 +5,7 @@ namespace HereticalSolutions.Persistence
 {
 	//WORKS ON WINDOWS AND LINUX ONLY
 	[Serializable]
-	public class FileAtApplicationDataPathSettings
+	public class FileAtTempPathSettings
 		: IPathSettings
 	{
 		public string RelativePath;
@@ -24,7 +24,7 @@ namespace HereticalSolutions.Persistence
 			{
 				return Path
 					.Combine(
-						ApplicationDataFolder,
+						TempFolder,
 						RelativePath)
 					.SanitizePath();
 			}

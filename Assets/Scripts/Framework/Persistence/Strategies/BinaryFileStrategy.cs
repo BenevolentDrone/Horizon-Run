@@ -8,13 +8,9 @@ namespace HereticalSolutions.Persistence
 	[SerializationStrategy]
 	public class BinaryFileStrategy
 		: ISerializationStrategy,
-		  IStrategyWithIODestination
+		  IStrategyWithIODestination,
+		  IStrategyWithFilter
 	{
-		private static readonly Type[] allowedValueTypes = new Type[]
-		{
-			typeof(byte[])
-		};
-
 		private readonly ILogger logger;
 
 		public string FullPath { get; private set; }
@@ -29,8 +25,6 @@ namespace HereticalSolutions.Persistence
 		}
 
 		#region ISerializationStrategy
-
-		public Type[] AllowedValueTypes { get => allowedValueTypes; }
 
 		#region Read
 
@@ -205,6 +199,21 @@ namespace HereticalSolutions.Persistence
 			{
 				File.Delete(savePath);
 			}
+		}
+
+		#endregion
+
+		#region IStrategyWithFilter
+
+		public bool AllowsType<TValue>()
+		{
+			return typeof(TValue) == typeof(byte[]);
+		}
+
+		public bool AllowsType(
+			Type valueType)
+		{
+			return valueType == typeof(byte[]);
 		}
 
 		#endregion

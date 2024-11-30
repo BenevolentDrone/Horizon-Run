@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.IO.IsolatedStorage;
 
 using HereticalSolutions.Logging;
 
@@ -83,7 +84,7 @@ namespace HereticalSolutions.Persistence
 
 			if (!directoryExists)
 			{
-				isoFile.CreateDirectory(directoryPath);
+				isolatedStorageFile.CreateDirectory(directoryPath);
 			}
 		}
 

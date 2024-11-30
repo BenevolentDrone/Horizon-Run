@@ -1,13 +1,6 @@
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-
-using HereticalSolutions.Repositories;
 
 using HereticalSolutions.Metadata;
-
-using HereticalSolutions.Logging;
 
 namespace HereticalSolutions.Persistence
 {
@@ -27,7 +20,20 @@ namespace HereticalSolutions.Persistence
 				//If it's a stream strategy and the stream is not open, then open the write stream
 				if (strategyWithStream != null && !strategyWithStream.StreamOpen)
 				{
-					strategyWithState.InitializeRead();
+					if (arguments.Has<IReadAndWriteArgument>())
+					{
+						if (!strategyWithState.SupportsSimultaneousReadAndWrite)
+						{
+							throw new InvalidOperationException(
+								$"THE STRATEGY {strategy.GetType().Name} DOES NOT SUPPORT SIMULTANEOUS READ AND WRITE");
+						}
+
+						strategyWithState.InitializeReadAndWrite();
+					}
+					else
+					{
+						strategyWithState.InitializeRead();
+					}
 				}
 			}
 		}
@@ -45,7 +51,14 @@ namespace HereticalSolutions.Persistence
 			{
 				if (strategyWithStream != null && strategyWithStream.StreamOpen)
 				{
-					strategyWithState.FinalizeRead();
+					if (strategyWithStream.CurrentMode == EStreamMode.READ_AND_WRITE)
+					{
+						strategyWithState.FinalizeReadAndWrite();
+					}
+					else if (strategyWithStream.CurrentMode == EStreamMode.READ)
+					{
+						strategyWithState.FinalizeRead();
+					}
 				}
 			}
 		}
@@ -54,15 +67,17 @@ namespace HereticalSolutions.Persistence
 			ISerializationStrategy strategy,
 			IStronglyTypedMetadata arguments)
 		{
-			if (arguments.Get<ISerializationArgument>().Append)
+			if (arguments.Has<IAppendArgument>())
 			{
 				EnsureStrategyInitializedForAppend(
-					strategy);
+					strategy,
+					arguments);
 			}
 			else
 			{
 				EnsureStrategyInitializedForWrite(
-					strategy);
+					strategy,
+					arguments);
 			}
 		}
 
@@ -80,7 +95,20 @@ namespace HereticalSolutions.Persistence
 				//If it's a stream strategy and the stream is not open, then open the write stream
 				if (strategyWithStream != null && !strategyWithStream.StreamOpen)
 				{
-					strategyWithState.InitializeAppend();
+					if (arguments.Has<IReadAndWriteArgument>())
+					{
+						if (!strategyWithState.SupportsSimultaneousReadAndWrite)
+						{
+							throw new InvalidOperationException(
+								$"THE STRATEGY {strategy.GetType().Name} DOES NOT SUPPORT SIMULTANEOUS READ AND WRITE");
+						}
+
+						strategyWithState.InitializeReadAndWrite();
+					}
+					else
+					{
+						strategyWithState.InitializeAppend();
+					}
 				}
 			}
 		}
@@ -114,7 +142,20 @@ namespace HereticalSolutions.Persistence
 				//If it's a stream strategy and the stream is not open, then open the write stream
 				if (strategyWithStream != null && !strategyWithStream.StreamOpen)
 				{
-					strategyWithState.InitializeWrite();
+					if (arguments.Has<IReadAndWriteArgument>())
+					{
+						if (!strategyWithState.SupportsSimultaneousReadAndWrite)
+						{
+							throw new InvalidOperationException(
+								$"THE STRATEGY {strategy.GetType().Name} DOES NOT SUPPORT SIMULTANEOUS READ AND WRITE");
+						}
+
+						strategyWithState.InitializeReadAndWrite();
+					}
+					else
+					{
+						strategyWithState.InitializeWrite();
+					}
 				}
 			}
 		}
@@ -123,15 +164,17 @@ namespace HereticalSolutions.Persistence
 			ISerializationStrategy strategy,
 			IStronglyTypedMetadata arguments)
 		{
-			if (arguments.Get<ISerializationArgument>().Append)
+			if (arguments.Has<IAppendArgument>())
 			{
 				EnsureStrategyFinalizedForAppend(
-					strategy);
+					strategy,
+					arguments);
 			}
 			else
 			{
 				EnsureStrategyFinalizedForWrite(
-					strategy);
+					strategy,
+					arguments);
 			}
 		}
 
@@ -148,7 +191,14 @@ namespace HereticalSolutions.Persistence
 			{
 				if (strategyWithStream != null && strategyWithStream.StreamOpen)
 				{
-					strategyWithState.FinalizeAppend();
+					if (strategyWithStream.CurrentMode == EStreamMode.READ_AND_WRITE)
+					{
+						strategyWithState.FinalizeReadAndWrite();
+					}
+					else if (strategyWithStream.CurrentMode == EStreamMode.APPEND)
+					{
+						strategyWithState.FinalizeAppend();
+					}
 				}
 			}
 		}
@@ -168,7 +218,14 @@ namespace HereticalSolutions.Persistence
 			{
 				if (strategyWithStream != null && strategyWithStream.StreamOpen)
 				{
-					strategyWithState.FinalizeWrite();
+					if (strategyWithStream.CurrentMode == EStreamMode.READ_AND_WRITE)
+					{
+						strategyWithState.FinalizeReadAndWrite();
+					}
+					else if (strategyWithStream.CurrentMode == EStreamMode.WRITE)
+					{
+						strategyWithState.FinalizeWrite();
+					}
 				}
 			}
 		}
@@ -179,8 +236,10 @@ namespace HereticalSolutions.Persistence
 			Func<byte[], TValue> convertFromBytesDelegate,
 			out TValue value)
 		{
-			if (strategy.AllowedValueTypes.Contains(typeof(TValue))
-				|| strategy.AllowedValueTypes.Contains(typeof(object))) //object is like a fallback. if the strategy allows object, then it can be cast to anything
+			IStrategyWithFilter strategyWithFilter = strategy as IStrategyWithFilter;
+
+			if (strategyWithFilter == null
+				|| strategyWithFilter.AllowsType<TValue>())
 			{
 				return TryRead<TValue>(
 					strategy,
@@ -188,8 +247,10 @@ namespace HereticalSolutions.Persistence
 					out value);
 			}
 
-			if (strategy.AllowedValueTypes.Contains(typeof(byte[]))) //almost anything can be converted to a byte array
+			if (strategyWithFilter.AllowsType<byte[]>()) //almost anything can be converted to a byte array
 			{
+				value = default;
+
 				var result = TryRead<byte[]>(
 					strategy,
 					arguments,
@@ -197,9 +258,50 @@ namespace HereticalSolutions.Persistence
 
 				if (result)
 				{
-					value = convertFromBytesDelegate?.Invoke(byteArray);
+					value = convertFromBytesDelegate.Invoke(byteArray);
 				}
 				
+				return result;
+			}
+
+			value = default;
+
+			return false;
+		}
+
+		public static bool TryReadPersistently(
+			ISerializationStrategy strategy,
+			IStronglyTypedMetadata arguments,
+			Func<byte[], object> convertFromBytesDelegate,
+			Type valueType,
+			out object value)
+		{
+			IStrategyWithFilter strategyWithFilter = strategy as IStrategyWithFilter;
+
+			if (strategyWithFilter == null
+				|| strategyWithFilter.AllowsType(valueType))
+			{
+				return TryRead(
+					strategy,
+					arguments,
+					valueType,
+					out value);
+			}
+
+			if (strategyWithFilter.AllowsType<byte[]>()) //almost anything can be converted to a byte array
+			{
+				value = default;
+
+				var result = TryRead<byte[]>(
+					strategy,
+					arguments,
+					out var byteArray);
+
+				if (result)
+				{
+					value = convertFromBytesDelegate.Invoke(byteArray);
+				}
+
 				return result;
 			}
 
@@ -229,14 +331,40 @@ namespace HereticalSolutions.Persistence
 				out value);
 		}
 
+		public static bool TryRead(
+			ISerializationStrategy strategy,
+			IStronglyTypedMetadata arguments,
+			Type valueType,
+			out object value)
+		{
+			if (arguments.Has<IBlockSerializationArgument>())
+			{
+				var blockArgument = arguments.Get<IBlockSerializationArgument>();
+
+				IBlockSerializationStrategy blockSerializationStrategy = strategy as IBlockSerializationStrategy;
+
+				return blockSerializationStrategy.BlockRead(
+					valueType,
+					0,
+					blockArgument.BlockSize,
+					out value);
+			}
+
+			return strategy.Read(
+				valueType,
+				out value);
+		}
+
 		public static bool TryWriteOrAppendPersistently<TValue>(
 			ISerializationStrategy strategy,
 			IStronglyTypedMetadata arguments,
 			Func<TValue, byte[]> convertToBytesDelegate,
 			TValue value)
 		{
-			if (strategy.AllowedValueTypes.Contains(typeof(TValue))
-				|| strategy.AllowedValueTypes.Contains(typeof(object))) //object is like a fallback. if the strategy allows object, then it can be cast to anything
+			IStrategyWithFilter strategyWithFilter = strategy as IStrategyWithFilter;
+
+			if (strategyWithFilter == null
+				|| strategyWithFilter.AllowsType<TValue>())
 			{
 				return TryWriteOrAppend<TValue>(
 					strategy,
@@ -244,7 +372,7 @@ namespace HereticalSolutions.Persistence
 					value);
 			}
 
-			if (strategy.AllowedValueTypes.Contains(typeof(byte[]))) //almost anything can be converted to a byte array
+			if (strategyWithFilter.AllowsType<byte[]>()) //almost anything can be converted to a byte array
 			{
 				return TryWriteOrAppend<byte[]>(
 					strategy,
@@ -255,12 +383,42 @@ namespace HereticalSolutions.Persistence
 			return false;
 		}
 
+		public static bool TryWriteOrAppendPersistently(
+			ISerializationStrategy strategy,
+			IStronglyTypedMetadata arguments,
+			Func<object, byte[]> convertToBytesDelegate,
+			Type valueType,
+			object valueObject)
+		{
+			IStrategyWithFilter strategyWithFilter = strategy as IStrategyWithFilter;
+
+			if (strategyWithFilter == null
+				|| strategyWithFilter.AllowsType(valueType))
+			{
+				return TryWriteOrAppend(
+					strategy,
+					arguments,
+					valueType,
+					valueObject);
+			}
+
+			if (strategyWithFilter.AllowsType<byte[]>()) //almost anything can be converted to a byte array
+			{
+				return TryWriteOrAppend<byte[]>(
+					strategy,
+					arguments,
+					convertToBytesDelegate?.Invoke(valueObject));
+			}
+
+			return false;
+		}
+
 		public static bool TryWriteOrAppend<TValue>(
 			ISerializationStrategy strategy,
 			IStronglyTypedMetadata arguments,
 			TValue value)
 		{
-			if (arguments.Get<ISerializationArgument>().Append)
+			if (arguments.Has<IAppendArgument>())
 			{
 				return strategy.Append<TValue>(
 					value);
@@ -280,6 +438,37 @@ namespace HereticalSolutions.Persistence
 
 			return strategy.Write<TValue>(
 				value);
+		}
+
+		public static bool TryWriteOrAppend(
+			ISerializationStrategy strategy,
+			IStronglyTypedMetadata arguments,
+			Type valueType,
+			object valueObject)
+		{
+			if (arguments.Has<IAppendArgument>())
+			{
+				return strategy.Append(
+					valueType,
+					valueObject);
+			}
+
+			if (arguments.Has<IBlockSerializationArgument>())
+			{
+				var blockArgument = arguments.Get<IBlockSerializationArgument>();
+
+				IBlockSerializationStrategy blockSerializationStrategy = strategy as IBlockSerializationStrategy;
+
+				return blockSerializationStrategy.BlockWrite(
+					valueType,
+					valueObject,
+					0,
+					blockArgument.BlockSize);
+			}
+
+			return strategy.Write(
+				valueType,
+				valueObject);
 		}
 	}
 }

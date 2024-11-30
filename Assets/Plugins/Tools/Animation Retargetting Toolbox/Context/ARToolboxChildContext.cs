@@ -1,4 +1,4 @@
-using HereticalSolutions.Repositories;
+using HereticalSolutions.Metadata;
 
 namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 {

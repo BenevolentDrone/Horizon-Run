@@ -9,7 +9,7 @@ namespace HereticalSolutions.Persistence
 		  IBlockSerializationStrategy,
 		  IAsyncBlockSerializationStrategy
 	{
-		ESreamMode CurrentMode { get; }
+		EStreamMode CurrentMode { get; }
 
 		Stream Stream { get; }
 

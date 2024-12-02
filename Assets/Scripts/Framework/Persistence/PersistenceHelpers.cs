@@ -20,7 +20,7 @@ namespace HereticalSolutions.Persistence
 				//If it's a stream strategy and the stream is not open, then open the write stream
 				if (strategyWithStream != null && !strategyWithStream.StreamOpen)
 				{
-					if (arguments.Has<IReadAndWriteArgument>())
+					if (arguments.Has<IReadAndWriteAccessArgument>())
 					{
 						if (!strategyWithState.SupportsSimultaneousReadAndWrite)
 						{
@@ -95,7 +95,7 @@ namespace HereticalSolutions.Persistence
 				//If it's a stream strategy and the stream is not open, then open the write stream
 				if (strategyWithStream != null && !strategyWithStream.StreamOpen)
 				{
-					if (arguments.Has<IReadAndWriteArgument>())
+					if (arguments.Has<IReadAndWriteAccessArgument>())
 					{
 						if (!strategyWithState.SupportsSimultaneousReadAndWrite)
 						{
@@ -142,7 +142,7 @@ namespace HereticalSolutions.Persistence
 				//If it's a stream strategy and the stream is not open, then open the write stream
 				if (strategyWithStream != null && !strategyWithStream.StreamOpen)
 				{
-					if (arguments.Has<IReadAndWriteArgument>())
+					if (arguments.Has<IReadAndWriteAccessArgument>())
 					{
 						if (!strategyWithState.SupportsSimultaneousReadAndWrite)
 						{

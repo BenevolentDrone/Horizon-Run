@@ -290,85 +290,22 @@ namespace HereticalSolutions.Time.Timers
 
         #region IVisitable
 
-        /// <summary>
-        /// Gets the type of the DTO object for serialization
-        /// </summary>
-        public Type DTOType => typeof(RuntimeTimerDTO);
-
-        public bool AcceptSave<TDTO>(
+        public bool AcceptSave(
             ISaveVisitor visitor,
-            out TDTO DTO)
+            ref object dto)
         {
-            var result = visitor
-                .Save<IRuntimeTimer, RuntimeTimerDTO>(
-                    this,
-                    out RuntimeTimerDTO runtimeTimerDTO);
-
-            DTO = default;
-
-            switch (runtimeTimerDTO)
-            {
-                case TDTO targetTypeDTO:
-
-                    DTO = targetTypeDTO;
-
-                    break;
-
-                default:
-
-                    throw new Exception(
-                        logger.TryFormatException<RuntimeTimer>(
-                            $"CANNOT CAST RETURN VALUE TYPE \"{typeof(RuntimeTimerDTO).Name}\" TO TYPE \"{typeof(TDTO).GetType().Name}\""));
-            }
-
-            return result;
+            return visitor.VisitSave<RuntimeTimer>(
+                ref dto,
+                this);
         }
 
-        /// <summary>
-        /// Accepts a save visitor and converts the timer to a DTO object
-        /// </summary>
-        /// <param name="visitor">The save visitor to accept.</param>
-        /// <param name="DTO">The converted DTO object.</param>
-        /// <returns>A value indicating whether the conversion was successful.</returns>
-        public bool AcceptSave(ISaveVisitor visitor, out object DTO)
+        public bool AcceptPopulate(
+            IPopulateVisitor visitor,
+            object dto)
         {
-            var result = visitor.Save<IRuntimeTimer, RuntimeTimerDTO>(this, out RuntimeTimerDTO runtimeTimerDTO);
-
-            DTO = runtimeTimerDTO;
-
-            return result;
-        }
-
-        public bool AcceptLoad<TDTO>(
-            ILoadVisitor visitor,
-            TDTO DTO)
-        {
-            switch (DTO)
-            {
-                case RuntimeTimerDTO targetTypeDTO:
-
-                    return visitor
-                        .Load<IRuntimeTimer, RuntimeTimerDTO>(
-                            targetTypeDTO,
-                            this);
-
-                default:
-
-                    throw new Exception(
-                        logger.TryFormatException<RuntimeTimer>(
-                            $"INVALID ARGUMENT TYPE. EXPECTED: \"{typeof(RuntimeTimerDTO).Name}\" RECEIVED: \"{typeof(TDTO).GetType().Name}\""));
-            }
-        }
-
-        /// <summary>
-        /// Accepts a load visitor and applies the values from the DTO object to the timer
-        /// </summary>
-        /// <param name="visitor">The load visitor to accept.</param>
-        /// <param name="DTO">The DTO object containing the values to apply.</param>
-        /// <returns>A value indicating whether the application of values was successful.</returns>
-        public bool AcceptLoad(ILoadVisitor visitor, object DTO)
-        {
-            return visitor.Load<IRuntimeTimer, RuntimeTimerDTO>((RuntimeTimerDTO)DTO, this);
+            return visitor.VisitPopulate<RuntimeTimer>(
+                dto,
+                this);
         }
 
         #endregion

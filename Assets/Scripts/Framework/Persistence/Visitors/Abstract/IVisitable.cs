@@ -1,15 +1,13 @@
-using System;
-
 namespace HereticalSolutions.Persistence
 {
     public interface IVisitable
     {
-        bool AcceptSave<TDTO>(
-            ISaveVisitorGeneric visitor,
-            out TDTO DTO);
-        
-        bool AcceptPopulate<TDTO>(
-            ILoadVisitorGeneric visitor,
-            TDTO DTO);
+        bool AcceptSave(
+            ISaveVisitor visitor,
+            ref object dto);
+
+        bool AcceptPopulate(
+            IPopulateVisitor visitor,
+            object dto);
     }
 }

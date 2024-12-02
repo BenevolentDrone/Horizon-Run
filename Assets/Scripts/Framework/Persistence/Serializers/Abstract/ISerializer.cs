@@ -1,19 +1,9 @@
 using System;
 
-using HereticalSolutions.Repositories;
-
-using HereticalSolutions.Metadata;
-
 namespace HereticalSolutions.Persistence
 {
     public interface ISerializer
     {
-        IFormatSerializer FormatSerializer { get; }
-
-        ISerializationStrategy SerializationStrategy { get; }
-
-        IStronglyTypedMetadata Arguments { get; }
-
         #region Serialize
 
         bool Serialize<TValue>(

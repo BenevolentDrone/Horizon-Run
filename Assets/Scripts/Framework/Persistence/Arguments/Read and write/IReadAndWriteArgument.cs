@@ -1,6 +1,6 @@
 namespace HereticalSolutions.Persistence
 {
-	public interface IReadAndWriteArgument
+	public interface IReadAndWriteAccessArgument
 	{
 	}
 }

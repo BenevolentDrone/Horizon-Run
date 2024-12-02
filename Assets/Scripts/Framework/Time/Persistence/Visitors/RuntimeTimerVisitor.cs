@@ -1,85 +1,287 @@
+using System;
+
 using HereticalSolutions.Persistence;
 
+using HereticalSolutions.Time.Timers;
 using HereticalSolutions.Time.Factories;
 
 using HereticalSolutions.Logging;
 
-namespace HereticalSolutions.Time.Visitors
+namespace HereticalSolutions.Time
 {
+    [Visitor(typeof(RuntimeTimer), typeof(RuntimeTimerDTO))]
     public class RuntimeTimerVisitor
-        : ASaveLoadVisitor<IRuntimeTimer, RuntimeTimerDTO>
+        : ISaveVisitor,
+          ILoadVisitor,
+          IPopulateVisitor
     {
         private readonly ILoggerResolver loggerResolver;
+
+        private readonly ILogger logger;
 
         public RuntimeTimerVisitor(
             ILoggerResolver loggerResolver = null,
             ILogger logger = null)
-            : base(logger)
         {
             this.loggerResolver = loggerResolver;
+
+            this.logger = logger;
         }
 
-        #region ILoadVisitorGeneric
+        #region IVisitor
 
-        public override bool Load(RuntimeTimerDTO DTO, out IRuntimeTimer value)
+        public bool CanVisit<TVisitable>()
         {
-            value = TimeFactory.BuildRuntimeTimer(
-                DTO.ID,
-                DTO.DefaultDuration,
-                loggerResolver);
+            return typeof(TVisitable) == typeof(RuntimeTimer);
+        }
 
-            ((ITimerWithState)value).SetState(DTO.State);
+        public bool CanVisit(
+            Type visitableType)
+        {
+            return visitableType == typeof(RuntimeTimer);
+        }
 
-            ((IRuntimeTimerContext)value).CurrentTimeElapsed = DTO.CurrentTimeElapsed;
+        #endregion
 
-            ((IRuntimeTimerContext)value).CurrentDuration = DTO.CurrentDuration;
+        #region ISaveVisitor
 
-            value.Accumulate = DTO.Accumulate;
+        public bool VisitSave<TVisitable>(
+            ref object dto,
+            TVisitable visitable)
+        {
+            RuntimeTimer timer = visitable as RuntimeTimer;
 
-            value.Repeat = DTO.Repeat;
-            
-            value.FlushTimeElapsedOnRepeat = DTO.FlushTimeElapsedOnRepeat;
-            
-            value.FireRepeatCallbackOnFinish = DTO.FireRepeatCallbackOnFinish;
+            if (timer == null)
+            {
+                logger?.LogError(
+                    GetType(),
+                    $"VISITABLE IS NOT OF TYPE: {typeof(RuntimeTimer).Name}");
+
+                dto = null;
+
+                return false;
+            }
+
+            dto = new RuntimeTimerDTO
+            {
+                ID = timer.ID,
+                State = timer.State,
+                CurrentTimeElapsed = ((IRuntimeTimerContext)timer).CurrentTimeElapsed,
+                Accumulate = timer.Accumulate,
+                Repeat = timer.Repeat,
+                CurrentDuration = timer.CurrentDuration,
+                DefaultDuration = timer.DefaultDuration
+            };
 
             return true;
         }
 
-        public override bool Load(RuntimeTimerDTO DTO, IRuntimeTimer valueToPopulate)
+        public bool VisitSave(
+            ref object dto,
+            Type visitableType,
+            IVisitable visitable)
         {
-            ((ITimerWithState)valueToPopulate).SetState(DTO.State);
+            RuntimeTimer timer = visitable as RuntimeTimer;
 
-            ((IRuntimeTimerContext)valueToPopulate).CurrentTimeElapsed = DTO.CurrentTimeElapsed;
+            if (timer == null)
+            {
+                logger?.LogError(
+                    GetType(),
+                    $"VISITABLE IS NOT OF TYPE: {typeof(RuntimeTimer).Name}");
 
-            ((IRuntimeTimerContext)valueToPopulate).CurrentDuration = DTO.CurrentDuration;
+                dto = null;
 
-            valueToPopulate.Accumulate = DTO.Accumulate;
+                return false;
+            }
 
-            valueToPopulate.Repeat = DTO.Repeat;
-            
-            valueToPopulate.FlushTimeElapsedOnRepeat = DTO.FlushTimeElapsedOnRepeat;
-            
-            valueToPopulate.FireRepeatCallbackOnFinish = DTO.FireRepeatCallbackOnFinish;
+            dto = new RuntimeTimerDTO
+            {
+                ID = timer.ID,
+                State = timer.State,
+                CurrentTimeElapsed = ((IRuntimeTimerContext)timer).CurrentTimeElapsed,
+                Accumulate = timer.Accumulate,
+                Repeat = timer.Repeat,
+                CurrentDuration = timer.CurrentDuration,
+                DefaultDuration = timer.DefaultDuration
+            };
 
             return true;
         }
 
         #endregion
 
-        #region ISaveVisitorGeneric
+        #region ILoadVisitor
 
-        public override bool Save(IRuntimeTimer value, out RuntimeTimerDTO DTO)
+        public bool VisitLoad<TVisitable>(
+            object dto,
+            out TVisitable visitable)
         {
-            DTO = new RuntimeTimerDTO
+            RuntimeTimerDTO castedDTO = dto as RuntimeTimerDTO;
+
+            if (castedDTO == null)
             {
-                ID = value.ID,
-                State = value.State,
-                CurrentTimeElapsed = ((IRuntimeTimerContext)value).CurrentTimeElapsed,
-                Accumulate = value.Accumulate,
-                Repeat = value.Repeat,
-                CurrentDuration = value.CurrentDuration,
-                DefaultDuration = value.DefaultDuration
-            };
+                logger?.LogError(
+                    GetType(),
+                    $"DTO IS NOT OF TYPE: {typeof(RuntimeTimerDTO).Name}");
+
+                visitable = default;
+
+                return false;
+            }
+
+            var timer = TimeFactory.BuildRuntimeTimer(
+                castedDTO.ID,
+                castedDTO.DefaultDuration,
+                loggerResolver);
+
+            ((ITimerWithState)timer).SetState(castedDTO.State);
+
+            ((IRuntimeTimerContext)timer).CurrentTimeElapsed = castedDTO.CurrentTimeElapsed;
+
+            ((IRuntimeTimerContext)timer).CurrentDuration = castedDTO.CurrentDuration;
+
+            timer.Accumulate = castedDTO.Accumulate;
+
+            timer.Repeat = castedDTO.Repeat;
+
+            timer.FlushTimeElapsedOnRepeat = castedDTO.FlushTimeElapsedOnRepeat;
+
+            timer.FireRepeatCallbackOnFinish = castedDTO.FireRepeatCallbackOnFinish;
+
+            visitable = timer.CastFromTo<RuntimeTimer, TVisitable>();
+
+            return true;
+        }
+
+        public bool VisitLoad(
+            object dto,
+            Type visitableType,
+            out IVisitable visitable)
+        {
+            RuntimeTimerDTO castedDTO = dto as RuntimeTimerDTO;
+
+            if (castedDTO == null)
+            {
+                logger?.LogError(
+                    GetType(),
+                    $"DTO IS NOT OF TYPE: {typeof(RuntimeTimerDTO).Name}");
+
+                visitable = default;
+
+                return false;
+            }
+
+            var timer = TimeFactory.BuildRuntimeTimer(
+                castedDTO.ID,
+                castedDTO.DefaultDuration,
+                loggerResolver);
+
+            ((ITimerWithState)timer).SetState(castedDTO.State);
+
+            ((IRuntimeTimerContext)timer).CurrentTimeElapsed = castedDTO.CurrentTimeElapsed;
+
+            ((IRuntimeTimerContext)timer).CurrentDuration = castedDTO.CurrentDuration;
+
+            timer.Accumulate = castedDTO.Accumulate;
+
+            timer.Repeat = castedDTO.Repeat;
+
+            timer.FlushTimeElapsedOnRepeat = castedDTO.FlushTimeElapsedOnRepeat;
+
+            timer.FireRepeatCallbackOnFinish = castedDTO.FireRepeatCallbackOnFinish;
+
+            visitable = timer;
+
+            return true;
+        }
+
+        #endregion
+
+        #region IPopulateVisitor
+
+        public bool VisitPopulate<TVisitable>(
+            object dto,
+            TVisitable visitable)
+        {
+            RuntimeTimerDTO castedDTO = dto as RuntimeTimerDTO;
+
+            if (castedDTO == null)
+            {
+                logger?.LogError(
+                    GetType(),
+                    $"DTO IS NOT OF TYPE: {typeof(RuntimeTimerDTO).Name}");
+
+                return false;
+            }
+
+            RuntimeTimer timer = visitable as RuntimeTimer;
+
+            if (timer == null)
+            {
+                logger?.LogError(
+                    GetType(),
+                    $"VISITABLE IS NOT OF TYPE: {typeof(RuntimeTimer).Name}");
+
+                return false;
+            }
+
+            ((ITimerWithState)timer).SetState(castedDTO.State);
+
+            ((IRuntimeTimerContext)timer).CurrentTimeElapsed = castedDTO.CurrentTimeElapsed;
+
+            ((IRuntimeTimerContext)timer).CurrentDuration = castedDTO.CurrentDuration;
+
+            timer.Accumulate = castedDTO.Accumulate;
+
+            timer.Repeat = castedDTO.Repeat;
+
+            timer.FlushTimeElapsedOnRepeat = castedDTO.FlushTimeElapsedOnRepeat;
+
+            timer.FireRepeatCallbackOnFinish = castedDTO.FireRepeatCallbackOnFinish;
+
+            return true;
+        }
+
+        public bool VisitPopulate(
+            object dto,
+            Type visitableType,
+            IVisitable visitable)
+        {
+            RuntimeTimerDTO castedDTO = dto as RuntimeTimerDTO;
+
+            if (castedDTO == null)
+            {
+                logger?.LogError(
+                    GetType(),
+                    $"DTO IS NOT OF TYPE: {typeof(RuntimeTimerDTO).Name}");
+
+                return false;
+            }
+
+            RuntimeTimer timer = visitable as RuntimeTimer;
+
+            if (timer == null)
+            {
+                logger?.LogError(
+                    GetType(),
+                    $"VISITABLE IS NOT OF TYPE: {typeof(RuntimeTimer).Name}");
+
+                return false;
+            }
+
+            ((ITimerWithState)timer).SetState(castedDTO.State);
+
+            ((IRuntimeTimerContext)timer).CurrentTimeElapsed = castedDTO.CurrentTimeElapsed;
+
+            ((IRuntimeTimerContext)timer).CurrentDuration = castedDTO.CurrentDuration;
+
+            timer.Accumulate = castedDTO.Accumulate;
+
+            timer.Repeat = castedDTO.Repeat;
+
+            timer.FlushTimeElapsedOnRepeat = castedDTO.FlushTimeElapsedOnRepeat;
+
+            timer.FireRepeatCallbackOnFinish = castedDTO.FireRepeatCallbackOnFinish;
 
             return true;
         }

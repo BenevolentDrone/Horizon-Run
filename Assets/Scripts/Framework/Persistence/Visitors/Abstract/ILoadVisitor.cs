@@ -1,10 +1,17 @@
+using System;
+
 namespace HereticalSolutions.Persistence
 {
-    public interface ILoadVisitor<TDTO>
-        : IConcreteVisitor
+    public interface ILoadVisitor
+        : IVisitor
     {
-        bool Load(
-            TDTO DTO,
+        bool VisitLoad<TVisitable>(
+            object dto,
+            out TVisitable visitable);
+
+        bool VisitLoad(
+            object dto,
+            Type visitableType,
             out IVisitable visitable);
     }
 }

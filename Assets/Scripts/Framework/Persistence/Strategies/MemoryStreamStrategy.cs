@@ -16,6 +16,22 @@ namespace HereticalSolutions.Persistence
 		  IAsyncBlockSerializationStrategy,
 		  IStrategyWithFilter
 	{
+		private readonly byte[] buffer;
+
+		public byte[] Buffer
+		{
+			get
+			{
+				if (buffer != null)
+					return buffer;
+
+				if (memoryStream != null)
+					return memoryStream.GetBuffer();
+
+				return null;
+			}
+		}
+
 		private readonly ILogger logger;
 
 
@@ -24,9 +40,24 @@ namespace HereticalSolutions.Persistence
 		public MemoryStream MemoryStream { get { return memoryStream; } }
 
 
+		private int index = -1;
+
+		public int Index { get { return index; } }
+
+
+		private int count = -1;
+
+		public int Count { get { return count; } }
+
+
 		public MemoryStreamStrategy(
+			byte[] buffer = null,
+			int index = -1,
+			int count = -1,
 			ILogger logger = null)
 		{
+			this.buffer = buffer;
+
 			this.logger = logger;
 
 
@@ -1016,7 +1047,22 @@ namespace HereticalSolutions.Persistence
 		private bool OpenStream(
 			out MemoryStream dataStream)
 		{
-			dataStream = new MemoryStream();
+			if (buffer == null)
+			{
+				dataStream = new MemoryStream();
+			}
+			else if (index < 0 && count < 0)
+			{
+				dataStream = new MemoryStream(
+					buffer);
+			}
+			else
+			{
+				dataStream = new MemoryStream(
+					buffer,
+					index,
+					count);
+			}
 
 			return true;
 		}

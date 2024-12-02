@@ -12,7 +12,13 @@ using YamlDotNetSerializer = YamlDotNet.Serialization.ISerializer;
 using YamlDotNetDeserializer = YamlDotNet.Serialization.IDeserializer;
 #endif
 
+using System;
+using System.Collections.Generic;
+using System.Reflection;
 using System.Runtime.Serialization.Formatters.Binary;
+
+using HereticalSolutions.Repositories;
+using HereticalSolutions.Repositories.Factories;
 
 using HereticalSolutions.Logging;
 
@@ -20,16 +26,64 @@ namespace HereticalSolutions.Persistence.Factories
 {
     public static class PersistenceFactory
     {
+        #region Visitors
+
+        public static DispatchVisitor BuildDispatchVisitor(
+            ILoggerResolver loggerResolver = null)
+        {
+            IRepository<Type, IEnumerable<IVisitor>> concreteVisitorRepository =
+                RepositoriesFactory.BuildDictionaryRepository<Type, IEnumerable<IVisitor>>();
+
+            TypeHelpers.GetTypesWithAttributeInAllAssemblies<VisitorAttribute>(
+                out Type[] visitorTypes);
+
+            foreach (Type visitorType in visitorTypes)
+            {
+                if (Activator.CreateInstance(visitorType) is IVisitor visitor)
+                {
+                    var attribute = visitorType.GetCustomAttribute<VisitorAttribute>(false);
+
+                    var visitableType = attribute.TargetType;
+
+                    if (concreteVisitorRepository.Has(visitableType))
+                    {
+                        var visitorList = concreteVisitorRepository
+                            .Get(visitableType)
+                            as List<IVisitor>;
+
+                        visitorList.Add(visitor);
+                    }
+                    else
+                    {
+                        concreteVisitorRepository.Add(
+                            visitableType,
+                            new List<IVisitor> { visitor });
+                    }
+                }
+            }            
+
+            return new DispatchVisitor(
+                concreteVisitorRepository,
+                loggerResolver?.GetLogger<DispatchVisitor>());
+        }
+
+        #endregion
+
         #region Arguments
 
-        public static SerializationArgument BuildSerializationArgument(
-            string fullAddress,
-            bool append = false)
+        public static AppendArgument BuildAppendArgument()
         {
-            return new SerializationArgument
+            return new AppendArgument
             {
-                FullAddress = fullAddress,
-                Append = append
+            };
+        }
+
+        public static PathArgument BuildPathArgument(
+            string path)
+        {
+            return new PathArgument
+            {
+                Path = path
             };
         }
 
@@ -39,6 +93,13 @@ namespace HereticalSolutions.Persistence.Factories
             return new BlockSerializationArgument
             {
                 BlockSize = blockSize
+            };
+        }
+
+        public static ReadAndWriteAccessArgument BuildReadAndWriteAccessArgument()
+        {
+            return new ReadAndWriteAccessArgument
+            {
             };
         }
 

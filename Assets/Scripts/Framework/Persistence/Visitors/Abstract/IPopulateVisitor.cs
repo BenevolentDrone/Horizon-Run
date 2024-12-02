@@ -1,10 +1,17 @@
+using System;
+
 namespace HereticalSolutions.Persistence
 {
-	public interface IPopulateVisitor<TDTO>
-		: IConcreteVisitor
+	public interface IPopulateVisitor
+		: IVisitor
 	{
-		bool Populate(
-			TDTO DTO,
-			ref IVisitable visitable);
+		bool VisitPopulate<TVisitable>(
+			object dto,
+			TVisitable visitable);
+
+		bool VisitPopulate(
+			object dto,
+			Type visitableType,
+			IVisitable visitable);
 	}
 }

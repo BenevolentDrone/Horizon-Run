@@ -1,9 +1,9 @@
 namespace HereticalSolutions.Persistence
 {
-	public class ReadAndWriteArgument
-		: IReadAndWriteArgument
+	public class ReadAndWriteAccessArgument
+		: IReadAndWriteAccessArgument
 	{
-		public ReadAndWriteArgument()
+		public ReadAndWriteAccessArgument()
 		{
 		}
 	}

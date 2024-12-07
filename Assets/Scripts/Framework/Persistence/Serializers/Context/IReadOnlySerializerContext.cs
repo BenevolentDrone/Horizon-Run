@@ -4,7 +4,7 @@ using HereticalSolutions.Metadata;
 
 namespace HereticalSolutions.Persistence
 {
-	public interface ISerializerInternal
+	public interface IReadOnlySerializerContext
 	{
 		IVisitor Visitor { get; }
 

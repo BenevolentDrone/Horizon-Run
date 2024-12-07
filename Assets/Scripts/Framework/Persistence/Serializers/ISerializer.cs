@@ -4,6 +4,8 @@ namespace HereticalSolutions.Persistence
 {
     public interface ISerializer
     {
+        IReadOnlySerializerContext Context { get; }
+
         #region Serialize
 
         bool Serialize<TValue>(

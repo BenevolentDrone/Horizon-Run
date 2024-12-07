@@ -7,5 +7,17 @@ namespace HereticalSolutions.Metadata
 		bool Has<TMetadata>();
 
 		TMetadata Get<TMetadata>();
+
+		bool TryGet<TMetadata>(
+			out TMetadata value);
+
+		void AddOrUpdate<TMetadata>(
+			TMetadata value);
+
+		void Remove<TMetadata>();
+
+		bool TryRemove<TMetadata>();
+
+		void Clear();
 	}
 }

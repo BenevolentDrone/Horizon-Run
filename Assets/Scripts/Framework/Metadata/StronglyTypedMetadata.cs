@@ -1,5 +1,3 @@
-using System;
-
 using HereticalSolutions.Repositories;
 
 namespace HereticalSolutions.Metadata
@@ -7,10 +5,10 @@ namespace HereticalSolutions.Metadata
 	public class StronglyTypedMetadata
 		: IStronglyTypedMetadata
 	{
-		private readonly IReadOnlyObjectRepository metadataRepository;
+		private readonly IObjectRepository metadataRepository;
 
 		public StronglyTypedMetadata(
-			IReadOnlyObjectRepository metadataRepository)
+			IObjectRepository metadataRepository)
 		{
 			this.metadataRepository = metadataRepository;
 		}
@@ -25,6 +23,35 @@ namespace HereticalSolutions.Metadata
 		public TMetadata Get<TMetadata>()
 		{
 			return metadataRepository.Get<TMetadata>();
+		}
+
+		public bool TryGet<TMetadata>(
+			out TMetadata value)
+		{
+			return metadataRepository.TryGet<TMetadata>(
+				out value);
+		}
+
+		public void AddOrUpdate<TMetadata>(
+			TMetadata value)
+		{
+			metadataRepository.AddOrUpdate<TMetadata>(
+				value);
+		}
+
+		public void Remove<TMetadata>()
+		{
+			metadataRepository.Remove<TMetadata>();
+		}
+
+		public bool TryRemove<TMetadata>()
+		{
+			return metadataRepository.TryRemove<TMetadata>();
+		}
+
+		public void Clear()
+		{
+
 		}
 
 		#endregion

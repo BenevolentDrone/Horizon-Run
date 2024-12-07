@@ -1,8 +1,30 @@
+using HereticalSolutions.Metadata.Factories;
+using HereticalSolutions.Persistence.Factories;
+
+using HereticalSolutions.Logging;
+
 namespace HereticalSolutions.Persistence
 {
-	public interface ISerializerBuilder
+	public class SerializerBuilder
+		: ISerializerBuilder
 	{
-		ISerializerBuilder NewSerializer();
+		private readonly ILogger logger;
+
+		private ISerializerContext serializerContext;
+
+		public SerializerBuilder()
+		{
+			serializerContext = null;
+		}
+
+		#region ISerializerBuilder
+
+		ISerializerBuilder NewSerializer()
+		{
+			serializerContext = new SerializerContext();
+
+			return this;
+		}
 
 		#region Settings
 
@@ -65,7 +87,19 @@ namespace HereticalSolutions.Persistence
 
 		#region Arguments
 
-		ISerializerBuilder WithPath();
+		ISerializerBuilder WithPath()
+		{
+			if (serializerContext == null)
+			{
+
+			}
+
+			EnsureArgumentsExist();
+
+			serializerContext.Arguments.Add(new PathArgument());
+
+			return this;
+		}
 
 		ISerializerBuilder WithAppend();
 
@@ -78,5 +112,13 @@ namespace HereticalSolutions.Persistence
 		#endregion
 
 		ISerializer Build();
+
+		#endregion
+
+		private void EnsureArgumentsExist()
+		{
+			if (serializerContext.Arguments == null)
+				serializerContext.Arguments = MetadataFactory.BuildStronglyTypedMetadata();
+		}
 	}
 }

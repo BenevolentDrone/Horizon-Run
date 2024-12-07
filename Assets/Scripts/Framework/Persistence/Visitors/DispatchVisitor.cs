@@ -27,8 +27,6 @@ namespace HereticalSolutions.Persistence
 
 		#region IVisitor
 
-		#region Can visit
-
 		public bool CanVisit<TVisitable>()
 		{
 			return concreteVisitorRepository.Has(
@@ -42,7 +40,46 @@ namespace HereticalSolutions.Persistence
 				visitableType);
 		}
 
-		#endregion
+		public Type GetDTOType<TVisitable>()
+		{
+			if (!concreteVisitorRepository.TryGet(
+				typeof(TVisitable),
+				out IEnumerable<IVisitor> concreteVisitors))
+			{
+				return null;
+			}
+
+			foreach (IVisitor concreteVisitor in concreteVisitors)
+			{
+				if (concreteVisitor is ISaveVisitor concreteSaveVisitor)
+				{
+					return concreteSaveVisitor.GetDTOType<TVisitable>();
+				}
+			}
+
+			return null;
+		}
+
+		public Type GetDTOType(
+			Type visitableType)
+		{
+			if (!concreteVisitorRepository.TryGet(
+				visitableType,
+				out IEnumerable<IVisitor> concreteVisitors))
+			{
+				return null;
+			}
+
+			foreach (IVisitor concreteVisitor in concreteVisitors)
+			{
+				if (concreteVisitor is ISaveVisitor concreteSaveVisitor)
+				{
+					return concreteSaveVisitor.GetDTOType(visitableType);
+				}
+			}
+
+			return null;
+		}
 
 		#endregion
 

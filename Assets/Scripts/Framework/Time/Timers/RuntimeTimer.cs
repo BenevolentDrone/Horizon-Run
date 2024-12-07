@@ -10,7 +10,7 @@ using HereticalSolutions.LifetimeManagement;
 
 using HereticalSolutions.Logging;
 
-namespace HereticalSolutions.Time.Timers
+namespace HereticalSolutions.Time
 {
     public class RuntimeTimer
         : ITimer,

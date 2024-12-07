@@ -24,7 +24,7 @@ namespace HereticalSolutions.Persistence
             this.logger = logger;
         }
 
-        #region ISerializer
+        #region IFormatSerializer
 
         public bool Serialize<TValue>(
             ISerializationStrategy strategy,
@@ -39,7 +39,7 @@ namespace HereticalSolutions.Persistence
             {
                 logger?.LogError(
                     GetType(),
-                    "BinaryFormatterSerializer ONLY SUPPORTS STRATEGIES WITH STREAMS");
+                    $"{GetType().Name} ONLY SUPPORTS STRATEGIES WITH STREAMS");
 
                 return false;
             }
@@ -65,7 +65,7 @@ namespace HereticalSolutions.Persistence
             {
                 logger?.LogError(
                     GetType(),
-                    "BinaryFormatterSerializer ONLY SUPPORTS STRATEGIES WITH STREAMS");
+                    $"{GetType().Name} ONLY SUPPORTS STRATEGIES WITH STREAMS");
 
                 return false;
             }
@@ -90,7 +90,7 @@ namespace HereticalSolutions.Persistence
             {
                 logger?.LogError(
                     GetType(),
-                    "BinaryFormatterSerializer ONLY SUPPORTS STRATEGIES WITH STREAMS");
+                    $"{GetType().Name} ONLY SUPPORTS STRATEGIES WITH STREAMS");
 
                 value = default;
 
@@ -119,7 +119,7 @@ namespace HereticalSolutions.Persistence
             {
                 logger?.LogError(
                     GetType(),
-                    "BinaryFormatterSerializer ONLY SUPPORTS STRATEGIES WITH STREAMS");
+                    $"{GetType().Name} ONLY SUPPORTS STRATEGIES WITH STREAMS");
 
                 valueObject = default;
 
@@ -145,7 +145,7 @@ namespace HereticalSolutions.Persistence
             {
                 logger?.LogError(
                     GetType(),
-                    "BinaryFormatterSerializer ONLY SUPPORTS STRATEGIES WITH STREAMS");
+                    $"{GetType().Name} ONLY SUPPORTS STRATEGIES WITH STREAMS");
 
                 return false;
             }
@@ -172,7 +172,7 @@ namespace HereticalSolutions.Persistence
             {
                 logger?.LogError(
                     GetType(),
-                    "BinaryFormatterSerializer ONLY SUPPORTS STRATEGIES WITH STREAMS");
+                    $"{GetType().Name} ONLY SUPPORTS STRATEGIES WITH STREAMS");
 
                 return false;
             }

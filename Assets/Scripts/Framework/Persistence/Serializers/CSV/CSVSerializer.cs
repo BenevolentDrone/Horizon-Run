@@ -33,7 +33,7 @@ namespace HereticalSolutions.Persistence
             this.logger = logger;
         }
 
-        #region ISerializer
+        #region IFormatSerializer
 
         public bool Serialize<TValue>(
             ISerializationStrategy strategy,

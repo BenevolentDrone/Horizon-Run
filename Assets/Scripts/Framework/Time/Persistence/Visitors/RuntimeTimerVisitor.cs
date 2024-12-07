@@ -2,7 +2,6 @@ using System;
 
 using HereticalSolutions.Persistence;
 
-using HereticalSolutions.Time.Timers;
 using HereticalSolutions.Time.Factories;
 
 using HereticalSolutions.Logging;
@@ -39,6 +38,23 @@ namespace HereticalSolutions.Time
             Type visitableType)
         {
             return visitableType == typeof(RuntimeTimer);
+        }
+
+        public Type GetDTOType<TVisitable>()
+        {
+            if (typeof(TVisitable) != typeof(RuntimeTimer))
+                return null;
+
+            return typeof(RuntimeTimerDTO);
+        }
+
+        public Type GetDTOType(
+            Type visitableType)
+        {
+            if (visitableType != typeof(RuntimeTimer))
+                return null;
+
+            return typeof(RuntimeTimerDTO);
         }
 
         #endregion

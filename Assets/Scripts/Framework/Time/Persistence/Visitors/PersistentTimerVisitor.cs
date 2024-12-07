@@ -1,101 +1,323 @@
+using System;
+
 using HereticalSolutions.Persistence;
 
 using HereticalSolutions.Time.Factories;
 
 using HereticalSolutions.Logging;
 
-namespace HereticalSolutions.Time.Visitors
+namespace HereticalSolutions.Time
 {
+    [Visitor(typeof(PersistentTimer), typeof(PersistentTimerDTO))]
     public class PersistentTimerVisitor
-        : ASaveLoadVisitor<IPersistentTimer, PersistentTimerDTO>
+        : ISaveVisitor,
+          ILoadVisitor,
+          IPopulateVisitor
     {
         private readonly ILoggerResolver loggerResolver;
+
+        private readonly ILogger logger;
 
         public PersistentTimerVisitor(
             ILoggerResolver loggerResolver = null,
             ILogger logger = null)
-            : base(logger)
         {
             this.loggerResolver = loggerResolver;
+
+            this.logger = logger;
         }
 
-        #region ILoadVisitorGeneric
+        #region IVisitor
 
-        public override bool Load(
-            PersistentTimerDTO DTO,
-            out IPersistentTimer value)
+        public bool CanVisit<TVisitable>()
         {
-            value = TimeFactory.BuildPersistentTimer(
-                DTO.ID,
-                DTO.DefaultDurationSpan,
-                loggerResolver);
+            return typeof(TVisitable) == typeof(PersistentTimer);
+        }
 
-            ((ITimerWithState)value).SetState(DTO.State);
+        public bool CanVisit(
+            Type visitableType)
+        {
+            return visitableType == typeof(PersistentTimer);
+        }
 
-            ((IPersistentTimerContext)value).StartTime = DTO.StartTime;
+        public Type GetDTOType<TVisitable>()
+        {
+            if (typeof(TVisitable) != typeof(PersistentTimer))
+                return null;
 
-            ((IPersistentTimerContext)value).EstimatedFinishTime = DTO.EstimatedFinishTime;
+            return typeof(PersistentTimerDTO);
+        }
 
-            ((IPersistentTimerContext)value).SavedProgress = DTO.SavedProgress;
+        public Type GetDTOType(
+            Type visitableType)
+        {
+            if (visitableType != typeof(PersistentTimer))
+                return null;
 
-            ((IPersistentTimerContext)value).CurrentDurationSpan = DTO.CurrentDurationSpan;
+            return typeof(PersistentTimerDTO);
+        }
 
-            value.Accumulate = DTO.Accumulate;
+        #endregion
 
-            value.Repeat = DTO.Repeat;
-            
-            value.FlushTimeElapsedOnRepeat = DTO.FlushTimeElapsedOnRepeat;
-            
-            value.FireRepeatCallbackOnFinish = DTO.FireRepeatCallbackOnFinish;
+        #region ISaveVisitor
+
+        public bool VisitSave<TVisitable>(
+            ref object dto,
+            TVisitable visitable)
+        {
+            PersistentTimer timer = visitable as PersistentTimer;
+
+            if (timer == null)
+            {
+                logger?.LogError(
+                    GetType(),
+                    $"VISITABLE IS NOT OF TYPE: {typeof(PersistentTimer).Name}");
+
+                dto = null;
+
+                return false;
+            }
+
+            dto = new PersistentTimerDTO
+            {
+                ID = timer.ID,
+                State = timer.State,
+                StartTime = ((IPersistentTimerContext)timer).StartTime,
+                EstimatedFinishTime = ((IPersistentTimerContext)timer).EstimatedFinishTime,
+                SavedProgress = ((IPersistentTimerContext)timer).SavedProgress,
+                Accumulate = timer.Accumulate,
+                Repeat = timer.Repeat,
+                CurrentDurationSpan = timer.CurrentDurationSpan,
+                DefaultDurationSpan = timer.DefaultDurationSpan
+            };
 
             return true;
         }
 
-        public override bool Load(
-            PersistentTimerDTO DTO,
-            IPersistentTimer valueToPopulate)
+        public bool VisitSave(
+            ref object dto,
+            Type visitableType,
+            IVisitable visitable)
         {
-            ((ITimerWithState)valueToPopulate).SetState(DTO.State);
+            PersistentTimer timer = visitable as PersistentTimer;
 
-            ((IPersistentTimerContext)valueToPopulate).StartTime = DTO.StartTime;
+            if (timer == null)
+            {
+                logger?.LogError(
+                    GetType(),
+                    $"VISITABLE IS NOT OF TYPE: {typeof(PersistentTimer).Name}");
 
-            ((IPersistentTimerContext)valueToPopulate).EstimatedFinishTime = DTO.EstimatedFinishTime;
+                dto = null;
 
-            ((IPersistentTimerContext)valueToPopulate).SavedProgress = DTO.SavedProgress;
+                return false;
+            }
 
-            ((IPersistentTimerContext)valueToPopulate).CurrentDurationSpan = DTO.CurrentDurationSpan;
-
-            valueToPopulate.Accumulate = DTO.Accumulate;
-
-            valueToPopulate.Repeat = DTO.Repeat;
-            
-            valueToPopulate.FlushTimeElapsedOnRepeat = DTO.FlushTimeElapsedOnRepeat;
-            
-            valueToPopulate.FireRepeatCallbackOnFinish = DTO.FireRepeatCallbackOnFinish;
+            dto = new PersistentTimerDTO
+            {
+                ID = timer.ID,
+                State = timer.State,
+                StartTime = ((IPersistentTimerContext)timer).StartTime,
+                EstimatedFinishTime = ((IPersistentTimerContext)timer).EstimatedFinishTime,
+                SavedProgress = ((IPersistentTimerContext)timer).SavedProgress,
+                Accumulate = timer.Accumulate,
+                Repeat = timer.Repeat,
+                CurrentDurationSpan = timer.CurrentDurationSpan,
+                DefaultDurationSpan = timer.DefaultDurationSpan
+            };
 
             return true;
         }
 
         #endregion
 
-        #region ISaveVisitorGeneric
+        #region ILoadVisitor
 
-        public override bool Save(
-            IPersistentTimer value,
-            out PersistentTimerDTO DTO)
+        public bool VisitLoad<TVisitable>(
+            object dto,
+            out TVisitable visitable)
         {
-            DTO = new PersistentTimerDTO
+            PersistentTimerDTO castedDTO = dto as PersistentTimerDTO;
+
+            if (castedDTO == null)
             {
-                ID = value.ID,
-                State = value.State,
-                StartTime = ((IPersistentTimerContext)value).StartTime,
-                EstimatedFinishTime = ((IPersistentTimerContext)value).EstimatedFinishTime,
-                SavedProgress = ((IPersistentTimerContext)value).SavedProgress,
-                Accumulate = value.Accumulate,
-                Repeat = value.Repeat,
-                CurrentDurationSpan = value.CurrentDurationSpan,
-                DefaultDurationSpan = value.DefaultDurationSpan
-            };
+                logger?.LogError(
+                    GetType(),
+                    $"DTO IS NOT OF TYPE: {typeof(PersistentTimerDTO).Name}");
+
+                visitable = default;
+
+                return false;
+            }
+
+            var timer = TimeFactory.BuildPersistentTimer(
+                castedDTO.ID,
+                castedDTO.DefaultDurationSpan,
+                loggerResolver);
+
+            ((ITimerWithState)timer).SetState(castedDTO.State);
+
+            ((IPersistentTimerContext)timer).StartTime = castedDTO.StartTime;
+
+            ((IPersistentTimerContext)timer).EstimatedFinishTime = castedDTO.EstimatedFinishTime;
+
+            ((IPersistentTimerContext)timer).SavedProgress = castedDTO.SavedProgress;
+
+            ((IPersistentTimerContext)timer).CurrentDurationSpan = castedDTO.CurrentDurationSpan;
+
+            timer.Accumulate = castedDTO.Accumulate;
+
+            timer.Repeat = castedDTO.Repeat;
+
+            timer.FlushTimeElapsedOnRepeat = castedDTO.FlushTimeElapsedOnRepeat;
+
+            timer.FireRepeatCallbackOnFinish = castedDTO.FireRepeatCallbackOnFinish;
+
+            visitable = timer.CastFromTo<PersistentTimer, TVisitable>();
+
+            return true;
+        }
+
+        public bool VisitLoad(
+            object dto,
+            Type visitableType,
+            out IVisitable visitable)
+        {
+            PersistentTimerDTO castedDTO = dto as PersistentTimerDTO;
+
+            if (castedDTO == null)
+            {
+                logger?.LogError(
+                    GetType(),
+                    $"DTO IS NOT OF TYPE: {typeof(PersistentTimerDTO).Name}");
+
+                visitable = default;
+
+                return false;
+            }
+
+            var timer = TimeFactory.BuildPersistentTimer(
+                castedDTO.ID,
+                castedDTO.DefaultDurationSpan,
+                loggerResolver);
+
+            ((ITimerWithState)timer).SetState(castedDTO.State);
+
+            ((IPersistentTimerContext)timer).StartTime = castedDTO.StartTime;
+
+            ((IPersistentTimerContext)timer).EstimatedFinishTime = castedDTO.EstimatedFinishTime;
+
+            ((IPersistentTimerContext)timer).SavedProgress = castedDTO.SavedProgress;
+
+            ((IPersistentTimerContext)timer).CurrentDurationSpan = castedDTO.CurrentDurationSpan;
+
+            timer.Accumulate = castedDTO.Accumulate;
+
+            timer.Repeat = castedDTO.Repeat;
+
+            timer.FlushTimeElapsedOnRepeat = castedDTO.FlushTimeElapsedOnRepeat;
+
+            timer.FireRepeatCallbackOnFinish = castedDTO.FireRepeatCallbackOnFinish;
+
+            visitable = timer;
+
+            return true;
+        }
+
+        #endregion
+
+        #region IPopulateVisitor
+
+        public bool VisitPopulate<TVisitable>(
+            object dto,
+            TVisitable visitable)
+        {
+            PersistentTimerDTO castedDTO = dto as PersistentTimerDTO;
+
+            if (castedDTO == null)
+            {
+                logger?.LogError(
+                    GetType(),
+                    $"DTO IS NOT OF TYPE: {typeof(PersistentTimerDTO).Name}");
+
+                return false;
+            }
+
+            PersistentTimer timer = visitable as PersistentTimer;
+
+            if (timer == null)
+            {
+                logger?.LogError(
+                    GetType(),
+                    $"VISITABLE IS NOT OF TYPE: {typeof(PersistentTimer).Name}");
+
+                return false;
+            }
+
+            ((ITimerWithState)timer).SetState(castedDTO.State);
+
+            ((IPersistentTimerContext)timer).StartTime = castedDTO.StartTime;
+
+            ((IPersistentTimerContext)timer).EstimatedFinishTime = castedDTO.EstimatedFinishTime;
+
+            ((IPersistentTimerContext)timer).SavedProgress = castedDTO.SavedProgress;
+
+            ((IPersistentTimerContext)timer).CurrentDurationSpan = castedDTO.CurrentDurationSpan;
+
+            timer.Accumulate = castedDTO.Accumulate;
+
+            timer.Repeat = castedDTO.Repeat;
+
+            timer.FlushTimeElapsedOnRepeat = castedDTO.FlushTimeElapsedOnRepeat;
+
+            timer.FireRepeatCallbackOnFinish = castedDTO.FireRepeatCallbackOnFinish;
+
+            return true;
+        }
+
+        public bool VisitPopulate(
+            object dto,
+            Type visitableType,
+            IVisitable visitable)
+        {
+            PersistentTimerDTO castedDTO = dto as PersistentTimerDTO;
+
+            if (castedDTO == null)
+            {
+                logger?.LogError(
+                    GetType(),
+                    $"DTO IS NOT OF TYPE: {typeof(PersistentTimerDTO).Name}");
+
+                return false;
+            }
+
+            PersistentTimer timer = visitable as PersistentTimer;
+
+            if (timer == null)
+            {
+                logger?.LogError(
+                    GetType(),
+                    $"VISITABLE IS NOT OF TYPE: {typeof(PersistentTimer).Name}");
+
+                return false;
+            }
+
+            ((ITimerWithState)timer).SetState(castedDTO.State);
+
+            ((IPersistentTimerContext)timer).StartTime = castedDTO.StartTime;
+
+            ((IPersistentTimerContext)timer).EstimatedFinishTime = castedDTO.EstimatedFinishTime;
+
+            ((IPersistentTimerContext)timer).SavedProgress = castedDTO.SavedProgress;
+
+            ((IPersistentTimerContext)timer).CurrentDurationSpan = castedDTO.CurrentDurationSpan;
+
+            timer.Accumulate = castedDTO.Accumulate;
+
+            timer.Repeat = castedDTO.Repeat;
+
+            timer.FlushTimeElapsedOnRepeat = castedDTO.FlushTimeElapsedOnRepeat;
+
+            timer.FireRepeatCallbackOnFinish = castedDTO.FireRepeatCallbackOnFinish;
 
             return true;
         }

@@ -10,7 +10,7 @@ using HereticalSolutions.LifetimeManagement;
 
 using HereticalSolutions.Logging;
 
-namespace HereticalSolutions.Time.Timers
+namespace HereticalSolutions.Time
 {
     public class PersistentTimer
         : ITimer,
@@ -342,88 +342,22 @@ namespace HereticalSolutions.Time.Timers
 
         #region IVisitable
 
-        /// <summary>
-        /// Gets the type of the data transfer object for the timer
-        /// </summary>
-        public Type DTOType
-        {
-            get => typeof(PersistentTimerDTO);
-        }
-
-        public bool AcceptSave<TDTO>(
+        public bool AcceptSave(
             ISaveVisitor visitor,
-            out TDTO DTO)
+            ref object dto)
         {
-            var result = visitor
-                .Save<IPersistentTimer, PersistentTimerDTO>(
-                    this,
-                    out PersistentTimerDTO persistentTimerDTO);
-
-            DTO = default;
-
-            switch (persistentTimerDTO)
-            {
-                case TDTO targetTypeDTO:
-
-                    DTO = targetTypeDTO;
-
-                    break;
-
-                default:
-
-                    throw new Exception(
-                        logger.TryFormatException<PersistentTimer>(
-                            $"CANNOT CAST RETURN VALUE TYPE \"{typeof(PersistentTimerDTO).Name}\" TO TYPE \"{typeof(TDTO).GetType().Name}\""));
-            }
-
-            return result;
+            return visitor.VisitSave<PersistentTimer>(
+                ref dto,
+                this);
         }
 
-        /// <summary>
-        /// Accepts a save visitor and returns whether the visit was successful
-        /// </summary>
-        /// <param name="visitor">The save visitor.</param>
-        /// <param name="DTO">The data transfer object.</param>
-        /// <returns>True if the visit was successful, false otherwise.</returns>
-        public bool AcceptSave(ISaveVisitor visitor, out object DTO)
+        public bool AcceptPopulate(
+            IPopulateVisitor visitor,
+            object dto)
         {
-            var result = visitor.Save<IPersistentTimer, PersistentTimerDTO>(this, out PersistentTimerDTO persistentTimerDTO);
-
-            DTO = persistentTimerDTO;
-
-            return result;
-        }
-
-        public bool AcceptLoad<TDTO>(
-            ILoadVisitor visitor,
-            TDTO DTO)
-        {
-            switch (DTO)
-            {
-                case PersistentTimerDTO targetTypeDTO:
-
-                    return visitor
-                        .Load<IPersistentTimer, PersistentTimerDTO>(
-                            targetTypeDTO,
-                            this);
-
-                default:
-
-                    throw new Exception(
-                        logger.TryFormatException<PersistentTimer>(
-                            $"INVALID ARGUMENT TYPE. EXPECTED: \"{typeof(PersistentTimerDTO).Name}\" RECEIVED: \"{typeof(TDTO).GetType().Name}\""));
-            }
-        }
-
-        /// <summary>
-        /// Accepts a load visitor and returns whether the visit was successful
-        /// </summary>
-        /// <param name="visitor">The load visitor.</param>
-        /// <param name="DTO">The data transfer object.</param>
-        /// <returns>True if the visit was successful, false otherwise.</returns>
-        public bool AcceptLoad(ILoadVisitor visitor, object DTO)
-        {
-            return visitor.Load<IPersistentTimer, PersistentTimerDTO>((PersistentTimerDTO)DTO, this);
+            return visitor.VisitPopulate<PersistentTimer>(
+                dto,
+                this);
         }
 
         #endregion

@@ -24,7 +24,7 @@ namespace HereticalSolutions.ResourceManagement
 	{
 		private readonly IRepository<int, string> variantIDHashToID;
 
-		private readonly IRepository<int, IResourceVariantData> variantsRepository;
+		private readonly IRepository<int, IResourceVariantData> variantRepository;
 
 		private readonly IAsyncNotifierSingleArgGeneric<int, IResourceVariantData> variantAddedNotifier;
 
@@ -35,7 +35,7 @@ namespace HereticalSolutions.ResourceManagement
 
 		private readonly IRepository<int, string> nestedResourceIDHashToID;
 
-		private readonly IRepository<int, IReadOnlyResourceData> nestedResourcesRepository;
+		private readonly IRepository<int, IReadOnlyResourceData> nestedResourceRepository;
 
 		private readonly IAsyncNotifierSingleArgGeneric<int, IReadOnlyResourceData> nestedResourceAddedNotifier;
 
@@ -48,11 +48,11 @@ namespace HereticalSolutions.ResourceManagement
 			ResourceDescriptor descriptor,
 
 			IRepository<int, string> variantIDHashToID,
-			IRepository<int, IResourceVariantData> variantsRepository,
+			IRepository<int, IResourceVariantData> variantRepository,
 			IAsyncNotifierSingleArgGeneric<int, IResourceVariantData> variantAddedNotifier,
 
 			IRepository<int, string> nestedResourceIDHashToID,
-			IRepository<int, IReadOnlyResourceData> nestedResourcesRepository,
+			IRepository<int, IReadOnlyResourceData> nestedResourceRepository,
 			IAsyncNotifierSingleArgGeneric<int, IReadOnlyResourceData> nestedResourceAddedNotifier,
 
 			SemaphoreSlim semaphore,
@@ -64,14 +64,14 @@ namespace HereticalSolutions.ResourceManagement
 
 			this.variantIDHashToID = variantIDHashToID;
 
-			this.variantsRepository = variantsRepository;
+			this.variantRepository = variantRepository;
 
 			this.variantAddedNotifier = variantAddedNotifier;
 
 
 			this.nestedResourceIDHashToID = nestedResourceIDHashToID;
 
-			this.nestedResourcesRepository = nestedResourcesRepository;
+			this.nestedResourceRepository = nestedResourceRepository;
 
 			this.nestedResourceAddedNotifier = nestedResourceAddedNotifier;
 
@@ -129,7 +129,7 @@ namespace HereticalSolutions.ResourceManagement
 
 			try
 			{
-				return variantsRepository.Has(variantIDHash);
+				return variantRepository.Has(variantIDHash);
 			}
 			finally
 			{
@@ -156,7 +156,7 @@ namespace HereticalSolutions.ResourceManagement
 
 			try
 			{
-				if (!variantsRepository.TryGet(
+				if (!variantRepository.TryGet(
 					variantIDHash,
 					out var variant))
 					return null;
@@ -190,7 +190,7 @@ namespace HereticalSolutions.ResourceManagement
 
 			try
 			{
-				return variantsRepository.TryGet(variantIDHash, out variant);
+				return variantRepository.TryGet(variantIDHash, out variant);
 			}
 			finally
 			{
@@ -221,7 +221,7 @@ namespace HereticalSolutions.ResourceManagement
 
 				try
 				{
-					return variantsRepository.Keys;
+					return variantRepository.Keys;
 				}
 				finally
 				{
@@ -271,7 +271,7 @@ namespace HereticalSolutions.ResourceManagement
 
 				try
 				{
-					return variantsRepository.Values;
+					return variantRepository.Values;
 				}
 				finally
 				{
@@ -369,7 +369,7 @@ namespace HereticalSolutions.ResourceManagement
 
 			try
 			{
-				return nestedResourcesRepository.Has(nestedResourceIDHash);
+				return nestedResourceRepository.Has(nestedResourceIDHash);
 			}
 			finally
 			{
@@ -396,7 +396,7 @@ namespace HereticalSolutions.ResourceManagement
 
 			try
 			{
-				if (!nestedResourcesRepository.TryGet(
+				if (!nestedResourceRepository.TryGet(
 					nestedResourceIDHash,
 					out var nestedResource))
 					return null;
@@ -430,7 +430,7 @@ namespace HereticalSolutions.ResourceManagement
 
 			try
 			{
-				return nestedResourcesRepository.TryGet(
+				return nestedResourceRepository.TryGet(
 					nestedResourceIDHash,
 					out nestedResource);
 			}
@@ -465,7 +465,7 @@ namespace HereticalSolutions.ResourceManagement
 
 				try
 				{
-					return nestedResourcesRepository.Keys;
+					return nestedResourceRepository.Keys;
 				}
 				finally
 				{
@@ -515,7 +515,7 @@ namespace HereticalSolutions.ResourceManagement
 
 				try
 				{
-					return nestedResourcesRepository.Values;
+					return nestedResourceRepository.Values;
 				}
 				finally
 				{
@@ -552,7 +552,7 @@ namespace HereticalSolutions.ResourceManagement
 
 			try
 			{
-				if (!variantsRepository.TryAdd(
+				if (!variantRepository.TryAdd(
 					variant.Descriptor.VariantIDHash,
 					variant))
 				{
@@ -630,7 +630,7 @@ namespace HereticalSolutions.ResourceManagement
 
 			try
 			{
-				if (!variantsRepository.TryGet(
+				if (!variantRepository.TryGet(
 					variantIDHash,
 					out variant))
 				{
@@ -641,7 +641,7 @@ namespace HereticalSolutions.ResourceManagement
 
 				variantIDHashToID.TryRemove(variantIDHash);
 
-				variantsRepository.TryRemove(variantIDHash);
+				variantRepository.TryRemove(variantIDHash);
 
 				UpdateDefaultVariant();
 			}
@@ -707,9 +707,9 @@ namespace HereticalSolutions.ResourceManagement
 
 			int topPriority = int.MinValue;
 
-			foreach (var hashID in variantsRepository.Keys)
+			foreach (var hashID in variantRepository.Keys)
 			{
-				var currentVariant = variantsRepository.Get(hashID);
+				var currentVariant = variantRepository.Get(hashID);
 
 				var currentPriority = currentVariant.Descriptor.Priority;
 
@@ -738,11 +738,11 @@ namespace HereticalSolutions.ResourceManagement
 
 			try
 			{
-				variantsToFree = variantsRepository.Values.ToArray();
+				variantsToFree = variantRepository.Values.ToArray();
 
 				variantIDHashToID.Clear();
 
-				variantsRepository.Clear();
+				variantRepository.Clear();
 
 				defaultVariant = null;
 			}
@@ -808,7 +808,7 @@ namespace HereticalSolutions.ResourceManagement
 
 			try
 			{
-				if (!nestedResourcesRepository.TryAdd(
+				if (!nestedResourceRepository.TryAdd(
 					nestedResource.Descriptor.IDHash,
 					nestedResource))
 				{
@@ -865,7 +865,7 @@ namespace HereticalSolutions.ResourceManagement
 
 			try
 			{
-				if (!nestedResourcesRepository.TryGet(
+				if (!nestedResourceRepository.TryGet(
 					nestedResourceIDHash,
 					out nestedResource))
 				{
@@ -878,7 +878,7 @@ namespace HereticalSolutions.ResourceManagement
 
 				nestedResourceIDHashToID.TryRemove(nestedResourceIDHash);
 
-				nestedResourcesRepository.TryRemove(nestedResourceIDHash);
+				nestedResourceRepository.TryRemove(nestedResourceIDHash);
 			}
 			finally
 			{
@@ -953,11 +953,11 @@ namespace HereticalSolutions.ResourceManagement
 
 			try
 			{
-				nestedResourcesToFree = nestedResourcesRepository.Values.ToArray();
+				nestedResourcesToFree = nestedResourceRepository.Values.ToArray();
 
 				nestedResourceIDHashToID.Clear();
 
-				nestedResourcesRepository.Clear();
+				nestedResourceRepository.Clear();
 			}
 			finally
 			{
@@ -1129,7 +1129,7 @@ namespace HereticalSolutions.ResourceManagement
 
 			try
 			{
-				if (variantsRepository.TryGet(
+				if (variantRepository.TryGet(
 					variantIDHash,
 					out var result))
 				{
@@ -1214,7 +1214,7 @@ namespace HereticalSolutions.ResourceManagement
 
 			try
 			{
-				if (nestedResourcesRepository.TryGet(
+				if (nestedResourceRepository.TryGet(
 					nestedResourceIDHash,
 					out var result))
 				{
@@ -1328,14 +1328,14 @@ namespace HereticalSolutions.ResourceManagement
 			if (variantIDHashToID is ICleanuppable)
 				(variantIDHashToID as ICleanuppable).Cleanup();
 
-			if (variantsRepository is ICleanuppable)
-				(variantsRepository as ICleanuppable).Cleanup();
+			if (variantRepository is ICleanuppable)
+				(variantRepository as ICleanuppable).Cleanup();
 
 			if (nestedResourceIDHashToID is ICleanuppable)
 				(nestedResourceIDHashToID as ICleanuppable).Cleanup();
 
-			if (nestedResourcesRepository is ICleanuppable)
-				(nestedResourcesRepository as ICleanuppable).Cleanup();
+			if (nestedResourceRepository is ICleanuppable)
+				(nestedResourceRepository as ICleanuppable).Cleanup();
 
 			if (nestedResourceAddedNotifier is ICleanuppable)
 				(nestedResourceAddedNotifier as ICleanuppable).Cleanup();
@@ -1350,14 +1350,14 @@ namespace HereticalSolutions.ResourceManagement
 			if (variantIDHashToID is IDisposable)
 				(variantIDHashToID as IDisposable).Dispose();
 
-			if (variantsRepository is IDisposable)
-				(variantsRepository as IDisposable).Dispose();
+			if (variantRepository is IDisposable)
+				(variantRepository as IDisposable).Dispose();
 
 			if (nestedResourceIDHashToID is IDisposable)
 				(nestedResourceIDHashToID as IDisposable).Dispose();
 
-			if (nestedResourcesRepository is IDisposable)
-				(nestedResourcesRepository as IDisposable).Dispose();
+			if (nestedResourceRepository is IDisposable)
+				(nestedResourceRepository as IDisposable).Dispose();
 
 			if (nestedResourceAddedNotifier is IDisposable)
 				(nestedResourceAddedNotifier as IDisposable).Dispose();

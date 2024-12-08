@@ -6,13 +6,10 @@ using HereticalSolutions.Delegates.Broadcasting;
 using HereticalSolutions.Delegates.Subscriptions;
 
 using HereticalSolutions.Pools;
-using HereticalSolutions.Pools.Decorators;
 
 using HereticalSolutions.ResourceManagement;
 
 using HereticalSolutions.AssetImport;
-
-using HereticalSolutions.Entities;
 
 using HereticalSolutions.Logging;
 using HereticalSolutions.Logging.Factories;
@@ -21,6 +18,7 @@ using ILogger = HereticalSolutions.Logging.ILogger;
 using UnityEngine;
 
 using Zenject;
+using HereticalSolutions.Persistence;
 
 namespace HereticalSolutions.Modules.Core_DefaultECS.DI
 {
@@ -31,8 +29,6 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.DI
 
 
         private ILogger cachedLogger;
-
-        //private IDumpable cachedDumpableLogger;
 
 
         private bool catchingLogs;
@@ -89,11 +85,15 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.DI
                     new []
                     {
                         LoggersFactory.BuildFileSink(
-                            (loggingSettings.LoggingEnvironmentSettings.GetLogsFolderFromEnvironment)
-                                ? System.Environment.GetEnvironmentVariable(
-                                    loggingSettings.LoggingEnvironmentSettings.LogsFolderEnvironmentKey)
-                                : $"{Application.dataPath}/../",
-                            $"Runtime logs/{logFileName}.log",
+                            //(loggingSettings.LoggingEnvironmentSettings.GetLogsFolderFromEnvironment)
+                            //    ? System.Environment.GetEnvironmentVariable(
+                            //        loggingSettings.LoggingEnvironmentSettings.LogsFolderEnvironmentKey)
+                            //    : $"{Application.dataPath}/../",
+                            //$"Runtime logs/{logFileName}.log",
+                            new FileAtApplicationDataPathSettings
+                            {
+                                RelativePath = $"../Runtime logs/{logFileName}.log"
+                            },
                             (ILoggerResolver)loggerBuilder)
                     })
 
@@ -235,42 +235,6 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.DI
                 .AsCached();
 
             cachedLogger = loggerBuilder.CurrentLogger;
-
-            //#region Dumpable
-            //
-            //cachedDumpableLogger = null;
-            //
-            //var currentLogger = loggerBuilder.CurrentLogger;
-            //
-            //do
-            //{
-            //    if (currentLogger is IDumpable dumpableLogger)
-            //    {
-            //        cachedDumpableLogger = (IDumpable)currentLogger;
-            //
-            //        break;
-            //    }
-            //
-            //    if (currentLogger is not ILoggerWrapper loggerWrapper)
-            //    {
-            //        cachedDumpableLogger = null;
-            //
-            //        break;
-            //    }
-            //
-            //    currentLogger = loggerWrapper.InnerLogger;
-            //}
-            //while (true);
-            //
-            //if (cachedDumpableLogger != null)
-            //{
-            //    Container
-            //        .Bind<IDumpable>()
-            //        .FromInstance(cachedDumpableLogger)
-            //        .AsCached();
-            //}
-            //
-            //#endregion
 
             #region Catch logs
 

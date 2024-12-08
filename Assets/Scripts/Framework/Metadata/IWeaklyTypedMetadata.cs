@@ -21,6 +21,10 @@ namespace HereticalSolutions.Metadata
 			string key,
 			out TMetadata value);
 
+		bool TryAdd(
+			string key,
+			object value);
+
 		void AddOrUpdate(
 			string key,
 			object value);

@@ -29,9 +29,9 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.DI
         {
             #region Simulation update
             
-            var updateSynchronizationProvidersRepository = updateTimeManager as ISynchronizationProvidersRepository;
+            var updateSynchronizationProviderRepository = updateTimeManager as ISynchronizationProviderRepository;
 
-            updateSynchronizationProvidersRepository.TryGetProvider(
+            updateSynchronizationProviderRepository.TryGetProvider(
                 "Update",
                 out var updateSynchronizationProvider);
             
@@ -51,9 +51,9 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.DI
 
             #region Simulation fixed update
 
-            var fixedUpdateSynchronizationProvidersRepository = fixedUpdateTimeManager as ISynchronizationProvidersRepository;
+            var fixedUpdateSynchronizationProviderRepository = fixedUpdateTimeManager as ISynchronizationProviderRepository;
 
-            fixedUpdateSynchronizationProvidersRepository.TryGetProvider(
+            fixedUpdateSynchronizationProviderRepository.TryGetProvider(
                 "Fixed update",
                 out var fixedUpdateSynchronizationProvider);
             
@@ -73,9 +73,9 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.DI
 
             #region View late update
 
-            var lateUpdateSynchronizationProvidersRepository = lateUpdateTimeManager as ISynchronizationProvidersRepository;
+            var lateUpdateSynchronizationProviderRepository = lateUpdateTimeManager as ISynchronizationProviderRepository;
 
-            lateUpdateSynchronizationProvidersRepository.TryGetProvider(
+            lateUpdateSynchronizationProviderRepository.TryGetProvider(
                 "Late update",
                 out var lateUpdateSynchronizationProvider);
             

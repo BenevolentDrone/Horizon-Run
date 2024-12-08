@@ -1,9 +1,7 @@
 using System;
 
 using HereticalSolutions.Persistence;
-using HereticalSolutions.Persistence.Arguments;
 using HereticalSolutions.Persistence.Factories;
-using HereticalSolutions.Persistence.IO;
 
 using HereticalSolutions.Time;
 using HereticalSolutions.Time.Factories;
@@ -18,24 +16,6 @@ namespace HereticalSolutions.Samples.PersistentTimerWithSerializationSample
 {
 	public class PersistentTimerWithSerializationSampleBehaviour : MonoBehaviour
 	{
-		[SerializeField]
-		private UnityPersistentFilePathSettings binFSSettings;
-
-		[SerializeField]
-		private UnityPersistentFilePathSettings protoFSSettings;
-
-		[SerializeField]
-		private UnityPersistentFilePathSettings jsonFSSettings;
-
-		[SerializeField]
-		private UnityPersistentFilePathSettings xmlFSSettings;
-
-		[SerializeField]
-		private UnityPersistentFilePathSettings yamlFSSettings;
-
-		[SerializeField]
-		private UnityPersistentFilePathSettings csvFSSettings;
-
 		[SerializeField]
 		private float autosaveCooldown = 5f;
 

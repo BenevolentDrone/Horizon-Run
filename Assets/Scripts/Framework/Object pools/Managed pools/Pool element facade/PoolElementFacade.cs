@@ -13,14 +13,14 @@ namespace HereticalSolutions.Pools
           ICleanuppable,
           IDisposable
     {
-        private readonly StronglyTypedMetadata metadata;
+        private readonly IStronglyTypedMetadata metadata;
         
         private EPoolElementStatus status;
 
         private IManagedPool<T> pool;
         
         public PoolElementFacade(
-            StronglyTypedMetadata metadata)
+            IStronglyTypedMetadata metadata)
         {
             Value = default;
 
@@ -57,7 +57,7 @@ namespace HereticalSolutions.Pools
         
         #endregion
         
-        public StronglyTypedMetadata Metadata
+        public IStronglyTypedMetadata Metadata
         {
             get => metadata;
         }

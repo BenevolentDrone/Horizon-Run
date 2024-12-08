@@ -1,7 +1,7 @@
 namespace HereticalSolutions.Synchronization
 {
-	public interface ISynchronizablesGenericArgRepository<TDelta>
-		: IReadOnlySynchronizablesGenericArgRepository<TDelta>
+	public interface ISynchronizableGenericArgRepository<TDelta>
+		: IReadOnlySynchronizableGenericArgRepository<TDelta>
 	{
 		void AddSynchronizable(ISynchronizableGenericArg<TDelta> synchronizable);
 

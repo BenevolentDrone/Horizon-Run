@@ -1,3 +1,7 @@
+#define CSV_SUPPORT
+#define YAML_SUPPORT
+#define PROTOBUF_SUPPORT
+
 namespace HereticalSolutions.Persistence
 {
 	public interface ISerializerBuilder
@@ -16,7 +20,8 @@ namespace HereticalSolutions.Persistence
 			FileAtTempPathSettings filePathSettings);
 
 		ISerializerBuilder From<TPathSettings>(
-			TPathSettings pathSettings);
+			TPathSettings pathSettings)
+			where TPathSettings : IPathSettings;
 
 		#endregion
 
@@ -24,24 +29,30 @@ namespace HereticalSolutions.Persistence
 
 		ISerializerBuilder ToObject();
 
-		ISerializerBuilder ToPlainText();
+		ISerializerBuilder ToBinary();
 
 		ISerializerBuilder ToJSON();
 
-		ISerializerBuilder ToCSV(
-			bool includeHeader = true);
-
-		ISerializerBuilder ToYAML();
-
-		ISerializerBuilder ToProtobuf();
-
 		ISerializerBuilder ToXML();
 
-		ISerializerBuilder ToBinary();
+#if CSV_SUPPORT
+		ISerializerBuilder ToCSV(
+			bool includeHeader = true);
+#endif
 
-		ISerializerBuilder To<TSerializationFormat>();
+#if YAML_SUPPORT
+		ISerializerBuilder ToYAML();
+#endif
 
-		#endregion
+#if PROTOBUF_SUPPORT
+		ISerializerBuilder ToProtobuf();
+#endif
+
+		ISerializerBuilder To<TFormatSerializer>(
+			object[] arguments)
+			where TFormatSerializer : IFormatSerializer;
+
+#endregion
 
 		#region Serialization strategies
 
@@ -51,29 +62,41 @@ namespace HereticalSolutions.Persistence
 
 		ISerializerBuilder AsBinaryFile();
 
-		ISerializerBuilder AsTextStream();
+		ISerializerBuilder AsTextStream(
+			bool flushAutomatically = true);
 
-		ISerializerBuilder AsFileStream();
+		ISerializerBuilder AsFileStream(
+			bool flushAutomatically = true);
 
-		ISerializerBuilder AsMemoryStream();
+		ISerializerBuilder AsMemoryStream(
+			byte[] buffer = null,
+			int index = -1,
+			int count = -1);
 
-		ISerializerBuilder AsIsolatedStorageFileStream();
+		ISerializerBuilder AsIsolatedStorageFileStream(
+			bool flushAutomatically = true);
 
-		ISerializerBuilder As<TMedia>();
+		ISerializerBuilder As<TSerializationStrategy>(
+			object[] arguments)
+			where TSerializationStrategy : ISerializationStrategy;
 
 		#endregion
 
 		#region Arguments
 
-		ISerializerBuilder WithPath();
+		ISerializerBuilder WithPath(
+			string path);
 
 		ISerializerBuilder WithAppend();
 
-		ISerializerBuilder WithReadWrite();
+		ISerializerBuilder WithReadWriteAccess();
 
-		ISerializerBuilder WithBlockSerialization();
+		ISerializerBuilder WithBlockSerialization(
+			int blockSize = 1024);
 
-		ISerializerBuilder With<TArgument>();
+		ISerializerBuilder With<TInterface, TArgument>(
+			object[] arguments)
+			where TArgument : TInterface;
 
 		#endregion
 

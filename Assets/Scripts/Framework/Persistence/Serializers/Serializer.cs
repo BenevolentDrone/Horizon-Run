@@ -274,7 +274,7 @@ namespace HereticalSolutions.Persistence
 				if (!loadVisitor.VisitLoad(
 					dto,
 					valueType,
-					out IVisitable valueVisitable))
+					out valueObject))
 				{
 					logger?.LogError(
 						GetType(),
@@ -282,9 +282,6 @@ namespace HereticalSolutions.Persistence
 
 					return false;
 				}
-
-				valueObject = valueVisitable;
-
 			}
 			catch (Exception exception)
 			{

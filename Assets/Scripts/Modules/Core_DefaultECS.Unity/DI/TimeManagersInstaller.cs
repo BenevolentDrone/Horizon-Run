@@ -27,9 +27,9 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.DI
 
             var updateTimeManager = TimeFactory.BuildTimeManager(loggerResolver);
 
-            var updateSynchronizablesRepository = updateTimeManager as ISynchronizablesGenericArgRepository<float>;
+            var updateSynchronizableRepository = updateTimeManager as ISynchronizableGenericArgRepository<float>;
 
-            updateSynchronizablesRepository.AddSynchronizable(
+            updateSynchronizableRepository.AddSynchronizable(
                 SynchronizationFactory.BuildSynchronizationContextGeneric<float>(
                     "Update",
                     canBeToggled: true,
@@ -51,9 +51,9 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.DI
 
             var fixedUpdateTimeManager = TimeFactory.BuildTimeManager(loggerResolver);
 
-            var fixedUpdateSynchronizablesRepository = fixedUpdateTimeManager as ISynchronizablesGenericArgRepository<float>;
+            var fixedUpdateSynchronizableRepository = fixedUpdateTimeManager as ISynchronizableGenericArgRepository<float>;
 
-            fixedUpdateSynchronizablesRepository.AddSynchronizable(
+            fixedUpdateSynchronizableRepository.AddSynchronizable(
                 SynchronizationFactory.BuildSynchronizationContextGeneric<float>(
                     "Fixed update",
                     canBeToggled: true,
@@ -75,9 +75,9 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.DI
 
             var lateUpdateTimeManager = TimeFactory.BuildTimeManager(loggerResolver);
 
-            var lateUpdateSynchronizablesRepository = lateUpdateTimeManager as ISynchronizablesGenericArgRepository<float>;
+            var lateUpdateSynchronizableRepository = lateUpdateTimeManager as ISynchronizableGenericArgRepository<float>;
 
-            lateUpdateSynchronizablesRepository.AddSynchronizable(
+            lateUpdateSynchronizableRepository.AddSynchronizable(
                 SynchronizationFactory.BuildSynchronizationContextGeneric<float>(
                     "Late update",
                     canBeToggled: true,

@@ -135,7 +135,7 @@ namespace HereticalSolutions.Persistence
 		public bool VisitSave(
 			ref object dto,
 			Type visitableType,
-			IVisitable visitable)
+			object visitableObject)
 		{
 			if (!concreteVisitorRepository.TryGet(
 				visitableType,
@@ -157,7 +157,7 @@ namespace HereticalSolutions.Persistence
 					if (concreteSaveVisitor.VisitSave(
 						ref dto,
 						visitableType,
-						visitable))
+						visitableObject))
 					{
 						return true;
 					}
@@ -248,7 +248,7 @@ namespace HereticalSolutions.Persistence
 		public bool VisitLoad(
 			object dto,
 			Type visitableType,
-			out IVisitable visitable)
+			out object visitableObject)
 		{
 			if (!concreteVisitorRepository.TryGet(
 				visitableType,
@@ -258,7 +258,7 @@ namespace HereticalSolutions.Persistence
 					GetType(),
 					$"NO VISITOR REGISTERED FOR VISITABLE TYPE: {visitableType.Name}");
 
-				visitable = default;
+				visitableObject = default;
 
 				return false;
 			}
@@ -270,7 +270,7 @@ namespace HereticalSolutions.Persistence
 					if (concreteLoadVisitor.VisitLoad(
 						dto,
 						visitableType,
-						out visitable))
+						out visitableObject))
 					{
 						return true;
 					}
@@ -279,7 +279,7 @@ namespace HereticalSolutions.Persistence
 						GetType(),
 						$"FAILED TO LOAD VISITABLE TYPE: {visitableType.Name}");
 
-					visitable = default;
+					visitableObject = default;
 
 					return false;
 				}
@@ -289,7 +289,7 @@ namespace HereticalSolutions.Persistence
 				GetType(),
 				$"NO CONCRETE LOAD VISITOR REGISTERED FOR VISITABLE TYPE: {visitableType.Name}");
 
-			visitable = default;
+			visitableObject = default;
 
 			return false;
 		}
@@ -344,7 +344,7 @@ namespace HereticalSolutions.Persistence
 		public bool VisitPopulate(
 			object dto,
 			Type visitableType,
-			IVisitable visitable)
+			object visitableObject)
 		{
 			if (!concreteVisitorRepository.TryGet(
 				visitableType,
@@ -363,7 +363,7 @@ namespace HereticalSolutions.Persistence
 				{
 					if (concretePopulateVisitor.VisitPopulate(
 						dto,
-						visitable))
+						visitableObject))
 					{
 						return true;
 					}

@@ -22,6 +22,7 @@ using TWorld = DefaultEcs.World;
 using TPrototypeID = System.String;
 
 using TEntity = DefaultEcs.Entity;
+using HereticalSolutions.Modules.Core_DefaultECS.Factories;
 
 namespace HereticalSolutions.Modules.Core_DefaultECS.DI
 {
@@ -190,9 +191,9 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.DI
 				return false;
 			}
 
-			worldPrototypeVisitor = new DefaultECSEntityPrototypeVisitor(
+			worldPrototypeVisitor = EntityPersistenceFactory.BuildDefaultECSEntityPrototypeVisitor(
 				worldPrototypeRepository,
-				loggerResolver?.GetLogger<DefaultECSEntityPrototypeVisitor>());
+				loggerResolver);
 
 			return true;
 		}
@@ -287,7 +288,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.DI
 				variantID,
 				out IResourceVariantData registryVariant))
 			{
-				if (!registryWorldPrototypeVisitor.Load(
+				if (!registryWorldPrototypeVisitor.VisitLoad(
 					registryVariant
 					    .StorageHandle
 					    .GetResource<EntitySettings>()

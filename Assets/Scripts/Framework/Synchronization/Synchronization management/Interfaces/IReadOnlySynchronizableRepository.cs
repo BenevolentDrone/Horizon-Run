@@ -1,6 +1,6 @@
 namespace HereticalSolutions.Synchronization
 {
-	public interface IReadOnlySynchronizablesRepository
+	public interface IReadOnlySynchronizableRepository
 	{
 		bool TryGetSynchronizable(
 			string id,

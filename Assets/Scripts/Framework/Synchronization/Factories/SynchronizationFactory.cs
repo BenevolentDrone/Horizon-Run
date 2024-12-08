@@ -7,6 +7,7 @@ using HereticalSolutions.Repositories.Factories;
 using HereticalSolutions.Time.Factories;
 
 using HereticalSolutions.Logging;
+using HereticalSolutions.Metadata.Factories;
 
 namespace HereticalSolutions.Synchronization.Factories
 {
@@ -22,11 +23,10 @@ namespace HereticalSolutions.Synchronization.Factories
 			var descriptor = new SynchronizationDescriptor(
 				id);
 
-			var metadata = RepositoriesFactory.BuildDictionaryObjectRepository();
+			var metadata = MetadataFactory.BuildStronglyTypedMetadata();
 
 			if (canBeToggled)
-				metadata.Add(
-					typeof(ITogglable),
+				metadata.TryAdd<ITogglable>(
 					new TogglableMetadata());
 
 			var pinger = PingersFactory.BuildNonAllocPinger(loggerResolver);
@@ -53,16 +53,14 @@ namespace HereticalSolutions.Synchronization.Factories
 			var descriptor = new SynchronizationDescriptor(
 				id);
 
-			var metadata = RepositoriesFactory.BuildDictionaryObjectRepository();
+			var metadata = MetadataFactory.BuildStronglyTypedMetadata();
 
 			if (canBeToggled)
-				metadata.Add(
-					typeof(ITogglable),
+				metadata.TryAdd<ITogglable>(
 					new TogglableMetadata(active));
 
 			if (canScale)
-				metadata.Add(
-					typeof(IScalable<TDelta>),
+				metadata.TryAdd<IScalable<TDelta>>(
 					new ScalableMetadata<TDelta>(
 						scale,
 						scaleDeltaDelegate));
@@ -95,16 +93,14 @@ namespace HereticalSolutions.Synchronization.Factories
 			var descriptor = new SynchronizationDescriptor(
 				id);
 
-			var metadata = RepositoriesFactory.BuildDictionaryObjectRepository();
+			var metadata = MetadataFactory.BuildStronglyTypedMetadata();
 
 			if (canBeToggled)
-				metadata.Add(
-					typeof(ITogglable),
+				metadata.TryAdd<ITogglable>(
 					new TogglableMetadata(active));
 
 			if (canScale)
-				metadata.Add(
-					typeof(IScalable<TDelta>),
+				metadata.TryAdd<IScalable<TDelta>>(
 					new ScalableMetadata<TDelta>(
 						scale,
 						scaleDeltaDelegate));
@@ -114,8 +110,7 @@ namespace HereticalSolutions.Synchronization.Factories
 				deltaToFloatDelegate(fixedDelta),
 				loggerResolver);
 
-			metadata.Add(
-				typeof(IHasFixedDelta<TDelta>),
+			metadata.TryAdd<IHasFixedDelta<TDelta>>(
 				new HasFixedDeltaMetadata<TDelta>(
 					fixedDelta,
 					fixedDeltaTimer,

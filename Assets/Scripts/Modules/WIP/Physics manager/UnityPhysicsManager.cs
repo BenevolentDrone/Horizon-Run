@@ -26,7 +26,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 
 		private readonly Queue<ushort> freeHandles;
 
-		private readonly IRepository<ushort, UnityPhysicsBodyDescriptor> physicsBodiesRepository;
+		private readonly IRepository<ushort, UnityPhysicsBodyDescriptor> physicsBodyRepository;
 
 		private readonly AddressArgument addressArgument;
 
@@ -39,14 +39,14 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 		public UnityPhysicsManager(
 			IManagedPool<GameObject> physicsBodiesPool,
 			Queue<ushort> freeHandles,
-			IRepository<ushort, UnityPhysicsBodyDescriptor> physicsBodiesRepository,
+			IRepository<ushort, UnityPhysicsBodyDescriptor> physicsBodyRepository,
 			ILogger logger = null)
 		{
 			this.physicsBodiesPool = physicsBodiesPool;
 
 			this.freeHandles = freeHandles;
 
-			this.physicsBodiesRepository = physicsBodiesRepository;
+			this.physicsBodyRepository = physicsBodyRepository;
 
 			this.logger = logger;
 
@@ -67,7 +67,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 			if (rigidBodyHandle == 0)
 				return false;
 
-			return physicsBodiesRepository.Has(rigidBodyHandle);
+			return physicsBodyRepository.Has(rigidBodyHandle);
 		}
 
 		public bool SpawnPhysicsBody(
@@ -124,7 +124,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 
 			physicsBody.PoolElement = pooledPhysicsBodyElement;
 
-			physicsBodiesRepository.Add(
+			physicsBodyRepository.Add(
 				physicsBodyHandle,
 				physicsBody);
 
@@ -143,7 +143,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 					logger.TryFormatException<UnityPhysicsManager>(
 						$"INVALID PHYSICS BODY HANDLE {physicsBodyHandle}"));
 
-			var result = physicsBodiesRepository.TryGet(
+			var result = physicsBodyRepository.TryGet(
 				physicsBodyHandle,
 				out physicsBody);
 
@@ -156,7 +156,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 			if (physicsBodyHandle == 0)
 				return false;
 
-			if (!physicsBodiesRepository.TryGet(
+			if (!physicsBodyRepository.TryGet(
 				physicsBodyHandle,
 				out var physicsBody))
 			{
@@ -176,7 +176,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 
 			poolElement.Push();
 
-			physicsBodiesRepository.TryRemove(physicsBodyHandle);
+			physicsBodyRepository.TryRemove(physicsBodyHandle);
 
 			freeHandles.Enqueue(physicsBodyHandle);
 

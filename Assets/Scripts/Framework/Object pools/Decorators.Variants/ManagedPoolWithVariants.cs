@@ -15,18 +15,18 @@ namespace HereticalSolutions.Pools.Decorators
           ICleanuppable,
           IDisposable
     {
-        private readonly IRepository<int, VariantContainer<T>> innerPoolsRepository;
+        private readonly IRepository<int, VariantContainer<T>> innerPoolRepository;
 
         private readonly IRandomGenerator randomGenerator;
 
         private readonly ILogger logger;
 
         public ManagedPoolWithVariants(
-            IRepository<int, VariantContainer<T>> innerPoolsRepository,
+            IRepository<int, VariantContainer<T>> innerPoolRepository,
             IRandomGenerator randomGenerator,
             ILogger logger = null)
         {
-            this.innerPoolsRepository = innerPoolsRepository;
+            this.innerPoolRepository = innerPoolRepository;
 
             this.randomGenerator = randomGenerator;
 
@@ -39,7 +39,7 @@ namespace HereticalSolutions.Pools.Decorators
         {
             #region Validation
 
-            if (!innerPoolsRepository.TryGet(
+            if (!innerPoolRepository.TryGet(
                     0,
                     out var currentVariant))
                 throw new Exception(
@@ -59,7 +59,7 @@ namespace HereticalSolutions.Pools.Decorators
                 hitDice -= currentVariant.Chance;
                 index++;
 
-                if (!innerPoolsRepository.TryGet(
+                if (!innerPoolRepository.TryGet(
                         index,
                         out currentVariant))
                     throw new Exception(
@@ -82,7 +82,7 @@ namespace HereticalSolutions.Pools.Decorators
             if (args != null 
                 && args.TryGetArgument<VariantArgument>(out var arg))
             {
-                if (!innerPoolsRepository.TryGet(
+                if (!innerPoolRepository.TryGet(
                         arg.Variant,
                         out var variant))
                     throw new Exception(
@@ -98,7 +98,7 @@ namespace HereticalSolutions.Pools.Decorators
 
             #region Validation
 
-            if (!innerPoolsRepository.TryGet(
+            if (!innerPoolRepository.TryGet(
                     0,
                     out var currentVariant))
                 throw new Exception(
@@ -118,7 +118,7 @@ namespace HereticalSolutions.Pools.Decorators
                 hitDice -= currentVariant.Chance;
                 index++;
 
-                if (!innerPoolsRepository.TryGet(index, out currentVariant))
+                if (!innerPoolRepository.TryGet(index, out currentVariant))
                     throw new Exception(
                         logger.TryFormatException<ManagedPoolWithVariants<T>>(
                             "INVALID VARIANT CHANCES"));
@@ -153,7 +153,7 @@ namespace HereticalSolutions.Pools.Decorators
             
             int variant = metadata.Variant;
 
-            if (!innerPoolsRepository.TryGet(
+            if (!innerPoolRepository.TryGet(
                     variant,
                     out var poolByVariant))
                 throw new Exception(
@@ -169,8 +169,8 @@ namespace HereticalSolutions.Pools.Decorators
 
         public void Cleanup()
         {
-            if (innerPoolsRepository is ICleanuppable)
-                (innerPoolsRepository as ICleanuppable).Cleanup();
+            if (innerPoolRepository is ICleanuppable)
+                (innerPoolRepository as ICleanuppable).Cleanup();
         }
 
         #endregion
@@ -179,8 +179,8 @@ namespace HereticalSolutions.Pools.Decorators
 
         public void Dispose()
         {
-            if (innerPoolsRepository is IDisposable)
-                (innerPoolsRepository as IDisposable).Dispose();
+            if (innerPoolRepository is IDisposable)
+                (innerPoolRepository as IDisposable).Dispose();
         }
 
         #endregion
@@ -191,7 +191,7 @@ namespace HereticalSolutions.Pools.Decorators
         {
             int index = 0;
 
-            while (innerPoolsRepository.Has(index))
+            while (innerPoolRepository.Has(index))
             {
                 index++;
             }
@@ -207,7 +207,7 @@ namespace HereticalSolutions.Pools.Decorators
             float chance,
             IManagedPool<T> poolByVariant)
         {
-            innerPoolsRepository.Add(
+            innerPoolRepository.Add(
                 index,
                 new VariantContainer<T>
                 {

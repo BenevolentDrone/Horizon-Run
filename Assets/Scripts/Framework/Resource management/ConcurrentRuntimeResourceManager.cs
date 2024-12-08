@@ -23,7 +23,7 @@ namespace HereticalSolutions.ResourceManagement
 	{
 		private readonly IRepository<int, string> rootResourceIDHashToID;
 
-		private readonly IRepository<int, IReadOnlyResourceData> rootResourcesRepository;
+		private readonly IRepository<int, IReadOnlyResourceData> rootResourceRepository;
 
 		private readonly IAsyncNotifierSingleArgGeneric<int, IReadOnlyResourceData> rootResourceAddedNotifier;
 
@@ -33,14 +33,14 @@ namespace HereticalSolutions.ResourceManagement
 
 		public ConcurrentRuntimeResourceManager(
 			IRepository<int, string> rootResourceIDHashToID,
-			IRepository<int, IReadOnlyResourceData> rootResourcesRepository,
+			IRepository<int, IReadOnlyResourceData> rootResourceRepository,
 			IAsyncNotifierSingleArgGeneric<int, IReadOnlyResourceData> rootResourceAddedNotifier,
 			SemaphoreSlim semaphore,
 			ILogger logger = null)
 		{
 			this.rootResourceIDHashToID = rootResourceIDHashToID;
 
-			this.rootResourcesRepository = rootResourcesRepository;
+			this.rootResourceRepository = rootResourceRepository;
 
 			this.rootResourceAddedNotifier = rootResourceAddedNotifier;
 
@@ -61,7 +61,7 @@ namespace HereticalSolutions.ResourceManagement
 			
 			try
 			{
-				return rootResourcesRepository.Has(rootResourceIDHash);
+				return rootResourceRepository.Has(rootResourceIDHash);
 			}
 			finally
 			{
@@ -82,7 +82,7 @@ namespace HereticalSolutions.ResourceManagement
 
 			try
 			{
-				if (!rootResourcesRepository.TryGet(
+				if (!rootResourceRepository.TryGet(
 					resourcePathPartHashes[0],
 					out resource))
 					return false;
@@ -105,7 +105,7 @@ namespace HereticalSolutions.ResourceManagement
 
 			try
 			{
-				if (!rootResourcesRepository.TryGet(
+				if (!rootResourceRepository.TryGet(
 					resourcePathParts[0].AddressToHash(),
 					out resource))
 					return false;
@@ -132,7 +132,7 @@ namespace HereticalSolutions.ResourceManagement
 
 			try
 			{
-				if (!rootResourcesRepository.TryGet(
+				if (!rootResourceRepository.TryGet(
 					rootResourceIDHash,
 					out resource))
 				{
@@ -160,7 +160,7 @@ namespace HereticalSolutions.ResourceManagement
 
 			try
 			{
-				if (!rootResourcesRepository.TryGet(
+				if (!rootResourceRepository.TryGet(
 					resourcePathPartHashes[0],
 					out resource))
 					return null;
@@ -186,7 +186,7 @@ namespace HereticalSolutions.ResourceManagement
 
 			try
 			{
-				if (!rootResourcesRepository.TryGet(
+				if (!rootResourceRepository.TryGet(
 					resourcePathParts[0].AddressToHash(),
 					out resource))
 					return null;
@@ -216,7 +216,7 @@ namespace HereticalSolutions.ResourceManagement
 
 			try
 			{
-				return rootResourcesRepository.TryGet(
+				return rootResourceRepository.TryGet(
 					rootResourceIDHash,
 					out resource);
 			}
@@ -243,7 +243,7 @@ namespace HereticalSolutions.ResourceManagement
 
 			try
 			{
-				if (!rootResourcesRepository.TryGet(
+				if (!rootResourceRepository.TryGet(
 					resourcePathPartHashes[0],
 					out resource))
 					return false;
@@ -266,7 +266,7 @@ namespace HereticalSolutions.ResourceManagement
 
 			try
 			{
-				if (!rootResourcesRepository.TryGet(
+				if (!rootResourceRepository.TryGet(
 					resourcePathParts[0].AddressToHash(),
 					out resource))
 					return false;
@@ -293,7 +293,7 @@ namespace HereticalSolutions.ResourceManagement
 
 			try
 			{
-				if (!rootResourcesRepository.TryGet(
+				if (!rootResourceRepository.TryGet(
 					rootResourceIDHash,
 					out resource))
 				{
@@ -321,7 +321,7 @@ namespace HereticalSolutions.ResourceManagement
 
 			try
 			{
-				if (!rootResourcesRepository.TryGet(
+				if (!rootResourceRepository.TryGet(
 					resourcePathPartHashes[0],
 					out resource))
 					return null;
@@ -347,7 +347,7 @@ namespace HereticalSolutions.ResourceManagement
 
 			try
 			{
-				if (!rootResourcesRepository.TryGet(
+				if (!rootResourceRepository.TryGet(
 					resourcePathParts[0].AddressToHash(),
 					out resource))
 					return null;
@@ -379,7 +379,7 @@ namespace HereticalSolutions.ResourceManagement
 
 			try
 			{
-				if (!rootResourcesRepository.TryGet(
+				if (!rootResourceRepository.TryGet(
 					rootResourceIDHash,
 					out rootResource))
 				{
@@ -417,7 +417,7 @@ namespace HereticalSolutions.ResourceManagement
 
 			try
 			{
-				if (!rootResourcesRepository.TryGet(
+				if (!rootResourceRepository.TryGet(
 					resourcePathPartHashes[0],
 					out rootResource))
 				{
@@ -455,7 +455,7 @@ namespace HereticalSolutions.ResourceManagement
 
 			try
 			{
-				if (!rootResourcesRepository.TryGet(
+				if (!rootResourceRepository.TryGet(
 					resourcePathParts[0].AddressToHash(),
 					out rootResource))
 				{
@@ -495,7 +495,7 @@ namespace HereticalSolutions.ResourceManagement
 
 				try
 				{
-					return rootResourcesRepository.Keys;
+					return rootResourceRepository.Keys;
 				}
 				finally
 				{
@@ -529,7 +529,7 @@ namespace HereticalSolutions.ResourceManagement
 
 				try
 				{
-					return rootResourcesRepository.Values;
+					return rootResourceRepository.Values;
 				}
 				finally
 				{
@@ -552,7 +552,7 @@ namespace HereticalSolutions.ResourceManagement
 
 			try
 			{
-				if (!rootResourcesRepository.TryAdd(
+				if (!rootResourceRepository.TryAdd(
 					rootResource.Descriptor.IDHash,
 					rootResource))
 				{
@@ -588,7 +588,7 @@ namespace HereticalSolutions.ResourceManagement
 
 			try
 			{
-				if (!rootResourcesRepository.TryGet(
+				if (!rootResourceRepository.TryGet(
 					rootResourceIDHash,
 					out resource))
 				{
@@ -597,7 +597,7 @@ namespace HereticalSolutions.ResourceManagement
 					return;
 				}
 
-				rootResourcesRepository.TryRemove(rootResourceIDHash);
+				rootResourceRepository.TryRemove(rootResourceIDHash);
 
 				rootResourceIDHashToID.TryRemove(rootResourceIDHash);
 			}
@@ -662,11 +662,11 @@ namespace HereticalSolutions.ResourceManagement
 
 			try
 			{
-				rootResourcesToFree = rootResourcesRepository.Values.ToArray();
+				rootResourcesToFree = rootResourceRepository.Values.ToArray();
 
 				rootResourceIDHashToID.Clear();
 
-				rootResourcesRepository.Clear();
+				rootResourceRepository.Clear();
 			}
 			finally
 			{
@@ -729,7 +729,7 @@ namespace HereticalSolutions.ResourceManagement
 
 			try
 			{
-				if (rootResourcesRepository.TryGet(
+				if (rootResourceRepository.TryGet(
 					rootResourceIDHash,
 					out var result))
 				{
@@ -1030,8 +1030,8 @@ namespace HereticalSolutions.ResourceManagement
 			if (rootResourceIDHashToID is ICleanuppable)
 				(rootResourceIDHashToID as ICleanuppable).Cleanup();
 
-			if (rootResourcesRepository is ICleanuppable)
-				(rootResourcesRepository as ICleanuppable).Cleanup();
+			if (rootResourceRepository is ICleanuppable)
+				(rootResourceRepository as ICleanuppable).Cleanup();
 
 			if (rootResourceAddedNotifier is ICleanuppable)
 				(rootResourceAddedNotifier as ICleanuppable).Cleanup();
@@ -1046,8 +1046,8 @@ namespace HereticalSolutions.ResourceManagement
 			if (rootResourceIDHashToID is IDisposable)
 				(rootResourceIDHashToID as IDisposable).Dispose();
 
-			if (rootResourcesRepository is IDisposable)
-				(rootResourcesRepository as IDisposable).Dispose();
+			if (rootResourceRepository is IDisposable)
+				(rootResourceRepository as IDisposable).Dispose();
 
 			if (rootResourceAddedNotifier is IDisposable)
 				(rootResourceAddedNotifier as IDisposable).Dispose();

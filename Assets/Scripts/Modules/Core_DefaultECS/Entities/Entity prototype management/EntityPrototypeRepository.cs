@@ -17,29 +17,29 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
 	public class EntityPrototypeRepository
 		: IEntityPrototypeRepositoryWithWorld<TWorld, TPrototypeID, TEntity>
 	{
-		private readonly IRepository<TPrototypeID, TEntity> prototypesRepository;
+		private readonly IRepository<TPrototypeID, TEntity> prototypeRepository;
 
 		public EntityPrototypeRepository(
 			TWorld prototypeWorld,
-			IRepository<TPrototypeID, TEntity> prototypesRepository)
+			IRepository<TPrototypeID, TEntity> prototypeRepository)
 		{
 			PrototypeWorld = prototypeWorld;
 
-			this.prototypesRepository = prototypesRepository;
+			this.prototypeRepository = prototypeRepository;
 		}
 
 		#region IEntityPrototypeRepository
 
 		public bool HasPrototype(TPrototypeID prototypeID)
 		{
-			return prototypesRepository.Has(prototypeID);
+			return prototypeRepository.Has(prototypeID);
 		}
 
 		public bool TryGetPrototype(
 			TPrototypeID prototypeID,
 			out TEntity prototypeEntity)
 		{
-			return prototypesRepository.TryGet(
+			return prototypeRepository.TryGet(
 				prototypeID,
 				out prototypeEntity);
 		}
@@ -50,7 +50,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
 		{
 			prototypeEntity = PrototypeWorld.CreateEntity();
 
-			if (!prototypesRepository.TryAdd(
+			if (!prototypeRepository.TryAdd(
 				prototypeID,
 				prototypeEntity))
 			{
@@ -65,11 +65,11 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
 		public bool RemovePrototype(
 			TPrototypeID prototypeID)
 		{
-			return prototypesRepository.TryRemove(
+			return prototypeRepository.TryRemove(
 				prototypeID);
 		}
 
-		public IEnumerable<TPrototypeID> AllPrototypeIDs { get => prototypesRepository.Keys; }
+		public IEnumerable<TPrototypeID> AllPrototypeIDs { get => prototypeRepository.Keys; }
 
 		#endregion
 

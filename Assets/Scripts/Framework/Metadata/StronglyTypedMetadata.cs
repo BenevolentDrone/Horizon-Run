@@ -32,6 +32,13 @@ namespace HereticalSolutions.Metadata
 				out value);
 		}
 
+		public bool TryAdd<TMetadata>(
+			TMetadata value)
+		{
+			return metadataRepository.TryAdd<TMetadata>(
+				value);
+		}
+
 		public void AddOrUpdate<TMetadata>(
 			TMetadata value)
 		{

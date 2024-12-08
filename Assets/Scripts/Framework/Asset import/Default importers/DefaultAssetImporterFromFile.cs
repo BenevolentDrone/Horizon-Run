@@ -11,16 +11,12 @@ using HereticalSolutions.Logging;
 
 namespace HereticalSolutions.AssetImport
 {
-	public abstract class DefaultAssetImporterFromFile<TAsset, TDTO>
+	public abstract class DefaultAssetImporterFromFile<TAsset>
 		: AAssetImporter
 	{
 		protected string resourcePath;
 
 		protected ISerializer serializer;
-
-		protected ISerializationArgument serializationArgument;
-
-		protected ILoadVisitorGeneric<TAsset, TDTO> visitor;
 
 		public DefaultAssetImporterFromFile(
 			ILoggerResolver loggerResolver = null,
@@ -34,19 +30,13 @@ namespace HereticalSolutions.AssetImport
 		public void Initialize(
 			IRuntimeResourceManager runtimeResourceManager,
 			string resourcePath,
-			ISerializer serializer,
-			ISerializationArgument serializationArgument,
-			ILoadVisitorGeneric<TAsset, TDTO> visitor)
+			ISerializer serializer)
 		{
 			InitializeInternal(runtimeResourceManager);
 
 			this.resourcePath = resourcePath;
 
 			this.serializer = serializer;
-
-			this.serializationArgument = serializationArgument;
-
-			this.visitor = visitor;
 		}
 
 		public override async Task<IResourceVariantData> Import(
@@ -54,12 +44,7 @@ namespace HereticalSolutions.AssetImport
 		{
 			progress?.Report(0f);
 
-			serializer.Deserialize<TDTO>(
-				serializationArgument,
-				out var dto);
-
-			visitor.Load(
-				dto,
+			serializer.Deserialize<TAsset>(
 				out var asset);
 
 			var task = AddAssetAsResourceToManager(
@@ -85,10 +70,6 @@ namespace HereticalSolutions.AssetImport
 			resourcePath = null;
 
 			serializer = null;
-
-			serializationArgument = null;
-
-			visitor = null;
 		}
 
 		protected virtual async Task<IResourceVariantData> AddAssetAsResourceToManager(

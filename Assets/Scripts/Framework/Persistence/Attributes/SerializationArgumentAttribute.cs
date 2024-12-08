@@ -2,9 +2,9 @@ namespace HereticalSolutions.Persistence
 {
 	[System.AttributeUsage(
 		System.AttributeTargets.Class)]
-	public class FormatSerializerAttribute : System.Attribute
+	public class SerializationArgumentAttribute : System.Attribute
 	{
-		public FormatSerializerAttribute()
+		public SerializationArgumentAttribute()
 		{
 		}
 	}

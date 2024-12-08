@@ -10,6 +10,6 @@ namespace HereticalSolutions.Pools
         /// <summary>
         /// Gets the metadata of the pool element.
         /// </summary>
-        StronglyTypedMetadata Metadata { get; }
+        IStronglyTypedMetadata Metadata { get; }
     }
 }

@@ -19,19 +19,19 @@ namespace HereticalSolutions.Pools.Decorators
     {
         private readonly int level;
 
-        private readonly IRepository<int, IManagedPool<T>> innerPoolsRepository;
+        private readonly IRepository<int, IManagedPool<T>> innerPoolRepository;
 
         private readonly PoolWithAddressBuilder<T> builder;
 
         private readonly ILogger logger;
 
         public ManagedPoolWithAddress(
-            IRepository<int, IManagedPool<T>> innerPoolsRepository,
+            IRepository<int, IManagedPool<T>> innerPoolRepository,
             int level,
             PoolWithAddressBuilder<T> builder = null,
             ILogger logger = null)
         {
-            this.innerPoolsRepository = innerPoolsRepository;
+            this.innerPoolRepository = innerPoolRepository;
 
             this.level = level;
             
@@ -75,7 +75,7 @@ namespace HereticalSolutions.Pools.Decorators
 
             if (arg.AddressHashes.Length == level)
             {
-                if (!innerPoolsRepository.TryGet(
+                if (!innerPoolRepository.TryGet(
                         0,
                         out poolByAddress))
                     throw new Exception(
@@ -93,7 +93,7 @@ namespace HereticalSolutions.Pools.Decorators
 
             int currentAddressHash = arg.AddressHashes[level];
 
-            if (!innerPoolsRepository.TryGet(
+            if (!innerPoolRepository.TryGet(
                     currentAddressHash,
                     out poolByAddress))
                 throw new Exception(
@@ -131,7 +131,7 @@ namespace HereticalSolutions.Pools.Decorators
 
             if (addressHashes.Length == level)
             {
-                if (!innerPoolsRepository.TryGet(
+                if (!innerPoolRepository.TryGet(
                         0,
                         out pool))
                     throw new Exception(
@@ -145,7 +145,7 @@ namespace HereticalSolutions.Pools.Decorators
 
             int currentAddressHash = addressHashes[level];
 
-            if (!innerPoolsRepository.TryGet(currentAddressHash, out pool))
+            if (!innerPoolRepository.TryGet(currentAddressHash, out pool))
                 throw new Exception(
                     logger.TryFormatException<ManagedPoolWithAddress<T>>(
                         $"INVALID ADDRESS {{ {currentAddressHash} }}"));
@@ -159,8 +159,8 @@ namespace HereticalSolutions.Pools.Decorators
 
         public void Cleanup()
         {
-            if (innerPoolsRepository is ICleanuppable)
-                (innerPoolsRepository as ICleanuppable).Cleanup();
+            if (innerPoolRepository is ICleanuppable)
+                (innerPoolRepository as ICleanuppable).Cleanup();
         }
 
         #endregion
@@ -169,13 +169,13 @@ namespace HereticalSolutions.Pools.Decorators
 
         public void Dispose()
         {
-            if (innerPoolsRepository is IDisposable)
-                (innerPoolsRepository as IDisposable).Dispose();
+            if (innerPoolRepository is IDisposable)
+                (innerPoolRepository as IDisposable).Dispose();
         }
 
         #endregion
 
-        public IRepository<int, IManagedPool<T>> InnerPoolsRepository { get => innerPoolsRepository; }
+        public IRepository<int, IManagedPool<T>> InnerPoolRepository { get => innerPoolRepository; }
 
         public void AddPool(
             string address,

@@ -1,4 +1,6 @@
-using HereticalSolutions.Metadata;
+using HereticalSolutions.Persistence;
+using HereticalSolutions.Persistence.Factories;
+
 using HereticalSolutions.Metadata.Factories;
 
 using UnityEditor;
@@ -24,6 +26,8 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 		private double lastEditorUpdateTime;
 
 		private Vector2 scrollPos;
+
+		private ISerializer serializer;
 
 		#region EditorWindow callbacks
 
@@ -126,20 +130,28 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 			{
 				lastEditorUpdateTime = EditorApplication.timeSinceStartup;
 			}
+
+			if (serializer == null)
+			{
+				var serializerBuilder = PersistenceFactory.BuildSerializerBuilder(
+					null);
+
+				serializer = serializerBuilder
+					.NewSerializer()
+					.ToJSON()
+					.AsEditorPrefsWithUUID<int>(
+						KEY_PREFS_SAVED_EDITOR_STATES,
+						KEY_PREFS_EDITOR_STATE_SAVE_PREFIX,
+						this.GetInstanceID())
+					.Build();
+			}
 		}
 
 		void OnBeforeAssemblyReload()
 		{
 			//Debug.Log($"[ARToolboxWindow] OnBeforeAssemblyReload {this.GetInstanceID()}");
 
-			var saves = ARToolboxEditorHelpers.GetSavedEditorStatesFromEditorPrefs(
-				KEY_PREFS_SAVED_EDITOR_STATES);
-
-			ARToolboxEditorHelpers.SerializeStateToEditorPrefs<object>(
-				KEY_PREFS_SAVED_EDITOR_STATES,
-				KEY_PREFS_EDITOR_STATE_SAVE_PREFIX,
-				this.GetInstanceID(),
-				saves,
+			serializer.Serialize<object>(
 				null);
 
 			//Debug.Log($"[ARToolboxWindow] SAVED");
@@ -149,20 +161,10 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 		{
 			//Debug.Log($"[ARToolboxWindow] OnAfterAssemblyReload {this.GetInstanceID()}");
 
-			var saves = ARToolboxEditorHelpers.GetSavedEditorStatesFromEditorPrefs(
-				KEY_PREFS_SAVED_EDITOR_STATES);
-
-			if (saves.Length != 0)
+			if (serializer.Deserialize<object>(
+				out var _))
 			{
-				if (ARToolboxEditorHelpers.TryDeserializeStateFromEditorPrefs<object>(
-					KEY_PREFS_SAVED_EDITOR_STATES,
-					KEY_PREFS_EDITOR_STATE_SAVE_PREFIX,
-					this.GetInstanceID(),
-					saves,
-					out _))
-				{
-					//Debug.Log($"[ARToolboxWindow] RESTORED");
-				}
+				//Debug.Log($"[ARToolboxWindow] RESTORED");
 			}
 		}
 

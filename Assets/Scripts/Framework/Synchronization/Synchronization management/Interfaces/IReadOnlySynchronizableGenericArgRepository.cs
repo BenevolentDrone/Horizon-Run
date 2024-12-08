@@ -1,6 +1,6 @@
 namespace HereticalSolutions.Synchronization
 {
-	public interface IReadOnlySynchronizablesGenericArgRepository<TDelta>
+	public interface IReadOnlySynchronizableGenericArgRepository<TDelta>
 	{
 		bool TryGetSynchronizable(
 			string id,

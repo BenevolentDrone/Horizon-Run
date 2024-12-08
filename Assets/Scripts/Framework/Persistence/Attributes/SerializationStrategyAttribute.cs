@@ -1,5 +1,3 @@
-using System;
-
 namespace HereticalSolutions.Persistence
 {
 	[System.AttributeUsage(

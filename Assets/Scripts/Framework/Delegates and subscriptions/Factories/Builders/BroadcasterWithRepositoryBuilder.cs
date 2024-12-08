@@ -11,7 +11,7 @@ namespace HereticalSolutions.Delegates.Factories
 {
     public class BroadcasterWithRepositoryBuilder
     {
-        private readonly IRepository<Type, object> broadcastersRepository;
+        private readonly IRepository<Type, object> broadcasterRepository;
 
         private readonly ILoggerResolver loggerResolver;
 
@@ -20,12 +20,12 @@ namespace HereticalSolutions.Delegates.Factories
         {
             this.loggerResolver = loggerResolver;
 
-            broadcastersRepository = RepositoriesFactory.BuildDictionaryRepository<Type, object>();
+            broadcasterRepository = RepositoriesFactory.BuildDictionaryRepository<Type, object>();
         }
 
         public BroadcasterWithRepositoryBuilder Add<TBroadcaster>()
         {
-            broadcastersRepository.Add(
+            broadcasterRepository.Add(
                 typeof(TBroadcaster),
                 BroadcastersFactory.BuildBroadcasterGeneric<TBroadcaster>(loggerResolver));
 
@@ -35,7 +35,7 @@ namespace HereticalSolutions.Delegates.Factories
         public BroadcasterWithRepository Build()
         {
             return BroadcastersFactory.BuildBroadcasterWithRepository(
-                broadcastersRepository,
+                broadcasterRepository,
                 loggerResolver);
         }
     }

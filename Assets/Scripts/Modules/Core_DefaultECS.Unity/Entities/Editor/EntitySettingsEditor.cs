@@ -2,9 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 
-using HereticalSolutions.Persistence.Arguments;
+using HereticalSolutions.Persistence;
 using HereticalSolutions.Persistence.Factories;
-using HereticalSolutions.Persistence.Serializers;
 
 using HereticalSolutions.Entities;
 
@@ -32,9 +31,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Editor
 
 		private ILoggerResolver loggerResolver;
 
-		private JSONSerializer jsonSerializer;
-
-		private StringArgument stringArgument;
+		private ISerializer serializer;
 
 		
 		private GUIStyle structNameLabelStyle;
@@ -82,20 +79,19 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Editor
 				loggerResolver = (ILoggerResolver)loggerBuilder;
 			}
 
-			if (jsonSerializer == null)
+			if (serializer == null)
 			{
 				if (DEBUG_OPERATION)
-					UnityEngine.Debug.Log("[EntitySettingsEditor] Creating new JSONSerializer");
+					UnityEngine.Debug.Log("[EntitySettingsEditor] Creating new serializer");
 
-				jsonSerializer = UnityPersistenceFactory.BuildSimpleUnityJSONSerializer(loggerResolver);
-			}
+				var serializerBuilder = PersistenceFactory.BuildSerializerBuilder(
+					loggerResolver);
 
-			if (stringArgument == null)
-			{
-				if (DEBUG_OPERATION)
-					UnityEngine.Debug.Log("[EntitySettingsEditor] Creating new StringArgument");
-
-				stringArgument = new StringArgument();
+				serializer = serializerBuilder
+					.NewSerializer()
+					.ToJSON()
+					.AsString()
+					.Build();
 			}
 
 			if (structNameLabelStyle == null)
@@ -1108,11 +1104,12 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Editor
 			if (DEBUG_OPERATION)
 				UnityEngine.Debug.Log("[EntitySettingsEditor] Serializing");
 
-			jsonSerializer.Serialize<EntityPrototypeDTO>(
-				stringArgument,
+			serializer.Serialize<EntityPrototypeDTO>(
 				entityPrototypeDTO);
 
-			((EntitySettings)target).EntityJson = stringArgument.Value;
+			var stringStrategy = serializer.Context.SerializationStrategy as StringStrategy;
+
+			((EntitySettings)target).EntityJson = stringStrategy.Value;
 
 			if (DEBUG_OPERATION)
 			{
@@ -1141,10 +1138,11 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Editor
 				return;
 			}
 
-			stringArgument.Value = ((EntitySettings)target).EntityJson;
+			var stringStrategy = serializer.Context.SerializationStrategy as StringStrategy;
 
-			bool success = jsonSerializer.Deserialize(
-				stringArgument,
+			stringStrategy.Value = ((EntitySettings)target).EntityJson;
+
+			bool success = serializer.Deserialize(
 				typeof(EntityPrototypeDTO),
 				out object newEntityDTO);
 

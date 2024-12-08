@@ -12,6 +12,6 @@ namespace HereticalSolutions.Persistence
         bool VisitSave(
             ref object dto,
             Type visitableType,
-            IVisitable visitable);
+            object visitableObject);
     }
 }

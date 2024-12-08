@@ -21,14 +21,14 @@ namespace HereticalSolutions.ResourceManagement
 	{
 		private readonly IRepository<int, string> variantIDHashToID;
 
-		private readonly IRepository<int, IResourceVariantData> variantsRepository;
+		private readonly IRepository<int, IResourceVariantData> variantRepository;
 
 		private IResourceVariantData defaultVariant;
 
 
 		private readonly IRepository<int, string> nestedResourceIDHashToID;
 
-		private readonly IRepository<int, IReadOnlyResourceData> nestedResourcesRepository;
+		private readonly IRepository<int, IReadOnlyResourceData> nestedResourceRepository;
 
 
 		private readonly ILogger logger;
@@ -37,20 +37,20 @@ namespace HereticalSolutions.ResourceManagement
 		public ResourceData(
 			ResourceDescriptor descriptor,
 			IRepository<int, string> variantIDHashToID,
-			IRepository<int, IResourceVariantData> variantsRepository,
+			IRepository<int, IResourceVariantData> variantRepository,
 			IRepository<int, string> nestedResourceIDHashToID,
-			IRepository<int, IReadOnlyResourceData> nestedResourcesRepository,
+			IRepository<int, IReadOnlyResourceData> nestedResourceRepository,
 			ILogger logger = null)
 		{
 			Descriptor = descriptor;
 			
 			this.variantIDHashToID = variantIDHashToID;
 
-			this.variantsRepository = variantsRepository;
+			this.variantRepository = variantRepository;
 
 			this.nestedResourceIDHashToID = nestedResourceIDHashToID;
 
-			this.nestedResourcesRepository = nestedResourcesRepository;
+			this.nestedResourceRepository = nestedResourceRepository;
 
 			this.logger = logger;
 
@@ -78,7 +78,7 @@ namespace HereticalSolutions.ResourceManagement
 
 		public bool HasVariant(int variantIDHash)
 		{
-			return variantsRepository.Has(variantIDHash);
+			return variantRepository.Has(variantIDHash);
 		}
 
 		public bool HasVariant(string variantID)
@@ -93,7 +93,7 @@ namespace HereticalSolutions.ResourceManagement
 		/// <returns>The variant data associated with the specified variant ID hash.</returns>
 		public IResourceVariantData GetVariant(int variantIDHash)
 		{
-			if (!variantsRepository.TryGet(
+			if (!variantRepository.TryGet(
 				variantIDHash,
 				out var variant))
 				return null;
@@ -115,7 +115,7 @@ namespace HereticalSolutions.ResourceManagement
 			int variantIDHash,
 			out IResourceVariantData variant)
 		{
-			return variantsRepository.TryGet(
+			return variantRepository.TryGet(
 				variantIDHash,
 				out variant);
 		}
@@ -132,11 +132,11 @@ namespace HereticalSolutions.ResourceManagement
 		/// <summary>
 		/// Gets the variant hashes available for the resource
 		/// </summary>
-		public IEnumerable<int> VariantIDHashes => variantsRepository.Keys;
+		public IEnumerable<int> VariantIDHashes => variantRepository.Keys;
 
 		public IEnumerable<string> VariantIDs => variantIDHashToID.Values;
 
-		public IEnumerable<IResourceVariantData> AllVariants => variantsRepository.Values;
+		public IEnumerable<IResourceVariantData> AllVariants => variantRepository.Values;
 
 		#endregion
 
@@ -148,7 +148,7 @@ namespace HereticalSolutions.ResourceManagement
 
 		public bool HasNestedResource(int nestedResourceIDHash)
 		{
-			return nestedResourcesRepository.Has(nestedResourceIDHash);
+			return nestedResourceRepository.Has(nestedResourceIDHash);
 		}
 
 		public bool HasNestedResource(string nestedResourceID)
@@ -158,7 +158,7 @@ namespace HereticalSolutions.ResourceManagement
 
 		public IReadOnlyResourceData GetNestedResource(int nestedResourceIDHash)
 		{
-			if (!nestedResourcesRepository.TryGet(
+			if (!nestedResourceRepository.TryGet(
 				nestedResourceIDHash,
 				out var nestedResource))
 				return null;
@@ -175,7 +175,7 @@ namespace HereticalSolutions.ResourceManagement
 			int nestedResourceIDHash,
 			out IReadOnlyResourceData nestedResource)
 		{
-			return nestedResourcesRepository.TryGet(
+			return nestedResourceRepository.TryGet(
 				nestedResourceIDHash,
 				out nestedResource);
 		}
@@ -189,11 +189,11 @@ namespace HereticalSolutions.ResourceManagement
 				out nestedResource);
 		}
 
-		public IEnumerable<int> NestedResourceIDHashes => nestedResourcesRepository.Keys;
+		public IEnumerable<int> NestedResourceIDHashes => nestedResourceRepository.Keys;
 
 		public IEnumerable<string> NestedResourceIDs => nestedResourceIDHashToID.Values;
 
-		public IEnumerable<IReadOnlyResourceData> AllNestedResources => nestedResourcesRepository.Values;
+		public IEnumerable<IReadOnlyResourceData> AllNestedResources => nestedResourceRepository.Values;
 
 		#endregion
 
@@ -213,7 +213,7 @@ namespace HereticalSolutions.ResourceManagement
 		{
 			progress?.Report(0f);
 
-			if (!variantsRepository.TryAdd(
+			if (!variantRepository.TryAdd(
 				variant.Descriptor.VariantIDHash,
 				variant))
 			{
@@ -253,7 +253,7 @@ namespace HereticalSolutions.ResourceManagement
 		{
 			progress?.Report(0f);
 
-			if (!variantsRepository.TryGet(
+			if (!variantRepository.TryGet(
 				variantIDHash,
 				out var variant))
 			{
@@ -264,7 +264,7 @@ namespace HereticalSolutions.ResourceManagement
 
 			variantIDHashToID.TryRemove(variantIDHash);
 
-			variantsRepository.TryRemove(variantIDHash);
+			variantRepository.TryRemove(variantIDHash);
 
 			UpdateDefaultVariant();
 
@@ -311,9 +311,9 @@ namespace HereticalSolutions.ResourceManagement
 
 			int topPriority = int.MinValue;
 
-			foreach (var hashID in variantsRepository.Keys)
+			foreach (var hashID in variantRepository.Keys)
 			{
-				var currentVariant = variantsRepository.Get(hashID);
+				var currentVariant = variantRepository.Get(hashID);
 
 				var currentPriority = currentVariant.Descriptor.Priority;
 
@@ -332,13 +332,13 @@ namespace HereticalSolutions.ResourceManagement
 		{
 			progress?.Report(0f);
 
-			int totalVariantsCount = variantsRepository.Count;
+			int totalVariantsCount = variantRepository.Count;
 
 			int counter = 0;
 
-			foreach (var key in variantsRepository.Keys)
+			foreach (var key in variantRepository.Keys)
 			{
-				if (variantsRepository.TryGet(
+				if (variantRepository.TryGet(
 					key,
 					out var variant))
 				{
@@ -371,7 +371,7 @@ namespace HereticalSolutions.ResourceManagement
 
 			variantIDHashToID.Clear();
 
-			variantsRepository.Clear();
+			variantRepository.Clear();
 
 			defaultVariant = null;
 
@@ -384,7 +384,7 @@ namespace HereticalSolutions.ResourceManagement
 		{
 			progress?.Report(0f);
 
-			if (!nestedResourcesRepository.TryAdd(
+			if (!nestedResourceRepository.TryAdd(
 				nestedResource.Descriptor.IDHash,
 				nestedResource))
 			{
@@ -409,7 +409,7 @@ namespace HereticalSolutions.ResourceManagement
 		{
 			progress?.Report(0f);
 
-			if (!nestedResourcesRepository.TryGet(
+			if (!nestedResourceRepository.TryGet(
 				nestedResourceIDHash,
 				out var nestedResource))
 			{
@@ -422,7 +422,7 @@ namespace HereticalSolutions.ResourceManagement
 
 			nestedResourceIDHashToID.TryRemove(nestedResourceIDHash);
 
-			nestedResourcesRepository.TryRemove(nestedResourceIDHash);
+			nestedResourceRepository.TryRemove(nestedResourceIDHash);
 
 			if (free)
 			{
@@ -468,13 +468,13 @@ namespace HereticalSolutions.ResourceManagement
 		{
 			progress?.Report(0f);
 
-			int totalNestedResourcesCount = nestedResourcesRepository.Count;
+			int totalNestedResourcesCount = nestedResourceRepository.Count;
 
 			int counter = 0;
 
-			foreach (var key in nestedResourcesRepository.Keys)
+			foreach (var key in nestedResourceRepository.Keys)
 			{
-				if (!nestedResourcesRepository.TryGet(
+				if (!nestedResourceRepository.TryGet(
 					key,
 					out var nestedResource))
 				{
@@ -507,7 +507,7 @@ namespace HereticalSolutions.ResourceManagement
 
 			nestedResourceIDHashToID.Clear();
 
-			nestedResourcesRepository.Clear();
+			nestedResourceRepository.Clear();
 
 			progress?.Report(1f);
 		}
@@ -595,14 +595,14 @@ namespace HereticalSolutions.ResourceManagement
 			if (variantIDHashToID is ICleanuppable)
 				(variantIDHashToID as ICleanuppable).Cleanup();
 
-			if (variantsRepository is ICleanuppable)
-				(variantsRepository as ICleanuppable).Cleanup();
+			if (variantRepository is ICleanuppable)
+				(variantRepository as ICleanuppable).Cleanup();
 
 			if (nestedResourceIDHashToID is ICleanuppable)
 				(nestedResourceIDHashToID as ICleanuppable).Cleanup();
 
-			if (nestedResourcesRepository is ICleanuppable)
-				(nestedResourcesRepository as ICleanuppable).Cleanup();
+			if (nestedResourceRepository is ICleanuppable)
+				(nestedResourceRepository as ICleanuppable).Cleanup();
 		}
 
 		#endregion
@@ -614,14 +614,14 @@ namespace HereticalSolutions.ResourceManagement
 			if (variantIDHashToID is IDisposable)
 				(variantIDHashToID as IDisposable).Dispose();
 
-			if (variantsRepository is IDisposable)
-				(variantsRepository as IDisposable).Dispose();
+			if (variantRepository is IDisposable)
+				(variantRepository as IDisposable).Dispose();
 
 			if (nestedResourceIDHashToID is IDisposable)
 				(nestedResourceIDHashToID as IDisposable).Dispose();
 
-			if (nestedResourcesRepository is IDisposable)
-				(nestedResourcesRepository as IDisposable).Dispose();
+			if (nestedResourceRepository is IDisposable)
+				(nestedResourceRepository as IDisposable).Dispose();
 		}
 
 		#endregion

@@ -12,6 +12,6 @@ namespace HereticalSolutions.Persistence
         bool VisitLoad(
             object dto,
             Type visitableType,
-            out IVisitable visitable);
+            out object visitableObject);
     }
 }

@@ -41,12 +41,12 @@ namespace HereticalSolutions.Delegates.Factories
         #region Broadcaster with repository
 
         public static BroadcasterWithRepository BuildBroadcasterWithRepository(
-            IRepository<Type, object> broadcastersRepository,
+            IRepository<Type, object> broadcasterRepository,
             ILoggerResolver loggerResolver = null)
         {
             return BuildBroadcasterWithRepository(
                 RepositoriesFactory.BuildDictionaryObjectRepository(
-                    broadcastersRepository),
+                    broadcasterRepository),
                 loggerResolver);
         }
         
@@ -179,19 +179,13 @@ namespace HereticalSolutions.Delegates.Factories
         
         #region Non alloc broadcaster with repository
         
-        /// <summary>
-        /// Builds a non-allocating broadcaster with a repository.
-        /// </summary>
-        /// <param name="broadcastersRepository">The repository for the broadcasters.</param>
-        /// <param name="logger">The logger to use for logging.</param>
-        /// <returns>The built non-allocating broadcaster with a repository.</returns>
         public static NonAllocBroadcasterWithRepository BuildNonAllocBroadcasterWithRepository(
-            IRepository<Type, object> broadcastersRepository,
+            IRepository<Type, object> broadcasterRepository,
             ILoggerResolver loggerResolver = null)
         {
             return BuildNonAllocBroadcasterWithRepository(
                 RepositoriesFactory.BuildDictionaryObjectRepository(
-                    broadcastersRepository),
+                    broadcasterRepository),
                 loggerResolver);
         }
         

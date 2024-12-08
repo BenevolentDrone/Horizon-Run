@@ -1,6 +1,4 @@
-using HereticalSolutions.Persistence.Arguments;
-using HereticalSolutions.Persistence.Serializers;
-
+using HereticalSolutions.Persistence;
 using HereticalSolutions.Persistence.Factories;
 
 using HereticalSolutions.Entities;
@@ -17,9 +15,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
 	[CreateAssetMenu(fileName = "Entity settings", menuName = "Settings/Entities/Entity settings", order = 0)]
 	public class EntitySettings : ScriptableObject
 	{
-		private JSONSerializer jsonSerializer;
-
-		private StringArgument stringArgument;
+		private ISerializer serializer;
 
 		/// <summary>
 		/// The JSON string representation of the entity.
@@ -32,16 +28,23 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
 		public EntityPrototypeDTO GetPrototypeDTO(
 			ILoggerResolver loggerResolver = null)
 		{
-			if (jsonSerializer == null)
-				jsonSerializer = UnityPersistenceFactory.BuildSimpleUnityJSONSerializer(loggerResolver);
+			if (serializer == null)
+			{
+				var serializerBuilder = PersistenceFactory.BuildSerializerBuilder(
+					loggerResolver);
 
-			if (stringArgument == null)
-				stringArgument = new StringArgument();
+				serializer = serializerBuilder
+					.NewSerializer()
+					.ToJSON()
+					.AsString()
+					.Build();
+			}
 
-			stringArgument.Value = EntityJson;
+			var stringStrategy = serializer.Context.SerializationStrategy as StringStrategy;
 
-			bool success = jsonSerializer.Deserialize(
-				stringArgument,
+			stringStrategy.Value = EntityJson;
+
+			bool success = serializer.Deserialize(
 				typeof(EntityPrototypeDTO),
 				out object newEntityDTO);
 

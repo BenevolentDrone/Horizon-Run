@@ -8,8 +8,8 @@ namespace HereticalSolutions.Synchronization
 {
 	public class SynchronizationManager
 		: ISynchronizationManager,
-		  ISynchronizablesRepository,
-		  ISynchronizationProvidersRepository,
+		  ISynchronizableRepository,
+		  ISynchronizationProviderRepository,
 		  ICleanuppable,
 		  IDisposable
 	{
@@ -21,9 +21,9 @@ namespace HereticalSolutions.Synchronization
 			this.synchroRepository = synchroRepository;
 		}
 
-		#region ISynchronizablesRepository
+		#region ISynchronizableRepository
 
-		#region IReadOnlySynchronizablesRepository
+		#region IReadOnlySynchronizableRepository
 
 		public bool TryGetSynchronizable(
 			string id,
@@ -72,7 +72,7 @@ namespace HereticalSolutions.Synchronization
 
 		#endregion
 
-		#region ISynchronizationProvidersRepository
+		#region ISynchronizationProviderRepository
 
 		public bool TryGetProvider(
 			string id,

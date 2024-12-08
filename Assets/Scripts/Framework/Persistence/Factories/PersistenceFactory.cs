@@ -26,10 +26,31 @@ namespace HereticalSolutions.Persistence.Factories
 {
     public static class PersistenceFactory
     {
-        #region Visitors
+        private static readonly Type[] formatSerializerTypes;
 
-        public static DispatchVisitor BuildDispatchVisitor(
-            ILoggerResolver loggerResolver = null)
+        private static readonly Type[] serializationArgumentTypes;
+
+        private static readonly Type[] serializationStrategyTypes;
+
+        private static readonly IRepository<Type, IEnumerable<IVisitor>> visitorRepository;
+
+        #region Initialization
+
+        static PersistenceFactory()
+        {
+            TypeHelpers.GetTypesWithAttributeInAllAssemblies<FormatSerializerAttribute>(
+                out Type[] formatSerializerTypes);
+
+            TypeHelpers.GetTypesWithAttributeInAllAssemblies<SerializationArgumentAttribute>(
+                out Type[] serializationArgumentTypes);
+
+            TypeHelpers.GetTypesWithAttributeInAllAssemblies<SerializationStrategyAttribute>(
+                out Type[] serializationStrategyTypes);
+
+            visitorRepository = CreateVisitorRepository();
+        }
+
+        private static IRepository<Type, IEnumerable<IVisitor>> CreateVisitorRepository()
         {
             IRepository<Type, IEnumerable<IVisitor>> concreteVisitorRepository =
                 RepositoriesFactory.BuildDictionaryRepository<Type, IEnumerable<IVisitor>>();
@@ -60,10 +81,20 @@ namespace HereticalSolutions.Persistence.Factories
                             new List<IVisitor> { visitor });
                     }
                 }
-            }            
+            }
 
+            return concreteVisitorRepository;
+        }
+
+        #endregion
+
+        #region Visitors
+
+        public static DispatchVisitor BuildDispatchVisitor(
+            ILoggerResolver loggerResolver = null)
+        {
             return new DispatchVisitor(
-                concreteVisitorRepository,
+                visitorRepository,
                 loggerResolver?.GetLogger<DispatchVisitor>());
         }
 
@@ -103,9 +134,39 @@ namespace HereticalSolutions.Persistence.Factories
             };
         }
 
+        public static TSerializationArgument BuildSerializationArgument<TSerializationArgument>(
+            object[] arguments = null,
+            ILoggerResolver loggerResolver = null)
+        {
+            if (Array.IndexOf(
+                serializationArgumentTypes,
+                typeof(TSerializationArgument))
+                == -1) // to avoid using linq's Contains
+            {
+                throw new Exception(
+                    $"TYPE {typeof(TSerializationArgument).Name} IS NOT A VALID SERIALIZATION ARGUMENT TYPE");
+            }
+
+            arguments = TryAppendLogger(
+                typeof(TSerializationArgument),
+                arguments,
+                loggerResolver);
+
+            return (TSerializationArgument)Activator.CreateInstance(
+                typeof(TSerializationArgument),
+                 arguments);
+        }
+
         #endregion
 
         #region Format serializers
+
+        public static ObjectSerializer BuildObjectSerializer(
+            ILoggerResolver loggerResolver = null)
+        {
+            return new ObjectSerializer(
+                loggerResolver?.GetLogger<ObjectSerializer>());
+        }
 
         public static BinaryFormatterSerializer BuildBinaryFormatterSerializer(
             ILoggerResolver loggerResolver = null)
@@ -160,6 +221,30 @@ namespace HereticalSolutions.Persistence.Factories
         }
 #endif
 
+        public static TFormatSerializer BuildFormatSerializer<TFormatSerializer>(
+            object[] arguments = null,
+            ILoggerResolver loggerResolver = null)
+            where TFormatSerializer : IFormatSerializer
+        {
+            if (Array.IndexOf(
+                formatSerializerTypes,
+                typeof(TFormatSerializer))
+                == -1) // to avoid using linq's Contains
+            {
+                throw new Exception(
+                    $"TYPE {typeof(TFormatSerializer).Name} IS NOT A VALID FORMAT SERIALIZER TYPE");
+            }
+
+            arguments = TryAppendLogger(
+                typeof(TFormatSerializer),
+                arguments,
+                loggerResolver);
+
+            return (TFormatSerializer)Activator.CreateInstance(
+                typeof(TFormatSerializer),
+                 arguments);
+        }
+
         #endregion
 
         #region Serialization strategies
@@ -211,6 +296,19 @@ namespace HereticalSolutions.Persistence.Factories
                 loggerResolver?.GetLogger<FileStreamStrategy>());
         }
 
+        public static MemoryStreamStrategy BuildMemoryStreamStrategy(
+            byte[] buffer = null,
+            int index = -1,
+            int count = -1,
+            ILoggerResolver loggerResolver = null)
+        {
+            return new MemoryStreamStrategy(
+                buffer,
+                index,
+                count,
+                loggerResolver?.GetLogger<MemoryStreamStrategy>());
+        }
+
         public static IsolatedStorageStrategy BuildIsolatedStorageStrategy(
             string fullPath,
             bool flushAutomatically = true,
@@ -222,6 +320,76 @@ namespace HereticalSolutions.Persistence.Factories
                 loggerResolver?.GetLogger<IsolatedStorageStrategy>());
         }
 
+        public static TSerializationStrategy BuildSerializationStrategy<TSerializationStrategy>(
+            object[] arguments = null,
+            ILoggerResolver loggerResolver = null)
+            where TSerializationStrategy : ISerializationStrategy
+        {
+            if (Array.IndexOf(
+                serializationStrategyTypes,
+                typeof(TSerializationStrategy))
+                == -1) // to avoid using linq's Contains
+            {
+                throw new Exception(
+                    $"TYPE {typeof(TSerializationStrategy).Name} IS NOT A VALID SERIALIZATION STRATEGY TYPE");
+            }
+
+            arguments = TryAppendLogger(
+                typeof(TSerializationStrategy),
+                arguments,
+                loggerResolver);
+
+            return (TSerializationStrategy)Activator.CreateInstance(
+                typeof(TSerializationStrategy),
+                 arguments);
+        }
+
         #endregion
+
+        #region Builder
+
+        public static SerializerBuilder BuildSerializerBuilder(
+            ILoggerResolver loggerResolver = null)
+        {
+            return new SerializerBuilder(
+                loggerResolver,
+                loggerResolver?.GetLogger<SerializerBuilder>());
+        }
+
+        #endregion
+
+        private static object[] TryAppendLogger(
+            Type type,
+            object[] arguments,
+            ILoggerResolver loggerResolver)
+        {
+            if (loggerResolver == null)
+            {
+                return arguments;
+            }
+
+            var constructor = type.GetConstructors()[0];
+
+            var parameters = constructor.GetParameters();
+
+            if (parameters.Length == 0)
+            {
+                return arguments;
+            }
+
+            bool canReceiveLogger = parameters[parameters.Length - 1].ParameterType.IsAssignableFrom(typeof(ILogger));
+
+            if (!canReceiveLogger)
+            {
+                return arguments;
+            }
+
+            List<object> argumentList = new List<object>(arguments);
+
+            argumentList.Add(
+                loggerResolver.GetLogger(type));
+
+            return argumentList.ToArray();
+        }
     }
 }

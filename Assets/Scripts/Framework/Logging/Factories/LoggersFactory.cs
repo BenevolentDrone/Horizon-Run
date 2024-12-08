@@ -2,10 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 
-using HereticalSolutions.Persistence.Arguments;
-
-using HereticalSolutions.Persistence.IO;
-
+using HereticalSolutions.Persistence;
 using HereticalSolutions.Persistence.Factories;
 
 using HereticalSolutions.Repositories.Factories;
@@ -94,22 +91,23 @@ namespace HereticalSolutions.Logging.Factories
         }
 
         public static FileSink BuildFileSink(
-            string applicationDataFolder,
-            string relativePath,
+            IPathSettings pathSettings,
             ILoggerResolver loggerResolver)
         {
-            var serializationArgument = new StreamArgument(); //TextFileArgument();
+            var serializerBuilder = PersistenceFactory.BuildSerializerBuilder(
+                loggerResolver);
 
-            serializationArgument.Settings = new FilePathSettings
-            {
-                RelativePath = relativePath,
-                ApplicationDataFolder = applicationDataFolder
-            };
-
+            var serializer = serializerBuilder
+                .NewSerializer()
+                .From<IPathSettings>(
+                    pathSettings)
+                .ToObject()
+                .AsTextStream()
+                .WithAppend()
+                .Build();
+                
             var result = new FileSink(
-                serializationArgument,
-                PersistenceFactory.BuildSimplePlainTextSerializer(loggerResolver),
-                new List<string>());
+                serializer);
 
             return result;
         }

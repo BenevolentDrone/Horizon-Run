@@ -174,7 +174,7 @@ namespace HereticalSolutions.Pools
 
             if (node.PoolWithAddress != null)
             {
-                repository = node.PoolWithAddress.InnerPoolsRepository;
+                repository = node.PoolWithAddress.InnerPoolRepository;
             }
             else
             {

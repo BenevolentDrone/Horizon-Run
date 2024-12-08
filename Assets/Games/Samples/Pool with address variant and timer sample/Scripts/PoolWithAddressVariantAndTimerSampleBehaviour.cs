@@ -81,9 +81,9 @@ namespace HereticalSolutions.Samples.PoolWithAddressVariantAndTimerSample
 
 			timeManagerAsTickable = timeManager as ITickable;
 
-			var synchronizablesRepository = timeManager as ISynchronizablesGenericArgRepository<float>;
+			var synchronizableRepository = timeManager as ISynchronizableGenericArgRepository<float>;
 
-			synchronizablesRepository.AddSynchronizable(
+			synchronizableRepository.AddSynchronizable(
 				SynchronizationFactory.BuildSynchronizationContextGeneric<float>(
 					"Update",
 					canBeToggled: true,
@@ -93,9 +93,9 @@ namespace HereticalSolutions.Samples.PoolWithAddressVariantAndTimerSample
 					scaleDeltaDelegate: (value, scale) => value * scale,
 					loggerResolver: loggerResolver));
 
-			var synchronizationProvidersRepository = timeManager as  ISynchronizationProvidersRepository;
+			var synchronizationProviderRepository = timeManager as  ISynchronizationProviderRepository;
 
-			synchronizationProvidersRepository.TryGetProvider(
+			synchronizationProviderRepository.TryGetProvider(
 				"Update",
 				out var updateProvider);
 

@@ -8,15 +8,15 @@ namespace HereticalSolutions.Quests
     /// </summary>
     public class ActiveQuestObjectivesManager
     {
-        private readonly IRepository<string, List<ActiveQuestObjective>> activeObjectivesRepository;
+        private readonly IRepository<string, List<ActiveQuestObjective>> activeObjectiveRepository;
 
         /// <summary>
         /// Initializes a new instance of the ActiveQuestObjectivesManager class with the specified active objectives repository
         /// </summary>
-        /// <param name="activeObjectivesRepository">The repository for storing active quest objectives.</param>
-        public ActiveQuestObjectivesManager(IRepository<string, List<ActiveQuestObjective>> activeObjectivesRepository)
+        /// <param name="activeObjectiveRepository">The repository for storing active quest objectives.</param>
+        public ActiveQuestObjectivesManager(IRepository<string, List<ActiveQuestObjective>> activeObjectiveRepository)
         {
-            this.activeObjectivesRepository = activeObjectivesRepository;
+            this.activeObjectiveRepository = activeObjectiveRepository;
         }
 
         /// <summary>
@@ -28,13 +28,13 @@ namespace HereticalSolutions.Quests
             string objectiveID = activeObjective.Objective.Descriptor.ObjectiveID;
             
             // Add a new list of active objectives to the repository if the objective ID doesn't exist
-            if (!activeObjectivesRepository.Has(objectiveID))
+            if (!activeObjectiveRepository.Has(objectiveID))
             {
-                activeObjectivesRepository.Add(objectiveID, new List<ActiveQuestObjective>());
+                activeObjectiveRepository.Add(objectiveID, new List<ActiveQuestObjective>());
             }
             
             // Retrieve the list of active objectives by ID and add the new active objective to it
-            var trackersByID = activeObjectivesRepository.Get(objectiveID);
+            var trackersByID = activeObjectiveRepository.Get(objectiveID);
             trackersByID.Add(activeObjective);
         }
 
@@ -46,7 +46,7 @@ namespace HereticalSolutions.Quests
         /// <returns>true if the active quest objectives with the specified objective ID were found; otherwise, false.</returns>
         public bool GetObjectives(string objectiveID, out IEnumerable<ActiveQuestObjective> activeObjectives)
         {
-            var result = activeObjectivesRepository.TryGet(objectiveID, out List<ActiveQuestObjective> objectivesList);
+            var result = activeObjectiveRepository.TryGet(objectiveID, out List<ActiveQuestObjective> objectivesList);
 
             activeObjectives = objectivesList;
 
@@ -61,10 +61,10 @@ namespace HereticalSolutions.Quests
         {
             List<ActiveQuestObjective> result = new List<ActiveQuestObjective>();
 
-            var keys = activeObjectivesRepository.Keys;
+            var keys = activeObjectiveRepository.Keys;
             
             foreach (var key in keys)
-                result.AddRange(activeObjectivesRepository.Get(key));
+                result.AddRange(activeObjectiveRepository.Get(key));
 
             return result;
         }
@@ -76,10 +76,10 @@ namespace HereticalSolutions.Quests
         public void RemoveObjective(ActiveQuestObjective activeObjective)
         {
             // Check if the objective ID exists in the repository and remove the active objective from it
-            if (!activeObjectivesRepository.Has(activeObjective.Objective.Descriptor.ObjectiveID))
+            if (!activeObjectiveRepository.Has(activeObjective.Objective.Descriptor.ObjectiveID))
                 return;
                 
-            activeObjectivesRepository.Get(activeObjective.Objective.Descriptor.ObjectiveID).Remove(activeObjective);
+            activeObjectiveRepository.Get(activeObjective.Objective.Descriptor.ObjectiveID).Remove(activeObjective);
         }
     }
 }

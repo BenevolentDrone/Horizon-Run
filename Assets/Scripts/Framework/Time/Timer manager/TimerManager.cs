@@ -19,7 +19,7 @@ namespace HereticalSolutions.Time
 		private readonly string timerManagerID;
 
 
-		private readonly IRepository<int, IPoolElementFacade<TimerWithSubscriptionsContainer>> timerContainersRepository;
+		private readonly IRepository<int, IPoolElementFacade<TimerWithSubscriptionsContainer>> timerContainerRepository;
 
 		private readonly IRepository<string, List<DurationHandlePair>> sharedTimerHandleRepository;
 		
@@ -29,14 +29,14 @@ namespace HereticalSolutions.Time
 		
 		public TimerManager(
 			string timerManagerID,
-			IRepository<int, IPoolElementFacade<TimerWithSubscriptionsContainer>> timerContainersRepository,
+			IRepository<int, IPoolElementFacade<TimerWithSubscriptionsContainer>> timerContainerRepository,
 			IRepository<string, List<DurationHandlePair>> sharedTimerHandleRepository,
 			IManagedPool<TimerWithSubscriptionsContainer> timerContainersPool,
 			bool renameTimersOnPop = true)
 		{
 			this.timerManagerID = timerManagerID;
 
-			this.timerContainersRepository = timerContainersRepository;
+			this.timerContainerRepository = timerContainerRepository;
 			
 			this.sharedTimerHandleRepository = sharedTimerHandleRepository;
 
@@ -60,12 +60,12 @@ namespace HereticalSolutions.Time
 				timerHandle = IDAllocationsFactory.BuildUshort();
 			}
 			while (timerHandle == 0
-				|| timerContainersRepository.Has(timerHandle));
+				|| timerContainerRepository.Has(timerHandle));
 
 
 			var pooledTimerContainer = timerContainersPool.Pop();
 
-			timerContainersRepository.Add(
+			timerContainerRepository.Add(
 				timerHandle,
 				pooledTimerContainer);
 
@@ -194,7 +194,7 @@ namespace HereticalSolutions.Time
 			ushort timerHandle,
 			out IRuntimeTimer timer)
 		{
-			var result = timerContainersRepository.TryGet(
+			var result = timerContainerRepository.TryGet(
 				timerHandle,
 				out var pooledTimerContainer);
 
@@ -206,7 +206,7 @@ namespace HereticalSolutions.Time
 		public bool TryDestroyTimer(
 			ushort timerHandle)
 		{
-			if (!timerContainersRepository.TryGet(
+			if (!timerContainerRepository.TryGet(
 				timerHandle,
 				out var pooledTimerContainer))
 			{
@@ -258,7 +258,7 @@ namespace HereticalSolutions.Time
 			
 			pooledTimerContainer.Push();
 
-			timerContainersRepository.TryRemove(timerHandle);
+			timerContainerRepository.TryRemove(timerHandle);
 			
 			
 			return true;
@@ -270,8 +270,8 @@ namespace HereticalSolutions.Time
 
 		public void Cleanup()
 		{
-			if (timerContainersRepository is ICleanuppable)
-				(timerContainersRepository as ICleanuppable).Cleanup();
+			if (timerContainerRepository is ICleanuppable)
+				(timerContainerRepository as ICleanuppable).Cleanup();
 
 			if (timerContainersPool is ICleanuppable)
 				(timerContainersPool as ICleanuppable).Cleanup();
@@ -283,8 +283,8 @@ namespace HereticalSolutions.Time
 
 		public void Dispose()
 		{
-			if (timerContainersRepository is IDisposable)
-				(timerContainersRepository as IDisposable).Dispose();
+			if (timerContainerRepository is IDisposable)
+				(timerContainerRepository as IDisposable).Dispose();
 
 			if (timerContainersPool is IDisposable)
 				(timerContainersPool as IDisposable).Dispose();

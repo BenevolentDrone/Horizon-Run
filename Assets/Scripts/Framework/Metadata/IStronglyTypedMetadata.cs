@@ -11,6 +11,9 @@ namespace HereticalSolutions.Metadata
 		bool TryGet<TMetadata>(
 			out TMetadata value);
 
+		bool TryAdd<TMetadata>(
+			TMetadata value);
+
 		void AddOrUpdate<TMetadata>(
 			TMetadata value);
 

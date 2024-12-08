@@ -95,9 +95,9 @@ namespace HereticalSolutions.Time
         public bool VisitSave(
             ref object dto,
             Type visitableType,
-            IVisitable visitable)
+            object visitableObject)
         {
-            RuntimeTimer timer = visitable as RuntimeTimer;
+            RuntimeTimer timer = visitableObject as RuntimeTimer;
 
             if (timer == null)
             {
@@ -172,7 +172,7 @@ namespace HereticalSolutions.Time
         public bool VisitLoad(
             object dto,
             Type visitableType,
-            out IVisitable visitable)
+            out object visitableObject)
         {
             RuntimeTimerDTO castedDTO = dto as RuntimeTimerDTO;
 
@@ -182,7 +182,7 @@ namespace HereticalSolutions.Time
                     GetType(),
                     $"DTO IS NOT OF TYPE: {typeof(RuntimeTimerDTO).Name}");
 
-                visitable = default;
+                visitableObject = default;
 
                 return false;
             }
@@ -206,7 +206,7 @@ namespace HereticalSolutions.Time
 
             timer.FireRepeatCallbackOnFinish = castedDTO.FireRepeatCallbackOnFinish;
 
-            visitable = timer;
+            visitableObject = timer;
 
             return true;
         }
@@ -261,7 +261,7 @@ namespace HereticalSolutions.Time
         public bool VisitPopulate(
             object dto,
             Type visitableType,
-            IVisitable visitable)
+            object visitableObject)
         {
             RuntimeTimerDTO castedDTO = dto as RuntimeTimerDTO;
 
@@ -274,7 +274,7 @@ namespace HereticalSolutions.Time
                 return false;
             }
 
-            RuntimeTimer timer = visitable as RuntimeTimer;
+            RuntimeTimer timer = visitableObject as RuntimeTimer;
 
             if (timer == null)
             {

@@ -10,8 +10,8 @@ namespace HereticalSolutions.Time
 {
     public class TimeManager
         : ITimeManager,
-          ISynchronizablesGenericArgRepository<float>,
-          ISynchronizationProvidersRepository,
+          ISynchronizableGenericArgRepository<float>,
+          ISynchronizationProviderRepository,
           ICleanuppable,
           IDisposable
     {
@@ -110,7 +110,7 @@ namespace HereticalSolutions.Time
 
         #endregion
 
-        #region ISynchronizationProvidersRepository
+        #region ISynchronizationProviderRepository
 
         public bool TryGetProvider(
             string id,

@@ -8,6 +8,8 @@ using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
+using HereticalSolutions.Persistence;
+
 using HereticalSolutions.Logging;
 using HereticalSolutions.Logging.Factories;
 using ILogger = HereticalSolutions.Logging.ILogger;
@@ -93,8 +95,6 @@ public class DODExperimentsBehaviour : MonoBehaviour
     #region Logging
     
     private ILogger logger;
-    
-    private IDumpable cachedDumpableLogger;
     
     private bool catchingLogs = true;
 
@@ -191,8 +191,10 @@ public class DODExperimentsBehaviour : MonoBehaviour
                 new[]
                 {
                     LoggersFactory.BuildFileSink(
-                        $"{Application.dataPath}/../",
-                        $"Runtime logs/{logFileName}.log",
+                        new FileAtApplicationDataPathSettings
+                        {
+                            RelativePath = $"../Runtime logs/{logFileName}.log"
+                        },
                         (ILoggerResolver)loggerBuilder)
                 })
 
@@ -245,8 +247,6 @@ public class DODExperimentsBehaviour : MonoBehaviour
         logger = loggerBuilder.CurrentLogger;
         
         #region Dumpable
-            
-        cachedDumpableLogger = null;
             
         var currentLogger = loggerBuilder.CurrentLogger;
 

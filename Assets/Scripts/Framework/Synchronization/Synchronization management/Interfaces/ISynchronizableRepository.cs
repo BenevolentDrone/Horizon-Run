@@ -1,7 +1,7 @@
 namespace HereticalSolutions.Synchronization
 {
-	public interface ISynchronizablesRepository
-		: IReadOnlySynchronizablesRepository
+	public interface ISynchronizableRepository
+		: IReadOnlySynchronizableRepository
 	{
 		void AddSynchronizable(ISynchronizableNoArgs synchronizable);
 

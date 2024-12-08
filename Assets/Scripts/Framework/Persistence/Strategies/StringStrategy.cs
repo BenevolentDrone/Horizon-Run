@@ -11,7 +11,7 @@ namespace HereticalSolutions.Persistence
     {
         private readonly ILogger logger;
 
-        public string Value { get; private set; }
+        public string Value { get; set; }
 
         public StringStrategy(
             ILogger logger = null)

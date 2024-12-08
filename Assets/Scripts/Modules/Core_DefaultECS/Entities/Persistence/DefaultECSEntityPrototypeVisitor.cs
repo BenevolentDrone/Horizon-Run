@@ -13,80 +13,98 @@ using HereticalSolutions.Logging;
 
 using DefaultEcs;
 
+using TPrototypeID = System.String;
+
+using TEntity = DefaultEcs.Entity;
+
 namespace HereticalSolutions.Modules.Core_DefaultECS
 {
+	[Visitor(typeof(Entity), typeof(EntityPrototypeDTO))]
 	public class DefaultECSEntityPrototypeVisitor
-		: ASaveLoadVisitor<Entity, EntityPrototypeDTO>
+		: ISaveVisitor,
+          ILoadVisitor,
+          IPopulateVisitor
 	{
-		#region Reflection
+		private readonly Type[] componentTypes;
 
-		private static Type[] componentTypes;
+		private readonly MethodInfo writeComponentMethodInfo;
 
-		private static MethodInfo writeComponentMethodInfo;
+		private readonly IReadOnlyRepository<Type, WriteComponentToObjectDelegate> componentWriters;
 
-		private static IReadOnlyRepository<Type, WriteComponentToObjectDelegate> componentWriters;
+		private readonly IEntityPrototypeRepository<TPrototypeID, TEntity> prototypeRepository;
 
-		#endregion
-
-		private readonly IEntityPrototypeRepository<string, Entity> prototypesRepository;
+		private readonly ILogger logger;
 
 		public DefaultECSEntityPrototypeVisitor(
-			IEntityPrototypeRepository<string, Entity> prototypesRepository,
+			Type[] componentTypes,
+			MethodInfo writeComponentMethodInfo,
+			IReadOnlyRepository<Type, WriteComponentToObjectDelegate> componentWriters,
+			IEntityPrototypeRepository<TPrototypeID, TEntity> prototypeRepository,
 			ILogger logger = null)
-			: base(logger)
 		{
-			this.prototypesRepository = prototypesRepository;
+			this.componentTypes = componentTypes;
+
+			this.writeComponentMethodInfo = writeComponentMethodInfo;
+
+			this.componentWriters = componentWriters;
+
+			this.prototypeRepository = prototypeRepository;
+
+			this.logger = logger;
 		}
 
-		#region ILoadVisitorGeneric
+		#region IVisitor
 
-		public override bool Load(
-			EntityPrototypeDTO DTO,
-			out Entity value)
+		public bool CanVisit<TVisitable>()
 		{
-			LazyInitialization();
-
-			prototypesRepository.TryAllocatePrototype(
-				DTO.PrototypeID,
-				out value);
-
-			foreach (var component in DTO.Components)
-			{
-				componentWriters
-					.Get(component.GetType())
-					.Invoke(
-						value,
-						component);
-			}
-
-			return true;
+			return typeof(TVisitable) == typeof(Entity);
 		}
 
-		public override bool Load(
-			EntityPrototypeDTO DTO,
-			Entity valueToPopulate)
+		public bool CanVisit(
+			Type visitableType)
 		{
-			LazyInitialization();
+			return visitableType == typeof(Entity);
+		}
 
-			foreach (var component in DTO.Components)
-			{
-				componentWriters
-					.Get(component.GetType())
-					.Invoke(
-						valueToPopulate,
-						component);
-			}
+		public Type GetDTOType<TVisitable>()
+		{
+			if (typeof(TVisitable) != typeof(Entity))
+				return null;
 
-			return true;
+			return typeof(EntityPrototypeDTO);
+		}
+
+		public Type GetDTOType(
+			Type visitableType)
+		{
+			if (visitableType != typeof(Entity))
+				return null;
+
+			return typeof(EntityPrototypeDTO);
 		}
 
 		#endregion
 
-		#region ISaveVisitorGeneric
+		#region ISaveVisitor
 
-		public override bool Save(Entity value, out EntityPrototypeDTO DTO)
+		public bool VisitSave<TVisitable>(
+			ref object dto,
+			TVisitable visitable)
 		{
-			var entitySerializationWrapper = new EntitySerializationWrapper(value);
+			Entity entity = visitable.CastFromTo<TVisitable, Entity>();
+
+			if (entity == null)
+			{
+				logger?.LogError(
+					GetType(),
+					$"VISITABLE IS NOT OF TYPE: {typeof(Entity).Name}");
+
+				dto = null;
+
+				return false;
+			}
+
+			var entitySerializationWrapper = new EntitySerializationWrapper(entity);
 
 			object[] componentsArray = new object[entitySerializationWrapper.Components.Length];
 
@@ -98,13 +116,13 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
 			string prototypeID = string.Empty;
 
 			//TODO: optimize
-			foreach (var key in prototypesRepository.AllPrototypeIDs)
+			foreach (var key in prototypeRepository.AllPrototypeIDs)
 			{
-				if (prototypesRepository.TryGetPrototype(
+				if (prototypeRepository.TryGetPrototype(
 					key,
 					out Entity prototypeEntity))
 				{
-					if (prototypeEntity.Equals(value))
+					if (prototypeEntity.Equals(entity))
 					{
 						prototypeID = key;
 
@@ -113,7 +131,62 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
 				}
 			}
 
-			DTO = new EntityPrototypeDTO
+			dto = new EntityPrototypeDTO
+			{
+				PrototypeID = prototypeID,
+
+				Components = componentsArray
+			};
+
+			return true;
+		}
+
+		public bool VisitSave(
+			ref object dto,
+			Type visitableType,
+			object visitableObject)
+		{
+			Entity entity = (Entity)visitableObject;
+
+			if (entity == default)
+			{
+				logger?.LogError(
+					GetType(),
+					$"VISITABLE IS NOT OF TYPE: {typeof(Entity).Name}");
+
+				dto = null;
+
+				return false;
+			}
+
+			var entitySerializationWrapper = new EntitySerializationWrapper(entity);
+
+			object[] componentsArray = new object[entitySerializationWrapper.Components.Length];
+
+			for (int i = 0; i < componentsArray.Length; i++)
+			{
+				componentsArray[i] = entitySerializationWrapper.Components[i].ObjectValue;
+			}
+
+			string prototypeID = string.Empty;
+
+			//TODO: optimize
+			foreach (var key in prototypeRepository.AllPrototypeIDs)
+			{
+				if (prototypeRepository.TryGetPrototype(
+					key,
+					out Entity prototypeEntity))
+				{
+					if (prototypeEntity.Equals(entity))
+					{
+						prototypeID = key;
+
+						break;
+					}
+				}
+			}
+
+			dto = new EntityPrototypeDTO
 			{
 				PrototypeID = prototypeID,
 
@@ -125,53 +198,161 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
 
 		#endregion
 
-		private void LazyInitialization()
+		#region ILoadVisitor
+
+		public bool VisitLoad<TVisitable>(
+			object dto,
+			out TVisitable visitable)
 		{
-			if (componentTypes == null)
+			EntityPrototypeDTO castedDTO = (EntityPrototypeDTO)dto;
+
+			if (castedDTO.Equals(default))
 			{
-				TypeHelpers.GetTypesWithAttributeInAllAssemblies<ComponentAttribute>(
-					out componentTypes);
+				logger?.LogError(
+					GetType(),
+					$"DTO IS NOT OF TYPE: {typeof(EntityPrototypeDTO).Name}");
+
+				visitable = default;
+
+				return false;
 			}
 
-			if (writeComponentMethodInfo == null)
+			prototypeRepository.TryAllocatePrototype(
+				castedDTO.PrototypeID,
+				out var visitableEntity);
+
+			foreach (var component in castedDTO.Components)
 			{
-				writeComponentMethodInfo =
-					typeof(DefaultECSEntityPrototypeVisitor).GetMethod(
-						"WriteComponent",
-						BindingFlags.Static | BindingFlags.Public);
+				componentWriters
+					.Get(component.GetType())
+					.Invoke(
+						visitableEntity,
+						component);
 			}
 
-			if (componentWriters == null)
-			{
-				componentWriters = BuildComponentWriters(
-					writeComponentMethodInfo,
-					componentTypes);
-			}
+			visitable = visitableEntity.CastFromTo<Entity, TVisitable>();
+
+			return true;
 		}
 
-		private static IReadOnlyRepository<Type, WriteComponentToObjectDelegate> BuildComponentWriters(
-			MethodInfo writeComponentMethodInfo,
-			Type[] componentTypes)
+		public bool VisitLoad(
+			object dto,
+			Type visitableType,
+			out object visitableObject)
 		{
-			IReadOnlyRepository<Type, WriteComponentToObjectDelegate> result =
-				RepositoriesFactory.BuildDictionaryRepository<Type, WriteComponentToObjectDelegate>();
+			EntityPrototypeDTO castedDTO = (EntityPrototypeDTO)dto;
 
-			for (int i = 0; i < componentTypes.Length; i++)
+			if (castedDTO.Equals(default))
 			{
-				MethodInfo writeComponentGeneric = writeComponentMethodInfo.MakeGenericMethod(componentTypes[i]);
+				logger?.LogError(
+					GetType(),
+					$"DTO IS NOT OF TYPE: {typeof(EntityPrototypeDTO).Name}");
 
-				WriteComponentToObjectDelegate writeComponentGenericDelegate =
-					(WriteComponentToObjectDelegate)writeComponentGeneric.CreateDelegate(
-						typeof(WriteComponentToObjectDelegate),
-						null);
+				visitableObject = default;
 
-				((IRepository<Type, WriteComponentToObjectDelegate>)result).Add(
-					componentTypes[i],
-					writeComponentGenericDelegate);
+				return false;
 			}
 
-			return result;
+			prototypeRepository.TryAllocatePrototype(
+				castedDTO.PrototypeID,
+				out var visitableEntity);
+
+			foreach (var component in castedDTO.Components)
+			{
+				componentWriters
+					.Get(component.GetType())
+					.Invoke(
+						visitableEntity,
+						component);
+			}
+
+			visitableObject = visitableEntity;
+
+			return true;
 		}
+
+		#endregion
+
+		#region IPopulateVisitor
+
+		public bool VisitPopulate<TVisitable>(
+			object dto,
+			TVisitable visitable)
+		{
+			Entity entity = visitable.CastFromTo<TVisitable, Entity>();
+
+			if (entity == null)
+			{
+				logger?.LogError(
+					GetType(),
+					$"VISITABLE IS NOT OF TYPE: {typeof(Entity).Name}");
+
+				return false;
+			}
+
+			EntityPrototypeDTO castedDTO = (EntityPrototypeDTO)dto;
+
+			if (castedDTO.Equals(default))
+			{
+				logger?.LogError(
+					GetType(),
+					$"DTO IS NOT OF TYPE: {typeof(EntityPrototypeDTO).Name}");
+
+				return false;
+			}
+
+			foreach (var component in castedDTO.Components)
+			{
+				componentWriters
+					.Get(component.GetType())
+					.Invoke(
+						entity,
+						component);
+			}
+
+			return true;
+		}
+
+		public bool VisitPopulate(
+			object dto,
+			Type visitableType,
+			object visitableObject)
+		{
+			Entity entity = (Entity)visitableObject;
+
+			if (entity.Equals(default))
+			{
+				logger?.LogError(
+					GetType(),
+					$"VISITABLE IS NOT OF TYPE: {typeof(Entity).Name}");
+
+				return false;
+			}
+
+			EntityPrototypeDTO castedDTO = (EntityPrototypeDTO)dto;
+
+			if (castedDTO.Equals(default))
+			{
+				logger?.LogError(
+					GetType(),
+					$"DTO IS NOT OF TYPE: {typeof(EntityPrototypeDTO).Name}");
+
+				return false;
+			}
+
+			foreach (var component in castedDTO.Components)
+			{
+				componentWriters
+					.Get(component.GetType())
+					.Invoke(
+						entity,
+						component);
+			}
+
+			return true;
+		}
+
+		#endregion
 
 		public static void WriteComponent<TComponent>(
 			Entity entity,

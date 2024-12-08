@@ -16,7 +16,7 @@ namespace HereticalSolutions.Quests
 
         private readonly IReadOnlyRepository<string, QuestStage> questPrototypeStagesDatabase;
 
-        private readonly IRepository<string, ActiveQuest> activeQuestsRepository;
+        private readonly IRepository<string, ActiveQuest> activeQuestRepository;
 
         private readonly ActiveQuestObjectivesManager objectivesManager;
         
@@ -25,17 +25,17 @@ namespace HereticalSolutions.Quests
         /// </summary>
         /// <param name="questsDatabase">The database of quest prototypes.</param>
         /// <param name="questPrototypeStagesDatabase">The database of quest stage prototypes.</param>
-        /// <param name="activeQuestsRepository">The repository of active quests.</param>
+        /// <param name="activeQuestRepository">The repository of active quests.</param>
         /// <param name="objectivesManager">The manager of objectives for active quests.</param>
         public ActiveQuestsManager(
             IReadOnlyRepository<string, Quest> questsDatabase,
             IReadOnlyRepository<string, QuestStage> questPrototypeStagesDatabase,
-            IRepository<string, ActiveQuest> activeQuestsRepository,
+            IRepository<string, ActiveQuest> activeQuestRepository,
             ActiveQuestObjectivesManager objectivesManager)
         {
             this.questsDatabase = questsDatabase;
             this.questPrototypeStagesDatabase = questPrototypeStagesDatabase;
-            this.activeQuestsRepository = activeQuestsRepository;
+            this.activeQuestRepository = activeQuestRepository;
             this.objectivesManager = objectivesManager;
         }
 
@@ -48,7 +48,7 @@ namespace HereticalSolutions.Quests
         /// <returns>Returns true if the quest is active, otherwise returns false.</returns>
         public bool IsQuestActive(string questID)
         {
-            return activeQuestsRepository.Has(questID);
+            return activeQuestRepository.Has(questID);
         }
         
         /// <summary>
@@ -62,7 +62,7 @@ namespace HereticalSolutions.Quests
             if (!IsQuestActive(questID))
                 throw new Exception($"[ActiveQuestsManager] QUEST \"{questID}\" IS NOT ACTIVE");
             
-            return activeQuestsRepository.Get(questID);
+            return activeQuestRepository.Get(questID);
         }
         
         #endregion
@@ -77,7 +77,7 @@ namespace HereticalSolutions.Quests
         /// <exception cref="Exception">Throws an exception if the quest is already active or if the quest ID is unknown.</exception>
         public ActiveQuest StartQuest(string questID)
         {
-            if (activeQuestsRepository.Has(questID))
+            if (activeQuestRepository.Has(questID))
                 throw new Exception($"[ActiveQuestsManager] QUEST \"{questID}\" IS ALREADY ACTIVE");
             
             if (!questsDatabase.Has(questID))
@@ -104,7 +104,7 @@ namespace HereticalSolutions.Quests
             activeQuest.OnStageCompleted += OnQuestStageCompleted;
             activeQuest.OnQuestCompleted += onCompletedDelegate;
             
-            activeQuestsRepository.Add(activeQuest.Quest.Descriptor.ID, activeQuest);
+            activeQuestRepository.Add(activeQuest.Quest.Descriptor.ID, activeQuest);
                 
             activeQuest.Start();
 
@@ -144,7 +144,7 @@ namespace HereticalSolutions.Quests
             UnityEngine.Debug.Log($"[ActiveQuestsManager] QUEST \"{activeQuest.Quest.Descriptor.ID}\": COMPLETED");
 #endif
 
-            activeQuestsRepository.Remove(activeQuest.Quest.Descriptor.ID);
+            activeQuestRepository.Remove(activeQuest.Quest.Descriptor.ID);
         }
         
         #endregion

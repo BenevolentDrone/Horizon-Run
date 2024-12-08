@@ -1,6 +1,6 @@
 namespace HereticalSolutions.Synchronization
 {
-	public interface ISynchronizationProvidersRepository
+	public interface ISynchronizationProviderRepository
 	{
 		bool TryGetProvider(
 			string id,

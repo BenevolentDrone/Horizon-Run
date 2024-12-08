@@ -407,7 +407,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Factories
 		{
 			var worldRepository = RepositoriesFactory.BuildDictionaryRepository<TWorldID, TWorld>();
 
-			var worldControllersRepository = RepositoriesFactory.BuildDictionaryRepository<
+			var worldControllerRepository = RepositoriesFactory.BuildDictionaryRepository<
 				TWorld,
 				IEntityWorldController<TWorld, TEntity>>();
 
@@ -417,7 +417,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Factories
 
 			return new EntityWorldRepository(
 				worldRepository,
-				worldControllersRepository,
+				worldControllerRepository,
 				logger);
 		}
 

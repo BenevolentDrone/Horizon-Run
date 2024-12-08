@@ -62,6 +62,15 @@ namespace HereticalSolutions.Metadata
 			return false;
 		}
 
+		public bool TryAdd(
+			string key,
+			object value)
+		{
+			return metadataRepository.TryAdd(
+				key,
+				value);
+		}
+
 		public void AddOrUpdate(
 			string key,
 			object value)

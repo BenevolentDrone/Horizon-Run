@@ -8,7 +8,6 @@ using HereticalSolutions.Repositories.Factories;
 using HereticalSolutions.Synchronization;
 
 using HereticalSolutions.Time.Strategies;
-using HereticalSolutions.Time.Timers;
 
 using HereticalSolutions.Logging;
 

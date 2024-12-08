@@ -10,6 +10,8 @@ namespace HereticalSolutions.Persistence
 		{
 			var builderCasted = builder as ISerializerBuilderInternal;
 
+			builderCasted.EnsureArgumentsExist();
+
 			builderCasted.SerializerContext.Arguments.TryAdd<IPathArgument>(
 				PersistenceFactory.BuildPathArgument(
 					filePathSettings.FullPath));
@@ -22,6 +24,8 @@ namespace HereticalSolutions.Persistence
 			FileAtPersistentDataPathSettings filePathSettings)
 		{
 			var builderCasted = builder as ISerializerBuilderInternal;
+
+			builderCasted.EnsureArgumentsExist();
 
 			builderCasted.SerializerContext.Arguments.TryAdd<IPathArgument>(
 				PersistenceFactory.BuildPathArgument(

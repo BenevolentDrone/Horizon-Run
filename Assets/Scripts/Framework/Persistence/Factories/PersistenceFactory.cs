@@ -21,6 +21,7 @@ using HereticalSolutions.Repositories;
 using HereticalSolutions.Repositories.Factories;
 
 using HereticalSolutions.Logging;
+using System.Linq;
 
 namespace HereticalSolutions.Persistence.Factories
 {
@@ -58,28 +59,63 @@ namespace HereticalSolutions.Persistence.Factories
             TypeHelpers.GetTypesWithAttributeInAllAssemblies<VisitorAttribute>(
                 out Type[] visitorTypes);
 
+
             foreach (Type visitorType in visitorTypes)
             {
-                if (Activator.CreateInstance(visitorType) is IVisitor visitor)
+                try
                 {
-                    var attribute = visitorType.GetCustomAttribute<VisitorAttribute>(false);
+                    object instance = null;
 
-                    var visitableType = attribute.TargetType;
+                    var hasDefaultConstructor = visitorType.GetConstructor(Type.EmptyTypes) != null;
 
-                    if (concreteVisitorRepository.Has(visitableType))
+                    if (hasDefaultConstructor)
                     {
-                        var visitorList = concreteVisitorRepository
-                            .Get(visitableType)
-                            as List<IVisitor>;
-
-                        visitorList.Add(visitor);
+                        instance = Activator.CreateInstance(visitorType);
                     }
                     else
                     {
-                        concreteVisitorRepository.Add(
-                            visitableType,
-                            new List<IVisitor> { visitor });
+                        instance = Activator.CreateInstance(visitorType,
+                            BindingFlags.CreateInstance |
+                            BindingFlags.Public |
+                            BindingFlags.Instance |
+                            BindingFlags.OptionalParamBinding,
+                            null, new Object[] { Type.Missing }, null);
                     }
+
+                    if (instance == null)
+                        continue;
+
+                    if (instance is IVisitor visitor)
+                    {
+                        var attribute = visitorType.GetCustomAttribute<VisitorAttribute>(false);
+    
+                        var visitableType = attribute.TargetType;
+    
+                        if (concreteVisitorRepository.Has(visitableType))
+                        {
+                            var visitorList = concreteVisitorRepository
+                                .Get(visitableType)
+                                as List<IVisitor>;
+    
+                            visitorList.Add(visitor);
+                        }
+                        else
+                        {
+                            concreteVisitorRepository.Add(
+                                visitableType,
+                                new List<IVisitor> { visitor });
+                        }
+                    }
+                }
+                catch (MissingMethodException methodMissingException)
+                {
+                    continue;
+                }
+                catch (Exception e)
+                {
+                    throw new Exception(
+                        $"FAILED TO CREATE VISITOR INSTANCE FOR TYPE {visitorType.Name}",
+                        e);
                 }
             }
 

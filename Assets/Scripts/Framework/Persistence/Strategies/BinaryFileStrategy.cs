@@ -91,12 +91,6 @@ namespace HereticalSolutions.Persistence
 
 			string savePath = FullPath;
 
-			if (!IOHelpers.FileExists(
-				savePath))
-			{
-				return false;
-			}
-
 			byte[] contents = value.CastFromTo<TValue, byte[]>();
 
 			File.WriteAllBytes(savePath, contents);
@@ -112,12 +106,6 @@ namespace HereticalSolutions.Persistence
 				valueType);
 
 			string savePath = FullPath;
-
-			if (!IOHelpers.FileExists(
-				savePath))
-			{
-				return false;
-			}
 
 			byte[] contents = value.CastFromTo<object, byte[]>();
 

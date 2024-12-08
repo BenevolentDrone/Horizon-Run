@@ -91,12 +91,6 @@ namespace HereticalSolutions.Persistence
 
             string savePath = FullPath;
 
-            if (!IOHelpers.FileExists(
-                savePath))
-            {
-                return false;
-            }
-
             string contents = value.CastFromTo<TValue, string>();
 
             File.WriteAllText(savePath, contents);
@@ -112,12 +106,6 @@ namespace HereticalSolutions.Persistence
                 valueType);
 
             string savePath = FullPath;
-
-            if (!IOHelpers.FileExists(
-                savePath))
-            {
-                return false;
-            }
 
             string contents = value.CastFromTo<object, string>();
 
@@ -138,12 +126,6 @@ namespace HereticalSolutions.Persistence
 
             string savePath = FullPath;
 
-            if (!IOHelpers.FileExists(
-                savePath))
-            {
-                return false;
-            }
-
             string contents = value.CastFromTo<TValue, string>();
 
             File.AppendAllText(savePath, contents);
@@ -159,12 +141,6 @@ namespace HereticalSolutions.Persistence
                 valueType);
 
             string savePath = FullPath;
-
-            if (!IOHelpers.FileExists(
-                savePath))
-            {
-                return false;
-            }
 
             string contents = value.CastFromTo<object, string>();
 

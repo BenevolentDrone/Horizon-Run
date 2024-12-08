@@ -189,7 +189,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -90, y: 55}
+  m_AnchoredPosition: {x: -90.00006, y: 55}
   m_SizeDelta: {x: -220, y: -150}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &594376720
@@ -256,7 +256,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 13.05
+  m_fontSize: 55
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -871,16 +871,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 782613de60d0c9e1caa72b8c75f31bf7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  binFSSettings: {fileID: 11400000, guid: 07f063b2336a0722b8ddd68e044f6e8c, type: 2}
-  protoFSSettings: {fileID: 11400000, guid: bbea378ea2db06d43b7187a67320a999, type: 2}
-  jsonFSSettings: {fileID: 11400000, guid: b0191ff572087b919a4dc91c20919db3, type: 2}
-  xmlFSSettings: {fileID: 11400000, guid: 9c169ece3981824aaa0414e0fa073874, type: 2}
-  yamlFSSettings: {fileID: 11400000, guid: fb6b3c0e4b6cbc407909980016e93dc5, type: 2}
-  csvFSSettings: {fileID: 11400000, guid: 3af203358ca56d4fc9445d2723afe6d8, type: 2}
-  autosaveCooldown: 5
-  debugCountdown: 0
-  append: 1
-  forceDeserializationRoll: -1
+  FileAtAbsolutePathSettings:
+    Path: /SSD1/Repositories/Unity/Heretical Solutions/Heretical Unity Projects/Test/RuntimeTimer.test
+  FileAtRelativePathSettings:
+    AbsoluteFolderPath: /SSD1/Repositories/Unity/Heretical Solutions/Heretical Unity
+      Projects/Test/RuntimeTimer.test/SSD1/Repositories/Unity/Heretical Solutions/Heretical
+      Unity Projects/
+    RelativePath: Test/RuntimeTimer.test
+  FileAtTempPathSettings:
+    RelativePath: HereticalUnityProjects/Test/RuntimeTimer.test
+  FileAtApplicationDataPathSettings:
+    RelativePath: ../Test/RuntimeTimer.test
+  FileAtPersistentDataPathSettings:
+    RelativePath: Test/RuntimeTimer.test
 --- !u!1001 &1810595696
 PrefabInstance:
   m_ObjectHideFlags: 0

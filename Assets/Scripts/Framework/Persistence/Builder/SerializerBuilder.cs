@@ -42,6 +42,12 @@ namespace HereticalSolutions.Persistence
 
 		public ILoggerResolver LoggerResolver => loggerResolver;
 
+		public void EnsureArgumentsExist()
+		{
+			if (serializerContext.Arguments == null)
+				serializerContext.Arguments = MetadataFactory.BuildStronglyTypedMetadata();
+		}
+
 		#endregion
 
 		#region ISerializerBuilder
@@ -201,7 +207,7 @@ namespace HereticalSolutions.Persistence
 		{
 			EnsureArgumentsExist();
 
-			if (!serializerContext.Arguments.Has<PathArgument>())
+			if (!serializerContext.Arguments.Has<IPathArgument>())
 			{
 				throw new Exception(
 					logger.TryFormatException(
@@ -210,7 +216,7 @@ namespace HereticalSolutions.Persistence
 			}
 
 			serializerContext.SerializationStrategy = PersistenceFactory.BuildTextFileStrategy(
-				serializerContext.Arguments.Get<PathArgument>().Path,
+				serializerContext.Arguments.Get<IPathArgument>().Path,
 				loggerResolver);
 
 			return this;
@@ -220,7 +226,7 @@ namespace HereticalSolutions.Persistence
 		{
 			EnsureArgumentsExist();
 
-			if (!serializerContext.Arguments.Has<PathArgument>())
+			if (!serializerContext.Arguments.Has<IPathArgument>())
 			{
 				throw new Exception(
 					logger.TryFormatException(
@@ -229,7 +235,7 @@ namespace HereticalSolutions.Persistence
 			}
 
 			serializerContext.SerializationStrategy = PersistenceFactory.BuildBinaryFileStrategy(
-				serializerContext.Arguments.Get<PathArgument>().Path,
+				serializerContext.Arguments.Get<IPathArgument>().Path,
 				loggerResolver);
 
 			return this;
@@ -240,7 +246,7 @@ namespace HereticalSolutions.Persistence
 		{
 			EnsureArgumentsExist();
 
-			if (!serializerContext.Arguments.Has<PathArgument>())
+			if (!serializerContext.Arguments.Has<IPathArgument>())
 			{
 				throw new Exception(
 					logger.TryFormatException(
@@ -249,7 +255,7 @@ namespace HereticalSolutions.Persistence
 			}
 
 			serializerContext.SerializationStrategy = PersistenceFactory.BuildTextStreamStrategy(
-				serializerContext.Arguments.Get<PathArgument>().Path,
+				serializerContext.Arguments.Get<IPathArgument>().Path,
 				flushAutomatically,
 				loggerResolver);
 
@@ -261,7 +267,7 @@ namespace HereticalSolutions.Persistence
 		{
 			EnsureArgumentsExist();
 
-			if (!serializerContext.Arguments.Has<PathArgument>())
+			if (!serializerContext.Arguments.Has<IPathArgument>())
 			{
 				throw new Exception(
 					logger.TryFormatException(
@@ -270,7 +276,7 @@ namespace HereticalSolutions.Persistence
 			}
 
 			serializerContext.SerializationStrategy = PersistenceFactory.BuildFileStreamStrategy(
-				serializerContext.Arguments.Get<PathArgument>().Path,
+				serializerContext.Arguments.Get<IPathArgument>().Path,
 				flushAutomatically,
 				loggerResolver);
 
@@ -296,7 +302,7 @@ namespace HereticalSolutions.Persistence
 		{
 			EnsureArgumentsExist();
 
-			if (!serializerContext.Arguments.Has<PathArgument>())
+			if (!serializerContext.Arguments.Has<IPathArgument>())
 			{
 				throw new Exception(
 					logger.TryFormatException(
@@ -305,7 +311,7 @@ namespace HereticalSolutions.Persistence
 			}
 
 			serializerContext.SerializationStrategy = PersistenceFactory.BuildIsolatedStorageStrategy(
-				serializerContext.Arguments.Get<PathArgument>().Path,
+				serializerContext.Arguments.Get<IPathArgument>().Path,
 				flushAutomatically,
 				loggerResolver);
 
@@ -421,11 +427,5 @@ namespace HereticalSolutions.Persistence
 		}
 
 		#endregion
-
-		private void EnsureArgumentsExist()
-		{
-			if (serializerContext.Arguments == null)
-				serializerContext.Arguments = MetadataFactory.BuildStronglyTypedMetadata();
-		}
 	}
 }

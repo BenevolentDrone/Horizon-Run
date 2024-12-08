@@ -85,9 +85,17 @@ namespace HereticalSolutions.Persistence
 			ISerializationStrategy strategy,
 			IStronglyTypedMetadata arguments)
 		{
+			IStrategyWithIODestination strategyWithIODestination = strategy as IStrategyWithIODestination;
+
 			IStrategyWithStream strategyWithStream = strategy as IStrategyWithStream;
 
 			IStrategyWithState strategyWithState = strategy as IStrategyWithState;
+
+			if (strategyWithStream == null || !strategyWithStream.StreamOpen)
+			{
+				//Ensure that if there is no folder, then create it
+				strategyWithIODestination.EnsureIOTargetDestinationExists();
+			}
 
 
 			if (strategyWithState != null)
@@ -134,6 +142,9 @@ namespace HereticalSolutions.Persistence
 					{
 						strategyWithIODestination.EraseIOTarget();
 					}
+
+					//Ensure that if there is no folder, then create it
+					strategyWithIODestination.EnsureIOTargetDestinationExists();
 				}
 			}
 

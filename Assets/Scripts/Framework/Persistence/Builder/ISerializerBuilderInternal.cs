@@ -7,5 +7,7 @@ namespace HereticalSolutions.Persistence
 		ISerializerContext SerializerContext { get; set; }
 
 		ILoggerResolver LoggerResolver { get; }
+
+		void EnsureArgumentsExist();
 	}
 }

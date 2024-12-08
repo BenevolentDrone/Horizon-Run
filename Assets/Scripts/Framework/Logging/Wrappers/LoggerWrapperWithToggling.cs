@@ -6,7 +6,7 @@ namespace HereticalSolutions.Logging
 		: ILogger,
 		  ILoggerWrapper
 	{
-		private readonly ILogger innerLogger;
+		private ILogger innerLogger;
 
 		public bool Active { get; set; }
 
@@ -17,13 +17,12 @@ namespace HereticalSolutions.Logging
 		public bool ErrorsActive { get; set; }
 
 		public LoggerWrapperWithToggling(
-			ILogger innerLogger,
 			bool active = true,
 			bool printLogs = true,
 			bool printWarnings = true,
 			bool printErrors = true)
 		{
-			this.innerLogger = innerLogger;
+			innerLogger = null;
 
 			Active = active;
 
@@ -36,7 +35,11 @@ namespace HereticalSolutions.Logging
 
 		#region ILoggerWrapper
 
-		public ILogger InnerLogger { get => innerLogger; }
+		public ILogger InnerLogger
+		{
+			get => innerLogger;
+			set => innerLogger = value;
+		}
 
 		#endregion
 

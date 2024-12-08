@@ -47,25 +47,26 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
 
 			ILoggerBuilder loggerBuilder = LoggersFactory.BuildLoggerBuilder();
 
-			loggerBuilder
-				.ToggleAllowedByDefault(true)
-				.AddSink(
-					new TMProUGUISink(
-						logTextComponent: textComponent,
-						warningTextComponent: textComponent,
-						errorTextComponent: textComponent));
-
-			if (sinkIntoLogger)
-			{						
-				loggerBuilder
-					.Branch(
-						new []
-						{
-							logger
-						});
-			}
-
-			localProgressLogger = loggerBuilder.CurrentLogger;
+			//TODO: refactor
+			//loggerBuilder
+			//	.ToggleAllowedByDefault(true)
+			//	.AddSink(
+			//		new TMProUGUISink(
+			//			logTextComponent: textComponent,
+			//			warningTextComponent: textComponent,
+			//			errorTextComponent: textComponent));
+			//
+			//if (sinkIntoLogger)
+			//{						
+			//	loggerBuilder
+			//		.Branch(
+			//			new []
+			//			{
+			//				logger
+			//			});
+			//}
+			//
+			//localProgressLogger = loggerBuilder.CurrentLogger;
 
 			//TODO: refactor
 			IEnumerable<ILogger> innerLoggers = loadingProgressLogger.InnerLoggers;

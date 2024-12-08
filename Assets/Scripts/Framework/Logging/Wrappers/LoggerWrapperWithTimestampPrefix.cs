@@ -1,23 +1,31 @@
 using System;
-using System.Threading;
+using System.Globalization;
 
 namespace HereticalSolutions.Logging
 {
-    public class LoggerWrapperWithThreadIndexPrefix
+    public class LoggerWrapperWithTimestampPrefix
         : ILogger,
           ILoggerWrapper
     {
-        private readonly ILogger innerLogger;
+        private readonly bool utc;
+        
+        private ILogger innerLogger;
 
-        public LoggerWrapperWithThreadIndexPrefix(
-            ILogger innerLogger)
+        public LoggerWrapperWithTimestampPrefix(
+            bool utc)
         {
-            this.innerLogger = innerLogger;
+            this.utc = utc;
+
+            innerLogger = null;
         }
 
         #region ILoggerWrapper
 
-        public ILogger InnerLogger { get => innerLogger; }
+        public ILogger InnerLogger
+        {
+            get => innerLogger;
+            set => innerLogger = value;
+        }
 
         #endregion
 
@@ -28,7 +36,7 @@ namespace HereticalSolutions.Logging
         public void Log(
             string value)
         {
-            value = FormatLogWithThreadIndex(
+            value = FormatLogWithTimestamp(
                 value);
             
             innerLogger.Log(value);
@@ -37,7 +45,7 @@ namespace HereticalSolutions.Logging
         public void Log<TSource>(
             string value)
         {
-            value = FormatLogWithThreadIndex(
+            value = FormatLogWithTimestamp(
                 value);
 
             innerLogger.Log<TSource>(value);
@@ -47,7 +55,7 @@ namespace HereticalSolutions.Logging
             Type logSource,
             string value)
         {
-            value = FormatLogWithThreadIndex(
+            value = FormatLogWithTimestamp(
                 value);
 
             innerLogger.Log(
@@ -59,7 +67,7 @@ namespace HereticalSolutions.Logging
             string value,
             object[] arguments)
         {
-            value = FormatLogWithThreadIndex(
+            value = FormatLogWithTimestamp(
                 value);
             
             innerLogger.Log(
@@ -71,7 +79,7 @@ namespace HereticalSolutions.Logging
             string value,
             object[] arguments)
         {
-            value = FormatLogWithThreadIndex(
+            value = FormatLogWithTimestamp(
                 value);
 
             innerLogger.Log<TSource>(
@@ -84,7 +92,7 @@ namespace HereticalSolutions.Logging
             string value,
             object[] arguments)
         {
-            value = FormatLogWithThreadIndex(
+            value = FormatLogWithTimestamp(
                 value);
 
             innerLogger.Log(
@@ -100,7 +108,7 @@ namespace HereticalSolutions.Logging
         public void LogWarning(
             string value)
         {
-            value = FormatLogWithThreadIndex(
+            value = FormatLogWithTimestamp(
                 value);
             
             innerLogger.LogWarning(
@@ -110,7 +118,7 @@ namespace HereticalSolutions.Logging
         public void LogWarning<TSource>(
             string value)
         {
-            value = FormatLogWithThreadIndex(
+            value = FormatLogWithTimestamp(
                 value);
 
             innerLogger.LogWarning<TSource>(value);
@@ -120,7 +128,7 @@ namespace HereticalSolutions.Logging
             Type logSource,
             string value)
         {
-            value = FormatLogWithThreadIndex(
+            value = FormatLogWithTimestamp(
                 value);
 
             innerLogger.LogWarning(
@@ -132,7 +140,7 @@ namespace HereticalSolutions.Logging
             string value,
             object[] arguments)
         {
-            value = FormatLogWithThreadIndex(
+            value = FormatLogWithTimestamp(
                 value);
             
             innerLogger.LogWarning(
@@ -144,7 +152,7 @@ namespace HereticalSolutions.Logging
             string value,
             object[] arguments)
         {
-            value = FormatLogWithThreadIndex(
+            value = FormatLogWithTimestamp(
                 value);
 
             innerLogger.LogWarning<TSource>(
@@ -157,7 +165,7 @@ namespace HereticalSolutions.Logging
             string value,
             object[] arguments)
         {
-            value = FormatLogWithThreadIndex(
+            value = FormatLogWithTimestamp(
                 value);
 
             innerLogger.LogWarning(
@@ -173,7 +181,7 @@ namespace HereticalSolutions.Logging
         public void LogError(
             string value)
         {
-            value = FormatLogWithThreadIndex(
+            value = FormatLogWithTimestamp(
                 value);
             
             innerLogger.LogError(
@@ -183,7 +191,7 @@ namespace HereticalSolutions.Logging
         public void LogError<TSource>(
             string value)
         {
-            value = FormatLogWithThreadIndex(
+            value = FormatLogWithTimestamp(
                 value);
 
             innerLogger.LogError<TSource>(value);
@@ -193,7 +201,7 @@ namespace HereticalSolutions.Logging
             Type logSource,
             string value)
         {
-            value = FormatLogWithThreadIndex(
+            value = FormatLogWithTimestamp(
                 value);
 
             innerLogger.LogError(
@@ -205,7 +213,7 @@ namespace HereticalSolutions.Logging
             string value,
             object[] arguments)
         {
-            value = FormatLogWithThreadIndex(
+            value = FormatLogWithTimestamp(
                 value);
             
             innerLogger.LogError(
@@ -217,7 +225,7 @@ namespace HereticalSolutions.Logging
             string value,
             object[] arguments)
         {
-            value = FormatLogWithThreadIndex(
+            value = FormatLogWithTimestamp(
                 value);
 
             innerLogger.LogError<TSource>(
@@ -230,7 +238,7 @@ namespace HereticalSolutions.Logging
             string value,
             object[] arguments)
         {
-            value = FormatLogWithThreadIndex(
+            value = FormatLogWithTimestamp(
                 value);
 
             innerLogger.LogError(
@@ -246,7 +254,7 @@ namespace HereticalSolutions.Logging
         public string FormatException(
             string value)
         {
-            value = FormatLogWithThreadIndex(
+            value = FormatLogWithTimestamp(
                 value);
             
             return innerLogger.FormatException(value);
@@ -255,7 +263,7 @@ namespace HereticalSolutions.Logging
         public string FormatException<TSource>(
             string value)
         {
-            value = FormatLogWithThreadIndex(
+            value = FormatLogWithTimestamp(
                 value);
 
             return innerLogger.FormatException<TSource>(value);
@@ -265,7 +273,7 @@ namespace HereticalSolutions.Logging
             Type logSource,
             string value)
         {
-            value = FormatLogWithThreadIndex(
+            value = FormatLogWithTimestamp(
                 value);
 
             return innerLogger.FormatException(
@@ -277,10 +285,14 @@ namespace HereticalSolutions.Logging
 
         #endregion
 
-        private string FormatLogWithThreadIndex(
+        private string FormatLogWithTimestamp(
             string value)
         {
-            return $"[THREAD {Thread.CurrentThread.ManagedThreadId}] {value}";
+            var now = (utc)
+                ? DateTime.UtcNow
+                : DateTime.Now;
+            
+            return $"[{now.ToString("HH:mm:ss.fff", CultureInfo.InvariantCulture)}] {value}";
         }
     }
 }

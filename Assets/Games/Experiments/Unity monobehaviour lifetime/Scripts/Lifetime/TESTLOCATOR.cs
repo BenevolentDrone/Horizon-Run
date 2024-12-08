@@ -1,4 +1,4 @@
-using HeresySolutions.Lifetime;
+using HereticalSolutions.Lifetime;
 using System.Collections.Generic;
 
 public class TESTLOCATOR

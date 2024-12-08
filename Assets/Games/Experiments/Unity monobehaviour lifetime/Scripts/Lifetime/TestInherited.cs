@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Threading;
 using System.Text;
 
-namespace HeresySolutions.Lifetime
+namespace HereticalSolutions.Lifetime
 {
     public class TestInherited : Test, ISerializationCallbackReceiver
     {

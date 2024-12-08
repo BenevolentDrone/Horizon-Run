@@ -3,6 +3,6 @@ namespace HereticalSolutions.Logging
 	public interface ILoggerWrapper
 		: ILogger
 	{
-		ILogger InnerLogger { get; }
+		ILogger InnerLogger { get; set; }
 	}
 }

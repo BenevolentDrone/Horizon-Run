@@ -5,12 +5,19 @@ namespace HereticalSolutions.Logging
 {
 	public interface ILoggerBuilder
 	{
-		ILogger CurrentLogger { get; }
+		ILogger RootLogger { get; }
+
+		ILogger CurrentLogger { get; set; }
 
 		bool CurrentAllowedByDefault { get; }
 
+
+		ILoggerBuilder NewLogger();
+
+
 		ILoggerBuilder ToggleAllowedByDefault(
 			bool allowed);
+
 
 		ILoggerBuilder ToggleLogSource<TLogSource>(
 			bool allowed);
@@ -19,10 +26,16 @@ namespace HereticalSolutions.Logging
 			Type logSourceType,
 			bool allowed);
 
-		ILoggerBuilder AddSink(ILoggerSink logger);
 
-		ILoggerBuilder Wrap(ILoggerWrapper logger);
+		ILoggerBuilder AddSink(
+			ILoggerSink logger);
 
-		ILoggerBuilder Branch(IEnumerable<ILogger> siblingLoggers);
+		ILoggerBuilder AddWrapperBelow(
+			ILoggerWrapper logger);
+
+		ILoggerBuilder Branch();
+
+		
+		ILoggerResolver Build();
 	}
 }

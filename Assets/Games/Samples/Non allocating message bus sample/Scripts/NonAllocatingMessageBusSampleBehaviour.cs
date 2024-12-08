@@ -42,19 +42,19 @@ namespace HereticalSolutions.Samples.NonAllocatingMessageBusSample
 
 			ILoggerBuilder loggerBuilder = LoggersFactory.BuildLoggerBuilder();
 
-			loggerBuilder
+			loggerResolver = loggerBuilder
+				.NewLogger()
 				.ToggleAllowedByDefault(false)
+				.ToggleLogSource(typeof(NonAllocatingMessageBusSampleBehaviour), true)
+				.AddWrapperBelow(
+					LoggersFactory.BuildLoggerWrapperWithSourceTypePrefix())
+				.AddWrapperBelow(
+					LoggersFactory.BuildLoggerWrapperWithLogTypePrefix())
+				.AddWrapperBelow(
+					LoggersFactory.BuildLoggerWrapperWithTimestampPrefix(false))
 				.AddSink(
 					LoggersFactoryUnity.BuildUnityDebugLogSink())
-				.Wrap(
-					LoggersFactory.BuildLoggerWrapperWithLogTypePrefix(
-						loggerBuilder.CurrentLogger))
-				.Wrap(
-					LoggersFactory.BuildLoggerWrapperWithSourceTypePrefix(
-						loggerBuilder.CurrentLogger))
-				.ToggleLogSource(typeof(NonAllocatingMessageBusSampleBehaviour), true);
-
-			loggerResolver = (ILoggerResolver)loggerBuilder;
+				.Build();
 
 			logger = loggerResolver.GetLogger<NonAllocatingMessageBusSampleBehaviour>();
 

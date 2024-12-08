@@ -1,4 +1,7 @@
 using System;
+using System.Globalization;
+
+using HereticalSolutions.Persistence;
 
 using HereticalSolutions.Systems;
 using HereticalSolutions.Systems.Factories;
@@ -19,87 +22,125 @@ namespace HereticalSolutions.Samples.SystemAndProceduresSequentialSample
 
 		private ILogger logger;
 
+		private ISerializer fileSinkSerializer;
+
 		private Action delegateSystem;
 
 		void Start()
 		{
 			#region Initiate logger resolver and logger itself
 
-			//string dateTimeNow = DateTime.Now.ToString("s", CultureInfo.InvariantCulture);
-			//
-			//dateTimeNow = dateTimeNow.Replace('T', '_');
-			//
-			//dateTimeNow = dateTimeNow.Replace(':', '-');
-			//
-			//string logFileName = dateTimeNow;
+			string dateTimeNow = DateTime.UtcNow.ToString("s", CultureInfo.InvariantCulture);
+
+			dateTimeNow = dateTimeNow.Replace('T', '_');
+
+			dateTimeNow = dateTimeNow.Replace(':', '-');
+
+			string logFileName = dateTimeNow;
+
 
 			ILoggerBuilder loggerBuilder = LoggersFactory.BuildLoggerBuilder();
 
-			loggerBuilder
+			loggerResolver = loggerBuilder
+
+				.NewLogger()
+
 				.ToggleAllowedByDefault(
 					true)
 
-				// Output
+				//Wrappers
 
-				.AddSink(
-					LoggersFactoryUnity.BuildUnityDebugLogSink())
+				.AddWrapperBelow(
+					LoggersFactory.BuildProxyWrapper())
+
+				.Build(); //Preemptively build the logger resolver so that it can be already injected
+
+			loggerBuilder
+
+				//Recursion prevention gate
+
+				//THIS ONE IS PLACED BEFORE THE THREAD SAFETY WRAPPER FOR A REASON
+				//IMAGINE AN ERROR LOG GOING IN
+				//THE SEMAPHORE IS LOCKED
+				//THE LOG IS GOING THROUGH ALL OF THE WRAPPERS AND REACHES UNITY DEBUG LOG BOTTOM WRAPPER
+				//THE ERROR IS LOGGED WITH Debug.LogError
+				//THEN THE FUN STARTS
+				//THIS INSTALLER IS SUBSCRIBED TO UNITYS LOGS
+				//IT SENDS IT DOWN THE LOGGER
+				//WHERE IT REACHES THE FUCKING SEMAPHORE
+				//AND WAITS FOR IT TO SPIN
+				//WHILE Debug.LogError IS ACTUALLY A BLOCKING CALL
+				//SO IT WONT START GOING UP THE CHAIN OF DELEGATES AND SPIN THE SEMAPHORE UNTIL THE CALLBACK IS FINISHED
+				//AND CALLBACK WONT FINISH AS IT WAITS FOR THE SEMAPHORE TO SPIN
+				//MAKING A DEADLOCK
+				//THE EASIEST WAY TO PREVENT THIS IS TO PERFORM A RECURSION GATE BEFORE THE SEMAPHORE
+
+				.AddWrapperBelow(
+					LoggersFactory.BuildLoggerWrapperWithRecursionPreventionGate())
+
+				//Thread safety
+
+				.AddWrapperBelow(
+					LoggersFactory.BuildLoggerWrapperWithSemaphoreSlim())
+
+				//Prefixes
+
+				.AddWrapperBelow(
+					LoggersFactory.BuildLoggerWrapperWithThreadIndexPrefix())
+				.AddWrapperBelow(
+					LoggersFactory.BuildLoggerWrapperWithSourceTypePrefix())
+				.AddWrapperBelow(
+					LoggersFactory.BuildLoggerWrapperWithLogTypePrefix())
+				.AddWrapperBelow(
+					LoggersFactory.BuildLoggerWrapperWithTimestampPrefix(
+						false))
+
+				// File sink
+
+				.Branch();
+
+			var branch = loggerBuilder.CurrentLogger;
+
+			var fileSink = LoggersFactory.BuildFileSink(
+				new FileAtApplicationDataPathSettings()
+				{
+					RelativePath = $"../Runtime logs/{logFileName}.log"
+				},
+				loggerResolver);
+
+			fileSinkSerializer = fileSink.Serializer;
+
+			loggerBuilder.AddSink(
+				fileSink);
+
+			loggerBuilder.CurrentLogger = branch;
+
+			// Recursion prevention prefix
+
+			loggerBuilder
+
+				.AddWrapperBelow(
+					LoggersFactory.BuildLoggerWrapperWithRecursionPreventionPrefix())
 
 				//Toggling
 
-				.Wrap(
+				.AddWrapperBelow(
 					LoggersFactory.BuildLoggerWrapperWithToggling(
-						loggerBuilder.CurrentLogger,
 						true,
 						true,
 						true,
 						true))
 
-				// Recursion prevention prefix
+				// Sink
 
-				.Wrap(
-					LoggersFactory.BuildLoggerWrapperWithRecursionPreventionPrefix(
-						loggerBuilder.CurrentLogger))
+				.AddSink(
+					LoggersFactoryUnity.BuildUnityDebugLogSink());
 
-				//// Logging to file
-				//
-				//.Branch(
-				//	new[]
-				//	{
-				//		LoggersFactory.BuildFileSink(
-				//			$"{Application.dataPath}/../",
-				//			$"Runtime logs/{logFileName}.log",
-				//			(ILoggerResolver)loggerBuilder)
-				//	})
+			//Open stream
 
-				//Prefixes
+			var streamStrategy = fileSinkSerializer.Context.SerializationStrategy as IStrategyWithStream;
 
-				.Wrap(
-					LoggersFactory.BuildLoggerWrapperWithTimestampPrefix(
-						false,
-						loggerBuilder.CurrentLogger))
-				.Wrap(
-					LoggersFactory.BuildLoggerWrapperWithLogTypePrefix(
-						loggerBuilder.CurrentLogger))
-				.Wrap(
-					LoggersFactory.BuildLoggerWrapperWithSourceTypePrefix(
-						loggerBuilder.CurrentLogger))
-				.Wrap(
-					LoggersFactory.BuildLoggerWrapperWithThreadIndexPrefix(
-						loggerBuilder.CurrentLogger))
-
-				//Thread safety
-
-				.Wrap(
-					LoggersFactory.BuildLoggerWrapperWithSemaphoreSlim(
-						loggerBuilder.CurrentLogger))
-
-				//Recursion prevention gate
-
-				.Wrap(
-					LoggersFactory.BuildLoggerWrapperWithRecursionPreventionGate(
-						loggerBuilder.CurrentLogger));
-
-			loggerResolver = (ILoggerResolver)loggerBuilder;
+			streamStrategy?.InitializeAppend();
 
 			logger = loggerResolver.GetLogger<SystemAndProceduresSequentialSampleBehaviour>();
 

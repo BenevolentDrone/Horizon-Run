@@ -28,7 +28,9 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.DI
         private LoggingSettingsScriptable loggingSettings;
 
 
-        private ILogger cachedLogger;
+        private ILogger rootLogger;
+
+        private ISerializer fileSinkSerializer;
 
 
         private bool catchingLogs;
@@ -52,94 +54,14 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.DI
 
             ILoggerBuilder loggerBuilder = LoggersFactory.BuildLoggerBuilder();
 
-            //Remember that the log traverses wrappers in a bottom to top order
-            //While prefixes are added in a top to bottom order
-            loggerBuilder
+            var loggerResolver = loggerBuilder
+
+                .NewLogger()
+
                 .ToggleAllowedByDefault(
                     loggingSettings.BasicLoggingSettings.EnableLoggingByDefault)
 
-                // Output
-
-                .AddSink(
-                    LoggersFactoryUnity.BuildUnityDebugLogSink())
-
-                //Toggling
-
-                .Wrap(
-                    LoggersFactory.BuildLoggerWrapperWithToggling(
-                        loggerBuilder.CurrentLogger,
-                        true,
-                        false,
-                        false,
-                        true))
-
-                // Recursion prevention prefix
-
-                .Wrap(
-                    LoggersFactory.BuildLoggerWrapperWithRecursionPreventionPrefix(
-                        loggerBuilder.CurrentLogger))
-
-                // Logging to file
-
-                .Branch(
-                    new []
-                    {
-                        LoggersFactory.BuildFileSink(
-                            //(loggingSettings.LoggingEnvironmentSettings.GetLogsFolderFromEnvironment)
-                            //    ? System.Environment.GetEnvironmentVariable(
-                            //        loggingSettings.LoggingEnvironmentSettings.LogsFolderEnvironmentKey)
-                            //    : $"{Application.dataPath}/../",
-                            //$"Runtime logs/{logFileName}.log",
-                            new FileAtApplicationDataPathSettings
-                            {
-                                RelativePath = $"../Runtime logs/{logFileName}.log"
-                            },
-                            (ILoggerResolver)loggerBuilder)
-                    })
-
-                //Prefixes
-
-                .Wrap(
-                    LoggersFactory.BuildLoggerWrapperWithTimestampPrefix(
-                        loggingSettings.BasicLoggingSettings.LogTimeInUtc,
-                        loggerBuilder.CurrentLogger))
-                .Wrap(
-                    LoggersFactory.BuildLoggerWrapperWithLogTypePrefix(
-                        loggerBuilder.CurrentLogger))
-                .Wrap(
-                    LoggersFactory.BuildLoggerWrapperWithSourceTypePrefix(
-                        loggerBuilder.CurrentLogger))
-                .Wrap(
-                    LoggersFactory.BuildLoggerWrapperWithThreadIndexPrefix(
-                        loggerBuilder.CurrentLogger))
-
-                //Thread safety
-
-                .Wrap(
-                    LoggersFactory.BuildLoggerWrapperWithSemaphoreSlim(
-                        loggerBuilder.CurrentLogger))
-
-                //Recursion prevention gate
-
-                //THIS ONE IS PLACED BEFORE THE THREAD SAFETY WRAPPER FOR A REASON
-                //IMAGINE AN ERROR LOG GOING IN
-                //THE SEMAPHORE IS LOCKED
-                //THE LOG IS GOING THROUGH ALL OF THE WRAPPERS AND REACHES UNITY DEBUG LOG BOTTOM WRAPPER
-                //THE ERROR IS LOGGED WITH Debug.LogError
-                //THEN THE FUN STARTS
-                //THIS INSTALLER IS SUBSCRIBED TO UNITYS LOGS
-                //IT SENDS IT DOWN THE LOGGER
-                //WHERE IT REACHES THE FUCKING SEMAPHORE
-                //AND WAITS FOR IT TO SPIN
-                //WHILE Debug.LogError IS ACTUALLY A BLOCKING CALL
-                //SO IT WONT START GOING UP THE CHAIN OF DELEGATES AND SPIN THE SEMAPHORE UNTIL THE CALLBACK IS FINISHED
-                //AND CALLBACK WONT FINISH AS IT WAITS FOR THE SEMAPHORE TO SPIN
-                //MAKING A DEADLOCK
-                //THE EASIEST WAY TO PREVENT THIS IS TO PERFORM A RECURSION GATE BEFORE THE SEMAPHORE
-
-                .Wrap(
-                    LoggersFactory.BuildLoggerWrapperWithRecursionPreventionGate(
-                        loggerBuilder.CurrentLogger))
+                //Log sources
 
                 //TODO: extract to file
                 .ToggleLogSource(
@@ -225,16 +147,114 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.DI
 
                 .ToggleLogSource(
                     typeof(HierarchyDeinitializationSystem<,>),
-                    false);
+                    false)
 
-            var loggerResolver = (ILoggerResolver)loggerBuilder;
+                //Wrappers
+
+                .AddWrapperBelow(
+                    LoggersFactory.BuildProxyWrapper())
+
+                .Build(); //Preemptively build the logger resolver so that it can be already injected
+
+            loggerBuilder
+
+                //Recursion prevention gate
+
+                //THIS ONE IS PLACED BEFORE THE THREAD SAFETY WRAPPER FOR A REASON
+                //IMAGINE AN ERROR LOG GOING IN
+                //THE SEMAPHORE IS LOCKED
+                //THE LOG IS GOING THROUGH ALL OF THE WRAPPERS AND REACHES UNITY DEBUG LOG BOTTOM WRAPPER
+                //THE ERROR IS LOGGED WITH Debug.LogError
+                //THEN THE FUN STARTS
+                //THIS INSTALLER IS SUBSCRIBED TO UNITYS LOGS
+                //IT SENDS IT DOWN THE LOGGER
+                //WHERE IT REACHES THE FUCKING SEMAPHORE
+                //AND WAITS FOR IT TO SPIN
+                //WHILE Debug.LogError IS ACTUALLY A BLOCKING CALL
+                //SO IT WONT START GOING UP THE CHAIN OF DELEGATES AND SPIN THE SEMAPHORE UNTIL THE CALLBACK IS FINISHED
+                //AND CALLBACK WONT FINISH AS IT WAITS FOR THE SEMAPHORE TO SPIN
+                //MAKING A DEADLOCK
+                //THE EASIEST WAY TO PREVENT THIS IS TO PERFORM A RECURSION GATE BEFORE THE SEMAPHORE
+
+                .AddWrapperBelow(
+                    LoggersFactory.BuildLoggerWrapperWithRecursionPreventionGate())
+
+                //Thread safety
+
+                .AddWrapperBelow(
+                    LoggersFactory.BuildLoggerWrapperWithSemaphoreSlim())
+
+                //Prefixes
+
+                .AddWrapperBelow(
+                    LoggersFactory.BuildLoggerWrapperWithThreadIndexPrefix())
+                .AddWrapperBelow(
+                    LoggersFactory.BuildLoggerWrapperWithSourceTypePrefix())
+                .AddWrapperBelow(
+                    LoggersFactory.BuildLoggerWrapperWithLogTypePrefix())
+                .AddWrapperBelow(
+                    LoggersFactory.BuildLoggerWrapperWithTimestampPrefix(
+                        loggingSettings.BasicLoggingSettings.LogTimeInUtc))
+
+                // File sink
+
+                .Branch();
+
+            var branch = loggerBuilder.CurrentLogger;
+
+            var fileSink = LoggersFactory.BuildFileSink(
+                new FileAtApplicationDataPathSettings()
+                {
+                    //(loggingSettings.LoggingEnvironmentSettings.GetLogsFolderFromEnvironment)
+                    //    ? System.Environment.GetEnvironmentVariable(
+                    //        loggingSettings.LoggingEnvironmentSettings.LogsFolderEnvironmentKey)
+                    //    : $"{Application.dataPath}/../",
+                    //$"Runtime logs/{logFileName}.log",
+
+                    RelativePath = $"../Runtime logs/{logFileName}.log"
+                },
+                loggerResolver);
+
+            fileSinkSerializer = fileSink.Serializer;
+
+            loggerBuilder.AddSink(
+                fileSink);
+
+            loggerBuilder.CurrentLogger = branch;
+
+            // Recursion prevention prefix
+
+            loggerBuilder
+
+                .AddWrapperBelow(
+                    LoggersFactory.BuildLoggerWrapperWithRecursionPreventionPrefix())
+
+                //Toggling
+
+                .AddWrapperBelow(
+                    LoggersFactory.BuildLoggerWrapperWithToggling(
+                        true,
+                        false,
+                        false,
+                        true))
+
+                // Sink
+
+                .AddSink(
+                    LoggersFactoryUnity.BuildUnityDebugLogSink());
+
+                //Open stream
+
+                var streamStrategy = fileSinkSerializer.Context.SerializationStrategy as IStrategyWithStream;
+
+                streamStrategy?.InitializeAppend();
 
             Container
                 .Bind<ILoggerResolver>()
                 .FromInstance(loggerResolver)
                 .AsCached();
 
-            cachedLogger = loggerBuilder.CurrentLogger;
+            rootLogger = loggerBuilder.RootLogger;
 
             #region Catch logs
 
@@ -265,35 +285,35 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.DI
             {
                 case LogType.Log:
 
-                    cachedLogger.Log<Application>(
+                    rootLogger.Log<Application>(
                         log);
 
                     break;
 
                 case LogType.Warning:
 
-                    cachedLogger.LogWarning<Application>(
+                    rootLogger.LogWarning<Application>(
                         log);
 
                     break;
 
                 case LogType.Error:
 
-                    cachedLogger.LogError<Application>(
+                    rootLogger.LogError<Application>(
                         log);
 
                     break;
 
                 case LogType.Assert:
 
-                    cachedLogger.Log<Application>(
+                    rootLogger.Log<Application>(
                         log);
 
                     break;
 
                 case LogType.Exception:
 
-                    cachedLogger.LogError<Application>(
+                    rootLogger.LogError<Application>(
                         log);
 
                     break;
@@ -320,7 +340,12 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.DI
                 Application.logMessageReceivedThreaded -= ReceivedLog;
             }
 
-            //cachedDumpableLogger?.Dump();
+            if (fileSinkSerializer != null)
+            {
+                var streamStrategy = fileSinkSerializer.Context.SerializationStrategy as IStrategyWithStream;
+    
+                streamStrategy?.FinalizeAppend();
+            }
         }
     }
 }

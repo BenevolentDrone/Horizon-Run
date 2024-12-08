@@ -2,21 +2,24 @@ using System;
 
 namespace HereticalSolutions.Logging
 {
-	public class LoggerWrapperWithRecursionPreventionPrefix
+	public class ProxyWrapper
 		: ILogger,
 		  ILoggerWrapper
 	{
-		private readonly ILogger innerLogger;
+		private ILogger innerLogger;
 
-		public LoggerWrapperWithRecursionPreventionPrefix(
-			ILogger innerLogger)
+		public ProxyWrapper()
 		{
-			this.innerLogger = innerLogger;
+			innerLogger = null;
 		}
 
 		#region ILoggerWrapper
 
-		public ILogger InnerLogger { get => innerLogger; }
+		public ILogger InnerLogger
+		{
+			get => innerLogger;
+			set => innerLogger = value;
+		}
 
 		#endregion
 
@@ -27,25 +30,21 @@ namespace HereticalSolutions.Logging
 		public void Log(
 			string value)
 		{
-			value = $"{LoggingConstants.RECURSION_PREVENTION_PREFIX}{value}";
-
-			innerLogger.Log(value);
+			innerLogger.Log(
+				value);
 		}
 
 		public void Log<TSource>(
 			string value)
 		{
-			value = $"{LoggingConstants.RECURSION_PREVENTION_PREFIX}{value}";
-
-			innerLogger.Log<TSource>(value);
+			innerLogger.Log<TSource>(
+				value);
 		}
 
 		public void Log(
 			Type logSource,
 			string value)
 		{
-			value = $"{LoggingConstants.RECURSION_PREVENTION_PREFIX}{value}";
-
 			innerLogger.Log(
 				logSource,
 				value);
@@ -55,8 +54,6 @@ namespace HereticalSolutions.Logging
 			string value,
 			object[] arguments)
 		{
-			value = $"{LoggingConstants.RECURSION_PREVENTION_PREFIX}{value}";
-
 			innerLogger.Log(
 				value,
 				arguments);
@@ -66,8 +63,6 @@ namespace HereticalSolutions.Logging
 			string value,
 			object[] arguments)
 		{
-			value = $"{LoggingConstants.RECURSION_PREVENTION_PREFIX}{value}";
-
 			innerLogger.Log<TSource>(
 				value,
 				arguments);
@@ -78,8 +73,6 @@ namespace HereticalSolutions.Logging
 			string value,
 			object[] arguments)
 		{
-			value = $"{LoggingConstants.RECURSION_PREVENTION_PREFIX}{value}";
-
 			innerLogger.Log(
 				logSource,
 				value,
@@ -93,8 +86,6 @@ namespace HereticalSolutions.Logging
 		public void LogWarning(
 			string value)
 		{
-			value = $"{LoggingConstants.RECURSION_PREVENTION_PREFIX}{value}";
-
 			innerLogger.LogWarning(
 				value);
 		}
@@ -102,17 +93,14 @@ namespace HereticalSolutions.Logging
 		public void LogWarning<TSource>(
 			string value)
 		{
-			value = $"{LoggingConstants.RECURSION_PREVENTION_PREFIX}{value}";
-
-			innerLogger.LogWarning<TSource>(value);
+			innerLogger.LogWarning<TSource>(
+				value);
 		}
 
 		public void LogWarning(
 			Type logSource,
 			string value)
 		{
-			value = $"{LoggingConstants.RECURSION_PREVENTION_PREFIX}{value}";
-
 			innerLogger.LogWarning(
 				logSource,
 				value);
@@ -122,8 +110,6 @@ namespace HereticalSolutions.Logging
 			string value,
 			object[] arguments)
 		{
-			value = $"{LoggingConstants.RECURSION_PREVENTION_PREFIX}{value}";
-
 			innerLogger.LogWarning(
 				value,
 				arguments);
@@ -133,8 +119,6 @@ namespace HereticalSolutions.Logging
 			string value,
 			object[] arguments)
 		{
-			value = $"{LoggingConstants.RECURSION_PREVENTION_PREFIX}{value}";
-
 			innerLogger.LogWarning<TSource>(
 				value,
 				arguments);
@@ -145,8 +129,6 @@ namespace HereticalSolutions.Logging
 			string value,
 			object[] arguments)
 		{
-			value = $"{LoggingConstants.RECURSION_PREVENTION_PREFIX}{value}";
-
 			innerLogger.LogWarning(
 				logSource,
 				value,
@@ -156,12 +138,9 @@ namespace HereticalSolutions.Logging
 		#endregion
 
 		#region Error
-
 		public void LogError(
 			string value)
 		{
-			value = $"{LoggingConstants.RECURSION_PREVENTION_PREFIX}{value}";
-
 			innerLogger.LogError(
 				value);
 		}
@@ -169,8 +148,6 @@ namespace HereticalSolutions.Logging
 		public void LogError<TSource>(
 			string value)
 		{
-			value = $"{LoggingConstants.RECURSION_PREVENTION_PREFIX}{value}";
-
 			innerLogger.LogError<TSource>(value);
 		}
 
@@ -178,8 +155,6 @@ namespace HereticalSolutions.Logging
 			Type logSource,
 			string value)
 		{
-			value = $"{LoggingConstants.RECURSION_PREVENTION_PREFIX}{value}";
-
 			innerLogger.LogError(
 				logSource,
 				value);
@@ -189,8 +164,6 @@ namespace HereticalSolutions.Logging
 			string value,
 			object[] arguments)
 		{
-			value = $"{LoggingConstants.RECURSION_PREVENTION_PREFIX}{value}";
-
 			innerLogger.LogError(
 				value,
 				arguments);
@@ -200,8 +173,6 @@ namespace HereticalSolutions.Logging
 			string value,
 			object[] arguments)
 		{
-			value = $"{LoggingConstants.RECURSION_PREVENTION_PREFIX}{value}";
-
 			innerLogger.LogError<TSource>(
 				value,
 				arguments);
@@ -212,8 +183,6 @@ namespace HereticalSolutions.Logging
 			string value,
 			object[] arguments)
 		{
-			value = $"{LoggingConstants.RECURSION_PREVENTION_PREFIX}{value}";
-
 			innerLogger.LogError(
 				logSource,
 				value,
@@ -227,13 +196,15 @@ namespace HereticalSolutions.Logging
 		public string FormatException(
 			string value)
 		{
-			return innerLogger.FormatException(value);
+			return innerLogger.FormatException(
+				value);
 		}
 
 		public string FormatException<TSource>(
 			string value)
 		{
-			return innerLogger.FormatException<TSource>(value);
+			return innerLogger.FormatException<TSource>(
+				value);
 		}
 
 		public string FormatException(

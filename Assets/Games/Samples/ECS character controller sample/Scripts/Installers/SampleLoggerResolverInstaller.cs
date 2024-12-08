@@ -16,18 +16,18 @@ namespace HereticalSolutions.Samples.ECSCharacterControllerSample.Installers
         {
             ILoggerBuilder loggerBuilder = LoggersFactory.BuildLoggerBuilder();
 
-            loggerBuilder
+            var loggerResolver = loggerBuilder
+                .NewLogger()
                 .ToggleAllowedByDefault(allowedByDefault)
+                .AddWrapperBelow(
+                    LoggersFactory.BuildLoggerWrapperWithSourceTypePrefix())
+                .AddWrapperBelow(
+                    LoggersFactory.BuildLoggerWrapperWithLogTypePrefix())
+                .AddWrapperBelow(
+                    LoggersFactory.BuildLoggerWrapperWithTimestampPrefix(false))
                 .AddSink(
                     LoggersFactoryUnity.BuildUnityDebugLogSink())
-                .Wrap(
-                    LoggersFactory.BuildLoggerWrapperWithLogTypePrefix(
-                        loggerBuilder.CurrentLogger))
-                .Wrap(
-                    LoggersFactory.BuildLoggerWrapperWithSourceTypePrefix(
-                        loggerBuilder.CurrentLogger));
-
-            var loggerResolver = (ILoggerResolver)loggerBuilder;
+                .Build();
 
             Container
                 .Bind<ILoggerResolver>()

@@ -1,6 +1,6 @@
 using System;
 
-namespace HeresySolutions.Lifetime
+namespace HereticalSolutions.Lifetime
 {
     public class LifetimeController
     {

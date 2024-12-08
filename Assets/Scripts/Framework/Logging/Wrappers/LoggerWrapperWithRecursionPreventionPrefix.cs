@@ -2,21 +2,24 @@ using System;
 
 namespace HereticalSolutions.Logging
 {
-	public class LoggerWrapperWithRecursionPreventionGate
+	public class LoggerWrapperWithRecursionPreventionPrefix
 		: ILogger,
 		  ILoggerWrapper
 	{
-		private readonly ILogger innerLogger;
+		private ILogger innerLogger;
 
-		public LoggerWrapperWithRecursionPreventionGate(
-			ILogger innerLogger)
+		public LoggerWrapperWithRecursionPreventionPrefix()
 		{
-			this.innerLogger = innerLogger;
+			innerLogger = null;
 		}
 
 		#region ILoggerWrapper
 
-		public ILogger InnerLogger { get => innerLogger; }
+		public ILogger InnerLogger
+		{
+			get => innerLogger;
+			set => innerLogger = value;
+		}
 
 		#endregion
 
@@ -27,8 +30,7 @@ namespace HereticalSolutions.Logging
 		public void Log(
 			string value)
 		{
-			if (value.StartsWith(LoggingConstants.RECURSION_PREVENTION_PREFIX))
-				return;
+			value = $"{LoggingConstants.RECURSION_PREVENTION_PREFIX}{value}";
 
 			innerLogger.Log(value);
 		}
@@ -36,8 +38,7 @@ namespace HereticalSolutions.Logging
 		public void Log<TSource>(
 			string value)
 		{
-			if (value.StartsWith(LoggingConstants.RECURSION_PREVENTION_PREFIX))
-				return;
+			value = $"{LoggingConstants.RECURSION_PREVENTION_PREFIX}{value}";
 
 			innerLogger.Log<TSource>(value);
 		}
@@ -46,8 +47,7 @@ namespace HereticalSolutions.Logging
 			Type logSource,
 			string value)
 		{
-			if (value.StartsWith(LoggingConstants.RECURSION_PREVENTION_PREFIX))
-				return;
+			value = $"{LoggingConstants.RECURSION_PREVENTION_PREFIX}{value}";
 
 			innerLogger.Log(
 				logSource,
@@ -58,8 +58,7 @@ namespace HereticalSolutions.Logging
 			string value,
 			object[] arguments)
 		{
-			if (value.StartsWith(LoggingConstants.RECURSION_PREVENTION_PREFIX))
-				return;
+			value = $"{LoggingConstants.RECURSION_PREVENTION_PREFIX}{value}";
 
 			innerLogger.Log(
 				value,
@@ -70,8 +69,7 @@ namespace HereticalSolutions.Logging
 			string value,
 			object[] arguments)
 		{
-			if (value.StartsWith(LoggingConstants.RECURSION_PREVENTION_PREFIX))
-				return;
+			value = $"{LoggingConstants.RECURSION_PREVENTION_PREFIX}{value}";
 
 			innerLogger.Log<TSource>(
 				value,
@@ -83,8 +81,7 @@ namespace HereticalSolutions.Logging
 			string value,
 			object[] arguments)
 		{
-			if (value.StartsWith(LoggingConstants.RECURSION_PREVENTION_PREFIX))
-				return;
+			value = $"{LoggingConstants.RECURSION_PREVENTION_PREFIX}{value}";
 
 			innerLogger.Log(
 				logSource,
@@ -99,8 +96,7 @@ namespace HereticalSolutions.Logging
 		public void LogWarning(
 			string value)
 		{
-			if (value.StartsWith(LoggingConstants.RECURSION_PREVENTION_PREFIX))
-				return;
+			value = $"{LoggingConstants.RECURSION_PREVENTION_PREFIX}{value}";
 
 			innerLogger.LogWarning(
 				value);
@@ -109,8 +105,7 @@ namespace HereticalSolutions.Logging
 		public void LogWarning<TSource>(
 			string value)
 		{
-			if (value.StartsWith(LoggingConstants.RECURSION_PREVENTION_PREFIX))
-				return;
+			value = $"{LoggingConstants.RECURSION_PREVENTION_PREFIX}{value}";
 
 			innerLogger.LogWarning<TSource>(value);
 		}
@@ -119,8 +114,7 @@ namespace HereticalSolutions.Logging
 			Type logSource,
 			string value)
 		{
-			if (value.StartsWith(LoggingConstants.RECURSION_PREVENTION_PREFIX))
-				return;
+			value = $"{LoggingConstants.RECURSION_PREVENTION_PREFIX}{value}";
 
 			innerLogger.LogWarning(
 				logSource,
@@ -131,8 +125,7 @@ namespace HereticalSolutions.Logging
 			string value,
 			object[] arguments)
 		{
-			if (value.StartsWith(LoggingConstants.RECURSION_PREVENTION_PREFIX))
-				return;
+			value = $"{LoggingConstants.RECURSION_PREVENTION_PREFIX}{value}";
 
 			innerLogger.LogWarning(
 				value,
@@ -143,8 +136,7 @@ namespace HereticalSolutions.Logging
 			string value,
 			object[] arguments)
 		{
-			if (value.StartsWith(LoggingConstants.RECURSION_PREVENTION_PREFIX))
-				return;
+			value = $"{LoggingConstants.RECURSION_PREVENTION_PREFIX}{value}";
 
 			innerLogger.LogWarning<TSource>(
 				value,
@@ -156,8 +148,7 @@ namespace HereticalSolutions.Logging
 			string value,
 			object[] arguments)
 		{
-			if (value.StartsWith(LoggingConstants.RECURSION_PREVENTION_PREFIX))
-				return;
+			value = $"{LoggingConstants.RECURSION_PREVENTION_PREFIX}{value}";
 
 			innerLogger.LogWarning(
 				logSource,
@@ -172,8 +163,7 @@ namespace HereticalSolutions.Logging
 		public void LogError(
 			string value)
 		{
-			if (value.StartsWith(LoggingConstants.RECURSION_PREVENTION_PREFIX))
-				return;
+			value = $"{LoggingConstants.RECURSION_PREVENTION_PREFIX}{value}";
 
 			innerLogger.LogError(
 				value);
@@ -182,8 +172,7 @@ namespace HereticalSolutions.Logging
 		public void LogError<TSource>(
 			string value)
 		{
-			if (value.StartsWith(LoggingConstants.RECURSION_PREVENTION_PREFIX))
-				return;
+			value = $"{LoggingConstants.RECURSION_PREVENTION_PREFIX}{value}";
 
 			innerLogger.LogError<TSource>(value);
 		}
@@ -192,8 +181,7 @@ namespace HereticalSolutions.Logging
 			Type logSource,
 			string value)
 		{
-			if (value.StartsWith(LoggingConstants.RECURSION_PREVENTION_PREFIX))
-				return;
+			value = $"{LoggingConstants.RECURSION_PREVENTION_PREFIX}{value}";
 
 			innerLogger.LogError(
 				logSource,
@@ -204,8 +192,7 @@ namespace HereticalSolutions.Logging
 			string value,
 			object[] arguments)
 		{
-			if (value.StartsWith(LoggingConstants.RECURSION_PREVENTION_PREFIX))
-				return;
+			value = $"{LoggingConstants.RECURSION_PREVENTION_PREFIX}{value}";
 
 			innerLogger.LogError(
 				value,
@@ -216,8 +203,7 @@ namespace HereticalSolutions.Logging
 			string value,
 			object[] arguments)
 		{
-			if (value.StartsWith(LoggingConstants.RECURSION_PREVENTION_PREFIX))
-				return;
+			value = $"{LoggingConstants.RECURSION_PREVENTION_PREFIX}{value}";
 
 			innerLogger.LogError<TSource>(
 				value,
@@ -229,8 +215,7 @@ namespace HereticalSolutions.Logging
 			string value,
 			object[] arguments)
 		{
-			if (value.StartsWith(LoggingConstants.RECURSION_PREVENTION_PREFIX))
-				return;
+			value = $"{LoggingConstants.RECURSION_PREVENTION_PREFIX}{value}";
 
 			innerLogger.LogError(
 				logSource,

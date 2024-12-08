@@ -9,20 +9,23 @@ namespace HereticalSolutions.Logging
     {
         private readonly SemaphoreSlim semaphore;
         
-        private readonly ILogger innerLogger;
+        private ILogger innerLogger;
 
         public LoggerWrapperWithSemaphoreSlim(
-            SemaphoreSlim semaphore,
-            ILogger innerLogger)
+            SemaphoreSlim semaphore)
         {
             this.semaphore = semaphore;
             
-            this.innerLogger = innerLogger;
+            innerLogger = null;
         }
 
         #region ILoggerWrapper
 
-        public ILogger InnerLogger { get => innerLogger; }
+        public ILogger InnerLogger
+        {
+            get => innerLogger;
+            set => innerLogger = value;
+        }
 
         #endregion
 

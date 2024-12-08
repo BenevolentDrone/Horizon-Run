@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace HeresySolutions.Lifetime
+namespace HereticalSolutions.Lifetime
 {
     public class SmartObject : Component
     {

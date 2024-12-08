@@ -15,6 +15,8 @@ namespace HereticalSolutions.Logging
 			this.serializer = serializer;
 		}
 
+		public ISerializer Serializer => serializer;
+
 		#region ILogger
 
 		#region Log

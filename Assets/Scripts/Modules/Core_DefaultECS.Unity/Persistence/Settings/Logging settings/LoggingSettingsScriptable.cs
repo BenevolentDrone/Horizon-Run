@@ -14,10 +14,6 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
 
 		public LoggingSettings BasicLoggingSettings;
 
-		[Header("Logging environment settings")]
-
-		public LoggingEnvironmentSettings LoggingEnvironmentSettings;
-
 		[Header("Unity logging settings")]
 
 		public bool SendDebugLogsToLogger = true;

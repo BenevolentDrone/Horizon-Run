@@ -5,6 +5,6 @@ namespace HereticalSolutions.Logging
 	public interface ICompositeLoggerWrapper
 		: ILogger
 	{
-		IEnumerable<ILogger> InnerLoggers { get; }
+		List<ILogger> InnerLoggers { get; }
 	}
 }

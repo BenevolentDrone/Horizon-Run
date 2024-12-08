@@ -1,4 +1,4 @@
-namespace HeresySolutions.Lifetime
+namespace HereticalSolutions.Lifetime
 {
     public interface ILifetimeable
     {

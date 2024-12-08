@@ -95,7 +95,9 @@ public class DODExperimentsBehaviour : MonoBehaviour
     #region Logging
     
     private ILogger logger;
-    
+
+    private ISerializer fileSinkSerializer;
+
     private bool catchingLogs = true;
 
     private bool isQuittingApplication;
@@ -169,56 +171,21 @@ public class DODExperimentsBehaviour : MonoBehaviour
 
         ILoggerBuilder loggerBuilder = LoggersFactory.BuildLoggerBuilder();
 
-        //Remember that the log traverses wrappers in a bottom to top order
-        //While prefixes are added in a top to bottom order
+        var loggerResolver = loggerBuilder
+
+                .NewLogger()
+
+                .ToggleAllowedByDefault(
+                    true)
+
+                //Wrappers
+
+                .AddWrapperBelow(
+                    LoggersFactory.BuildProxyWrapper())
+
+                .Build(); //Preemptively build the logger resolver so that it can be already injected
+
         loggerBuilder
-            .ToggleAllowedByDefault(true)
-
-            // Output
-
-            .AddSink(
-                LoggersFactoryUnity.BuildUnityDebugLogSink())
-
-            // Recursion prevention prefix
-
-            .Wrap(
-                LoggersFactory.BuildLoggerWrapperWithRecursionPreventionPrefix(
-                    loggerBuilder.CurrentLogger))
-
-            // Logging to file
-
-            .Branch(
-                new[]
-                {
-                    LoggersFactory.BuildFileSink(
-                        new FileAtApplicationDataPathSettings
-                        {
-                            RelativePath = $"../Runtime logs/{logFileName}.log"
-                        },
-                        (ILoggerResolver)loggerBuilder)
-                })
-
-            //Prefixes
-
-            .Wrap(
-                LoggersFactory.BuildLoggerWrapperWithTimestampPrefix(
-                    false,
-                    loggerBuilder.CurrentLogger))
-            .Wrap(
-                LoggersFactory.BuildLoggerWrapperWithLogTypePrefix(
-                    loggerBuilder.CurrentLogger))
-            .Wrap(
-                LoggersFactory.BuildLoggerWrapperWithSourceTypePrefix(
-                    loggerBuilder.CurrentLogger))
-            .Wrap(
-                LoggersFactory.BuildLoggerWrapperWithThreadIndexPrefix(
-                    loggerBuilder.CurrentLogger))
-
-            //Thread safety
-
-            .Wrap(
-                LoggersFactory.BuildLoggerWrapperWithSemaphoreSlim(
-                    loggerBuilder.CurrentLogger))
 
             //Recursion prevention gate
 
@@ -238,39 +205,74 @@ public class DODExperimentsBehaviour : MonoBehaviour
             //MAKING A DEADLOCK
             //THE EASIEST WAY TO PREVENT THIS IS TO PERFORM A RECURSION GATE BEFORE THE SEMAPHORE
 
-            .Wrap(
-                LoggersFactory.BuildLoggerWrapperWithRecursionPreventionGate(
-                    loggerBuilder.CurrentLogger));
+            .AddWrapperBelow(
+                LoggersFactory.BuildLoggerWrapperWithRecursionPreventionGate())
 
-        var loggerResolver = (ILoggerResolver)loggerBuilder;
+            //Thread safety
+
+            .AddWrapperBelow(
+                LoggersFactory.BuildLoggerWrapperWithSemaphoreSlim())
+
+            //Prefixes
+
+            .AddWrapperBelow(
+                LoggersFactory.BuildLoggerWrapperWithThreadIndexPrefix())
+            .AddWrapperBelow(
+                LoggersFactory.BuildLoggerWrapperWithSourceTypePrefix())
+            .AddWrapperBelow(
+                LoggersFactory.BuildLoggerWrapperWithLogTypePrefix())
+            .AddWrapperBelow(
+                LoggersFactory.BuildLoggerWrapperWithTimestampPrefix(
+                    false))
+
+            // File sink
+
+            .Branch();
+
+        var branch = loggerBuilder.CurrentLogger;
+
+        var fileSink = LoggersFactory.BuildFileSink(
+            new FileAtApplicationDataPathSettings()
+            {
+                RelativePath = $"../Runtime logs/{logFileName}.log"
+            },
+            loggerResolver);
+
+        fileSinkSerializer = fileSink.Serializer;
+
+        loggerBuilder.AddSink(
+            fileSink);
+
+        loggerBuilder.CurrentLogger = branch;
+
+        // Recursion prevention prefix
+
+        loggerBuilder
+
+            .AddWrapperBelow(
+                LoggersFactory.BuildLoggerWrapperWithRecursionPreventionPrefix())
+
+            //Toggling
+
+            .AddWrapperBelow(
+                LoggersFactory.BuildLoggerWrapperWithToggling(
+                    true,
+                    true,
+                    true,
+                    true))
+
+            // Sink
+
+            .AddSink(
+                LoggersFactoryUnity.BuildUnityDebugLogSink());
+
+        //Open stream
+
+        var streamStrategy = fileSinkSerializer.Context.SerializationStrategy as IStrategyWithStream;
+
+        streamStrategy?.InitializeAppend();
 
         logger = loggerBuilder.CurrentLogger;
-        
-        #region Dumpable
-            
-        var currentLogger = loggerBuilder.CurrentLogger;
-
-        do
-        {
-            if (currentLogger is IDumpable dumpableLogger)
-            {
-                cachedDumpableLogger = (IDumpable)currentLogger;
-                    
-                break;
-            }
-
-            if (currentLogger is not ILoggerWrapper loggerWrapper)
-            {
-                cachedDumpableLogger = null;
-                    
-                break;
-            }
-
-            currentLogger = loggerWrapper.InnerLogger;
-        }
-        while (true);
-  
-        #endregion
 
         #region Catch logs
 
@@ -658,8 +660,6 @@ public class DODExperimentsBehaviour : MonoBehaviour
             IterateOverEntitiesUnsafeForLoopWithScrambledWithinCacheLineIndexes);
         
         Cleanup();
-        
-        cachedDumpableLogger?.Dump();
     }
 
     #region Experiments
@@ -1039,9 +1039,16 @@ public class DODExperimentsBehaviour : MonoBehaviour
         {
             Application.logMessageReceivedThreaded -= ReceivedLog;
         }
-        
+
+        if (fileSinkSerializer != null)
+        {
+            var streamStrategy = fileSinkSerializer.Context.SerializationStrategy as IStrategyWithStream;
+
+            streamStrategy?.FinalizeAppend();
+        }
+
 #if USE_GC_HANDLES
-        
+
         if (positionsHandle.IsAllocated)
         {
             logger.Log("Freeing positions pointer");

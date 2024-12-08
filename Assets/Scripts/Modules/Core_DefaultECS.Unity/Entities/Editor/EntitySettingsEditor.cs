@@ -65,18 +65,18 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Editor
 			{
 				ILoggerBuilder loggerBuilder = LoggersFactory.BuildLoggerBuilder();
 
-				loggerBuilder
+				loggerResolver = loggerBuilder
+					.NewLogger()
 					.ToggleAllowedByDefault(true)
+					.AddWrapperBelow(
+						LoggersFactory.BuildLoggerWrapperWithSourceTypePrefix())
+					.AddWrapperBelow(
+						LoggersFactory.BuildLoggerWrapperWithLogTypePrefix())
+					.AddWrapperBelow(
+						LoggersFactory.BuildLoggerWrapperWithTimestampPrefix(false))
 					.AddSink(
 						LoggersFactoryUnity.BuildUnityDebugLogSink())
-					.Wrap(
-						LoggersFactory.BuildLoggerWrapperWithLogTypePrefix(
-							loggerBuilder.CurrentLogger))
-					.Wrap(
-						LoggersFactory.BuildLoggerWrapperWithSourceTypePrefix(
-							loggerBuilder.CurrentLogger));
-
-				loggerResolver = (ILoggerResolver)loggerBuilder;
+					.Build();
 			}
 
 			if (serializer == null)

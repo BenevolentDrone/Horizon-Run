@@ -6,17 +6,17 @@ namespace HereticalSolutions.Logging
 	public class CompositeLoggerWrapper
 		: ICompositeLoggerWrapper
 	{
-		private readonly IEnumerable<ILogger> innerLoggers;
+		private readonly List<ILogger> innerLoggers;
 
 		public CompositeLoggerWrapper(
-			IEnumerable<ILogger> innerLoggers)
+			List<ILogger> innerLoggers)
 		{
 			this.innerLoggers = innerLoggers;
 		}
 
 		#region ICompositeLoggerWrapper
 
-		public IEnumerable<ILogger> InnerLoggers { get => innerLoggers; }
+		public List<ILogger> InnerLoggers { get => innerLoggers; }
 
 		#endregion
 

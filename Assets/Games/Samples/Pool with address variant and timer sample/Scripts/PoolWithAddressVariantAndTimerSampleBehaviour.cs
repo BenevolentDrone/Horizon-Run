@@ -57,19 +57,19 @@ namespace HereticalSolutions.Samples.PoolWithAddressVariantAndTimerSample
 
 			ILoggerBuilder loggerBuilder = LoggersFactory.BuildLoggerBuilder();
 
-			loggerBuilder
+			loggerResolver = loggerBuilder
+				.NewLogger()
 				.ToggleAllowedByDefault(false)
+				.ToggleLogSource(typeof(PoolWithAddressVariantAndTimerSampleBehaviour), true)
+				.AddWrapperBelow(
+					LoggersFactory.BuildLoggerWrapperWithSourceTypePrefix())
+				.AddWrapperBelow(
+					LoggersFactory.BuildLoggerWrapperWithLogTypePrefix())
+				.AddWrapperBelow(
+					LoggersFactory.BuildLoggerWrapperWithTimestampPrefix(false))
 				.AddSink(
 					LoggersFactoryUnity.BuildUnityDebugLogSink())
-				.Wrap(
-					LoggersFactory.BuildLoggerWrapperWithLogTypePrefix(
-						loggerBuilder.CurrentLogger))
-				.Wrap(
-					LoggersFactory.BuildLoggerWrapperWithSourceTypePrefix(
-						loggerBuilder.CurrentLogger))
-				.ToggleLogSource(typeof(PoolWithAddressVariantAndTimerSampleBehaviour), true);
-
-			loggerResolver = (ILoggerResolver)loggerBuilder;
+				.Build();
 
 			logger = loggerResolver.GetLogger<PoolWithAddressVariantAndTimerSampleBehaviour>();
 

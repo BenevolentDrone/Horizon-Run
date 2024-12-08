@@ -28,19 +28,19 @@ namespace HereticalSolutions.Samples.NonAllocatingPingerSample
 
 			ILoggerBuilder loggerBuilder = LoggersFactory.BuildLoggerBuilder();
 
-			loggerBuilder
+			loggerResolver = loggerBuilder
+				.NewLogger()
 				.ToggleAllowedByDefault(false)
+				.ToggleLogSource(typeof(NonAllocatingPingerSampleBehaviour), true)
+				.AddWrapperBelow(
+					LoggersFactory.BuildLoggerWrapperWithSourceTypePrefix())
+				.AddWrapperBelow(
+					LoggersFactory.BuildLoggerWrapperWithLogTypePrefix())
+				.AddWrapperBelow(
+					LoggersFactory.BuildLoggerWrapperWithTimestampPrefix(false))
 				.AddSink(
 					LoggersFactoryUnity.BuildUnityDebugLogSink())
-				.Wrap(
-					LoggersFactory.BuildLoggerWrapperWithLogTypePrefix(
-						loggerBuilder.CurrentLogger))
-				.Wrap(
-					LoggersFactory.BuildLoggerWrapperWithSourceTypePrefix(
-						loggerBuilder.CurrentLogger))
-				.ToggleLogSource(typeof(NonAllocatingPingerSampleBehaviour), true);
-
-			loggerResolver = (ILoggerResolver)loggerBuilder;
+				.Build();
 
 			logger = loggerResolver.GetLogger<NonAllocatingPingerSampleBehaviour>();
 

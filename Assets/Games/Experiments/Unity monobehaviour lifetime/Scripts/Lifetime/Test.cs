@@ -5,7 +5,7 @@ using System.Threading;
 using System.Text;
 using Random = System.Random;
 
-namespace HeresySolutions.Lifetime
+namespace HereticalSolutions.Lifetime
 {
     public class Test : MonoBehaviour, ISerializationCallbackReceiver
     {

@@ -25,10 +25,6 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
           ILoadVisitor,
           IPopulateVisitor
 	{
-		private readonly Type[] componentTypes;
-
-		private readonly MethodInfo writeComponentMethodInfo;
-
 		private readonly IReadOnlyRepository<Type, WriteComponentToObjectDelegate> componentWriters;
 
 		private readonly IEntityPrototypeRepository<TPrototypeID, TEntity> prototypeRepository;
@@ -36,16 +32,10 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
 		private readonly ILogger logger;
 
 		public DefaultECSEntityPrototypeVisitor(
-			Type[] componentTypes,
-			MethodInfo writeComponentMethodInfo,
 			IReadOnlyRepository<Type, WriteComponentToObjectDelegate> componentWriters,
 			IEntityPrototypeRepository<TPrototypeID, TEntity> prototypeRepository,
 			ILogger logger = null)
 		{
-			this.componentTypes = componentTypes;
-
-			this.writeComponentMethodInfo = writeComponentMethodInfo;
-
 			this.componentWriters = componentWriters;
 
 			this.prototypeRepository = prototypeRepository;

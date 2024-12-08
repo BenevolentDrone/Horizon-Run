@@ -38,8 +38,6 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Factories
 				componentTypes);
 
 			return new DefaultECSEntityPrototypeVisitor(
-				componentTypes,
-				writeComponentMethodInfo,
 				componentWriters,
 				prototypeRepository,
 				loggerResolver?.GetLogger<DefaultECSEntityPrototypeVisitor>());

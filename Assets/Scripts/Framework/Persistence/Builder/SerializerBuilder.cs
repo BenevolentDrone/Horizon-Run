@@ -392,6 +392,18 @@ namespace HereticalSolutions.Persistence
 
 		#endregion
 
+		#region Visitor
+
+		public ISerializerBuilder WithVisitor(
+			IVisitor visitor)
+		{
+			serializerContext.Visitor = visitor;
+
+			return this;
+		}
+
+		#endregion
+
 		public ISerializer Build()
 		{
 			if (serializerContext == null)
@@ -418,8 +430,11 @@ namespace HereticalSolutions.Persistence
 						"SERIALIZATION STRATEGY MISSING. PLEASE SPECIFY A SERIALIZATION STRATEGY BEFORE BUILDING"));
 			}
 
-			serializerContext.Visitor = PersistenceFactory.BuildDispatchVisitor(
-				loggerResolver);
+			if (serializerContext.Visitor == null)
+			{
+				serializerContext.Visitor = PersistenceFactory.BuildDispatchVisitor(
+					loggerResolver);
+			}
 
 			return new Serializer(
 				serializerContext,

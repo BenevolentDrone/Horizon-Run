@@ -100,6 +100,13 @@ namespace HereticalSolutions.Persistence
 
 		#endregion
 
+		#region Visitor
+
+		ISerializerBuilder WithVisitor(
+			IVisitor visitor);
+
+		#endregion
+
 		ISerializer Build();
 	}
 }

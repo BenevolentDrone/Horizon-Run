@@ -29,52 +29,64 @@ namespace HereticalSolutions.Persistence
 		public bool Serialize<TValue>(
 			TValue value)
 		{
-			if (!context.Visitor.CanVisit<TValue>())
-			{
-				logger?.LogError(
-					GetType(),
-					$"CANNOT VISIT TYPE: {typeof(TValue).Name}");
-
-				return false;
-			}
-
-			var saveVisitor = context.Visitor as ISaveVisitor;
-
-			if (saveVisitor == null)
-			{
-				logger?.LogError(
-					GetType(),
-					$"VISITOR IS NOT A SAVE VISITOR: {context.Visitor.GetType().Name}");
-
-				return false;
-			}
-
 			try
 			{
-				object dto = null;
-
-				if (!saveVisitor.VisitSave<TValue>(
-					ref dto,
-					value))
+				if (context.Visitor.CanVisit<TValue>())
 				{
-					logger?.LogError(
-						GetType(),
-						$"VISIT SAVE FAILED: {typeof(TValue).Name}");
-	
-					return false;
+					object dto = null;
+
+					var saveVisitor = context.Visitor as ISaveVisitor;
+
+					if (saveVisitor == null)
+					{
+						logger?.LogError(
+							GetType(),
+							$"VISITOR IS NOT A SAVE VISITOR: {context.Visitor.GetType().Name}");
+
+						return false;
+					}
+
+					if (!saveVisitor.VisitSave<TValue>(
+						ref dto,
+						value))
+					{
+						logger?.LogError(
+							GetType(),
+							$"VISIT SAVE FAILED: {typeof(TValue).Name}");
+
+						return false;
+					}
+
+					if (!context.FormatSerializer.Serialize(
+						context.SerializationStrategy,
+						context.Arguments,
+						dto.GetType(),
+						dto))
+					{
+						logger?.LogError(
+							GetType(),
+							$"SERIALIZATION FAILED: {dto.GetType().Name}");
+
+						return false;
+					}
 				}
-
-				if (!context.FormatSerializer.Serialize(
-					context.SerializationStrategy,
-					context.Arguments,
-					dto.GetType(),
-					dto))
+				else
 				{
-					logger?.LogError(
+					logger?.Log(
 						GetType(),
-						$"SERIALIZATION FAILED: {dto.GetType().Name}");
+						$"CANNOT VISIT TYPE: {typeof(TValue).Name}, TRYING TO SERIALIZE AS DTO");
 
-					return false;
+					if (!context.FormatSerializer.Serialize<TValue>(
+						context.SerializationStrategy,
+						context.Arguments,
+						value))
+					{
+						logger?.LogError(
+							GetType(),
+							$"SERIALIZATION FAILED: {typeof(TValue).Name}");
+
+						return false;
+					}
 				}
 			}
 			catch (Exception exception)
@@ -93,54 +105,67 @@ namespace HereticalSolutions.Persistence
 			Type valueType,
 			object valueObject)
 		{
-			if (!context.Visitor.CanVisit(valueType))
-			{
-				logger?.LogError(
-					GetType(),
-					$"CANNOT VISIT TYPE: {valueType.Name}");
-
-				return false;
-			}
-
-			var saveVisitor = context.Visitor as ISaveVisitor;
-
-			if (saveVisitor == null)
-			{
-				logger?.LogError(
-					GetType(),
-					$"VISITOR IS NOT A SAVE VISITOR: {context.Visitor.GetType().Name}");
-
-				return false;
-			}
-
 			try
 			{
-				object dto = null;
-
-				if (!saveVisitor.VisitSave(
-					ref dto,
-					valueType,
-					valueObject as IVisitable))
+				if (context.Visitor.CanVisit(valueType))
 				{
-					logger?.LogError(
-						GetType(),
-						$"VISIT SAVE FAILED: {valueType.Name}");
+					object dto = null;
 
-					return false;
+					var saveVisitor = context.Visitor as ISaveVisitor;
+
+					if (saveVisitor == null)
+					{
+						logger?.LogError(
+							GetType(),
+							$"VISITOR IS NOT A SAVE VISITOR: {context.Visitor.GetType().Name}");
+
+						return false;
+					}
+
+					if (!saveVisitor.VisitSave(
+						ref dto,
+						valueType,
+						valueObject as IVisitable))
+					{
+						logger?.LogError(
+							GetType(),
+							$"VISIT SAVE FAILED: {valueType.Name}");
+
+						return false;
+					}
+
+					if (!context.FormatSerializer.Serialize(
+						context.SerializationStrategy,
+						context.Arguments,
+						dto.GetType(),
+						dto))
+					{
+						logger?.LogError(
+							GetType(),
+							$"SERIALIZATION FAILED: {dto.GetType().Name}");
+
+						return false;
+					}
 				}
-
-				if (!context.FormatSerializer.Serialize(
-					context.SerializationStrategy,
-					context.Arguments,
-					dto.GetType(),
-					dto))
+				else
 				{
-					logger?.LogError(
+					logger?.Log(
 						GetType(),
-						$"SERIALIZATION FAILED: {dto.GetType().Name}");
+						$"CANNOT VISIT TYPE: {valueType.Name}, TRYING TO SERIALIZE AS DTO");
 
-					return false;
-				}
+					if (!context.FormatSerializer.Serialize(
+						context.SerializationStrategy,
+						context.Arguments,
+						valueType,
+						valueObject))
+					{
+						logger?.LogError(
+							GetType(),
+							$"SERIALIZATION FAILED: {valueType.Name}");
+
+						return false;
+					}
+				}				
 			}
 			catch (Exception exception)
 			{
@@ -163,56 +188,76 @@ namespace HereticalSolutions.Persistence
 		{
 			value = default;
 
-			if (!context.Visitor.CanVisit<TValue>())
-			{
-				logger?.LogError(
-					GetType(),
-					$"CANNOT VISIT TYPE: {typeof(TValue).Name}");
-
-				return false;
-			}
-
-			var loadVisitor = context.Visitor as ILoadVisitor;
-
-			if (loadVisitor == null)
-			{
-				logger?.LogError(
-					GetType(),
-					$"VISITOR IS NOT A LOAD VISITOR: {context.Visitor.GetType().Name}");
-
-				return false;
-			}
-
-			Type dtoType = loadVisitor.GetDTOType<TValue>();
-
 			try
 			{
-				object dto = null;
-
-				if (!context.FormatSerializer.Deserialize(
-					context.SerializationStrategy,
-					context.Arguments,
-					dtoType,
-					out dto))
+				if (context.Visitor.CanVisit<TValue>())
 				{
-					logger?.LogError(
-						GetType(),
-						$"DESERIALIZATION FAILED: {dtoType.Name}");
-
-					return false;
+					var loadVisitor = context.Visitor as ILoadVisitor;
+	
+					if (loadVisitor == null)
+					{
+						logger?.LogError(
+							GetType(),
+							$"VISITOR IS NOT A LOAD VISITOR: {context.Visitor.GetType().Name}");
+	
+						return false;
+					}
+	
+					Type dtoType = loadVisitor.GetDTOType<TValue>();
+	
+					if (!context.FormatSerializer.Deserialize(
+						context.SerializationStrategy,
+						context.Arguments,
+						dtoType,
+						out object dto))
+					{
+						logger?.LogError(
+							GetType(),
+							$"DESERIALIZATION FAILED: {dtoType.Name}");
+	
+						return false;
+					}
+	
+					if (!loadVisitor.VisitLoad<TValue>(
+						dto,
+						out value))
+					{
+						logger?.LogError(
+							GetType(),
+							$"VISIT LOAD FAILED: {typeof(TValue).Name}");
+	
+						return false;
+					}
 				}
-
-				if (!loadVisitor.VisitLoad<TValue>(
-					dto,
-					out value))
+				else
 				{
-					logger?.LogError(
+					logger?.Log(
 						GetType(),
-						$"VISIT LOAD FAILED: {typeof(TValue).Name}");
+						$"CANNOT VISIT TYPE: {typeof(TValue).Name}, TRYING TO DESERIALIZE AS DTO");
 
-					return false;
+					var loadVisitor = context.Visitor as ILoadVisitor;
+
+					if (loadVisitor == null)
+					{
+						logger?.LogError(
+							GetType(),
+							$"VISITOR IS NOT A LOAD VISITOR: {context.Visitor.GetType().Name}");
+
+						return false;
+					}
+
+					if (!context.FormatSerializer.Deserialize<TValue>(
+						context.SerializationStrategy,
+						context.Arguments,
+						out value))
+					{
+						logger?.LogError(
+							GetType(),
+							$"DESERIALIZATION FAILED: {typeof(TValue).Name}");
+
+						return false;
+					}
 				}
-
 			}
 			catch (Exception exception)
 			{
@@ -232,56 +277,78 @@ namespace HereticalSolutions.Persistence
 		{
 			valueObject = default;
 
-			if (!context.Visitor.CanVisit(valueType))
-			{
-				logger?.LogError(
-					GetType(),
-					$"CANNOT VISIT TYPE: {valueType.Name}");
-
-				return false;
-			}
-
-			var loadVisitor = context.Visitor as ILoadVisitor;
-
-			if (loadVisitor == null)
-			{
-				logger?.LogError(
-					GetType(),
-					$"VISITOR IS NOT A LOAD VISITOR: {context.Visitor.GetType().Name}");
-
-				return false;
-			}
-
-			Type dtoType = loadVisitor.GetDTOType(valueType);
-
 			try
 			{
-				object dto = null;
-
-				if (!context.FormatSerializer.Deserialize(
-					context.SerializationStrategy,
-					context.Arguments,
-					dtoType,
-					out dto))
+				if (context.Visitor.CanVisit(valueType))
 				{
-					logger?.LogError(
-						GetType(),
-						$"DESERIALIZATION FAILED: {dtoType.Name}");
-
-					return false;
+					var loadVisitor = context.Visitor as ILoadVisitor;
+	
+					if (loadVisitor == null)
+					{
+						logger?.LogError(
+							GetType(),
+							$"VISITOR IS NOT A LOAD VISITOR: {context.Visitor.GetType().Name}");
+	
+						return false;
+					}
+	
+					Type dtoType = loadVisitor.GetDTOType(valueType);
+	
+					if (!context.FormatSerializer.Deserialize(
+						context.SerializationStrategy,
+						context.Arguments,
+						dtoType,
+						out object dto))
+					{
+						logger?.LogError(
+							GetType(),
+							$"DESERIALIZATION FAILED: {dtoType.Name}");
+	
+						return false;
+					}
+	
+					if (!loadVisitor.VisitLoad(
+						dto,
+						valueType,
+						out valueObject))
+					{
+						logger?.LogError(
+							GetType(),
+							$"VISIT LOAD FAILED: {valueType.Name}");
+	
+						return false;
+					}
 				}
-
-				if (!loadVisitor.VisitLoad(
-					dto,
-					valueType,
-					out valueObject))
+				else
 				{
-					logger?.LogError(
+					logger?.Log(
 						GetType(),
-						$"VISIT LOAD FAILED: {valueType.Name}");
+						$"CANNOT VISIT TYPE: {valueType.Name}, TRYING TO DESERIALIZE AS DTO");
 
-					return false;
-				}
+					var loadVisitor = context.Visitor as ILoadVisitor;
+
+					if (loadVisitor == null)
+					{
+						logger?.LogError(
+							GetType(),
+							$"VISITOR IS NOT A LOAD VISITOR: {context.Visitor.GetType().Name}");
+
+						return false;
+					}
+
+					if (!context.FormatSerializer.Deserialize(
+						context.SerializationStrategy,
+						context.Arguments,
+						valueType,
+						out valueObject))
+					{
+						logger?.LogError(
+							GetType(),
+							$"DESERIALIZATION FAILED: {valueType.Name}");
+
+						return false;
+					}
+				}				
 			}
 			catch (Exception exception)
 			{
@@ -302,56 +369,76 @@ namespace HereticalSolutions.Persistence
 		public bool Populate<TValue>(
 			ref TValue value)
 		{
-			if (!context.Visitor.CanVisit<TValue>())
-			{
-				logger?.LogError(
-					GetType(),
-					$"CANNOT VISIT TYPE: {typeof(TValue).Name}");
-
-				return false;
-			}
-
-			var populateVisitor = context.Visitor as IPopulateVisitor;
-
-			if (populateVisitor == null)
-			{
-				logger?.LogError(
-					GetType(),
-					$"VISITOR IS NOT A POPULATE VISITOR: {context.Visitor.GetType().Name}");
-
-				return false;
-			}
-
-			Type dtoType = populateVisitor.GetDTOType<TValue>();
-
 			try
 			{
-				object dto = null;
-
-				if (!context.FormatSerializer.Deserialize(
-					context.SerializationStrategy,
-					context.Arguments,
-					dtoType,
-					out dto))
+				if (context.Visitor.CanVisit<TValue>())
 				{
-					logger?.LogError(
-						GetType(),
-						$"DESERIALIZATION FAILED: {dtoType.Name}");
-
-					return false;
+					var populateVisitor = context.Visitor as IPopulateVisitor;
+	
+					if (populateVisitor == null)
+					{
+						logger?.LogError(
+							GetType(),
+							$"VISITOR IS NOT A POPULATE VISITOR: {context.Visitor.GetType().Name}");
+	
+						return false;
+					}
+	
+					Type dtoType = populateVisitor.GetDTOType<TValue>();
+	
+					if (!context.FormatSerializer.Deserialize(
+						context.SerializationStrategy,
+						context.Arguments,
+						dtoType,
+						out object dto))
+					{
+						logger?.LogError(
+							GetType(),
+							$"DESERIALIZATION FAILED: {dtoType.Name}");
+	
+						return false;
+					}
+	
+					if (!populateVisitor.VisitPopulate<TValue>(
+						dto,
+						value))
+					{
+						logger?.LogError(
+							GetType(),
+							$"VISIT POPULATE FAILED: {typeof(TValue).Name}");
+	
+						return false;
+					}
 				}
-
-				if (!populateVisitor.VisitPopulate<TValue>(
-					dto,
-					value))
+				else
 				{
-					logger?.LogError(
+					logger?.Log(
 						GetType(),
-						$"VISIT POPULATE FAILED: {typeof(TValue).Name}");
-
-					return false;
+						$"CANNOT VISIT TYPE: {typeof(TValue).Name}, TRYING TO POPULATE AS DTO");
+	
+					var populateVisitor = context.Visitor as IPopulateVisitor;
+	
+					if (populateVisitor == null)
+					{
+						logger?.LogError(
+							GetType(),
+							$"VISITOR IS NOT A POPULATE VISITOR: {context.Visitor.GetType().Name}");
+	
+						return false;
+					}
+	
+					if (!context.FormatSerializer.Populate<TValue>(
+						context.SerializationStrategy,
+						context.Arguments,
+						ref value))
+					{
+						logger?.LogError(
+							GetType(),
+							$"POPULATING FAILED: {typeof(TValue).Name}");
+	
+						return false;
+					}
 				}
-
 			}
 			catch (Exception exception)
 			{
@@ -369,57 +456,78 @@ namespace HereticalSolutions.Persistence
 			Type valueType,
 			ref object valueObject)
 		{
-			if (!context.Visitor.CanVisit(valueType))
-			{
-				logger?.LogError(
-					GetType(),
-					$"CANNOT VISIT TYPE: {valueType.Name}");
-
-				return false;
-			}
-
-			var populateVisitor = context.Visitor as IPopulateVisitor;
-
-			if (populateVisitor == null)
-			{
-				logger?.LogError(
-					GetType(),
-					$"VISITOR IS NOT A POPULATE VISITOR: {context.Visitor.GetType().Name}");
-
-				return false;
-			}
-
-			Type dtoType = populateVisitor.GetDTOType(valueType);
-
 			try
 			{
-				object dto = null;
-
-				if (!context.FormatSerializer.Deserialize(
-					context.SerializationStrategy,
-					context.Arguments,
-					dtoType,
-					out dto))
+				if (context.Visitor.CanVisit(valueType))
 				{
-					logger?.LogError(
-						GetType(),
-						$"DESERIALIZATION FAILED: {dtoType.Name}");
-
-					return false;
+					var populateVisitor = context.Visitor as IPopulateVisitor;
+	
+					if (populateVisitor == null)
+					{
+						logger?.LogError(
+							GetType(),
+							$"VISITOR IS NOT A POPULATE VISITOR: {context.Visitor.GetType().Name}");
+	
+						return false;
+					}
+	
+					Type dtoType = populateVisitor.GetDTOType(valueType);
+	
+					if (!context.FormatSerializer.Deserialize(
+						context.SerializationStrategy,
+						context.Arguments,
+						dtoType,
+						out object dto))
+					{
+						logger?.LogError(
+							GetType(),
+							$"DESERIALIZATION FAILED: {dtoType.Name}");
+	
+						return false;
+					}
+	
+					if (!populateVisitor.VisitPopulate(
+						dto,
+						valueType,
+						valueObject as IVisitable))
+					{
+						logger?.LogError(
+							GetType(),
+							$"VISIT POPULATE FAILED: {valueType.Name}");
+	
+						return false;
+					}
 				}
-
-				if (!populateVisitor.VisitPopulate(
-					dto,
-					valueType,
-					valueObject as IVisitable))
+				else
 				{
-					logger?.LogError(
+					logger?.Log(
 						GetType(),
-						$"VISIT POPULATE FAILED: {valueType.Name}");
+						$"CANNOT VISIT TYPE: {valueType.Name}, TRYING TO POPULATE AS DTO");
 
-					return false;
+					var populateVisitor = context.Visitor as IPopulateVisitor;
+
+					if (populateVisitor == null)
+					{
+						logger?.LogError(
+							GetType(),
+							$"VISITOR IS NOT A POPULATE VISITOR: {context.Visitor.GetType().Name}");
+
+						return false;
+					}
+
+					if (!context.FormatSerializer.Populate(
+						context.SerializationStrategy,
+						context.Arguments,
+						valueType,
+						ref valueObject))
+					{
+						logger?.LogError(
+							GetType(),
+							$"POPULATING FAILED: {valueType.Name}");
+
+						return false;
+					}
 				}
-
 			}
 			catch (Exception exception)
 			{

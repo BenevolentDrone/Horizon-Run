@@ -30,7 +30,7 @@ foo.Publish(typeof(T), bar);
 ILoggerResolver loggerResolver;
 
 //An object repository is needed for the broadcaster to select the concrete broadcaster for a given argument type
-IReadOnlyObjectRepository repository;
+IReadOnlyInstanceRepository repository;
 
 //Create a publisher with a single argument
 IPublisherSingleArg foo = DelegatesFactory.BuildBroadcasterWithRepository(

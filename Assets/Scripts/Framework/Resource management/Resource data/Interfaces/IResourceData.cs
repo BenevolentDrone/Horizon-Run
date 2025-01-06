@@ -1,5 +1,8 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
+
+using HereticalSolutions.Logging;
 
 namespace HereticalSolutions.ResourceManagement
 {
@@ -12,44 +15,80 @@ namespace HereticalSolutions.ResourceManagement
         Task AddVariant(
             IResourceVariantData variant,
             bool allocate = true,
-            IProgress<float> progress = null);
+
+            //Async tail
+            CancellationToken cancellationToken = default,
+            IProgress<float> progress = null,
+            ILogger progressLogger = null);
 
         Task RemoveVariant(
             int variantIDHash,
             bool free = true,
-            IProgress<float> progress = null);
+
+            //Async tail
+            CancellationToken cancellationToken = default,
+            IProgress<float> progress = null,
+            ILogger progressLogger = null);
 
         Task RemoveVariant(
             string variantID,
             bool free = true,
-            IProgress<float> progress = null);
+
+            //Async tail
+            CancellationToken cancellationToken = default,
+            IProgress<float> progress = null,
+            ILogger progressLogger = null);
 
         Task ClearAllVariants(
             bool free = true,
-            IProgress<float> progress = null);
+
+            //Async tail
+            CancellationToken cancellationToken = default,
+            IProgress<float> progress = null,
+            ILogger progressLogger = null);
 
         IReadOnlyResourceData ParentResource { set; }
 
         Task AddNestedResource(
             IReadOnlyResourceData nestedResource,
-            IProgress<float> progress = null);
+
+            //Async tail
+            CancellationToken cancellationToken = default,
+            IProgress<float> progress = null,
+            ILogger progressLogger = null);
 
         Task RemoveNestedResource(
             int nestedResourceIDHash,
             bool free = true,
-            IProgress<float> progress = null);
+
+            //Async tail
+            CancellationToken cancellationToken = default,
+            IProgress<float> progress = null,
+            ILogger progressLogger = null);
 
         Task RemoveNestedResource(
             string nestedResourceID,
             bool free = true,
-            IProgress<float> progress = null);
+
+            //Async tail
+            CancellationToken cancellationToken = default,
+            IProgress<float> progress = null,
+            ILogger progressLogger = null);
 
         Task ClearAllNestedResources(
             bool free = true,
-            IProgress<float> progress = null);
+
+            //Async tail
+            CancellationToken cancellationToken = default,
+            IProgress<float> progress = null,
+            ILogger progressLogger = null);
 
         Task Clear(
             bool free = true,
-            IProgress<float> progress = null);
+
+            //Async tail
+            CancellationToken cancellationToken = default,
+            IProgress<float> progress = null,
+            ILogger progressLogger = null);
     }
 }

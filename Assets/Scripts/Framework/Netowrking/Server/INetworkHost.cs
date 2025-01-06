@@ -1,4 +1,8 @@
+using System;
+using System.Threading;
 using System.Threading.Tasks;
+
+using HereticalSolutions.Logging;
 
 namespace HereticalSolutions.Networking
 {
@@ -14,8 +18,18 @@ namespace HereticalSolutions.Networking
 
         Task Start(
             int port,
-            bool reserveSlotForSelf = false);
+            bool reserveSlotForSelf = false,
 
-        Task Stop();
+            //Async tail
+            CancellationToken cancellationToken = default,
+            IProgress<float> progress = null,
+            ILogger progressLogger = null);
+
+        Task Stop(
+            
+            //Async tail
+            CancellationToken cancellationToken = default,
+            IProgress<float> progress = null,
+            ILogger progressLogger = null);
     }
 }

@@ -1,5 +1,8 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
+
+using HereticalSolutions.Logging;
 
 namespace HereticalSolutions.ResourceManagement
 {
@@ -8,20 +11,36 @@ namespace HereticalSolutions.ResourceManagement
     {
         Task AddRootResource(
             IReadOnlyResourceData rootResource,
-            IProgress<float> progress = null);
+
+            //Async tail
+            CancellationToken cancellationToken = default,
+            IProgress<float> progress = null,
+            ILogger progressLogger = null);
 
         Task RemoveRootResource(
             int rootResourceIDHash = -1,
             bool free = true,
-            IProgress<float> progress = null);
+
+            //Async tail
+            CancellationToken cancellationToken = default,
+            IProgress<float> progress = null,
+            ILogger progressLogger = null);
 
         Task RemoveRootResource(
             string rootResourceID,
             bool free = true,
-            IProgress<float> progress = null);
+
+            //Async tail
+            CancellationToken cancellationToken = default,
+            IProgress<float> progress = null,
+            ILogger progressLogger = null);
 
         Task ClearAllRootResources(
             bool free = true,
-            IProgress<float> progress = null);
+
+            //Async tail
+            CancellationToken cancellationToken = default,
+            IProgress<float> progress = null,
+            ILogger progressLogger = null);
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 using HereticalSolutions.Collections.Managed;
@@ -63,7 +64,11 @@ namespace HereticalSolutions.ResourceManagement
 
 		protected abstract Task FreeResource(
 			TResource resource,
-			IProgress<float> progress = null);
+
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null);
 
 		protected async Task<IReadOnlyResourceStorageHandle> LoadDependency(
 			string path,
@@ -89,7 +94,12 @@ namespace HereticalSolutions.ResourceManagement
 
 		protected async Task ExecuteOnMainThread(
 			Action delegateToExecute,
-			IGenericCircularBuffer<MainThreadCommand> mainThreadCommandBuffer)
+			IGenericCircularBuffer<MainThreadCommand> mainThreadCommandBuffer,
+
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null)
 		{
 			var command = new MainThreadCommand(
 				delegateToExecute);
@@ -108,7 +118,12 @@ namespace HereticalSolutions.ResourceManagement
 
 		protected async Task ExecuteOnMainThread(
 			Func<Task> asyncDelegateToExecute,
-			IGenericCircularBuffer<MainThreadCommand> mainThreadCommandBuffer)
+			IGenericCircularBuffer<MainThreadCommand> mainThreadCommandBuffer,
+
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null)
 		{
 			var command = new MainThreadCommand(
 				asyncDelegateToExecute);

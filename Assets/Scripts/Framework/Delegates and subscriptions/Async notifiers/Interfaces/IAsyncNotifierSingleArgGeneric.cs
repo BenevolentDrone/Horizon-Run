@@ -1,4 +1,8 @@
+using System;
+using System.Threading;
 using System.Threading.Tasks;
+
+using HereticalSolutions.Logging;
 
 namespace HereticalSolutions.Delegates.Notifiers
 {
@@ -17,7 +21,12 @@ namespace HereticalSolutions.Delegates.Notifiers
 		/// <returns>A task representing the asynchronous operation and containing the value</returns>
 		Task<TValue> GetValueWhenNotified(
 			TArgument argument = default,
-			bool ignoreKey = false);
+			bool ignoreKey = false,
+
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null);
 
 		/// <summary>
 		/// Gets the task that waits for notification
@@ -37,6 +46,11 @@ namespace HereticalSolutions.Delegates.Notifiers
 		/// <returns>A task representing the asynchronous operation</returns>
 		Task Notify(
 			TArgument argument,
-			TValue value);
+			TValue value,
+
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null);
 	}
 }

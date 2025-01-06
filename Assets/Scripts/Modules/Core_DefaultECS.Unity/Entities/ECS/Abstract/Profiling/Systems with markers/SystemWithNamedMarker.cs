@@ -25,9 +25,9 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
 #if USE_PROFILING_MARKERS
             marker = new ProfilerMarker(markerName);
             
-            if (!MarkersRepository.Markers.Has(markerName))
+            if (!MarkerRepository.Markers.Has(markerName))
             {
-                MarkersRepository.Markers.Add(
+                MarkerRepository.Markers.Add(
                     markerName,
                     marker);
             }

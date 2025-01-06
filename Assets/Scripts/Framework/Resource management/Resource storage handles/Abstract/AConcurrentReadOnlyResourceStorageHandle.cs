@@ -49,7 +49,11 @@ namespace HereticalSolutions.ResourceManagement
 		}
 
 		public virtual async Task Allocate(
-			IProgress<float> progress = null)
+
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null)
 		{
 			progress?.Report(0f);
 
@@ -94,7 +98,11 @@ namespace HereticalSolutions.ResourceManagement
 		}
 
 		public async Task Free(
-			IProgress<float> progress = null)
+			
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null)
 		{
 			progress?.Report(0f);
 

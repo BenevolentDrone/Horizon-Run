@@ -4,12 +4,14 @@ using System.Collections.Generic;
 using HereticalSolutions.Repositories.Factories;
 
 using HereticalSolutions.LifetimeManagement;
+using HereticalSolutions.Persistence;
 
 namespace HereticalSolutions.Repositories
 {
     public class DictionaryRepository<TKey, TValue> :
         IRepository<TKey, TValue>,
         IClonableRepository<TKey, TValue>,
+        //IVisitable,
         ICleanuppable,
         IDisposable
     {
@@ -68,6 +70,18 @@ namespace HereticalSolutions.Repositories
             return database.TryAdd(
                 key,
                 value);
+        }
+
+        public TValue this[TKey key]
+        {
+            get
+            {
+                return database[key];
+            }
+            set
+            {
+                database[key] = value;
+            }
         }
 
         public void Update(
@@ -136,6 +150,18 @@ namespace HereticalSolutions.Repositories
         }
 
         #endregion
+
+        //#region IVisitable
+        //
+        //public bool AcceptSave(
+        //    ISaveVisitor visitor,
+        //    ref object dto);
+        //
+        //public bool AcceptPopulate(
+        //    IPopulateVisitor visitor,
+        //    object dto);
+        //
+        //#endregion
 
         #region ICleanUppable
 

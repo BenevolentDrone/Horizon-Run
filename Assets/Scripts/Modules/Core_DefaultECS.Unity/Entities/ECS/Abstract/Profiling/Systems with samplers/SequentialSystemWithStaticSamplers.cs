@@ -58,9 +58,9 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
                         false);
                 
                 if (usageMask[i]
-                    && !SamplersRepository.Samplers.Has(samplerKeys[i]))
+                    && !SamplerRepository.Samplers.Has(samplerKeys[i]))
                 {
-                    SamplersRepository.Samplers.Add(
+                    SamplerRepository.Samplers.Add(
                         samplerKeys[i],
                         CustomSampler.Create(samplerKeys[i]));
                 }
@@ -102,14 +102,14 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
 #if USE_PROFILING_SAMPLERS
                     if (usageMask[i])
                     {
-                        SamplersRepository.Samplers.Get(samplerKeys[i]).Begin();
+                        SamplerRepository.Samplers.Get(samplerKeys[i]).Begin();
 #endif
                     
                         systems[i].Update(state);
                     
                     
 #if USE_PROFILING_SAMPLERS
-                        SamplersRepository.Samplers.Get(samplerKeys[i]).End();
+                        SamplerRepository.Samplers.Get(samplerKeys[i]).End();
                     }
                     else
                     {

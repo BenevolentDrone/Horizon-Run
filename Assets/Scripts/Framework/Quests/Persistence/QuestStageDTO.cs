@@ -1,9 +1,11 @@
+using System;
+
 namespace HereticalSolutions.Quests
 {
     /// <summary>
     /// Represents a data transfer object for a quest stage
     /// </summary>
-    [System.Serializable]
+    [Serializable]
     public struct QuestStageDTO
     {
         /// <summary>

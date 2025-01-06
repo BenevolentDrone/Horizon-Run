@@ -55,6 +55,8 @@ namespace HereticalSolutions.Repositories
             TKey key,
             TValue value);
 
+        new TValue this[TKey key] { get; set; }
+
         /// <summary>
         /// Removes a key-value pair from the repository
         /// </summary>

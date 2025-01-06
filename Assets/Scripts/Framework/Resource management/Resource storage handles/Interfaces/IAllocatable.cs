@@ -1,5 +1,8 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
+
+using HereticalSolutions.Logging;
 
 namespace HereticalSolutions.ResourceManagement
 {
@@ -7,8 +10,18 @@ namespace HereticalSolutions.ResourceManagement
     {
         bool Allocated { get; }
 
-        Task Allocate(IProgress<float> progress = null);
+        Task Allocate(
 
-        Task Free(IProgress<float> progress = null);
+            //Async tail
+            CancellationToken cancellationToken = default,
+            IProgress<float> progress = null,
+            ILogger progressLogger = null);
+
+        Task Free(
+            
+            //Async tail
+            CancellationToken cancellationToken = default,
+            IProgress<float> progress = null,
+            ILogger progressLogger = null);
     }
 }

@@ -40,7 +40,7 @@ INonAllocSubscribable foo = DelegatesFactory.BuildBuildNonAllocPinger(loggerReso
 INonAllocSubscribable foo = DelegatesFactory.BuildNonAllocBroadcasterGeneric<T>(loggerResolver);
 
 //An object repository is needed for the broadcaster to select the concrete broadcaster for a given argument type
-IReadOnlyObjectRepository repository;
+IReadOnlyInstanceRepository repository;
 
 //Create a non alloc subscribable with a single argument
 INonAllocSubscribable foo = DelegatesFactory.BuildNonAllocBroadcasterWithRepository(

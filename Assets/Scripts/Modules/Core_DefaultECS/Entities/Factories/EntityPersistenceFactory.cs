@@ -5,13 +5,9 @@ using System.Reflection;
 using HereticalSolutions.Repositories;
 using HereticalSolutions.Repositories.Factories;
 
-using HereticalSolutions.Persistence;
-
 using HereticalSolutions.Entities;
 
 using HereticalSolutions.Logging;
-
-using DefaultEcs;
 
 using TPrototypeID = System.String;
 

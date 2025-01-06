@@ -23,7 +23,7 @@ namespace HereticalSolutions.Messaging.Factories
     {
         private const int DEFAULT_MESSAGE_POOL_CAPACITY = 16;
         
-        private readonly IObjectRepository messagePoolRepository;
+        private readonly IInstanceRepository messagePoolRepository;
 
         private readonly NonAllocBroadcasterWithRepositoryBuilder broadcasterBuilder;
 
@@ -39,7 +39,7 @@ namespace HereticalSolutions.Messaging.Factories
         {
             this.loggerResolver = loggerResolver;
 
-            messagePoolRepository = RepositoriesFactory.BuildDictionaryObjectRepository();
+            messagePoolRepository = RepositoriesFactory.BuildDictionaryInstanceRepository();
 
             broadcasterBuilder = new NonAllocBroadcasterWithRepositoryBuilder(
                 loggerResolver);
@@ -123,7 +123,7 @@ namespace HereticalSolutions.Messaging.Factories
             
             return new NonAllocMessageBus(
                 broadcasterBuilder.Build(),
-                (IReadOnlyObjectRepository)messagePoolRepository,
+                (IReadOnlyInstanceRepository)messagePoolRepository,
                 mailbox,
                 mailboxContents,
                 logger);

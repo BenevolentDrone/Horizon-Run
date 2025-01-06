@@ -1,9 +1,11 @@
+using  System;
+
 namespace HereticalSolutions.Quests
 {
     /// <summary>
     /// Represents a descriptor for a quest objective
     /// </summary>
-    [System.Serializable]
+    [Serializable]
     public struct QuestObjectiveDescriptor
     {
         /// <summary>

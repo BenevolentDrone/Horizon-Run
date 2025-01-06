@@ -1,9 +1,11 @@
+using System;
+
 namespace HereticalSolutions.Quests
 {
     /// <summary>
     /// Struct that represents a quest property with a key and value
     /// </summary>
-    [System.Serializable]
+    [Serializable]
     public struct QuestPropertyDTO
     {
         /// <summary>

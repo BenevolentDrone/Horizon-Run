@@ -33,6 +33,8 @@ namespace HereticalSolutions.Repositories
 			TKey key,
 			out TValue value);
 
+		TValue this[TKey key] { get; }
+
 		/// <summary>
 		/// Gets the number of key-value pairs contained in the repository
 		/// </summary>

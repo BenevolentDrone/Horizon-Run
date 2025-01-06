@@ -625,7 +625,14 @@ namespace Sketchfab
 		}
 
 		// Model archive download and import
-		public void importArchive(byte[] data, string unzipDirectory, string importDirectory, string prefabName, bool addToCurrentScene = false)
+		public void importArchive(
+			byte[] data,
+			string unzipDirectory,
+			string importDirectory,
+			string prefabName,
+			string currentUID,
+			string subfolderName,
+			bool addToCurrentScene = false)
 		{
 			if (!GLTFUtils.isFolderInProjectDirectory(importDirectory))
 			{
@@ -633,8 +640,15 @@ namespace Sketchfab
 				return;
 			}
 
-			_importer.configure(importDirectory, prefabName, addToCurrentScene);
-			_importer.loadFromBuffer(data);
+			_importer.configure(
+				importDirectory,
+				prefabName,
+				addToCurrentScene);
+				
+			_importer.loadFromBuffer(
+				data,
+				currentUID,
+				subfolderName);
 		}
 
 		void ImportProgress(UnityGLTF.GLTFEditorImporter.IMPORT_STEP step, int current, int total)

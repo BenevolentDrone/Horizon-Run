@@ -56,7 +56,7 @@ foo.Unsubscribe(typeof(T), Bar);
 ILoggerResolver loggerResolver;
 
 //An object repository is needed for the broadcaster to select the concrete broadcaster for a given argument type
-IReadOnlyObjectRepository repository;
+IReadOnlyInstanceRepository repository;
 
 //Create a subscribable with a single argument
 ISubscribableSingleArg foo = DelegatesFactory.BuildBroadcasterWithRepository(

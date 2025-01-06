@@ -10,20 +10,10 @@ using HereticalSolutions.Logging;
 
 namespace HereticalSolutions.Delegates.Subscriptions
 {
-    /// <summary>
-    /// Represents a subscription with a single generic argument.
-    /// </summary>
-    /// <typeparam name="TValue">The type of the argument.</typeparam>
     public class SubscriptionSingleArgGeneric<TValue>
         : ISubscription,
-          ISubscriptionState<IInvokableSingleArgGeneric<TValue>>,
-          ISubscriptionState<IInvokableSingleArg>,
-          ISubscriptionHandler<
-              INonAllocSubscribableSingleArgGeneric<TValue>,
-              IInvokableSingleArgGeneric<TValue>>,
-          ISubscriptionHandler<
-              INonAllocSubscribableSingleArg,
-              IInvokableSingleArg>,
+          ISubscriptionContext<IInvokableSingleArgGeneric<TValue>>,
+          ISubscriptionContext<IInvokableSingleArg>,
           ICleanuppable,
           IDisposable
     {
@@ -55,9 +45,6 @@ namespace HereticalSolutions.Delegates.Subscriptions
 
         #region ISubscription
 
-        /// <summary>
-        /// Gets a value indicating whether the subscription is active.
-        /// </summary>
         public bool Active { get; private set; }
 
         #endregion
@@ -82,11 +69,6 @@ namespace HereticalSolutions.Delegates.Subscriptions
 
         #region ISubscriptionHandler (Generic)
 
-        /// <summary>
-        /// Validates if the subscription can be activated.
-        /// </summary>
-        /// <param name="publisher">The publisher.</param>
-        /// <returns>Always returns true.</returns>
         public bool ValidateActivation(INonAllocSubscribableSingleArgGeneric<TValue> publisher)
         {
             if (Active)
@@ -131,11 +113,6 @@ namespace HereticalSolutions.Delegates.Subscriptions
                 $"SUBSCRIPTION ACTIVATED: {this.GetHashCode()}");
         }
 
-        /// <summary>
-        /// Validates if the subscription can be terminated.
-        /// </summary>
-        /// <param name="publisher">The publisher.</param>
-        /// <returns>Always returns true.</returns>
         public bool ValidateTermination(
             INonAllocSubscribableSingleArgGeneric<TValue> publisher)
         {
@@ -161,11 +138,6 @@ namespace HereticalSolutions.Delegates.Subscriptions
 
         #region ISubscriptionHandler
 
-        /// <summary>
-        /// Validates if the subscription can be activated.
-        /// </summary>
-        /// <param name="publisher">The publisher.</param>
-        /// <returns>Always returns true.</returns>
         public bool ValidateActivation(
             INonAllocSubscribableSingleArg publisher)
         {

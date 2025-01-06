@@ -38,7 +38,10 @@ namespace Sketchfab
 			_importer.Update();
 		}
 
-		public void configure(string importDirectory, string prefabName, bool addToScene = false)
+		public void configure(
+			string importDirectory,
+			string prefabName,
+			bool addToScene = false)
 		{
 
 			if (importDirectory.Length > 0)
@@ -105,6 +108,30 @@ namespace Sketchfab
 			return findGltfFile(_unzipDirectory);
 		}
 
+		private void SaveArchiveTo(
+			byte[] zipData,
+			string path)
+		{
+			var directoryPath = Path.GetDirectoryName(path);
+
+			if (!Directory.Exists(directoryPath))
+				Directory.CreateDirectory(directoryPath);
+
+			MemoryStream stream = new MemoryStream(zipData);
+
+			FileStream fileStream = new FileStream(
+				path,
+				FileMode.Create,
+				FileAccess.Write);
+
+
+			stream.WriteTo(fileStream);
+
+			fileStream.Close();
+
+			stream.Close();
+		}
+
 		private string unzipGLTFArchiveData(byte[] zipData)
 		{
 			if (!Directory.Exists(_unzipDirectory))
@@ -129,8 +156,13 @@ namespace Sketchfab
 			return directory.Replace(Application.dataPath, "Assets");
 		}
 
-		public void loadFromBuffer(byte[] data)
+		public void loadFromBuffer(
+			byte[] data,
+			string currentUID,
+			string subfolderName)
 		{
+			_importDirectory = $"{_importDirectory}_{currentUID}";
+
 			if (!GLTFUtils.isFolderInProjectDirectory(_importDirectory))
 			{
 				Debug.LogError("Import directory is outside of project directory. Please select path in Assets/");
@@ -142,9 +174,19 @@ namespace Sketchfab
 				Directory.CreateDirectory(_importDirectory);
 			}
 
-			_gltfInput = unzipGLTFArchiveData(data);
-			_importer.setupForPath(_gltfInput, _importDirectory, _currentSampleName, _addToCurrentScene);
-			_importer.Load();
+			string postfix = (subfolderName == "glb")
+				? ".glb"
+				: $"_{subfolderName}.zip";
+
+			string targetPath = $"{_importDirectory}/{subfolderName}/{_currentSampleName}_{currentUID}{postfix}";
+
+			SaveArchiveTo(
+				data,
+				targetPath);
+
+			//_gltfInput = unzipGLTFArchiveData(data);
+			//_importer.setupForPath(_gltfInput, _importDirectory, _currentSampleName, _addToCurrentScene);
+			//_importer.Load();
 		}
 
 		private bool isSupportedFile(string filepath)
@@ -172,7 +214,12 @@ namespace Sketchfab
 				Directory.CreateDirectory(_importDirectory);
 			}
 
-			_importer.setupForPath(_gltfInput, _importDirectory, _currentSampleName, _addToCurrentScene);
+			_importer.setupForPath(
+				_gltfInput,
+				_importDirectory,
+				_currentSampleName,
+				_addToCurrentScene);
+
 			_importer.Load();
 		}
 

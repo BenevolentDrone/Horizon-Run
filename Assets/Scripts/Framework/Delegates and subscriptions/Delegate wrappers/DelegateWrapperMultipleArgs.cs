@@ -2,7 +2,8 @@ using System;
 
 namespace HereticalSolutions.Delegates.Wrappers
 {
-    public class DelegateWrapperMultipleArgs : IInvokableMultipleArgs
+    public class DelegateWrapperMultipleArgs
+        : IInvokableMultipleArgs
     {
         private readonly Action<object[]> @delegate;
 

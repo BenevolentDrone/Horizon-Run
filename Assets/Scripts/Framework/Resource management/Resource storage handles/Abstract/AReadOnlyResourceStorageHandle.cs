@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 using HereticalSolutions.Logging;
@@ -32,7 +33,11 @@ namespace HereticalSolutions.ResourceManagement
 		}
 
 		public virtual async Task Allocate(
-			IProgress<float> progress = null)
+
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null)
 		{
 			progress?.Report(0f);
 
@@ -68,7 +73,11 @@ namespace HereticalSolutions.ResourceManagement
 		}
 
 		public virtual async Task Free(
-			IProgress<float> progress = null)
+			
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null)
 		{
 			progress?.Report(0f);
 

@@ -2,6 +2,8 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
+using HereticalSolutions.Logging;
+
 namespace HereticalSolutions.StateMachines
 {
     /// <summary>
@@ -20,8 +22,11 @@ namespace HereticalSolutions.StateMachines
         /// <returns>A task representing the asynchronous operation.</returns>
         Task EnterState(
             TBaseState state,
-            CancellationToken cancellationToken,
-            IProgress<float> progress = null);
+
+            //Async tail
+            CancellationToken cancellationToken = default,
+            IProgress<float> progress = null,
+            ILogger progressLogger = null);
 
         /// <summary>
         /// Exits the specified state
@@ -32,7 +37,10 @@ namespace HereticalSolutions.StateMachines
         /// <returns>A task representing the asynchronous operation.</returns>
         Task ExitState(
             TBaseState state,
-            CancellationToken cancellationToken,
-            IProgress<float> progress = null);
+
+            //Async tail
+            CancellationToken cancellationToken = default,
+            IProgress<float> progress = null,
+            ILogger progressLogger = null);
     }
 }

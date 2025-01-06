@@ -12,36 +12,36 @@ namespace HereticalSolutions.Repositories.Factories
         #region Dictionary object repository
 
         /// <summary>
-        /// Builds a new instance of <see cref="DictionaryObjectRepository"/>.
+        /// Builds a new instance of <see cref="DictionaryInstanceRepository"/>.
         /// </summary>
-        /// <returns>A new instance of <see cref="DictionaryObjectRepository"/>.</returns>
-        public static DictionaryObjectRepository BuildDictionaryObjectRepository()
+        /// <returns>A new instance of <see cref="DictionaryInstanceRepository"/>.</returns>
+        public static DictionaryInstanceRepository BuildDictionaryInstanceRepository()
         {
-            return new DictionaryObjectRepository(
+            return new DictionaryInstanceRepository(
                 BuildDictionaryRepository<Type, object>());
         }
         
         /// <summary>
-        /// Builds a new instance of <see cref="DictionaryObjectRepository"/> with the specified <paramref name="database"/>.
+        /// Builds a new instance of <see cref="DictionaryInstanceRepository"/> with the specified <paramref name="database"/>.
         /// </summary>
         /// <param name="database">The repository database.</param>
-        /// <returns>A new instance of <see cref="DictionaryObjectRepository"/>.</returns>
-        public static DictionaryObjectRepository BuildDictionaryObjectRepository(
+        /// <returns>A new instance of <see cref="DictionaryInstanceRepository"/>.</returns>
+        public static DictionaryInstanceRepository BuildDictionaryInstanceRepository(
             IRepository<Type, object> database)
         {
-            return new DictionaryObjectRepository(
+            return new DictionaryInstanceRepository(
                 database);
         }
 
         /// <summary>
-        /// Clones an existing <see cref="IRepository{Type, object}"/> and creates a new instance of <see cref="DictionaryObjectRepository"/>.
+        /// Clones an existing <see cref="IRepository{Type, object}"/> and creates a new instance of <see cref="DictionaryInstanceRepository"/>.
         /// </summary>
         /// <param name="contents">The repository contents to clone.</param>
-        /// <returns>A new instance of <see cref="DictionaryObjectRepository"/>.</returns>
-        public static DictionaryObjectRepository CloneDictionaryObjectRepository(
+        /// <returns>A new instance of <see cref="DictionaryInstanceRepository"/>.</returns>
+        public static DictionaryInstanceRepository CloneDictionaryInstanceRepository(
             IRepository<Type, object> contents)
         {
-            return new DictionaryObjectRepository(
+            return new DictionaryInstanceRepository(
                 ((IClonableRepository<Type, object>)contents).Clone());
         }
 
@@ -136,30 +136,30 @@ namespace HereticalSolutions.Repositories.Factories
         
         #region Concurrent dictionary object repository
 
-        public static ConcurrentDictionaryObjectRepository BuildConcurrentDictionaryObjectRepository()
+        public static ConcurrentDictionaryInstanceRepository BuildConcurrentDictionaryInstanceRepository()
         {
-            return new ConcurrentDictionaryObjectRepository(
+            return new ConcurrentDictionaryInstanceRepository(
                 new ConcurrentDictionary<Type, object>());
         }
 
-        public static ConcurrentDictionaryObjectRepository BuildConcurrentDictionaryObjectRepository(
+        public static ConcurrentDictionaryInstanceRepository BuildConcurrentDictionaryInstanceRepository(
             ConcurrentDictionary<Type, object> database)
         {
-            return new ConcurrentDictionaryObjectRepository(
+            return new ConcurrentDictionaryInstanceRepository(
                 database);
         }
 
-        public static ConcurrentDictionaryObjectRepository BuildConcurrentDictionaryObjectRepository(
+        public static ConcurrentDictionaryInstanceRepository BuildConcurrentDictionaryInstanceRepository(
             IEqualityComparer<Type> comparer)
         {
-            return new ConcurrentDictionaryObjectRepository(
+            return new ConcurrentDictionaryInstanceRepository(
                 new ConcurrentDictionary<Type, object>(comparer));
         }
 
-        public static ConcurrentDictionaryObjectRepository CloneConcurrentDictionaryObjectRepository(
+        public static ConcurrentDictionaryInstanceRepository CloneConcurrentDictionaryInstanceRepository(
             ConcurrentDictionary<Type, object> contents)
         {
-            return new ConcurrentDictionaryObjectRepository(
+            return new ConcurrentDictionaryInstanceRepository(
                 new ConcurrentDictionary<Type, object>(contents));
         }
 

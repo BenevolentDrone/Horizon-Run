@@ -45,13 +45,13 @@ namespace HereticalSolutions.Delegates.Factories
             ILoggerResolver loggerResolver = null)
         {
             return BuildBroadcasterWithRepository(
-                RepositoriesFactory.BuildDictionaryObjectRepository(
+                RepositoriesFactory.BuildDictionaryInstanceRepository(
                     broadcasterRepository),
                 loggerResolver);
         }
         
         public static BroadcasterWithRepository BuildBroadcasterWithRepository(
-            IReadOnlyObjectRepository repository,
+            IReadOnlyInstanceRepository repository,
             ILoggerResolver loggerResolver = null)
         {
             ILogger logger =
@@ -184,7 +184,7 @@ namespace HereticalSolutions.Delegates.Factories
             ILoggerResolver loggerResolver = null)
         {
             return BuildNonAllocBroadcasterWithRepository(
-                RepositoriesFactory.BuildDictionaryObjectRepository(
+                RepositoriesFactory.BuildDictionaryInstanceRepository(
                     broadcasterRepository),
                 loggerResolver);
         }
@@ -196,7 +196,7 @@ namespace HereticalSolutions.Delegates.Factories
         /// <param name="logger">The logger to use for logging.</param>
         /// <returns>The built non-allocating broadcaster with a repository.</returns>
         public static NonAllocBroadcasterWithRepository BuildNonAllocBroadcasterWithRepository(
-            IReadOnlyObjectRepository repository,
+            IReadOnlyInstanceRepository repository,
             ILoggerResolver loggerResolver = null)
         {
             ILogger logger =

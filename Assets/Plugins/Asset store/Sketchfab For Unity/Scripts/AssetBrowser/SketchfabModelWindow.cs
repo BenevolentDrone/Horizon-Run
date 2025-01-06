@@ -9,6 +9,7 @@ using UnityEngine;
 using UnityEditor;
 using SimpleJSON;
 using System.IO;
+using System;
 
 namespace Sketchfab
 {
@@ -26,6 +27,12 @@ namespace Sketchfab
 		bool show = false;
 		byte[] _lastArchive;
 
+		List<Tuple<string, string, int>> downloadArchiveRequests = new List<Tuple<string, string, int>>();
+
+		string currentUID = string.Empty;
+
+		string currentSubfolderName = string.Empty;
+
 		Vector2 _scrollView = new Vector2();
 
 		static void Init()
@@ -35,13 +42,17 @@ namespace Sketchfab
 			window.Show();
 		}
 
-		public void displayModelPage(SketchfabModel model, SketchfabBrowser browser)
+		public void displayModelPage(
+			SketchfabModel model,
+			SketchfabBrowser browser)
 		{
 			_window = browser;
 			if(_currentModel == null || model.uid != _currentModel.uid)
 			{
 				_currentModel = model;
+
 				_prefabName = GLTFUtils.cleanName(_currentModel.name).Replace(" ", "_");
+				
 				_importDirectory = Application.dataPath + "/Import/" + _prefabName.Replace(" ", "_");
 			}
 			else
@@ -69,7 +80,7 @@ namespace Sketchfab
 						// Name
 						GUILayout.BeginHorizontal();
 						GUILayout.FlexibleSpace();
-						GUILayout.Label(model.name, _ui.getSketchfabModelName());
+						GUILayout.Label($"{model.name} ({model.uid})", _ui.getSketchfabModelName());
 						GUILayout.FlexibleSpace();
 						GUILayout.EndHorizontal();
 
@@ -205,16 +216,17 @@ namespace Sketchfab
 		{
 			if (!assetAlreadyExists() || EditorUtility.DisplayDialog("Override asset", "The asset " + _prefabName + " already exists in project. Do you want to override it ?", "Override", "Cancel"))
 			{
-				// Reuse if still valid
-				if (_currentModel.tempDownloadUrl.Length > 0 && EditorApplication.timeSinceStartup - _currentModel.downloadRequestTime < _currentModel.urlValidityDuration)
-				{
-					requestArchive(_currentModel.tempDownloadUrl);
-				}
-				else
-				{
+				//// Reuse if still valid
+				//if (_currentModel.tempDownloadUrl.Length > 0 && EditorApplication.timeSinceStartup - _currentModel.downloadRequestTime < _currentModel.urlValidityDuration)
+				//{
+				//	requestArchive(_currentModel.tempDownloadUrl);
+				//}
+				//else
+				//{
 					fetchGLTFModel(_currentModel.uid, OnArchiveUpdate, _window._logger.getHeader());
-				}
+				//}
 			}
+			
 		}
 
 		void displayImportButton(bool isUserLoggedIn, bool modelIsAvailable)
@@ -321,6 +333,7 @@ namespace Sketchfab
 		private bool assetAlreadyExists()
 		{
 			string prefabPath = _importDirectory + "/" + _prefabName + ".prefab";
+
 			return File.Exists(prefabPath);
 		}
 
@@ -330,7 +343,32 @@ namespace Sketchfab
 			string _unzipDirectory = Application.temporaryCachePath + "/unzip";
 			_window._browserManager.setImportProgressCallback(UpdateProgress);
 			_window._browserManager.setImportFinishCallback(OnFinishImport);
-			_window._browserManager.importArchive(_lastArchive, _unzipDirectory, _importDirectory, _prefabName, _addToCurrentScene);
+			_window._browserManager.importArchive(
+				_lastArchive,
+				_unzipDirectory,
+				_importDirectory,
+				_prefabName,
+				currentUID,
+				currentSubfolderName,
+				_addToCurrentScene);
+
+			if (downloadArchiveRequests.Count > 0)
+			{
+				var currentRequestData = downloadArchiveRequests[0];
+
+				downloadArchiveRequests.RemoveAt(0);
+
+				currentSubfolderName = currentRequestData.Item1;
+				_currentModel.tempDownloadUrl = currentRequestData.Item2;
+				_currentModel.urlValidityDuration = currentRequestData.Item3;
+				_currentModel.downloadRequestTime = EditorApplication.timeSinceStartup;
+
+				requestArchive(_currentModel.tempDownloadUrl);
+			}
+			else
+			{
+				OnFinishImport();
+			}
 		}
 
 		private void handleDownloadCallback(float current)
@@ -359,6 +397,8 @@ namespace Sketchfab
 
 		public void fetchGLTFModel(string uid, RefreshCallback fetchedCallback, Dictionary<string, string> headers)
 		{
+			currentUID = uid;
+
 			string url = SketchfabPlugin.Urls.modelEndPoint + "/" + uid + "/download";
 			_modelRequest = new SketchfabRequest(url, headers);
 			_modelRequest.setCallback(handleDownloadAPIResponse);
@@ -374,12 +414,46 @@ namespace Sketchfab
 
 		void handleDownloadAPIResponse(string response)
 		{
+			downloadArchiveRequests.Clear();
+
+			currentSubfolderName = string.Empty;
+
 			JSONNode responseJson = Utils.JSONParse(response);
-			if(responseJson["gltf"] != null)
+
+			foreach (var key in responseJson.AsObject.Dict.Keys)
 			{
-				_currentModel.tempDownloadUrl = responseJson["gltf"]["url"];
-				_currentModel.urlValidityDuration = responseJson["gltf"]["expires"].AsInt;
+				downloadArchiveRequests.Add(
+					new Tuple<string, string, int>(
+						key,
+						responseJson[key]["url"],
+						responseJson[key]["expires"].AsInt));
+			}
+
+			//if (responseJson["source"] != null)
+			//{
+			//	_currentModel.tempDownloadUrl = responseJson["source"]["url"];
+			//	_currentModel.urlValidityDuration = responseJson["source"]["expires"].AsInt;
+			//	_currentModel.downloadRequestTime = EditorApplication.timeSinceStartup;
+			//	requestArchive(_currentModel.tempDownloadUrl);
+			//}
+			//else if (responseJson["gltf"] != null)
+			//{
+			//	_currentModel.tempDownloadUrl = responseJson["gltf"]["url"];
+			//	_currentModel.urlValidityDuration = responseJson["gltf"]["expires"].AsInt;
+			//	_currentModel.downloadRequestTime = EditorApplication.timeSinceStartup;
+			//	requestArchive(_currentModel.tempDownloadUrl);
+			//}
+			if (downloadArchiveRequests.Count > 0)
+			{
+				var currentRequestData = downloadArchiveRequests[0];
+
+				downloadArchiveRequests.RemoveAt(0);
+
+				currentSubfolderName = currentRequestData.Item1;
+				_currentModel.tempDownloadUrl = currentRequestData.Item2;
+				_currentModel.urlValidityDuration = currentRequestData.Item3;
 				_currentModel.downloadRequestTime = EditorApplication.timeSinceStartup;
+				
 				requestArchive(_currentModel.tempDownloadUrl);
 			}
 			else

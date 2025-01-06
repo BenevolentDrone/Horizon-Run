@@ -5,7 +5,7 @@ namespace HereticalSolutions.Quests
     /// <summary>
     /// Represents a quest stage descriptor
     /// </summary>
-    [System.Serializable]
+    [Serializable]
     public struct QuestStageDescriptor
     {
         /// <summary>

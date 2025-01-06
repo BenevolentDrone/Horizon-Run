@@ -58,9 +58,9 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
                         false);
                 
                 if (usageMask[i]
-                    && !MarkersRepository.Markers.Has(markerKeys[i]))
+                    && !MarkerRepository.Markers.Has(markerKeys[i]))
                 {
-                    MarkersRepository.Markers.Add(
+                    MarkerRepository.Markers.Add(
                         markerKeys[i],
                         new ProfilerMarker(markerKeys[i]));
                 }
@@ -102,7 +102,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
 #if USE_PROFILING_MARKERS
                     if (usageMask[i])
                     {
-                        using (MarkersRepository.Markers.Get(markerKeys[i]).Auto()) //To ensure it stays in release build
+                        using (MarkerRepository.Markers.Get(markerKeys[i]).Auto()) //To ensure it stays in release build
                         {
 
                         //markers[markerKeys[i]].Begin();

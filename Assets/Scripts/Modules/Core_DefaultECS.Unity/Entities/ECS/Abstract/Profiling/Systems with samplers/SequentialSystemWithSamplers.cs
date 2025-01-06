@@ -60,9 +60,9 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
                         false);
 
                 if (usageMask[i]
-                    && !SamplersRepository.Samplers.Has(samplerName))
+                    && !SamplerRepository.Samplers.Has(samplerName))
                 {
-                    SamplersRepository.Samplers.Add(
+                    SamplerRepository.Samplers.Add(
                         samplerName,
                         samplers[i]);
                 }

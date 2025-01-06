@@ -1,7 +1,10 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 using HereticalSolutions.ResourceManagement;
+
+using HereticalSolutions.Logging;
 
 namespace HereticalSolutions.AssetImport
 {
@@ -10,11 +13,20 @@ namespace HereticalSolutions.AssetImport
 	{
 		Task<IResourceVariantData> Import<TImporter>(
 			Action<TImporter> initializationDelegate = null,
-			IProgress<float> progress = null)
+
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null)
 			where TImporter : AAssetImporter;
 
 		Task RegisterPostProcessor<TImporter, TPostProcessor>(
-			TPostProcessor instance)
+			TPostProcessor instance,
+
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null)
 			where TImporter : AAssetImporter
 			where TPostProcessor : AAssetImportPostProcessor;
 	}

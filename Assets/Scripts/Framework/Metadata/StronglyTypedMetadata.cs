@@ -5,10 +5,10 @@ namespace HereticalSolutions.Metadata
 	public class StronglyTypedMetadata
 		: IStronglyTypedMetadata
 	{
-		private readonly IObjectRepository metadataRepository;
+		private readonly IInstanceRepository metadataRepository;
 
 		public StronglyTypedMetadata(
-			IObjectRepository metadataRepository)
+			IInstanceRepository metadataRepository)
 		{
 			this.metadataRepository = metadataRepository;
 		}

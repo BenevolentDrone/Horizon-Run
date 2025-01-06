@@ -20,7 +20,7 @@ namespace HereticalSolutions.Messaging
     {
         private readonly NonAllocBroadcasterWithRepository broadcaster;
 
-        private readonly IReadOnlyObjectRepository messageRepository;
+        private readonly IReadOnlyInstanceRepository messageRepository;
 
         private readonly IManagedPool<IPoolElementFacade<IMessage>> mailbox;
 
@@ -37,7 +37,7 @@ namespace HereticalSolutions.Messaging
         /// <param name="mailboxContents">The indexable collection of message elements.</param>
         public NonAllocMessageBus(
             NonAllocBroadcasterWithRepository broadcaster,
-            IReadOnlyObjectRepository messageRepository,
+            IReadOnlyInstanceRepository messageRepository,
             IManagedPool<IPoolElementFacade<IMessage>> mailbox,
             IDynamicArray<IPoolElementFacade<IPoolElementFacade<IMessage>>> mailboxContents,
             ILogger logger = null)

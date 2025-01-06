@@ -98,38 +98,38 @@ namespace HereticalSolutions.HorizonRun.DI
 
 			var worldContainer = entityManager as IContainsEntityWorlds<World, IDefaultECSEntityWorldController>;
 
-			var entityWorldsRepository = worldContainer.EntityWorldsRepository;
+			var entityWorldRepository = worldContainer.EntityWorldRepository;
 			
 			
-			var eventWorld = entityWorldsRepository.GetWorld(WorldConstants.EVENT_WORLD_ID);
+			var eventWorld = entityWorldRepository.GetWorld(WorldConstants.EVENT_WORLD_ID);
 
 			var simulationWorld = (includeSimulationWorld)
-				? entityWorldsRepository.GetWorld(WorldConstants.SIMULATION_WORLD_ID)
+				? entityWorldRepository.GetWorld(WorldConstants.SIMULATION_WORLD_ID)
 				: default;
 
 			var viewWorld = (includeViewWorld)
-				? entityWorldsRepository.GetWorld(WorldConstants.VIEW_WORLD_ID)
+				? entityWorldRepository.GetWorld(WorldConstants.VIEW_WORLD_ID)
 				: default;
 			
 			#region Synchronization providers
 
-			var updateSynchronizationProvidersRepository = updateTimeManager as ISynchronizationProvidersRepository;
+			var updateSynchronizationProviderRepository = updateTimeManager as ISynchronizationProviderRepository;
 
-			updateSynchronizationProvidersRepository.TryGetProvider(
+			updateSynchronizationProviderRepository.TryGetProvider(
 				"Update",
 				out var updateSynchronizationProvider);
 
 
-			var fixedUpdateSynchronizationProvidersRepository = fixedUpdateTimeManager as ISynchronizationProvidersRepository;
+			var fixedUpdateSynchronizationProviderRepository = fixedUpdateTimeManager as ISynchronizationProviderRepository;
 
-			fixedUpdateSynchronizationProvidersRepository.TryGetProvider(
+			fixedUpdateSynchronizationProviderRepository.TryGetProvider(
 				"Fixed update",
 				out var fixedUpdateSynchronizationProvider);
 
 
-			var lateUpdateSynchronizationProvidersRepository = lateUpdateTimeManager as ISynchronizationProvidersRepository;
+			var lateUpdateSynchronizationProviderRepository = lateUpdateTimeManager as ISynchronizationProviderRepository;
 
-			lateUpdateSynchronizationProvidersRepository.TryGetProvider(
+			lateUpdateSynchronizationProviderRepository.TryGetProvider(
 				"Late update",
 				out var lateUpdateSynchronizationProvider);
 			
@@ -141,7 +141,7 @@ namespace HereticalSolutions.HorizonRun.DI
 
 			if (includeViewWorld)
 			{
-				var viewWorldController = entityWorldsRepository.GeTEntityWorldController(WorldConstants.VIEW_WORLD_ID);
+				var viewWorldController = entityWorldRepository.GeTEntityWorldController(WorldConstants.VIEW_WORLD_ID);
 
 				var viewWorldSystemsContainer =
 					viewWorldController as IEntityWorldControllerWithLifeCycleSystems<IEntityInitializationSystem>;
@@ -160,7 +160,7 @@ namespace HereticalSolutions.HorizonRun.DI
 
 			if (includeSimulationWorld)
 			{
-				var simulationWorldController = entityWorldsRepository.GeTEntityWorldController(WorldConstants.SIMULATION_WORLD_ID);
+				var simulationWorldController = entityWorldRepository.GeTEntityWorldController(WorldConstants.SIMULATION_WORLD_ID);
 
 				var simulationWorldSystemsContainer = simulationWorldController as 
 					IEntityWorldControllerWithLifeCycleSystems<IEntityInitializationSystem>;

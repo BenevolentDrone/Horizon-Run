@@ -40,22 +40,22 @@ namespace HereticalSolutions.Samples.ECSCharacterControllerSample.Factories
 
 			var registryEntityRepository = RepositoriesFactory.BuildDictionaryRepository<Guid, Entity>();
 
-			var entityWorldsRepository = DefaultECSEntityFactory.BuildDefaultECSEntityWorldsRepository(loggerResolver);
+			var entityWorldRepository = DefaultECSEntityFactory.BuildDefaultECSEntityWorldRepository(loggerResolver);
 
 
-			entityWorldsRepository.AddWorld(
+			entityWorldRepository.AddWorld(
 				WorldConstants.REGISTRY_WORLD_ID,
 				DefaultECSEntityFactory.BuildDefaultECSRegistryWorldController(
 					createIDComponentDelegate,
-					DefaultECSEntityFactory.BuildDefaultECSPrototypesRepository(),
+					DefaultECSEntityFactory.BuildDefaultECSPrototypeRepository(),
 					loggerResolver));
 
-			entityWorldsRepository.AddWorld(
+			entityWorldRepository.AddWorld(
 				WorldConstants.EVENT_WORLD_ID,
 				DefaultECSEntityFactory.BuildDefaultECSEvenTEntityWorldController(
 					loggerResolver));
 
-			entityWorldsRepository.AddWorld(
+			entityWorldRepository.AddWorld(
 				WorldConstants.SIMULATION_WORLD_ID,
 				DefaultECSEntityFactory.BuildDefaultECSWorldController
 					<Guid,
@@ -81,7 +81,7 @@ namespace HereticalSolutions.Samples.ECSCharacterControllerSample.Factories
 
 						loggerResolver));
 
-			entityWorldsRepository.AddWorld(
+			entityWorldRepository.AddWorld(
 				WorldConstants.VIEW_WORLD_ID,
 				DefaultECSEntityFactory.BuildDefaultECSWorldController
 					<Guid,
@@ -109,8 +109,8 @@ namespace HereticalSolutions.Samples.ECSCharacterControllerSample.Factories
 
 			List<World> childEntityWorlds = new List<World>();
 
-			childEntityWorlds.Add(entityWorldsRepository.GetWorld(WorldConstants.SIMULATION_WORLD_ID));
-			childEntityWorlds.Add(entityWorldsRepository.GetWorld(WorldConstants.VIEW_WORLD_ID));
+			childEntityWorlds.Add(entityWorldRepository.GetWorld(WorldConstants.SIMULATION_WORLD_ID));
+			childEntityWorlds.Add(entityWorldRepository.GetWorld(WorldConstants.VIEW_WORLD_ID));
 
 			ILogger logger =
 				loggerResolver?.GetLogger<DefaultECSEntityManager<Guid>>()
@@ -119,7 +119,7 @@ namespace HereticalSolutions.Samples.ECSCharacterControllerSample.Factories
 			return new SampleEntityManager(
 				allocateIDDelegate,
 				registryEntityRepository,
-				entityWorldsRepository,
+				entityWorldRepository,
 				childEntityWorlds,
 				logger);
 		}

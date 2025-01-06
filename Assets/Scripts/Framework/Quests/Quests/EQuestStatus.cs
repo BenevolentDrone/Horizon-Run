@@ -1,9 +1,11 @@
+using System;
+
 namespace HereticalSolutions.Quests
 {
     /// <summary>
     /// Enumeration representing the status of a quest
     /// </summary>
-    [System.Serializable]
+    [Serializable]
     public enum EQuestStatus
     {
         /// <summary>

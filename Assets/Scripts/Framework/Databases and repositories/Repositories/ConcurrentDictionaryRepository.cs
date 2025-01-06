@@ -71,6 +71,18 @@ namespace HereticalSolutions.Repositories
 				value);
 		}
 
+		public TValue this[TKey key]
+		{
+			get
+			{
+				return database[key];
+			}
+			set
+			{
+				database[key] = value;
+			}
+		}
+
 		public void Update(
 			TKey key,
 			TValue value)

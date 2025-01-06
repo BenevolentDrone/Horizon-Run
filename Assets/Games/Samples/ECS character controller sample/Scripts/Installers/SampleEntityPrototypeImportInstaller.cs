@@ -58,10 +58,10 @@ namespace HereticalSolutions.Samples.ECSCharacterControllerSample.Installers
 
 							var worldContainer = entityManager as IContainsEntityWorlds<World, IDefaultECSEntityWorldController>;
 
-							var entityWorldsRepository = worldContainer.EntityWorldsRepository;
+							var entityWorldRepository = worldContainer.EntityWorldRepository;
 
 
-							var registryWorldController = entityWorldsRepository.GeTEntityWorldController(WorldConstants.REGISTRY_WORLD_ID);
+							var registryWorldController = entityWorldRepository.GeTEntityWorldController(WorldConstants.REGISTRY_WORLD_ID);
 
 							var registryWorldWithPrototype = registryWorldController as IEntityWorldControllerWithPrototypes<World, Entity>;
 
@@ -72,7 +72,7 @@ namespace HereticalSolutions.Samples.ECSCharacterControllerSample.Installers
 								loggerResolver?.GetLogger<DefaultECSEntityPrototypeVisitor>());
 
 
-							var simulationWorldController = entityWorldsRepository.GeTEntityWorldController(WorldConstants.SIMULATION_WORLD_ID);
+							var simulationWorldController = entityWorldRepository.GeTEntityWorldController(WorldConstants.SIMULATION_WORLD_ID);
 
 							var simulationWorldWithPrototype = simulationWorldController as IEntityWorldControllerWithPrototypes<World, Entity>;
 
@@ -83,7 +83,7 @@ namespace HereticalSolutions.Samples.ECSCharacterControllerSample.Installers
 								loggerResolver?.GetLogger<DefaultECSEntityPrototypeVisitor>());
 
 
-							var viewWorldController = entityWorldsRepository.GeTEntityWorldController(WorldConstants.VIEW_WORLD_ID);
+							var viewWorldController = entityWorldRepository.GeTEntityWorldController(WorldConstants.VIEW_WORLD_ID);
 
 							var viewWorldWithPrototype = viewWorldController as IEntityWorldControllerWithPrototypes<World, Entity>;
 

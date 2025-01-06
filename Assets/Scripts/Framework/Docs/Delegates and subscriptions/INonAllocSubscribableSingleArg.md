@@ -86,7 +86,7 @@ foo.Unsubscribe(
 ILoggerResolver loggerResolver;
 
 //An object repository is needed for the broadcaster to select the concrete broadcaster for a given argument type
-IReadOnlyObjectRepository repository;
+IReadOnlyInstanceRepository repository;
 
 //Create a non alloc subscribable with a single argument
 INonAllocSubscribableSingleArg foo = DelegatesFactory.BuildNonAllocBroadcasterWithRepository(

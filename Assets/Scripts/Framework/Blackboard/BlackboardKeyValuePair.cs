@@ -1,6 +1,8 @@
-﻿namespace HereticalSolutions.Blackboard
+﻿using System;
+
+namespace HereticalSolutions.Blackboard
 {
-    [System.Serializable]
+    [Serializable]
     public class BlackboardKeyValuePair
     {
         public string Key;

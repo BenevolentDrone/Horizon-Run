@@ -25,9 +25,9 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
 #if USE_PROFILING_SAMPLERS
             sampler = CustomSampler.Create(samplerName);
             
-            if (!SamplersRepository.Samplers.Has(samplerName))
+            if (!SamplerRepository.Samplers.Has(samplerName))
             {
-                SamplersRepository.Samplers.Add(
+                SamplerRepository.Samplers.Add(
                     samplerName,
                     sampler);
             }

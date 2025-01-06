@@ -14,9 +14,11 @@ using CsvHelper.Configuration.Attributes;
 using ProtoBuf;
 #endif
 
+using System;
+
 namespace HereticalSolutions.Time
 {
-    [System.Serializable]
+    [Serializable]
 #if JSON_OPT_IN_SUPPORT
     [JsonObject(MemberSerialization.OptIn)]
 #endif

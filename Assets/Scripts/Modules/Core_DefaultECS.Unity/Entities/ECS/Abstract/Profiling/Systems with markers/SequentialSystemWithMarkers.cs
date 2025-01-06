@@ -60,9 +60,9 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
                         false);
                 
                 if (usageMask[i]
-                    && !MarkersRepository.Markers.Has(markerName))
+                    && !MarkerRepository.Markers.Has(markerName))
                 {
-                    MarkersRepository.Markers.Add(
+                    MarkerRepository.Markers.Add(
                         markerName,
                         markers[i]);
                 }

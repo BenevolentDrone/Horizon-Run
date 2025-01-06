@@ -40,7 +40,7 @@ ISubscribable foo = DelegatesFactory.BuildPinger(loggerResolver);
 ISubscribable foo = DelegatesFactory.BuildBroadcasterGeneric<T>(loggerResolver);
 
 //An object repository is needed for the broadcaster to select the concrete broadcaster for a given argument type
-IReadOnlyObjectRepository repository;
+IReadOnlyInstanceRepository repository;
 
 //Create a subscribable with a single argument
 ISubscribable foo = DelegatesFactory.BuildBroadcasterWithRepository(

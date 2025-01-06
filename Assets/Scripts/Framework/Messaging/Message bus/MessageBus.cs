@@ -17,7 +17,7 @@ namespace HereticalSolutions.Messaging
     {
         private readonly BroadcasterWithRepository broadcaster;
 
-        private readonly IReadOnlyObjectRepository messageRepository;
+        private readonly IReadOnlyInstanceRepository messageRepository;
 
         private readonly Queue<IMessage> mailbox;
 
@@ -25,7 +25,7 @@ namespace HereticalSolutions.Messaging
 
         public MessageBus(
             BroadcasterWithRepository broadcaster,
-            IReadOnlyObjectRepository messageRepository,
+            IReadOnlyInstanceRepository messageRepository,
             Queue<IMessage> mailbox,
             ILogger logger = null)
         {

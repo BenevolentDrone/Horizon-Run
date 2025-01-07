@@ -109,13 +109,13 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Networking
 
             timer.FlushTimeElapsedOnRepeat = true;
 
-            ISubscription timerTickSubscription = DelegatesFactory.BuildSubscriptionSingleArgGeneric<IRuntimeTimer>(
+            INonAllocSubscription timerTickSubscription = DelegatesFactory.BuildSubscriptionSingleArgGeneric<IRuntimeTimer>(
                 (timerArg) => OnTick(),
                 loggerResolver);
 
             timer.OnFinish.Subscribe(
-                (ISubscriptionHandler<
-                    INonAllocSubscribableSingleArgGeneric<IRuntimeTimer>,
+                (INonAllocSubscriptionHandler<
+                    INonAllocSubscribable,
                     IInvokableSingleArgGeneric<IRuntimeTimer>>)
                 timerTickSubscription);
             

@@ -11,10 +11,10 @@ namespace HereticalSolutions.Time
 
         public SubscriptionSingleArgGeneric<IRuntimeTimer> StartTimerSubscription;
 
-        public INonAllocSubscribableSingleArgGeneric<IRuntimeTimer> OnStartPrivateSubscribable;
+        public INonAllocSubscribable OnStartPrivateSubscribable;
         
         public SubscriptionSingleArgGeneric<IRuntimeTimer> FinishTimerSubscription;
         
-        public INonAllocSubscribableSingleArgGeneric<IRuntimeTimer> OnFinishPrivateSubscribable;
+        public INonAllocSubscribable OnFinishPrivateSubscribable;
     }
 }

@@ -7,7 +7,7 @@ using HereticalSolutions.LifetimeManagement;
 
 using HereticalSolutions.Logging;
 
-namespace HereticalSolutions.Delegates.Broadcasting
+namespace HereticalSolutions.Delegates
 {
     public class BroadcasterWithRepository
         : IPublisherSingleArg,

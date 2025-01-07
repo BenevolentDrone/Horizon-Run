@@ -23,7 +23,7 @@ namespace HereticalSolutions.Synchronization
 
 		private readonly Func<TDelta, float> deltaToFloatDelegate;
 
-		private readonly ISubscription synchronizeFixedScubscription;
+		private readonly INonAllocSubscription synchronizeFixedScubscription;
 
 		private IPublisherSingleArgGeneric<TDelta> broadcasterAsPublisher;
 
@@ -60,8 +60,8 @@ namespace HereticalSolutions.Synchronization
 			fixedDeltaTimer.Start();
 
 			fixedDeltaTimer.OnFinishRepeated.Subscribe(
-				(ISubscriptionHandler<
-					INonAllocSubscribableSingleArgGeneric<IRuntimeTimer>,
+				(INonAllocSubscriptionHandler<
+					INonAllocSubscribable,
 					IInvokableSingleArgGeneric<IRuntimeTimer>>)
 					synchronizeFixedScubscription);
 		}

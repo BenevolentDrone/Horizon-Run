@@ -60,7 +60,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Networking
 
         private readonly IDeltaPacketProcessor[] deltaPacketProcessors;
 
-        private readonly INonAllocSubscribableNoArgs pinger;
+        private readonly INonAllocSubscribable pinger;
 
         #region Message bus
 
@@ -72,21 +72,21 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Networking
 
         #region Subscriptions
 
-        private ISubscription pingSubscription;
+        private INonAllocSubscription pingSubscription;
 
 
-        private readonly ISubscription clientJoinedServerSubscription;
+        private readonly INonAllocSubscription clientJoinedServerSubscription;
 
-        private readonly ISubscription clientReceivedPacketSubscription;
+        private readonly INonAllocSubscription clientReceivedPacketSubscription;
 
-        private readonly ISubscription clientDisconnectedSubscription;
+        private readonly INonAllocSubscription clientDisconnectedSubscription;
 
 
-        private readonly ISubscription serverStartedSubscription;
+        private readonly INonAllocSubscription serverStartedSubscription;
 
-        private readonly ISubscription serverReceivedPacketSubscription;
+        private readonly INonAllocSubscription serverReceivedPacketSubscription;
 
-        private readonly ISubscription serverStoppedSubscription;
+        private readonly INonAllocSubscription serverStoppedSubscription;
 
         #endregion
 
@@ -147,7 +147,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Networking
             EntityManager entityManager,
             IEventEntityBuilder<Entity, Guid> eventEntityBuilder,
             IDeltaPacketProcessor[] deltaPacketProcessors,
-            INonAllocSubscribableNoArgs pinger,
+            INonAllocSubscribable pinger,
             
             INonAllocMessageSender networkBusAsSender,
             INonAllocMessageReceiver networkBusAsReceiver,
@@ -453,7 +453,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Networking
                 logger?.LogError<NetworkEntityManager>(
                     $"PING SUBSCRIPTION IS STILL ACTIVE");
                 
-                (pingSubscription as ISubscriptionHandler<INonAllocSubscribableNoArgs, IInvokableNoArgs>).Terminate();
+                pingSubscription.Unsubscribe();
             }
             
             pinger.Subscribe(
@@ -503,7 +503,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Networking
                 logger?.LogError<NetworkEntityManager>(
                     $"PING SUBSCRIPTION IS STILL ACTIVE");
                 
-                (pingSubscription as ISubscriptionHandler<INonAllocSubscribableNoArgs, IInvokableNoArgs>).Terminate();
+                pingSubscription.Unsubscribe();
             }
             
             pinger.Subscribe(

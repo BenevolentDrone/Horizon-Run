@@ -1,5 +1,8 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
+
+using HereticalSolutions.Logging;
 
 namespace HereticalSolutions.StanleyScript
 {
@@ -19,7 +22,11 @@ namespace HereticalSolutions.StanleyScript
 		public abstract Task<bool> Handle(
 			string[] instructionTokens,
 			IRuntimeEnvironment environment,
-			CancellationToken token);
+
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null);
 
 		#endregion
 

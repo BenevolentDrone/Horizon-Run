@@ -1,6 +1,6 @@
 # ISubscribableSingleArgGeneric\<T\>
 
-Represents an interface for a subscribable object that supports a single argument generic delegate. Inherits from [`ISubscribable`](ISubscribable.md). For the non-allocating version, see [`INonAllocSubscribableSingleArgGeneric<T>`](INonAllocSubscribableSingleArgGeneric.md).
+Represents an interface for a subscribable object that supports a single argument generic delegate. Inherits from [`ISubscribable`](ISubscribable.md). For the non-allocating version, see [`INonAllocSubscribable`](INonAllocSubscribableSingleArgGeneric.md).
 
 ## Methods
 

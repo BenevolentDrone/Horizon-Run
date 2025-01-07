@@ -544,7 +544,11 @@ namespace HereticalSolutions.ResourceManagement
 
 		public async Task AddRootResource(
 			IReadOnlyResourceData rootResource,
-			IProgress<float> progress = null)
+
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null)
 		{
 			progress?.Report(0f);
 
@@ -578,7 +582,11 @@ namespace HereticalSolutions.ResourceManagement
 		public async Task RemoveRootResource(
 			int rootResourceIDHash = -1,
 			bool free = true,
-			IProgress<float> progress = null)
+
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null)
 		{
 			IReadOnlyResourceData resource;
 
@@ -617,7 +625,7 @@ namespace HereticalSolutions.ResourceManagement
 				var task = ((IResourceData)resource)
 					.Clear(
 						free,
-						localProgress);
+						progress: localProgress);
 
 				await task;
 					//.ConfigureAwait(false);
@@ -634,12 +642,16 @@ namespace HereticalSolutions.ResourceManagement
 		public async Task RemoveRootResource(
 			string rootResourceID,
 			bool free = true,
-			IProgress<float> progress = null)
+
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null)
 		{
 			var task = RemoveRootResource(
 				rootResourceID.AddressToHash(),
 				free,
-				progress);
+				progress: progress);
 
 			await task;
 				//.ConfigureAwait(false);
@@ -652,7 +664,11 @@ namespace HereticalSolutions.ResourceManagement
 
 		public async Task ClearAllRootResources(
 			bool free = true,
-			IProgress<float> progress = null)
+
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null)
 		{
 			progress?.Report(0f);
 
@@ -694,7 +710,7 @@ namespace HereticalSolutions.ResourceManagement
 					var task = rootResource
 						.Clear(
 							free,
-							localProgress);
+							progress: localProgress);
 
 					await task;
 						//.ConfigureAwait(false);
@@ -717,7 +733,13 @@ namespace HereticalSolutions.ResourceManagement
 
 		#region Get
 
-		public async Task<IReadOnlyResourceData> GetRootResourceWhenAvailable(int rootResourceIDHash)
+		public async Task<IReadOnlyResourceData> GetRootResourceWhenAvailable(
+			int rootResourceIDHash,
+
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null)
 		{
 			Task<IReadOnlyResourceData> waitForNotificationTask;
 
@@ -781,7 +803,12 @@ namespace HereticalSolutions.ResourceManagement
 		}
 
 		public async Task<IReadOnlyResourceData> GetRootResourceWhenAvailable(
-			string rootResourceID)
+			string rootResourceID,
+
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null)
 		{
 			var task = GetRootResourceWhenAvailable(
 				rootResourceID.AddressToHash());
@@ -797,7 +824,13 @@ namespace HereticalSolutions.ResourceManagement
 			return result;
 		}
 
-		public async Task<IReadOnlyResourceData> GetResourceWhenAvailable(int[] resourcePathPartHashes)
+		public async Task<IReadOnlyResourceData> GetResourceWhenAvailable(
+			int[] resourcePathPartHashes,
+
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null)
 		{
 			var getRootResourceTask = GetRootResourceWhenAvailable(
 				resourcePathPartHashes[0]);
@@ -825,7 +858,13 @@ namespace HereticalSolutions.ResourceManagement
 			return result;
 		}
 
-		public async Task<IReadOnlyResourceData> GetResourceWhenAvailable(string[] resourcePathParts)
+		public async Task<IReadOnlyResourceData> GetResourceWhenAvailable(
+			string[] resourcePathParts,
+
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null)
 		{
 			var getRootResourceTask = GetRootResourceWhenAvailable(
 				resourcePathParts[0]);
@@ -857,7 +896,13 @@ namespace HereticalSolutions.ResourceManagement
 
 		#region Get default
 
-		public async Task<IResourceVariantData> GetDefaultRootResourceWhenAvailable(int rootResourceIDHash)
+		public async Task<IResourceVariantData> GetDefaultRootResourceWhenAvailable(
+			int rootResourceIDHash,
+
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null)
 		{
 			var task = GetRootResourceWhenAvailable(rootResourceIDHash);
 
@@ -872,7 +917,13 @@ namespace HereticalSolutions.ResourceManagement
 			return rootResource.DefaultVariant;
 		}
 
-		public async Task<IResourceVariantData> GetDefaultRootResourceWhenAvailable(string rootResourceID)
+		public async Task<IResourceVariantData> GetDefaultRootResourceWhenAvailable(
+			string rootResourceID,
+
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null)
 		{
 			var task = GetRootResourceWhenAvailable(rootResourceID);
 
@@ -888,7 +939,12 @@ namespace HereticalSolutions.ResourceManagement
 		}
 
 		public async Task<IResourceVariantData> GetDefaultResourceWhenAvailable(
-			int[] resourcePathPartHashes)
+			int[] resourcePathPartHashes,
+
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null)
 		{
 			var getRootResourceTask = GetRootResourceWhenAvailable(resourcePathPartHashes[0]);
 
@@ -916,7 +972,12 @@ namespace HereticalSolutions.ResourceManagement
 		}
 
 		public async Task<IResourceVariantData> GetDefaultResourceWhenAvailable(
-			string[] resourcePathParts)
+			string[] resourcePathParts,
+
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null)
 		{
 			var getRootResourceTask = GetRootResourceWhenAvailable(resourcePathParts[0]);
 
@@ -952,7 +1013,11 @@ namespace HereticalSolutions.ResourceManagement
 		public async Task<IReadOnlyResourceStorageHandle> LoadDependency(
 			string path,
 			string variantID = null,
-			IProgress<float> progress = null)
+
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null)
 		{
 			var getDependencyResourceTask = GetDependencyResource(path);
 
@@ -988,7 +1053,7 @@ namespace HereticalSolutions.ResourceManagement
 
 				var allocateTask = dependencyStorageHandle
 					.Allocate(
-						localProgress);
+						progress: localProgress);
 
 				await allocateTask;
 					//.ConfigureAwait(false);
@@ -1005,7 +1070,12 @@ namespace HereticalSolutions.ResourceManagement
 		}
 
 		public async Task<IReadOnlyResourceData> GetDependencyResource(
-			string path)
+			string path,
+
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null)
 		{
 			var task = GetResourceWhenAvailable(
 				path.SplitAddressBySeparator());
@@ -1091,7 +1161,12 @@ namespace HereticalSolutions.ResourceManagement
 
 		private async Task<IReadOnlyResourceData> GetNestedResourceWhenAvailableRecursive(
 			IReadOnlyResourceData currentData,
-			int[] resourcePathPartHashes)
+			int[] resourcePathPartHashes,
+
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null)
 		{
 			for (int i = 1; i < resourcePathPartHashes.Length; i++)
 			{
@@ -1121,7 +1196,12 @@ namespace HereticalSolutions.ResourceManagement
 
 		private async Task<IReadOnlyResourceData> GetNestedResourceWhenAvailableRecursive(
 			IReadOnlyResourceData currentData,
-			string[] resourcePathParts)
+			string[] resourcePathParts,
+
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null)
 		{
 			for (int i = 1; i < resourcePathParts.Length; i++)
 			{

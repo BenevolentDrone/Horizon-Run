@@ -1,5 +1,8 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
+
+using HereticalSolutions.Logging;
 
 namespace HereticalSolutions.ResourceManagement
 {
@@ -8,9 +11,18 @@ namespace HereticalSolutions.ResourceManagement
 		Task<IReadOnlyResourceStorageHandle> LoadDependency(
 			string path,
 			string variantID = null,
-			IProgress<float> progress = null);
+
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null);
 
 		Task<IReadOnlyResourceData> GetDependencyResource(
-			string path);
+			string path,
+
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null);
 	}
 }

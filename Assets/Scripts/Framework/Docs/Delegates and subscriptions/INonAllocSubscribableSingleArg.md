@@ -6,13 +6,13 @@ Represents an interface for a non-allocating subscribable with a single argument
 
 Method | Description
 --- | ---
-`void Subscribe<T>(ISubscriptionHandler<INonAllocSubscribableSingleArgGeneric<T>, IInvokableSingleArgGeneric<T>> subscription)` | Subscribes to the event with a specific value type and a generic subscription handler
-`void Subscribe(Type valueType, ISubscriptionHandler<INonAllocSubscribableSingleArg, IInvokableSingleArg> subscription)` | Subscribes to the event with a specific value type and a non-generic subscription handler
-`void Unsubscribe<T>(ISubscriptionHandler<INonAllocSubscribableSingleArgGeneric<T>, IInvokableSingleArgGeneric<T>> subscription)` | Unsubscribes from the event with a specific value type and a generic subscription handler
-`void Unsubscribe(Type valueType, ISubscriptionHandler<INonAllocSubscribableSingleArg, IInvokableSingleArg> subscription)` | Unsubscribes from the event with a specific value type and a non-generic subscription handler
-`IEnumerable<ISubscriptionHandler<INonAllocSubscribableSingleArgGeneric<T>, IInvokableSingleArgGeneric<T>>> GetAllSubscriptions<T>()` | Gets all subscriptions for a specific value type with a generic subscription handler
-`IEnumerable<ISubscription> GetAllSubscriptions(Type valueType)` | Gets all subscriptions for a specific value type with a non-generic subscription handler
-`IEnumerable<ISubscriptionHandler<INonAllocSubscribableSingleArg, IInvokableSingleArg>> AllSubscriptions { get; }` | Gets all subscriptions with a non-generic subscription handler
+`void Subscribe<T>(INonAllocSubscriptionHandler<INonAllocSubscribable, IInvokableSingleArgGeneric<T>> subscription)` | Subscribes to the event with a specific value type and a generic subscription handler
+`void Subscribe(Type valueType, INonAllocSubscriptionHandler<INonAllocSubscribableSingleArg, IInvokableSingleArg> subscription)` | Subscribes to the event with a specific value type and a non-generic subscription handler
+`void Unsubscribe<T>(INonAllocSubscriptionHandler<INonAllocSubscribable, IInvokableSingleArgGeneric<T>> subscription)` | Unsubscribes from the event with a specific value type and a generic subscription handler
+`void Unsubscribe(Type valueType, INonAllocSubscriptionHandler<INonAllocSubscribableSingleArg, IInvokableSingleArg> subscription)` | Unsubscribes from the event with a specific value type and a non-generic subscription handler
+`IEnumerable<INonAllocSubscriptionHandler<INonAllocSubscribable, IInvokableSingleArgGeneric<T>>> GetAllSubscriptions<T>()` | Gets all subscriptions for a specific value type with a generic subscription handler
+`IEnumerable<INonAllocSubscription> GetAllSubscriptions(Type valueType)` | Gets all subscriptions for a specific value type with a non-generic subscription handler
+`IEnumerable<INonAllocSubscriptionHandler<INonAllocSubscribableSingleArg, IInvokableSingleArg>> AllSubscriptions { get; }` | Gets all subscriptions with a non-generic subscription handler
 
 ## Using INonAllocSubscribableSingleArg
 
@@ -47,13 +47,13 @@ var subscription = DelegatesFactory.BuildSubscriptionSingleArgGeneric<T>(
 	loggerResolver);
 
 foo.Subscribe<T>(
-	(ISubscriptionHandler<
-		INonAllocSubscribableSingleArgGeneric<T>, IInvokableSingleArgGeneric<T>>)
+	(INonAllocSubscriptionHandler<
+		INonAllocSubscribable, IInvokableSingleArgGeneric<T>>)
 		subscription);
 
 foo.Subscribe(
 	typeof(T),
-	(ISubscriptionHandler<
+	(INonAllocSubscriptionHandler<
 		INonAllocSubscribableSingleArg,
 		IInvokableSingleArg)
 		subscription);
@@ -64,16 +64,16 @@ foo.Subscribe(
 ```csharp
 INonAllocSubscribableSingleArg foo;
 
-ISubscription subscription;
+INonAllocSubscription subscription;
 
 foo.Unsubscribe<T>(
-	(ISubscriptionHandler<
-		INonAllocSubscribableSingleArgGeneric<T>, IInvokableSingleArgGeneric<T>>)
+	(INonAllocSubscriptionHandler<
+		INonAllocSubscribable, IInvokableSingleArgGeneric<T>>)
 		subscription);
 
 foo.Unsubscribe(
 	typeof(T),
-	(ISubscriptionHandler<
+	(INonAllocSubscriptionHandler<
 		INonAllocSubscribableSingleArg,
 		IInvokableSingleArg>)
 		subscription);
@@ -103,8 +103,8 @@ INonAllocSubscribableSingleArg foo = DelegatesFactory.BuildNonAllocBroadcasterGe
 #region INonAllocSubscribableSingleArg
 
 public void Subscribe<T>(
-	ISubscriptionHandler<
-		INonAllocSubscribableSingleArgGeneric<T>,
+	INonAllocSubscriptionHandler<
+		INonAllocSubscribable,
 		IInvokableSingleArgGeneric<T>>
 		subscription)
 {
@@ -116,14 +116,14 @@ public void Subscribe<T>(
 		throw new Exception(
 			$"INVALID VALUE TYPE: \"{valueType.Name}\"");
 
-	var broadcaster = (INonAllocSubscribableSingleArgGeneric<T>)broadcasterObject;
+	var broadcaster = (INonAllocSubscribable)broadcasterObject;
 
 	broadcaster.Subscribe(subscription);
 }
 
 public void Subscribe(
 	Type valueType,
-	ISubscriptionHandler<
+	INonAllocSubscriptionHandler<
 		INonAllocSubscribableSingleArg,
 		IInvokableSingleArg>
 		subscription)
@@ -140,8 +140,8 @@ public void Subscribe(
 }
 
 public void Unsubscribe<T>(
-	ISubscriptionHandler<
-		INonAllocSubscribableSingleArgGeneric<T>,
+	INonAllocSubscriptionHandler<
+		INonAllocSubscribable,
 		IInvokableSingleArgGeneric<T>>
 		subscription)
 {
@@ -153,14 +153,14 @@ public void Unsubscribe<T>(
 		throw new Exception(
 			$"INVALID VALUE TYPE: \"{valueType.Name}\"");
 
-	var broadcaster = (INonAllocSubscribableSingleArgGeneric<T>)broadcasterObject;
+	var broadcaster = (INonAllocSubscribable)broadcasterObject;
 
 	broadcaster.Unsubscribe(subscription);
 }
 
 public void Unsubscribe(
 	Type valueType,
-	ISubscriptionHandler<
+	INonAllocSubscriptionHandler<
 		INonAllocSubscribableSingleArg,
 		IInvokableSingleArg>
 		subscription)
@@ -177,8 +177,8 @@ public void Unsubscribe(
 }
 
 IEnumerable<
-	ISubscriptionHandler<
-		INonAllocSubscribableSingleArgGeneric<T>,
+	INonAllocSubscriptionHandler<
+		INonAllocSubscribable,
 		IInvokableSingleArgGeneric<T>>>
 		INonAllocSubscribableSingleArg.GetAllSubscriptions<T>()
 {
@@ -190,12 +190,12 @@ IEnumerable<
 		throw new Exception(
 			$"INVALID VALUE TYPE: \"{valueType.Name}\"");
 
-	var broadcaster = (INonAllocSubscribableSingleArgGeneric<T>)broadcasterObject;
+	var broadcaster = (INonAllocSubscribable)broadcasterObject;
 
 	return broadcaster.AllSubscriptions;
 }
 
-public IEnumerable<ISubscription> GetAllSubscriptions(Type valueType)
+public IEnumerable<INonAllocSubscription> GetAllSubscriptions(Type valueType)
 {
 	if (!broadcasterRepository.TryGet(
 			valueType,
@@ -209,14 +209,14 @@ public IEnumerable<ISubscription> GetAllSubscriptions(Type valueType)
 }
 
 IEnumerable<
-	ISubscriptionHandler<
+	INonAllocSubscriptionHandler<
 		INonAllocSubscribableSingleArg,
 		IInvokableSingleArg>>
 		INonAllocSubscribableSingleArg.AllSubscriptions
 {
 	get
 	{
-		var result = new List<ISubscriptionHandler<
+		var result = new List<INonAllocSubscriptionHandler<
 			INonAllocSubscribableSingleArg,
 			IInvokableSingleArg>>();
 

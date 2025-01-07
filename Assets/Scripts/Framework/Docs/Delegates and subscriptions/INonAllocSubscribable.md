@@ -1,12 +1,12 @@
 # INonAllocSubscribable
 
-Represents a subscribable object that allows non-allocating subscriptions. Contains methods that are not dependent on the type or the amount of arguments the subscribers can pass to the publisher. For interfaces that are dependent on the amount of arguments, see [`INonAllocSubscribableNoArgs`](INonAllocSubscribableNoArgs.md), [`INonAllocSubscribableSingleArg`](INonAllocSubscribableSingleArg.md), [`INonAllocSubscribableSingleArgGeneric<T>`](INonAllocSubscribableSingleArgGeneric.md), and [`INonAllocSubscribableMultipleArgs`](INonAllocSubscribableMultipleArgs.md). For the allocating version, see [`ISubscribable`](ISubscribable.md).
+Represents a subscribable object that allows non-allocating subscriptions. Contains methods that are not dependent on the type or the amount of arguments the subscribers can pass to the publisher. For interfaces that are dependent on the amount of arguments, see [`INonAllocSubscribable`](INonAllocSubscribable.md), [`INonAllocSubscribableSingleArg`](INonAllocSubscribableSingleArg.md), [`INonAllocSubscribable`](INonAllocSubscribableSingleArgGeneric.md), and [`INonAllocSubscribable`](INonAllocSubscribable.md). For the allocating version, see [`ISubscribable`](ISubscribable.md).
 
 ## Methods
 
 Method | Description
 --- | ---
-`IEnumerable<ISubscription> AllSubscriptions { get; }` | Gets all the current subscriptions to this object
+`IEnumerable<INonAllocSubscription> AllSubscriptions { get; }` | Gets all the current subscriptions to this object
 `void UnsubscribeAll()` | Unsubscribes all objects from this object
 
 ## Using INonAllocSubscribable
@@ -16,7 +16,7 @@ Method | Description
 ```csharp
 INonAllocSubscribable foo;
 
-IEnumerable<ISubscription> allSubscriptions = foo.AllSubscriptions;
+IEnumerable<INonAllocSubscription> allSubscriptions = foo.AllSubscriptions;
 ```
 
 ### Cancel all subscriptions
@@ -54,15 +54,15 @@ INonAllocSubscribable foo = DelegatesFactory.BuildNonAllocBroadcasterMultipleArg
 ## Implementing INonAllocSubscribable
 
 ```csharp
-private IIndexable<IPoolElement<ISubscription>> subscriptionsAsIndexable;
+private IIndexable<IPoolElement<INonAllocSubscription>> subscriptionsAsIndexable;
 
 #region INonAllocSubscribable
 
-public IEnumerable<ISubscription> AllSubscriptions
+public IEnumerable<INonAllocSubscription> AllSubscriptions
 {
 	get
 	{
-		ISubscription[] allSubscriptions = new ISubscription[subscriptionsAsIndexable.Count];
+		INonAllocSubscription[] allSubscriptions = new INonAllocSubscription[subscriptionsAsIndexable.Count];
 
 		for (int i = 0; i < allSubscriptions.Length; i++)
 			allSubscriptions[i] = subscriptionsAsIndexable[i].Value;
@@ -75,8 +75,8 @@ public void UnsubscribeAll()
 {
 	while (subscriptionsAsIndexable.Count > 0)
 	{
-		var subscription = (ISubscriptionHandler<
-			INonAllocSubscribableSingleArgGeneric<T>,
+		var subscription = (INonAllocSubscriptionHandler<
+			INonAllocSubscribable,
 			IInvokableSingleArgGeneric<T>>)
 			subscriptionsAsIndexable[0].Value;
 

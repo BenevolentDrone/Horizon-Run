@@ -11,28 +11,26 @@ using HereticalSolutions.Logging;
 namespace HereticalSolutions.Delegates.Subscriptions
 {
     public class SubscriptionSingleArgGeneric<TValue>
-        : ISubscription,
-          ISubscriptionContext<IInvokableSingleArgGeneric<TValue>>,
-          ISubscriptionContext<IInvokableSingleArg>,
+        : INonAllocSubscription,
+          INonAllocSubscriptionContext<IInvokableSingleArg>,
+          INonAllocSubscriptionContext<IInvokableSingleArgGeneric<TValue>>,
           ICleanuppable,
           IDisposable
     {
-        private readonly IInvokableSingleArgGeneric<TValue> invokable;
+        private readonly IInvokableSingleArgGeneric<TValue> @delegate;
 
         private readonly ILogger logger;
 
-        private object publisher;
+        private INonAllocSubscribable publisher;
 
-        private IPoolElementFacade<ISubscription> poolElement;
+        private IPoolElementFacade<INonAllocSubscription> poolElement;
 
         public SubscriptionSingleArgGeneric(
             Action<TValue> @delegate,
-            ILoggerResolver loggerResolver = null,
             ILogger logger = null)
         {
-            invokable = DelegatesFactory.BuildDelegateWrapperSingleArgGeneric(
-                @delegate,
-                loggerResolver);
+            this.@delegate = DelegatesFactory.BuildDelegateWrapperSingleArgGeneric(
+                @delegate);
 
             this.logger = logger;
 
@@ -43,130 +41,104 @@ namespace HereticalSolutions.Delegates.Subscriptions
             poolElement = null;
         }
 
-        #region ISubscription
+        #region INonAllocSubscription
 
         public bool Active { get; private set; }
 
-        #endregion
-
-        #region ISubscriptionState (Generic)
-
-        IInvokableSingleArgGeneric<TValue> ISubscriptionState<IInvokableSingleArgGeneric<TValue>>.Invokable =>
-            (IInvokableSingleArgGeneric<TValue>)invokable;
-
-        IPoolElementFacade<ISubscription> ISubscriptionState<IInvokableSingleArgGeneric<TValue>>.PoolElement => poolElement;
-
-        #endregion
-
-        #region ISubscriptionState
-
-        IInvokableSingleArg ISubscriptionState<IInvokableSingleArg>.Invokable =>
-            (IInvokableSingleArg)invokable;
-
-        IPoolElementFacade<ISubscription> ISubscriptionState<IInvokableSingleArg>.PoolElement => poolElement;
-
-        #endregion
-
-        #region ISubscriptionHandler (Generic)
-
-        public bool ValidateActivation(INonAllocSubscribableSingleArgGeneric<TValue> publisher)
+        public bool Subscribe(
+            INonAllocSubscribable publisher)
         {
             if (Active)
-                throw new Exception(
-                    logger.TryFormatException<SubscriptionSingleArgGeneric<TValue>>(
-                        "ATTEMPT TO ACTIVATE A SUBSCRIPTION THAT IS ALREADY ACTIVE"));
+                return false;
 
-            if (this.publisher != null)
-                throw new Exception(
-                    logger.TryFormatException<SubscriptionSingleArgGeneric<TValue>>(
-                        "SUBSCRIPTION ALREADY HAS A PUBLISHER"));
-
-            if (poolElement != null)
-                throw new Exception(
-                    logger.TryFormatException<SubscriptionSingleArgGeneric<TValue>>(
-                        "SUBSCRIPTION ALREADY HAS A POOL ELEMENT"));
-
-            if (invokable == null)
-                throw new Exception(
-                    logger.TryFormatException<SubscriptionSingleArgGeneric<TValue>>(
-                        "INVALID DELEGATE"));
-
-            return true;
+            return publisher.Subscribe(this);
         }
 
-        /// <summary>
-        /// Activates the subscription.
-        /// </summary>
-        /// <param name="publisher">The publisher.</param>
-        /// <param name="poolElement">The pool element.</param>
-        public void Activate(
-            INonAllocSubscribableSingleArgGeneric<TValue> publisher,
-            IPoolElementFacade<ISubscription> poolElement)
-        {
-            this.poolElement = poolElement;
-
-            this.publisher = publisher;
-
-            Active = true;
-
-            logger?.Log<SubscriptionSingleArgGeneric<TValue>>(
-                $"SUBSCRIPTION ACTIVATED: {this.GetHashCode()}");
-        }
-
-        public bool ValidateTermination(
-            INonAllocSubscribableSingleArgGeneric<TValue> publisher)
+        public bool Unsubscribe()
         {
             if (!Active)
-                throw new Exception(
-                    logger.TryFormatException<SubscriptionSingleArgGeneric<TValue>>(
-                        "ATTEMPT TO TERMINATE A SUBSCRIPTION THAT IS ALREADY INACTIVE"));
+                return false;
 
-            if (this.publisher != publisher)
-                throw new Exception(
-                    logger.TryFormatException<SubscriptionSingleArgGeneric<TValue>>(
-                        "INVALID PUBLISHER"));
-
-            if (poolElement == null)
-                throw new Exception(
-                    logger.TryFormatException<SubscriptionSingleArgGeneric<TValue>>(
-                        "INVALID POOL ELEMENT"));
-
-            return true;
+            return publisher.Unsubscribe(this);
         }
+
 
         #endregion
 
-        #region ISubscriptionHandler
+        #region INonAllocSubscriptionContext
+
+        IInvokableSingleArg INonAllocSubscriptionContext<IInvokableSingleArg>.Delegate
+        {
+            get => (IInvokableSingleArg)@delegate;
+        }
+
+        IInvokableSingleArgGeneric<TValue> INonAllocSubscriptionContext<IInvokableSingleArgGeneric<TValue>>.Delegate
+        {
+            get => @delegate;
+        }
+
+        public IPoolElementFacade<INonAllocSubscription> PoolElement
+        {
+            get => poolElement;
+        }
 
         public bool ValidateActivation(
-            INonAllocSubscribableSingleArg publisher)
+            INonAllocSubscribable publisher)
         {
             if (Active)
-                throw new Exception(
-                    logger.TryFormatException<SubscriptionSingleArgGeneric<TValue>>(
-                        "ATTEMPT TO ACTIVATE A SUBSCRIPTION THAT IS ALREADY ACTIVE"));
+            {
+                logger?.LogError(
+                    GetType(),
+                    $"ATTEMPT TO ACTIVATE A SUBSCRIPTION THAT IS ALREADY ACTIVE: {this.GetHashCode()}");
+
+                return false;
+            }
 
             if (this.publisher != null)
-                throw new Exception(
-                    logger.TryFormatException<SubscriptionSingleArgGeneric<TValue>>(
-                        "SUBSCRIPTION ALREADY HAS A PUBLISHER"));
+            {
+                logger?.LogError(
+                    GetType(),
+                    $"SUBSCRIPTION ALREADY HAS A PUBLISHER: {this.GetHashCode()}");
+
+                return false;
+            }
 
             if (poolElement != null)
-                throw new Exception(
-                    logger.TryFormatException<SubscriptionSingleArgGeneric<TValue>>(
-                        "SUBSCRIPTION ALREADY HAS A POOL ELEMENT"));
+            {
+                logger?.LogError(
+                    GetType(),
+                    $"SUBSCRIPTION ALREADY HAS A POOL ELEMENT: {this.GetHashCode()}");
 
-            if (invokable == null)
-                throw new Exception(
-                    logger.TryFormatException<SubscriptionSingleArgGeneric<TValue>>(
-                        "INVALID DELEGATE"));
+                return false;
+            }
+
+            if (@delegate == null)
+            {
+                logger?.LogError(
+                    GetType(),
+                    $"INVALID DELEGATE: {this.GetHashCode()}");
+
+                return false;
+            }
+
+            if (publisher is not IPublisherSingleArg
+                && publisher is not IPublisherSingleArgGeneric<TValue>
+                && publisher is not IAsyncPublisherSingleArg
+                && publisher is not IAsyncPublisherSingleArgGeneric<TValue>)
+            {
+                logger?.LogError(
+                    GetType(),
+                    $"INVALID PUBLISHER: EXPECTED {typeof(IPublisherSingleArg).Name} OR {typeof(IPublisherSingleArgGeneric<TValue>).Name} OR {typeof(IAsyncPublisherSingleArg).Name} OR {typeof(IAsyncPublisherSingleArgGeneric<TValue>).Name} : {this.GetHashCode()}");
+
+                return false;
+            }
 
             return true;
         }
 
         public void Activate(
-            INonAllocSubscribableSingleArg publisher,
-            IPoolElementFacade<ISubscription> poolElement)
+            INonAllocSubscribable publisher,
+            IPoolElementFacade<INonAllocSubscription> poolElement)
         {
             this.poolElement = poolElement;
 
@@ -174,27 +146,40 @@ namespace HereticalSolutions.Delegates.Subscriptions
 
             Active = true;
 
-            logger?.Log<SubscriptionSingleArgGeneric<TValue>>(
+            logger?.Log(
+                GetType(),
                 $"SUBSCRIPTION ACTIVATED: {this.GetHashCode()}");
         }
 
         public bool ValidateTermination(
-            INonAllocSubscribableSingleArg publisher)
+            INonAllocSubscribable publisher)
         {
             if (!Active)
-                throw new Exception(
-                    logger.TryFormatException<SubscriptionSingleArgGeneric<TValue>>(
-                        "ATTEMPT TO TERMINATE A SUBSCRIPTION THAT IS ALREADY ACTIVE"));
+            {
+                logger?.LogError(
+                    GetType(),
+                    $"ATTEMPT TO TERMINATE A SUBSCRIPTION THAT IS ALREADY ACTIVE: {this.GetHashCode()}");
+
+                return false;
+            }
 
             if (this.publisher != publisher)
-                throw new Exception(
-                    logger.TryFormatException<SubscriptionSingleArgGeneric<TValue>>(
-                        "INVALID PUBLISHER"));
+            {
+                logger?.LogError(
+                    GetType(),
+                    $"INVALID PUBLISHER: {this.GetHashCode()}");
+
+                return false;
+            }
 
             if (poolElement == null)
-                throw new Exception(
-                    logger.TryFormatException<SubscriptionSingleArgGeneric<TValue>>(
-                        "INVALID POOL ELEMENT"));
+            {
+                logger?.LogError(
+                    GetType(),
+                    $"INVALID POOL ELEMENT: {this.GetHashCode()}");
+
+                return false;
+            }
 
             return true;
         }
@@ -207,7 +192,8 @@ namespace HereticalSolutions.Delegates.Subscriptions
 
             Active = false;
 
-            logger?.Log<SubscriptionSingleArgGeneric<TValue>>(
+            logger?.Log(
+                GetType(),
                 $"SUBSCRIPTION TERMINATED: {this.GetHashCode()}");
         }
 
@@ -217,28 +203,16 @@ namespace HereticalSolutions.Delegates.Subscriptions
 
         public void Cleanup()
         {
-            //if (Active)
-            //{
-            //    switch (publisher)
-            //    {
-            //        case INonAllocSubscribableSingleArgGeneric<TValue> genericPublisher:
-            //
-            //            genericPublisher.Unsubscribe(this);
-            //
-            //            break;
-            //
-            //        case INonAllocSubscribableSingleArg nonGenericPublisher:
-            //
-            //            nonGenericPublisher.Unsubscribe<TValue>(this);
-            //
-            //            break;
-            //    }
-            //}
+            if (Active
+                && publisher != null
+                && publisher.Unsubscribe(this))
+            {
+            }
+            else
+                Terminate();
 
-            Terminate();
-
-            if (invokable is ICleanuppable)
-                (invokable as ICleanuppable).Cleanup();
+            if (@delegate is ICleanuppable)
+                (@delegate as ICleanuppable).Cleanup();
         }
 
         #endregion
@@ -247,28 +221,16 @@ namespace HereticalSolutions.Delegates.Subscriptions
 
         public void Dispose()
         {
-            //if (Active)
-            //{
-            //    switch (publisher)
-            //    {
-            //        case INonAllocSubscribableSingleArgGeneric<TValue> genericPublisher:
-            //
-            //            genericPublisher.Unsubscribe(this);
-            //
-            //            break;
-            //
-            //        case INonAllocSubscribableSingleArg nonGenericPublisher:
-            //        
-            //            nonGenericPublisher.Unsubscribe<TValue>(this);
-            //
-            //            break;
-            //    }
-            //}
+            if (Active
+                && publisher != null
+                && publisher.Unsubscribe(this))
+            {
+            }
+            else
+                Terminate();
 
-            Terminate();
-
-            if (invokable is IDisposable)
-                (invokable as IDisposable).Dispose();
+            if (@delegate is IDisposable)
+                (@delegate as IDisposable).Dispose();
         }
 
         #endregion

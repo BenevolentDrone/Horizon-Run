@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 using HereticalSolutions.ResourceManagement;
@@ -26,7 +27,11 @@ namespace HereticalSolutions.AssetImport
 		}
 
 		public virtual async Task<IResourceVariantData> Import(
-			IProgress<float> progress = null)
+
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null)
 		{
 			throw new NotImplementedException();
 		}
@@ -42,7 +47,12 @@ namespace HereticalSolutions.AssetImport
 		}
 
 		protected virtual async Task<IResourceData> GetOrCreateResourceData(
-			string fullResourcePath)
+			string fullResourcePath,
+
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null)
 		{
 			if (runtimeResourceManager == null)
 			{
@@ -146,7 +156,12 @@ namespace HereticalSolutions.AssetImport
 
 		protected virtual async Task<IResourceData> GetOrCreateNestedResourceData(
 			string parentResourcePath,
-			string nestedResourceID)
+			string nestedResourceID,
+
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null)
 		{
 			var getOrCreateResourceTask = GetOrCreateResourceData(
 				parentResourcePath);
@@ -199,7 +214,11 @@ namespace HereticalSolutions.AssetImport
 			ResourceVariantDescriptor variantDescriptor,
 			IReadOnlyResourceStorageHandle resourceStorageHandle,
 			bool allocate = true,
-			IProgress<float> progress = null)
+
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null)
 		{
 			progress?.Report(0f);
 
@@ -230,7 +249,11 @@ namespace HereticalSolutions.AssetImport
 		protected async Task<IReadOnlyResourceStorageHandle> LoadDependency(
 			string path,
 			string variantID = null,
-			IProgress<float> progress = null)
+
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null)
 		{
 			if (runtimeResourceManager == null)
 			{

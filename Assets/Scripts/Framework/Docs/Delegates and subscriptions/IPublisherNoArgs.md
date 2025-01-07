@@ -38,7 +38,7 @@ private Action multicastDelegate;
 public void Publish()
 {
 	//If any delegate that is invoked attempts to unsubscribe itself, it would produce an error because the collection
-	//should NOT be changed during the invokation
+	//should NOT be changed during the invocation
 	//That's why we'll copy the multicast delegate to a local variable and invoke it from there
 	//multicastDelegate?.Invoke();
 

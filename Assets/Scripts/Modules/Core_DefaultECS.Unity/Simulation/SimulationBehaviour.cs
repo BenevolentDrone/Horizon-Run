@@ -22,11 +22,11 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
 		private ISynchronizationProvider lateUpdateTimeManagerAsProvider;
 		
 		
-		private ISubscription updateSubscription;
+		private INonAllocSubscription updateSubscription;
 
-		private ISubscription fixedUpdateSubscription;
+		private INonAllocSubscription fixedUpdateSubscription;
 
-		private ISubscription lateUpdateSubscription;
+		private INonAllocSubscription lateUpdateSubscription;
 		
 		
 		private ISystem<float> eventSystems;

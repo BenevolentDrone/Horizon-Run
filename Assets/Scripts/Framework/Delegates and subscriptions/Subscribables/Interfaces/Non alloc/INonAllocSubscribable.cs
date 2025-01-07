@@ -5,12 +5,12 @@ namespace HereticalSolutions.Delegates
 	public interface INonAllocSubscribable
 	{
 		bool Subscribe(
-			ISubscription subscription);
+			INonAllocSubscription subscription);
 
 		bool Unsubscribe(
-			ISubscription subscription);
+			INonAllocSubscription subscription);
 
-		IEnumerable<ISubscription> AllSubscriptions { get; }
+		IEnumerable<INonAllocSubscription> AllSubscriptions { get; }
 
 		void UnsubscribeAll();
 	}

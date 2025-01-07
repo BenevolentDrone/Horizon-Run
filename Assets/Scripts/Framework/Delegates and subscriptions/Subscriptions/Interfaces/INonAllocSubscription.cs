@@ -4,9 +4,9 @@ namespace HereticalSolutions.Delegates
     {
         bool Active { get; }
 
-        void Subscribe(
+        bool Subscribe(
             INonAllocSubscribable publisher);
 
-        void Unsubscribe();
+        bool Unsubscribe();
     }
 }

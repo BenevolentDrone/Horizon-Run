@@ -35,16 +35,16 @@ namespace HereticalSolutions.Time
             float defaultDuration,
 
             IPublisherSingleArgGeneric<IRuntimeTimer> onStartAsPublisher,
-            INonAllocSubscribableSingleArgGeneric<IRuntimeTimer> onStartAsSubscribable,
+            INonAllocSubscribable onStartAsSubscribable,
 
             IPublisherSingleArgGeneric<IRuntimeTimer> onStartRepeatedAsPublisher,
-            INonAllocSubscribableSingleArgGeneric<IRuntimeTimer> onStartRepeatedAsSubscribable,
+            INonAllocSubscribable onStartRepeatedAsSubscribable,
             
             IPublisherSingleArgGeneric<IRuntimeTimer> onFinishAsPublisher,
-            INonAllocSubscribableSingleArgGeneric<IRuntimeTimer> onFinishAsSubscribable,
+            INonAllocSubscribable onFinishAsSubscribable,
             
             IPublisherSingleArgGeneric<IRuntimeTimer> onFinishRepeatedAsPublisher,
-            INonAllocSubscribableSingleArgGeneric<IRuntimeTimer> onFinishRepeatedAsSubscribable,
+            INonAllocSubscribable onFinishRepeatedAsSubscribable,
 
             IReadOnlyRepository<ETimerState, ITimerStrategy<IRuntimeTimerContext, float>> strategyRepository,
 
@@ -247,16 +247,16 @@ namespace HereticalSolutions.Time
         /// <summary>
         /// Gets the subscribable for the OnStart event
         /// </summary>
-        public INonAllocSubscribableSingleArgGeneric<IRuntimeTimer> OnStart { get; private set; }
+        public INonAllocSubscribable OnStart { get; private set; }
 
-        public INonAllocSubscribableSingleArgGeneric<IRuntimeTimer> OnStartRepeated { get; private set; }
+        public INonAllocSubscribable OnStartRepeated { get; private set; }
         
         /// <summary>
         /// Gets the subscribable for the OnFinish event
         /// </summary>
-        public INonAllocSubscribableSingleArgGeneric<IRuntimeTimer> OnFinish { get; private set; }
+        public INonAllocSubscribable OnFinish { get; private set; }
 
-        public INonAllocSubscribableSingleArgGeneric<IRuntimeTimer> OnFinishRepeated { get; private set; }
+        public INonAllocSubscribable OnFinishRepeated { get; private set; }
         
         #endregion
 

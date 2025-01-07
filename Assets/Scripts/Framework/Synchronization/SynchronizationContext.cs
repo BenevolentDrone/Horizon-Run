@@ -20,7 +20,7 @@ namespace HereticalSolutions.Synchronization
 
         private readonly IPublisherNoArgs pingerAsPublisher;
 
-        private readonly INonAllocSubscribableNoArgs pingerAsSubscribable;
+        private readonly INonAllocSubscribable pingerAsSubscribable;
 
 
         private SynchronizationDescriptor descriptor;
@@ -29,7 +29,7 @@ namespace HereticalSolutions.Synchronization
             SynchronizationDescriptor descriptor,
             IStronglyTypedMetadata metadata,
             IPublisherNoArgs pingerAsPublisher,
-            INonAllocSubscribableNoArgs pingerAsSubscribable)
+            INonAllocSubscribable pingerAsSubscribable)
         {
             this.descriptor = descriptor;
 
@@ -69,13 +69,13 @@ namespace HereticalSolutions.Synchronization
 
         #region ISynchronizationProvider
 
-        public void Subscribe(ISubscription subscription)
+        public void Subscribe(INonAllocSubscription subscription)
         {
             pingerAsSubscribable.Subscribe(
                 subscription);
         }
 
-        public void Unsubscribe(ISubscription subscription)
+        public void Unsubscribe(INonAllocSubscription subscription)
         {
             pingerAsSubscribable.Unsubscribe(
                 subscription);

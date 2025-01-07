@@ -9,19 +9,19 @@ using HereticalSolutions.LifetimeManagement;
 
 using HereticalSolutions.Logging;
 
-namespace HereticalSolutions.Delegates.Pinging
+namespace HereticalSolutions.Delegates
 {
     public class NonAllocPinger
         : IPublisherNoArgs,
-          INonAllocSubscribableNoArgs,
+          INonAllocSubscribable,
           ICleanuppable,
           IDisposable
     {
         #region Subscriptions
 
-        private readonly IManagedPool<ISubscription> subscriptionsPool;
+        private readonly IManagedPool<INonAllocSubscription> subscriptionsPool;
 
-        private readonly IDynamicArray<IPoolElementFacade<ISubscription>> subscriptionsContents;
+        private readonly IDynamicArray<IPoolElementFacade<INonAllocSubscription>> subscriptionsContents;
 
         #endregion
 
@@ -29,7 +29,7 @@ namespace HereticalSolutions.Delegates.Pinging
 
         #region Buffer
 
-        private ISubscription[] currentSubscriptionsBuffer;
+        private INonAllocSubscription[] currentSubscriptionsBuffer;
 
         private int currentSubscriptionsBufferCount = -1;
 
@@ -38,8 +38,8 @@ namespace HereticalSolutions.Delegates.Pinging
         private bool pingInProgress = false;
 
         public NonAllocPinger(
-            IManagedPool<ISubscription> subscriptionsPool,
-            IDynamicArray<IPoolElementFacade<ISubscription>> subscriptionsContents,
+            IManagedPool<INonAllocSubscription> subscriptionsPool,
+            IDynamicArray<IPoolElementFacade<INonAllocSubscription>> subscriptionsContents,
             ILogger logger = null)
         {
             this.subscriptionsPool = subscriptionsPool;
@@ -48,14 +48,14 @@ namespace HereticalSolutions.Delegates.Pinging
 
             this.subscriptionsContents = subscriptionsContents;
 
-            currentSubscriptionsBuffer = new ISubscription[subscriptionsContents.Capacity];
+            currentSubscriptionsBuffer = new INonAllocSubscription[subscriptionsContents.Capacity];
         }
 
-        #region INonAllocSubscribableNoArgs
+        #region INonAllocSubscribable
 
-        public void Subscribe(ISubscription subscription)
+        public void Subscribe(INonAllocSubscription subscription)
         {
-            var subscriptionHandler = (ISubscriptionHandler<INonAllocSubscribableNoArgs, IInvokableNoArgs>)subscription;
+            var subscriptionHandler = (INonAllocSubscriptionContext<>)subscription;
 
             if (!subscriptionHandler.ValidateActivation(this))
                 return;
@@ -70,14 +70,14 @@ namespace HereticalSolutions.Delegates.Pinging
                 $"SUBSCRIPTION ADDED: {subscriptionElement.Value.GetHashCode()}");
         }
 
-        public void Unsubscribe(ISubscription subscription)
+        public void Unsubscribe(INonAllocSubscription subscription)
         {
-            var subscriptionHandler = (ISubscriptionHandler<INonAllocSubscribableNoArgs, IInvokableNoArgs>)subscription;
+            var subscriptionHandler = (INonAllocSubscriptionContext<>)subscription;
 
             if (!subscriptionHandler.ValidateTermination(this))
                 return;
 
-            var poolElement = ((ISubscriptionState<IInvokableNoArgs>)subscription).PoolElement;
+            var poolElement = ((INonAllocSubscriptionState<IInvokableNoArgs>)subscription).PoolElement;
 
             TryRemoveFromBuffer(poolElement);
 
@@ -93,7 +93,7 @@ namespace HereticalSolutions.Delegates.Pinging
                 $"SUBSCRIPTION REMOVED: {previousValue.GetHashCode()}");
         }
 
-        public void Unsubscribe(IPoolElementFacade<ISubscription> subscription)
+        public void Unsubscribe(IPoolElementFacade<INonAllocSubscription> subscription)
         {
             TryRemoveFromBuffer(subscription);
 
@@ -104,11 +104,11 @@ namespace HereticalSolutions.Delegates.Pinging
 
         #region INonAllocSubscribable
 
-        public IEnumerable<ISubscription> AllSubscriptions
+        public IEnumerable<INonAllocSubscription> AllSubscriptions
         {
             get
             {
-                ISubscription[] allSubscriptions = new ISubscription[subscriptionsContents.Count];
+                INonAllocSubscription[] allSubscriptions = new INonAllocSubscription[subscriptionsContents.Count];
 
                 for (int i = 0; i < allSubscriptions.Length; i++)
                     allSubscriptions[i] = subscriptionsContents[i].Value;
@@ -127,7 +127,7 @@ namespace HereticalSolutions.Delegates.Pinging
 
         #endregion
 
-        private void TryRemoveFromBuffer(IPoolElementFacade<ISubscription> subscriptionElement)
+        private void TryRemoveFromBuffer(IPoolElementFacade<INonAllocSubscription> subscriptionElement)
         {
             if (!pingInProgress)
                 return;
@@ -146,7 +146,7 @@ namespace HereticalSolutions.Delegates.Pinging
         public void Publish()
         {
             //If any delegate that is invoked attempts to unsubscribe itself, it would produce an error because the collection
-            //should NOT be changed during the invokation
+            //should NOT be changed during the invocation
             //That's why we'll copy the subscriptions array to buffer and invoke it from there
 
             ValidateBufferSize();
@@ -209,7 +209,7 @@ namespace HereticalSolutions.Delegates.Pinging
         private void ValidateBufferSize()
         {
             if (currentSubscriptionsBuffer.Length < subscriptionsContents.Capacity)
-                currentSubscriptionsBuffer = new ISubscription[subscriptionsContents.Capacity];
+                currentSubscriptionsBuffer = new INonAllocSubscription[subscriptionsContents.Capacity];
         }
 
         private void CopySubscriptionsToBuffer()
@@ -226,7 +226,7 @@ namespace HereticalSolutions.Delegates.Pinging
             {
                 if (currentSubscriptionsBuffer[i] != null)
                 {
-                    var subscriptionState = (ISubscriptionState<IInvokableNoArgs>)currentSubscriptionsBuffer[i];
+                    var subscriptionState = (INonAllocSubscriptionState<IInvokableNoArgs>)currentSubscriptionsBuffer[i];
 
                     subscriptionState.Invokable.Invoke();
                 }

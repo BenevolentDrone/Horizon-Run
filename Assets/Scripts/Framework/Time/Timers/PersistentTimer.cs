@@ -34,16 +34,16 @@ namespace HereticalSolutions.Time
             TimeSpan defaultDurationSpan,
 
             IPublisherSingleArgGeneric<IPersistentTimer> onStartAsPublisher,
-            INonAllocSubscribableSingleArgGeneric<IPersistentTimer> onStartAsSubscribable,
+            INonAllocSubscribable onStartAsSubscribable,
 
             IPublisherSingleArgGeneric<IPersistentTimer> onStartRepeatedAsPublisher,
-            INonAllocSubscribableSingleArgGeneric<IPersistentTimer> onStartRepeatedAsSubscribable,
+            INonAllocSubscribable onStartRepeatedAsSubscribable,
             
             IPublisherSingleArgGeneric<IPersistentTimer> onFinishAsPublisher,
-            INonAllocSubscribableSingleArgGeneric<IPersistentTimer> onFinishAsSubscribable,
+            INonAllocSubscribable onFinishAsSubscribable,
 
             IPublisherSingleArgGeneric<IPersistentTimer> onFinishRepeatedAsPublisher,
-            INonAllocSubscribableSingleArgGeneric<IPersistentTimer> onFinishRepeatedAsSubscribable,
+            INonAllocSubscribable onFinishRepeatedAsSubscribable,
             
             IReadOnlyRepository<ETimerState, ITimerStrategy<IPersistentTimerContext, TimeSpan>> strategyRepository,
 
@@ -296,16 +296,16 @@ namespace HereticalSolutions.Time
         /// <summary>
         /// Gets the subscribable for the "on start" event of the timer
         /// </summary>
-        public INonAllocSubscribableSingleArgGeneric<IPersistentTimer> OnStart { get; private set; }
+        public INonAllocSubscribable OnStart { get; private set; }
         
-        public INonAllocSubscribableSingleArgGeneric<IPersistentTimer> OnStartRepeated { get; private set; }
+        public INonAllocSubscribable OnStartRepeated { get; private set; }
 
         /// <summary>
         /// Gets the subscribable for the "on finish" event of the timer
         /// </summary>
-        public INonAllocSubscribableSingleArgGeneric<IPersistentTimer> OnFinish { get; private set; }
+        public INonAllocSubscribable OnFinish { get; private set; }
         
-        public INonAllocSubscribableSingleArgGeneric<IPersistentTimer> OnFinishRepeated { get; private set; }
+        public INonAllocSubscribable OnFinishRepeated { get; private set; }
 
         #endregion
 

@@ -63,16 +63,16 @@ namespace HereticalSolutions.Time
         /// <summary>
         /// Event that is triggered when the timer starts
         /// </summary>
-        INonAllocSubscribableSingleArgGeneric<IRuntimeTimer> OnStart { get; }
+        INonAllocSubscribable OnStart { get; }
         
-        INonAllocSubscribableSingleArgGeneric<IRuntimeTimer> OnStartRepeated { get; }
+        INonAllocSubscribable OnStartRepeated { get; }
         
         /// <summary>
         /// Event that is triggered when the timer finishes
         /// </summary>
-        INonAllocSubscribableSingleArgGeneric<IRuntimeTimer> OnFinish { get; }
+        INonAllocSubscribable OnFinish { get; }
         
-        INonAllocSubscribableSingleArgGeneric<IRuntimeTimer> OnFinishRepeated { get; }
+        INonAllocSubscribable OnFinishRepeated { get; }
 
         #endregion
     }

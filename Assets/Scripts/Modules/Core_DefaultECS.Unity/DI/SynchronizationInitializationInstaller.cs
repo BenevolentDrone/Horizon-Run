@@ -30,7 +30,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.DI
                 .AsCached();
 
             Container
-                .Bind<INonAllocSubscribableNoArgs>()
+                .Bind<INonAllocSubscribable>()
                 .WithId("Update")
                 .FromInstance(updatePinger)
                 .AsCached();
@@ -48,7 +48,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.DI
                 .AsCached();
 
             Container
-                .Bind<INonAllocSubscribableNoArgs>()
+                .Bind<INonAllocSubscribable>()
                 .WithId("Fixed update")
                 .FromInstance(fixedUpdatePinger)
                 .AsCached();
@@ -66,7 +66,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.DI
                 .AsCached();
 
             Container
-                .Bind<INonAllocSubscribableNoArgs>()
+                .Bind<INonAllocSubscribable>()
                 .WithId("Late update")
                 .FromInstance(lateUpdatePinger)
                 .AsCached();

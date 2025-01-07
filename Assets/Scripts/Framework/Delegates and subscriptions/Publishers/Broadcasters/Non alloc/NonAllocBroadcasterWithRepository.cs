@@ -7,7 +7,7 @@ using HereticalSolutions.LifetimeManagement;
 
 using HereticalSolutions.Logging;
 
-namespace HereticalSolutions.Delegates.Broadcasting
+namespace HereticalSolutions.Delegates
 {
     /// <summary>
     /// Represents a non-allocating broadcaster with a repository.
@@ -91,8 +91,8 @@ namespace HereticalSolutions.Delegates.Broadcasting
         /// <typeparam name="TValue">The type of messages to subscribe to.</typeparam>
         /// <param name="subscription">The subscription handler.</param>
         public void Subscribe<TValue>(
-            ISubscriptionHandler<
-                INonAllocSubscribableSingleArgGeneric<TValue>,
+            INonAllocSubscriptionHandler<
+                INonAllocSubscribable,
                 IInvokableSingleArgGeneric<TValue>>
                 subscription)
         {
@@ -105,7 +105,7 @@ namespace HereticalSolutions.Delegates.Broadcasting
                     logger.TryFormatException<NonAllocBroadcasterWithRepository>(
                         $"INVALID VALUE TYPE: \"{valueType.Name}\""));
 
-            var broadcaster = (INonAllocSubscribableSingleArgGeneric<TValue>)broadcasterObject;
+            var broadcaster = (INonAllocSubscribable)broadcasterObject;
 
             broadcaster.Subscribe(subscription);
         }
@@ -117,7 +117,7 @@ namespace HereticalSolutions.Delegates.Broadcasting
         /// <param name="subscription">The subscription handler.</param>
         public void Subscribe(
             Type valueType,
-            ISubscriptionHandler<
+            INonAllocSubscriptionHandler<
                 INonAllocSubscribableSingleArg,
                 IInvokableSingleArg>
                 subscription)
@@ -140,8 +140,8 @@ namespace HereticalSolutions.Delegates.Broadcasting
         /// <typeparam name="TValue">The type of messages to unsubscribe from.</typeparam>
         /// <param name="subscription">The subscription handler.</param>
         public void Unsubscribe<TValue>(
-            ISubscriptionHandler<
-                INonAllocSubscribableSingleArgGeneric<TValue>,
+            INonAllocSubscriptionHandler<
+                INonAllocSubscribable,
                 IInvokableSingleArgGeneric<TValue>>
                 subscription)
         {
@@ -154,7 +154,7 @@ namespace HereticalSolutions.Delegates.Broadcasting
                     logger.TryFormatException<NonAllocBroadcasterWithRepository>(
                         $"INVALID VALUE TYPE: \"{valueType.Name}\""));
 
-            var broadcaster = (INonAllocSubscribableSingleArgGeneric<TValue>)broadcasterObject;
+            var broadcaster = (INonAllocSubscribable)broadcasterObject;
 
             broadcaster.Unsubscribe(subscription);
         }
@@ -166,7 +166,7 @@ namespace HereticalSolutions.Delegates.Broadcasting
         /// <param name="subscription">The subscription handler.</param>
         public void Unsubscribe(
             Type valueType,
-            ISubscriptionHandler<
+            INonAllocSubscriptionHandler<
                 INonAllocSubscribableSingleArg,
                 IInvokableSingleArg>
                 subscription)
@@ -184,8 +184,8 @@ namespace HereticalSolutions.Delegates.Broadcasting
         }
 
         IEnumerable<
-            ISubscriptionHandler<
-                INonAllocSubscribableSingleArgGeneric<TValue>,
+            INonAllocSubscriptionHandler<
+                INonAllocSubscribable,
                 IInvokableSingleArgGeneric<TValue>>>
                 INonAllocSubscribableSingleArg.GetAllSubscriptions<TValue>()
         {
@@ -198,12 +198,12 @@ namespace HereticalSolutions.Delegates.Broadcasting
                     logger.TryFormatException<NonAllocBroadcasterWithRepository>(
                         $"INVALID VALUE TYPE: \"{valueType.Name}\""));
 
-            var broadcaster = (INonAllocSubscribableSingleArgGeneric<TValue>)broadcasterObject;
+            var broadcaster = (INonAllocSubscribable)broadcasterObject;
 
             return broadcaster.AllSubscriptions;
         }
 
-        public IEnumerable<ISubscription> GetAllSubscriptions(Type valueType)
+        public IEnumerable<INonAllocSubscription> GetAllSubscriptions(Type valueType)
         {
             if (!broadcasterRepository.TryGet(
                     valueType,
@@ -218,14 +218,14 @@ namespace HereticalSolutions.Delegates.Broadcasting
         }
 
         IEnumerable<
-            ISubscriptionHandler<
+            INonAllocSubscriptionHandler<
                 INonAllocSubscribableSingleArg,
                 IInvokableSingleArg>>
                 INonAllocSubscribableSingleArg.AllSubscriptions
         {
             get
             {
-                var result = new List<ISubscriptionHandler<
+                var result = new List<INonAllocSubscriptionHandler<
                     INonAllocSubscribableSingleArg,
                     IInvokableSingleArg>>();
 
@@ -244,11 +244,11 @@ namespace HereticalSolutions.Delegates.Broadcasting
 
         #region INonAllocSubscribable
 
-        IEnumerable<ISubscription> INonAllocSubscribable.AllSubscriptions
+        IEnumerable<INonAllocSubscription> INonAllocSubscribable.AllSubscriptions
         {
             get
             {
-                List<ISubscription> result = new List<ISubscription>();
+                List<INonAllocSubscription> result = new List<INonAllocSubscription>();
 
                 foreach (var key in broadcasterRepository.Keys)
                 {

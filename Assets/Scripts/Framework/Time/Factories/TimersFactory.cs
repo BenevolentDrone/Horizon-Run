@@ -123,8 +123,8 @@ namespace HereticalSolutions.Time.Factories
         public static RuntimeTimer BuildRuntimeTimerWithPrivateSubscriptions(
             string id,
             float defaultDuration,
-            out INonAllocSubscribableSingleArgGeneric<IRuntimeTimer> onStartPrivateSubscribable,
-            out INonAllocSubscribableSingleArgGeneric<IRuntimeTimer> onFinishPrivateSubscribable,
+            out INonAllocSubscribable onStartPrivateSubscribable,
+            out INonAllocSubscribable onFinishPrivateSubscribable,
             ILoggerResolver loggerResolver = null)
         {
             
@@ -141,24 +141,24 @@ namespace HereticalSolutions.Time.Factories
             var onFinishRepeated = BroadcastersFactory.BuildNonAllocBroadcasterGeneric<IRuntimeTimer>(loggerResolver);
             
             
-            ISubscription privateStartSubscription = DelegatesFactory.BuildSubscriptionSingleArgGeneric<IRuntimeTimer>(
+            INonAllocSubscription privateStartSubscription = DelegatesFactory.BuildSubscriptionSingleArgGeneric<IRuntimeTimer>(
                 onStart.Publish,
                 loggerResolver);
             
             onStartPrivate.Subscribe(
-                (ISubscriptionHandler<
-                    INonAllocSubscribableSingleArgGeneric<IRuntimeTimer>,
+                (INonAllocSubscriptionHandler<
+                    INonAllocSubscribable,
                     IInvokableSingleArgGeneric<IRuntimeTimer>>)
                 privateStartSubscription);
             
             
-            ISubscription privateFinishSubscription = DelegatesFactory.BuildSubscriptionSingleArgGeneric<IRuntimeTimer>(
+            INonAllocSubscription privateFinishSubscription = DelegatesFactory.BuildSubscriptionSingleArgGeneric<IRuntimeTimer>(
                 onFinish.Publish,
                 loggerResolver);
             
             onFinishPrivate.Subscribe(
-                (ISubscriptionHandler<
-                    INonAllocSubscribableSingleArgGeneric<IRuntimeTimer>,
+                (INonAllocSubscriptionHandler<
+                    INonAllocSubscribable,
                     IInvokableSingleArgGeneric<IRuntimeTimer>>)
                 privateFinishSubscription);
 

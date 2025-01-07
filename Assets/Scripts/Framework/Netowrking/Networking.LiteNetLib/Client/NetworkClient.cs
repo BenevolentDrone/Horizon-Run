@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 using System.Net;
@@ -24,7 +25,7 @@ namespace HereticalSolutions.Networking.LiteNetLib
     {
         private readonly NetworkPlayerSettings playerSettings;
         
-        private readonly INonAllocSubscribableNoArgs pinger;
+        private readonly INonAllocSubscribable pinger;
         
         #region Message bus
 
@@ -64,24 +65,24 @@ namespace HereticalSolutions.Networking.LiteNetLib
 
         #region Subscriptions
 
-        private ISubscription pingSubscription;
+        private INonAllocSubscription pingSubscription;
         
-        private ISubscription startClientSubscription;
+        private INonAllocSubscription startClientSubscription;
         
-        private ISubscription stopClientSubscription;
+        private INonAllocSubscription stopClientSubscription;
         
-        private ISubscription connectSubscription;
+        private INonAllocSubscription connectSubscription;
         
-        private ISubscription disconnectSubscription;
+        private INonAllocSubscription disconnectSubscription;
 
-        private ISubscription sendPacketSubscription;
+        private INonAllocSubscription sendPacketSubscription;
         
         #endregion
         
         public NetworkClient(
             NetworkPlayerSettings playerSettings,
             
-            INonAllocSubscribableNoArgs pinger,
+            INonAllocSubscribable pinger,
             
             INonAllocMessageSender networkBusAsSender,
             INonAllocMessageReceiver networkBusAsReceiver,
@@ -191,8 +192,8 @@ namespace HereticalSolutions.Networking.LiteNetLib
             {
                 logger?.LogError<NetworkClient>(
                     $"PING SUBSCRIPTION IS STILL ACTIVE");
-                
-                (pingSubscription as ISubscriptionHandler<INonAllocSubscribableNoArgs, IInvokableNoArgs>).Terminate();
+
+                pingSubscription.Unsubscribe();
             }
             
             pinger.Subscribe(
@@ -270,7 +271,12 @@ namespace HereticalSolutions.Networking.LiteNetLib
             string ip,
             int port,
             string secret,
-            byte preferredPlayerSlot = byte.MaxValue)
+            byte preferredPlayerSlot = byte.MaxValue,
+
+            //Async tail
+            CancellationToken cancellationToken = default,
+            IProgress<float> progress = null,
+            ILogger progressLogger = null)
         {
             if (status != EClientStatus.DISCONNECTED)
             {

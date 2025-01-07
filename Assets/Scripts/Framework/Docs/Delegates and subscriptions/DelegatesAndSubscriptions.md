@@ -4,7 +4,7 @@
 
 - Use [`ISubscribable`](ISubscribable.md) interface family just like you would use a C#'s delegate (`Action`, `Func`) as a publisher for events (methods `Subscribe` and `Unsubscribe`)
 - Use `IPublisher` interface family just like you would use a C#'s delegate (`Action`, `Func`) as an event invoker (method `Publish`)
-- Use [`ISubscription`](ISubscription.md) interface family just like you would use a C#'s delegate (`Action`, `Func`) as an event subscription (methods `Activate` and `Terminate`)
+- Use [`INonAllocSubscription`](INonAllocSubscription.md) interface family just like you would use a C#'s delegate (`Action`, `Func`) as an event subscription (methods `Activate` and `Terminate`)
 - Use `IInvokable` interface family just like you would use a C#'s delegate (`Action`, `Func`) as a delegate wrapper (method `Invoke`)
 - Use [`INonAllocSubscribable`](INonAllocSubscribable.md) interface family just like you would use a C#'s delegate (`Action`, `Func`) as a publisher for events, but with non-allocating subscription methods (methods `Subscribe` and `Unsubscribe`)
 
@@ -24,10 +24,10 @@
 	- The `IPublisher` interface family is designed to allow publisher invokers to invoke the publisher but not to call its un/subscribe methods
 	- The `ISubscribable` interface family is designed to allow subscription holders to un/subscribe their subscriptions to the publisher but not to call its publishing methods
  	- The non-alloc versions of `ISubscribables` exist so that the subscription process itself produces no allocation. For this purpose, subscriptions are pre-allocated as variables at their holder classes, and their references get pooled to the publishers' invocation pools upon subscribing.
-- Each subscriber implements an `ISubscription` interface and an arbitrary (but always >= 1) amount of pairs of `ISubscriptionHandler` and `ISubscriptionState` interfaces that share the same `TInvokable` generic type.
-	- The `ISubscription` interface is inherited by all subscriptions to provide subscription holders with a convenient storage of multiple subscription instances with any amount and type of arguments. The publishers take care of finding out those internally.
-	- The `ISubscriptionHandler` interface is used by publishers to validate, activate, and terminate subscriptions based on the amount and type of arguments.
-	- The `ISubscriptionState` interface is used by publishers to invoke delegates and keep track of pool elements the subscriptions are stored in.
+- Each subscriber implements an `INonAllocSubscription` interface and an arbitrary (but always >= 1) amount of pairs of `INonAllocSubscriptionHandler` and `INonAllocSubscriptionState` interfaces that share the same `TInvokable` generic type.
+	- The `INonAllocSubscription` interface is inherited by all subscriptions to provide subscription holders with a convenient storage of multiple subscription instances with any amount and type of arguments. The publishers take care of finding out those internally.
+	- The `INonAllocSubscriptionHandler` interface is used by publishers to validate, activate, and terminate subscriptions based on the amount and type of arguments.
+	- The `INonAllocSubscriptionState` interface is used by publishers to invoke delegates and keep track of pool elements the subscriptions are stored in.
 
 ## Pub/sub interfaces
 
@@ -49,16 +49,16 @@
 ### Non-alloc publishers as subscription providers (subscribables)
 
 - [`INonAllocSubscribable`](INonAllocSubscribable.md) Represents a subscribable object that allows non-allocating subscriptions.
-- [`INonAllocSubscribableNoArgs`](INonAllocSubscribableNoArgs.md) Represents an interface for a non-allocating subscribable with no arguments.
-- [`INonAllocSubscribableSingleArgGeneric<TValue>`](INonAllocSubscribableSingleArgGeneric.md) Represents a non-allocating subscribable interface with a single generic argument.
+- [`INonAllocSubscribable`](INonAllocSubscribable.md) Represents an interface for a non-allocating subscribable with no arguments.
+- [`INonAllocSubscribable`](INonAllocSubscribableSingleArgGeneric.md) Represents a non-allocating subscribable interface with a single generic argument.
 - [`INonAllocSubscribableSingleArg`](INonAllocSubscribableSingleArg.md) Represents an interface for a non-allocating subscribable with a single argument.
-- [`INonAllocSubscribableMultipleArgs`](INonAllocSubscribableMultipleArgs.md) Represents an interface for a non-allocating subscribable with multiple arguments. Arguments are passed as an array of objects.
+- [`INonAllocSubscribable`](INonAllocSubscribable.md) Represents an interface for a non-allocating subscribable with multiple arguments. Arguments are passed as an array of objects.
 
 ### Subscriptions
 
-- [`ISubscription`](ISubscription.md) Represents a subscription to a publisher.
-- [`ISubscriptionHandler<TSubscribable, TInvokable>`](ISubscriptionHandler.md) Represents a handler for managing subscriptions to a specific type of subscribable object.
-- [`ISubscriptionState<TInvokable>`](ISubscriptionState.md) Represents the state of a subscription.
+- [`INonAllocSubscription`](INonAllocSubscription.md) Represents a subscription to a publisher.
+- [`INonAllocSubscriptionHandler<TSubscribable, TInvokable>`](INonAllocSubscriptionHandler.md) Represents a handler for managing subscriptions to a specific type of subscribable object.
+- [`INonAllocSubscriptionState<TInvokable>`](INonAllocSubscriptionState.md) Represents the state of a subscription.
 
 ### Delegate wrappers (invokables)
 

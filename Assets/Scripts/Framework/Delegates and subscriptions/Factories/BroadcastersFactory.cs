@@ -5,7 +5,7 @@ using HereticalSolutions.Allocations.Factories;
 
 using HereticalSolutions.Collections;
 
-using HereticalSolutions.Delegates.Broadcasting;
+using HereticalSolutions.Delegates;
 
 using HereticalSolutions.Pools;
 using HereticalSolutions.Pools.Factories;
@@ -24,7 +24,7 @@ namespace HereticalSolutions.Delegates.Factories
         private const int DEFAULT_BROADCASTER_CAPACITY = 16;
         
         //TODO: make thread safe
-        private static ManagedPoolBuilder<ISubscription> managedPoolBuilder;
+        private static ManagedPoolBuilder<INonAllocSubscription> managedPoolBuilder;
 
         #region Broadcaster multiple args
 
@@ -89,12 +89,12 @@ namespace HereticalSolutions.Delegates.Factories
         public static NonAllocBroadcasterMultipleArgs BuildNonAllocBroadcasterMultipleArgs(
             ILoggerResolver loggerResolver = null)
         {
-            Func<ISubscription> valueAllocationDelegate = AllocationsFactory.NullAllocationDelegate<ISubscription>;
+            Func<INonAllocSubscription> valueAllocationDelegate = AllocationsFactory.NullAllocationDelegate<INonAllocSubscription>;
 
             if (managedPoolBuilder == null)
-                managedPoolBuilder = new ManagedPoolBuilder<ISubscription>(
+                managedPoolBuilder = new ManagedPoolBuilder<INonAllocSubscription>(
                     loggerResolver,
-                    loggerResolver?.GetLogger<ManagedPoolBuilder<ISubscription>>());
+                    loggerResolver?.GetLogger<ManagedPoolBuilder<INonAllocSubscription>>());
             
             managedPoolBuilder.Initialize(
                 valueAllocationDelegate,
@@ -130,12 +130,12 @@ namespace HereticalSolutions.Delegates.Factories
             AllocationCommandDescriptor additional,
             ILoggerResolver loggerResolver = null)
         {
-            Func<ISubscription> valueAllocationDelegate = AllocationsFactory.NullAllocationDelegate<ISubscription>;
+            Func<INonAllocSubscription> valueAllocationDelegate = AllocationsFactory.NullAllocationDelegate<INonAllocSubscription>;
 
             if (managedPoolBuilder == null)
-                managedPoolBuilder = new ManagedPoolBuilder<ISubscription>(
+                managedPoolBuilder = new ManagedPoolBuilder<INonAllocSubscription>(
                     loggerResolver,
-                    loggerResolver?.GetLogger<ManagedPoolBuilder<ISubscription>>());
+                    loggerResolver?.GetLogger<ManagedPoolBuilder<INonAllocSubscription>>());
             
             managedPoolBuilder.Initialize(
                 valueAllocationDelegate,
@@ -159,15 +159,15 @@ namespace HereticalSolutions.Delegates.Factories
         }
         
         public static NonAllocBroadcasterMultipleArgs BuildNonAllocBroadcasterMultipleArgs(
-            IManagedPool<ISubscription> subscriptionsPool,
+            IManagedPool<INonAllocSubscription> subscriptionsPool,
             ILoggerResolver loggerResolver = null)
         {
             ILogger logger =
                 loggerResolver?.GetLogger<NonAllocBroadcasterMultipleArgs>()
                 ?? null;
             
-            IDynamicArray<IPoolElementFacade<ISubscription>> subscriptionsContents =
-                subscriptionsPool as IDynamicArray<IPoolElementFacade<ISubscription>>;
+            IDynamicArray<IPoolElementFacade<INonAllocSubscription>> subscriptionsContents =
+                subscriptionsPool as IDynamicArray<IPoolElementFacade<INonAllocSubscription>>;
 
             return new NonAllocBroadcasterMultipleArgs(
                 subscriptionsPool,
@@ -220,12 +220,12 @@ namespace HereticalSolutions.Delegates.Factories
         public static NonAllocBroadcasterGeneric<T> BuildNonAllocBroadcasterGeneric<T>(
             ILoggerResolver loggerResolver = null)
         {
-            Func<ISubscription> valueAllocationDelegate = AllocationsFactory.NullAllocationDelegate<ISubscription>;
+            Func<INonAllocSubscription> valueAllocationDelegate = AllocationsFactory.NullAllocationDelegate<INonAllocSubscription>;
 
             if (managedPoolBuilder == null)
-                managedPoolBuilder = new ManagedPoolBuilder<ISubscription>(
+                managedPoolBuilder = new ManagedPoolBuilder<INonAllocSubscription>(
                     loggerResolver,
-                    loggerResolver?.GetLogger<ManagedPoolBuilder<ISubscription>>());
+                    loggerResolver?.GetLogger<ManagedPoolBuilder<INonAllocSubscription>>());
             
             managedPoolBuilder.Initialize(
                 valueAllocationDelegate,
@@ -260,12 +260,12 @@ namespace HereticalSolutions.Delegates.Factories
             AllocationCommandDescriptor additional,
             ILoggerResolver loggerResolver = null)
         {
-            Func<ISubscription> valueAllocationDelegate = AllocationsFactory.NullAllocationDelegate<ISubscription>;
+            Func<INonAllocSubscription> valueAllocationDelegate = AllocationsFactory.NullAllocationDelegate<INonAllocSubscription>;
 
             if (managedPoolBuilder == null)
-                managedPoolBuilder = new ManagedPoolBuilder<ISubscription>(
+                managedPoolBuilder = new ManagedPoolBuilder<INonAllocSubscription>(
                     loggerResolver,
-                    loggerResolver?.GetLogger<ManagedPoolBuilder<ISubscription>>());
+                    loggerResolver?.GetLogger<ManagedPoolBuilder<INonAllocSubscription>>());
             
             managedPoolBuilder.Initialize(
                 valueAllocationDelegate,
@@ -289,15 +289,15 @@ namespace HereticalSolutions.Delegates.Factories
         }
         
         public static NonAllocBroadcasterGeneric<T> BuildNonAllocBroadcasterGeneric<T>(
-            IManagedPool<ISubscription> subscriptionsPool,
+            IManagedPool<INonAllocSubscription> subscriptionsPool,
             ILoggerResolver loggerResolver = null)
         {
             ILogger logger =
                 loggerResolver?.GetLogger<NonAllocBroadcasterGeneric<T>>()
                 ?? null;
 
-            IDynamicArray<IPoolElementFacade<ISubscription>> subscriptionsContents =
-                subscriptionsPool as IDynamicArray<IPoolElementFacade<ISubscription>>;
+            IDynamicArray<IPoolElementFacade<INonAllocSubscription>> subscriptionsContents =
+                subscriptionsPool as IDynamicArray<IPoolElementFacade<INonAllocSubscription>>;
             
             return new NonAllocBroadcasterGeneric<T>(
                 subscriptionsPool,

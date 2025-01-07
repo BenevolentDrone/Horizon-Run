@@ -1,8 +1,8 @@
 using System;
 using System.Globalization;
 
-using HereticalSolutions.Delegates.Pinging;
-using HereticalSolutions.Delegates.Broadcasting;
+using HereticalSolutions.Delegates;
+using HereticalSolutions.Delegates;
 using HereticalSolutions.Delegates.Subscriptions;
 
 using HereticalSolutions.Pools;

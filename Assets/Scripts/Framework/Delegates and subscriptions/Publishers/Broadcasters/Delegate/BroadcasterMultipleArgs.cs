@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 using HereticalSolutions.LifetimeManagement;
 
-namespace HereticalSolutions.Delegates.Broadcasting
+namespace HereticalSolutions.Delegates
 {
     public class BroadcasterMultipleArgs
         : IPublisherMultipleArgs,

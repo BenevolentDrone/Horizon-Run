@@ -48,7 +48,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Networking.Factories
             
             UniversalTemplateEntityManager entityManager,
             IEventEntityBuilder<Entity, Guid> eventEntityBuilder,
-            INonAllocSubscribableNoArgs pinger,
+            INonAllocSubscribable pinger,
             
             INonAllocMessageSender networkBusAsSender,
             INonAllocMessageReceiver networkBusAsReceiver,
@@ -188,7 +188,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Networking.Factories
             NetworkTimeoutSettings timeoutSettings,
             NetworkLagSimulationSettings lagSimulationSettings,
 
-            INonAllocSubscribableNoArgs pinger,
+            INonAllocSubscribable pinger,
             
             INonAllocMessageSender networkBusAsSender,
             INonAllocMessageReceiver networkBusAsReceiver,
@@ -250,7 +250,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Networking.Factories
             NetworkBasicSettings networkBasicSettings,
             NetworkLagSimulationSettings lagSimulationSettings,
 
-            INonAllocSubscribableNoArgs pinger,
+            INonAllocSubscribable pinger,
             
             INonAllocMessageSender networkBusAsSender,
             INonAllocMessageReceiver networkBusAsReceiver,

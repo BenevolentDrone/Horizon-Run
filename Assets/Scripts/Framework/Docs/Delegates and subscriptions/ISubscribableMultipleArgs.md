@@ -1,6 +1,6 @@
 # ISubscribableMultipleArgs
 
-Represents an interface for objects that can be subscribed to with multiple arguments. Arguments are passed as an array of objects. Inherits from [`ISubscribable`](ISubscribable.md). For the non-allocating version, see [`INonAllocSubscribableMultipleArgs`](INonAllocSubscribableMultipleArgs.md)
+Represents an interface for objects that can be subscribed to with multiple arguments. Arguments are passed as an array of objects. Inherits from [`ISubscribable`](ISubscribable.md). For the non-allocating version, see [`INonAllocSubscribable`](INonAllocSubscribable.md)
 
 ## Methods
 

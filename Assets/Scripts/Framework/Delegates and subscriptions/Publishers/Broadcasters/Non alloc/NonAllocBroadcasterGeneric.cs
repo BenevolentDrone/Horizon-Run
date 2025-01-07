@@ -9,21 +9,21 @@ using HereticalSolutions.LifetimeManagement;
 
 using HereticalSolutions.Logging;
 
-namespace HereticalSolutions.Delegates.Broadcasting
+namespace HereticalSolutions.Delegates
 {
     public class NonAllocBroadcasterGeneric<TValue>
         : IPublisherSingleArgGeneric<TValue>,
           IPublisherSingleArg,
-          INonAllocSubscribableSingleArgGeneric<TValue>,
+          INonAllocSubscribable,
           INonAllocSubscribableSingleArg,
           ICleanuppable,
           IDisposable
     {
         #region Subscriptions
 
-        private readonly IManagedPool<ISubscription> subscriptionsPool;
+        private readonly IManagedPool<INonAllocSubscription> subscriptionsPool;
 
-        private readonly IDynamicArray<IPoolElementFacade<ISubscription>> subscriptionsContents;
+        private readonly IDynamicArray<IPoolElementFacade<INonAllocSubscription>> subscriptionsContents;
         
         #endregion
 
@@ -31,7 +31,7 @@ namespace HereticalSolutions.Delegates.Broadcasting
 
         #region Buffer
 
-        private ISubscription[] currentSubscriptionsBuffer;
+        private INonAllocSubscription[] currentSubscriptionsBuffer;
 
         private int currentSubscriptionsBufferCount = -1;
 
@@ -40,8 +40,8 @@ namespace HereticalSolutions.Delegates.Broadcasting
         private bool broadcastInProgress = false;
 
         public NonAllocBroadcasterGeneric(
-            IManagedPool<ISubscription> subscriptionsPool,
-            IDynamicArray<IPoolElementFacade<ISubscription>> subscriptionsContents,
+            IManagedPool<INonAllocSubscription> subscriptionsPool,
+            IDynamicArray<IPoolElementFacade<INonAllocSubscription>> subscriptionsContents,
             ILogger logger = null)
         {
             this.subscriptionsPool = subscriptionsPool;
@@ -50,25 +50,22 @@ namespace HereticalSolutions.Delegates.Broadcasting
 
             this.subscriptionsContents = subscriptionsContents;
 
-            currentSubscriptionsBuffer = new ISubscription[subscriptionsContents.Capacity];
+            currentSubscriptionsBuffer = new INonAllocSubscription[subscriptionsContents.Capacity];
         }
 
         #region INonAllocSubscribableSingleArgGeneric
 
         public void Subscribe(
-            ISubscriptionHandler<
-                INonAllocSubscribableSingleArgGeneric<TValue>,
-                IInvokableSingleArgGeneric<TValue>>
-                subscription)
+            INonAllocSubscription subscription)
         {
             if (!subscription.ValidateActivation(this))
                 return;
 
             var subscriptionElement = subscriptionsPool.Pop();
 
-            var subscriptionState = (ISubscriptionState<IInvokableSingleArgGeneric<TValue>>)subscription;
+            var subscriptionState = (INonAllocSubscriptionState<IInvokableSingleArgGeneric<TValue>>)subscription;
 
-            subscriptionElement.Value = (ISubscription)subscriptionState;
+            subscriptionElement.Value = (INonAllocSubscription)subscriptionState;
 
             subscription.Activate(this, subscriptionElement);
 
@@ -77,15 +74,12 @@ namespace HereticalSolutions.Delegates.Broadcasting
         }
 
         public void Unsubscribe(
-            ISubscriptionHandler<
-                INonAllocSubscribableSingleArgGeneric<TValue>,
-                IInvokableSingleArgGeneric<TValue>>
-                subscription)
+            INonAllocSubscription subscription)
         {
             if (!subscription.ValidateTermination(this))
                 return;
 
-            var poolElement = ((ISubscriptionState<IInvokableSingleArgGeneric<TValue>>)subscription).PoolElement;
+            var poolElement = ((INonAllocSubscriptionState<IInvokableSingleArgGeneric<TValue>>)subscription).PoolElement;
 
             TryRemoveFromBuffer(poolElement);
 
@@ -101,22 +95,18 @@ namespace HereticalSolutions.Delegates.Broadcasting
                 $"SUBSCRIPTION REMOVED: {previousValue.GetHashCode()} <{typeof(TValue).Name}>");
         }
 
-        IEnumerable<
-            ISubscriptionHandler<
-                INonAllocSubscribableSingleArgGeneric<TValue>,
-                IInvokableSingleArgGeneric<TValue>>>
-                INonAllocSubscribableSingleArgGeneric<TValue>.AllSubscriptions
+        IEnumerable<INonAllocSubscription> INonAllocSubscribable.AllSubscriptions
         {
             get
             {
-                var allSubscriptions = new ISubscriptionHandler<
-                    INonAllocSubscribableSingleArgGeneric<TValue>,
+                var allSubscriptions = new INonAllocSubscriptionHandler<
+                    INonAllocSubscribable,
                     IInvokableSingleArgGeneric<TValue>>
                     [subscriptionsContents.Count];
 
                 for (int i = 0; i < allSubscriptions.Length; i++)
-                    allSubscriptions[i] = (ISubscriptionHandler<
-                        INonAllocSubscribableSingleArgGeneric<TValue>,
+                    allSubscriptions[i] = (INonAllocSubscriptionHandler<
+                        INonAllocSubscribable,
                         IInvokableSingleArgGeneric<TValue>>)
                         subscriptionsContents[i].Value;
 
@@ -129,15 +119,15 @@ namespace HereticalSolutions.Delegates.Broadcasting
         #region INonAllocSubscribableSingleArg
 
         public void Subscribe<TArgument>(
-            ISubscriptionHandler<
-                INonAllocSubscribableSingleArgGeneric<TArgument>,
+            INonAllocSubscriptionHandler<
+                INonAllocSubscribable,
                 IInvokableSingleArgGeneric<TArgument>>
                 subscription)
         {
             switch (subscription)
             {
-                case ISubscriptionHandler<
-                    INonAllocSubscribableSingleArgGeneric<TValue>,
+                case INonAllocSubscriptionHandler<
+                    INonAllocSubscribable,
                     IInvokableSingleArgGeneric<TValue>> tValueSubscription:
 
                     Subscribe(tValueSubscription);
@@ -154,15 +144,15 @@ namespace HereticalSolutions.Delegates.Broadcasting
 
         public void Subscribe(
             Type valueType,
-            ISubscriptionHandler<
+            INonAllocSubscriptionHandler<
                 INonAllocSubscribableSingleArg,
                 IInvokableSingleArg>
                 subscription)
         {
             switch (subscription)
             {
-                case ISubscriptionHandler<
-                    INonAllocSubscribableSingleArgGeneric<TValue>,
+                case INonAllocSubscriptionHandler<
+                    INonAllocSubscribable,
                     IInvokableSingleArgGeneric<TValue>>
                     tValueSubscription:
 
@@ -179,15 +169,15 @@ namespace HereticalSolutions.Delegates.Broadcasting
         }
 
         public void Unsubscribe<TArgument>(
-            ISubscriptionHandler<
-                INonAllocSubscribableSingleArgGeneric<TArgument>,
+            INonAllocSubscriptionHandler<
+                INonAllocSubscribable,
                 IInvokableSingleArgGeneric<TArgument>>
                 subscription)
         {
             switch (subscription)
             {
-                case ISubscriptionHandler<
-                    INonAllocSubscribableSingleArgGeneric<TValue>,
+                case INonAllocSubscriptionHandler<
+                    INonAllocSubscribable,
                     IInvokableSingleArgGeneric<TValue>>
                     tValueSubscription:
 
@@ -205,15 +195,15 @@ namespace HereticalSolutions.Delegates.Broadcasting
 
         public void Unsubscribe(
             Type valueType,
-            ISubscriptionHandler<
+            INonAllocSubscriptionHandler<
                 INonAllocSubscribableSingleArg,
                 IInvokableSingleArg>
                 subscription)
         {
             switch (subscription)
             {
-                case ISubscriptionHandler<
-                    INonAllocSubscribableSingleArgGeneric<TValue>,
+                case INonAllocSubscriptionHandler<
+                    INonAllocSubscribable,
                     IInvokableSingleArgGeneric<TValue>>
                     tValueSubscription:
 
@@ -230,28 +220,28 @@ namespace HereticalSolutions.Delegates.Broadcasting
         }
 
         IEnumerable<
-            ISubscriptionHandler<
-                INonAllocSubscribableSingleArgGeneric<TValue>,
+            INonAllocSubscriptionHandler<
+                INonAllocSubscribable,
                 IInvokableSingleArgGeneric<TValue>>>
                 INonAllocSubscribableSingleArg.GetAllSubscriptions<TValue>()
         {
-            var allSubscriptions = new ISubscriptionHandler<
-                INonAllocSubscribableSingleArgGeneric<TValue>,
+            var allSubscriptions = new INonAllocSubscriptionHandler<
+                INonAllocSubscribable,
                 IInvokableSingleArgGeneric<TValue>>
                 [subscriptionsContents.Count];
 
             for (int i = 0; i < allSubscriptions.Length; i++)
-                allSubscriptions[i] = (ISubscriptionHandler<
-                    INonAllocSubscribableSingleArgGeneric<TValue>,
+                allSubscriptions[i] = (INonAllocSubscriptionHandler<
+                    INonAllocSubscribable,
                     IInvokableSingleArgGeneric<TValue>>)
                     subscriptionsContents[i].Value;
 
             return allSubscriptions;
         }
 
-        public IEnumerable<ISubscription> GetAllSubscriptions(Type valueType)
+        public IEnumerable<INonAllocSubscription> GetAllSubscriptions(Type valueType)
         {
-            ISubscription[] allSubscriptions = new ISubscription[subscriptionsContents.Count];
+            INonAllocSubscription[] allSubscriptions = new INonAllocSubscription[subscriptionsContents.Count];
 
             for (int i = 0; i < allSubscriptions.Length; i++)
                 allSubscriptions[i] = subscriptionsContents[i].Value;
@@ -260,20 +250,20 @@ namespace HereticalSolutions.Delegates.Broadcasting
         }
 
         IEnumerable<
-            ISubscriptionHandler<
+            INonAllocSubscriptionHandler<
                 INonAllocSubscribableSingleArg,
                 IInvokableSingleArg>>
                 INonAllocSubscribableSingleArg.AllSubscriptions
         {
             get
             {
-                var allSubscriptions = new ISubscriptionHandler<
+                var allSubscriptions = new INonAllocSubscriptionHandler<
                     INonAllocSubscribableSingleArg,
                     IInvokableSingleArg>
                     [subscriptionsContents.Count];
 
                 for (int i = 0; i < allSubscriptions.Length; i++)
-                    allSubscriptions[i] = (ISubscriptionHandler<
+                    allSubscriptions[i] = (INonAllocSubscriptionHandler<
                         INonAllocSubscribableSingleArg,
                         IInvokableSingleArg>)
                         subscriptionsContents[i].Value;
@@ -286,11 +276,11 @@ namespace HereticalSolutions.Delegates.Broadcasting
 
         #region INonAllocSubscribable
 
-        public IEnumerable<ISubscription> AllSubscriptions
+        public IEnumerable<INonAllocSubscription> AllSubscriptions
         {
             get
             {
-                ISubscription[] allSubscriptions = new ISubscription[subscriptionsContents.Count];
+                INonAllocSubscription[] allSubscriptions = new INonAllocSubscription[subscriptionsContents.Count];
 
                 for (int i = 0; i < allSubscriptions.Length; i++)
                     allSubscriptions[i] = subscriptionsContents[i].Value;
@@ -303,8 +293,8 @@ namespace HereticalSolutions.Delegates.Broadcasting
         {
             while (subscriptionsContents.Count > 0)
             {
-                var subscription = (ISubscriptionHandler<
-                    INonAllocSubscribableSingleArgGeneric<TValue>,
+                var subscription = (INonAllocSubscriptionHandler<
+                    INonAllocSubscribable,
                     IInvokableSingleArgGeneric<TValue>>)
                     subscriptionsContents[0].Value;
 
@@ -319,7 +309,7 @@ namespace HereticalSolutions.Delegates.Broadcasting
         public void Publish(TValue value)
         {
             //If any delegate that is invoked attempts to unsubscribe itself, it would produce an error because the collection
-            //should NOT be changed during the invokation
+            //should NOT be changed during the invocation
             //That's why we'll copy the subscriptions array to buffer and invoke it from there
 
             ValidateBufferSize();
@@ -419,7 +409,7 @@ namespace HereticalSolutions.Delegates.Broadcasting
 
         #endregion
 
-        private void TryRemoveFromBuffer(IPoolElementFacade<ISubscription> subscriptionElement)
+        private void TryRemoveFromBuffer(IPoolElementFacade<INonAllocSubscription> subscriptionElement)
         {
             if (!broadcastInProgress)
                 return;
@@ -437,7 +427,7 @@ namespace HereticalSolutions.Delegates.Broadcasting
         private void ValidateBufferSize()
         {
             if (currentSubscriptionsBuffer.Length < subscriptionsContents.Capacity)
-                currentSubscriptionsBuffer = new ISubscription[subscriptionsContents.Capacity];
+                currentSubscriptionsBuffer = new INonAllocSubscription[subscriptionsContents.Capacity];
         }
 
         private void CopySubscriptionsToBuffer()
@@ -454,9 +444,9 @@ namespace HereticalSolutions.Delegates.Broadcasting
             {
                 if (currentSubscriptionsBuffer[i] != null)
                 {
-                    var subscriptionState = (ISubscriptionState<IInvokableSingleArgGeneric<TValue>>)currentSubscriptionsBuffer[i];
+                    var subscriptionState = (INonAllocSubscriptionContext<TValue>)currentSubscriptionsBuffer[i];
 
-                    subscriptionState.Invokable.Invoke(value);
+                    subscriptionState.Delegate.Invoke(value);
                 }
             }
 

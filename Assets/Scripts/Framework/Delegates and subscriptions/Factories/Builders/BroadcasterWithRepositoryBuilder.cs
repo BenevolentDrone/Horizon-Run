@@ -1,6 +1,6 @@
 using System;
 
-using HereticalSolutions.Delegates.Broadcasting;
+using HereticalSolutions.Delegates;
 
 using HereticalSolutions.Repositories;
 using HereticalSolutions.Repositories.Factories;

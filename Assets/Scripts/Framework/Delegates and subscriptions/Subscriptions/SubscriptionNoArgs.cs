@@ -20,9 +20,9 @@ namespace HereticalSolutions.Delegates.Subscriptions
 
         private readonly ILogger logger;
         
-        private INonAllocSubscribableNoArgs publisher;
+        private INonAllocSubscribable publisher;
 
-        private IPoolElementFacade<ISubscription> poolElement;
+        private IPoolElementFacade<INonAllocSubscription> poolElement;
         
         public SubscriptionNoArgs(
             Action @delegate,
@@ -40,43 +40,50 @@ namespace HereticalSolutions.Delegates.Subscriptions
             poolElement = null;
         }
 
-        #region ISubscription
+        #region INonAllocSubscription
         
         public bool Active { get; private set;  }
 
-        public void Subscribe(
+        public bool Subscribe(
             INonAllocSubscribable publisher)
         {
-            
+            if (Active)
+                return false;
+
+            return publisher.Subscribe(this);
         }
 
-        public void Unsubscribe()
+        public bool Unsubscribe()
         {
+            if (!Active)
+                return false;
+
+            return publisher.Unsubscribe(this);
         }
 
 
         #endregion
 
-        #region ISubscriptionContext
+        #region INonAllocSubscriptionContext
 
         public IInvokableNoArgs Delegate
         {
-            get => invokable;
+            get => @delegate;
         }
 
-        public IPoolElementFacade<ISubscription> PoolElement
+        public IPoolElementFacade<INonAllocSubscription> PoolElement
         {
             get => poolElement;
         }
 
         public bool ValidateActivation(
-            INonAllocSubscribableNoArgs publisher)
+            INonAllocSubscribable publisher)
         {
             if (Active)
             {
                 logger?.LogError(
                     GetType(),
-                    "ATTEMPT TO ACTIVATE A SUBSCRIPTION THAT IS ALREADY ACTIVE");
+                    $"ATTEMPT TO ACTIVATE A SUBSCRIPTION THAT IS ALREADY ACTIVE: {this.GetHashCode()}");
 
                 return false;
             }
@@ -85,7 +92,7 @@ namespace HereticalSolutions.Delegates.Subscriptions
             {
                 logger?.LogError(
                     GetType(),
-                    "SUBSCRIPTION ALREADY HAS A PUBLISHER");
+                    $"SUBSCRIPTION ALREADY HAS A PUBLISHER: {this.GetHashCode()}");
 
                 return false;
             }
@@ -94,7 +101,7 @@ namespace HereticalSolutions.Delegates.Subscriptions
             {
                 logger?.LogError(
                     GetType(),
-                    "SUBSCRIPTION ALREADY HAS A POOL ELEMENT");
+                    $"SUBSCRIPTION ALREADY HAS A POOL ELEMENT: {this.GetHashCode()}");
 
                 return false;
             }
@@ -103,7 +110,17 @@ namespace HereticalSolutions.Delegates.Subscriptions
             {
                 logger?.LogError(
                     GetType(),
-                    "INVALID DELEGATE");
+                    $"INVALID DELEGATE: {this.GetHashCode()}");
+
+                return false;
+            }
+
+            if (publisher is not IPublisherNoArgs
+                && publisher is not IAsyncPublisherNoArgs)
+            {
+                logger?.LogError(
+                    GetType(),
+                    $"INVALID PUBLISHER: EXPECTED {typeof(IPublisherNoArgs).Name} OR {typeof(IAsyncPublisherNoArgs).Name} : {this.GetHashCode()}");
 
                 return false;
             }
@@ -112,8 +129,8 @@ namespace HereticalSolutions.Delegates.Subscriptions
         }
 
         public void Activate(
-            INonAllocSubscribableNoArgs publisher,
-            IPoolElementFacade<ISubscription> poolElement)
+            INonAllocSubscribable publisher,
+            IPoolElementFacade<INonAllocSubscription> poolElement)
         {
             this.poolElement = poolElement;
 
@@ -127,13 +144,13 @@ namespace HereticalSolutions.Delegates.Subscriptions
         }
 
         public bool ValidateTermination(
-            INonAllocSubscribableNoArgs publisher)
+            INonAllocSubscribable publisher)
         {
             if (!Active)
             {
                 logger?.LogError(
                     GetType(),
-                    "ATTEMPT TO TERMINATE A SUBSCRIPTION THAT IS ALREADY ACTIVE");
+                    $"ATTEMPT TO TERMINATE A SUBSCRIPTION THAT IS ALREADY ACTIVE: {this.GetHashCode()}");
 
                 return false;
             }
@@ -142,7 +159,7 @@ namespace HereticalSolutions.Delegates.Subscriptions
             {
                 logger?.LogError(
                     GetType(),
-                    "INVALID PUBLISHER");
+                    $"INVALID PUBLISHER: {this.GetHashCode()}");
 
                 return false;
             }
@@ -151,7 +168,7 @@ namespace HereticalSolutions.Delegates.Subscriptions
             {
                 logger?.LogError(
                     GetType(),
-                    "INVALID POOL ELEMENT");
+                    $"INVALID POOL ELEMENT: {this.GetHashCode()}");
 
                 return false;
             }
@@ -178,13 +195,16 @@ namespace HereticalSolutions.Delegates.Subscriptions
 
         public void Cleanup()
         {
-            //if (Active)
-            //    publisher.Unsubscribe(this);
+            if (Active
+                && publisher != null
+                && publisher.Unsubscribe(this))
+            {
+            }
+            else
+                Terminate();
 
-            Terminate();
-
-            if (invokable is ICleanuppable)
-                (invokable as ICleanuppable).Cleanup();
+            if (@delegate is ICleanuppable)
+                (@delegate as ICleanuppable).Cleanup();
         }
 
         #endregion
@@ -193,13 +213,16 @@ namespace HereticalSolutions.Delegates.Subscriptions
 
         public void Dispose()
         {
-            //if (Active)
-            //    publisher.Unsubscribe(this);
+            if (Active
+                && publisher != null
+                && publisher.Unsubscribe(this))
+            {
+            }
+            else
+                Terminate();
 
-            Terminate();
-
-            if (invokable is IDisposable)
-                (invokable as IDisposable).Dispose();
+            if (@delegate is IDisposable)
+                (@delegate as IDisposable).Dispose();
         }
 
         #endregion

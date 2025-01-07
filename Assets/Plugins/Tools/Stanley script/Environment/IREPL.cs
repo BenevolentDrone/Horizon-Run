@@ -1,5 +1,8 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
+
+using HereticalSolutions.Logging;
 
 namespace HereticalSolutions.StanleyScript
 {
@@ -7,6 +10,10 @@ namespace HereticalSolutions.StanleyScript
 	{
 		Task<bool> Execute(
 			string instruction,
-			CancellationToken cancellationToken);
+
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null);
 	}
 }

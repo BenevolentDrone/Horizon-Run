@@ -77,13 +77,13 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 
 			Entity entityClosure = entity;
 
-			ISubscription timerTickSubscription = DelegatesFactory.BuildSubscriptionSingleArgGeneric<IRuntimeTimer>(
+			INonAllocSubscription timerTickSubscription = DelegatesFactory.BuildSubscriptionSingleArgGeneric<IRuntimeTimer>(
 				(timerArg) => OnTick(entityClosure),
 				loggerResolver);
 
 			timer.OnFinish.Subscribe(
-				(ISubscriptionHandler<
-					INonAllocSubscribableSingleArgGeneric<IRuntimeTimer>,
+				(INonAllocSubscriptionHandler<
+					INonAllocSubscribable,
 					IInvokableSingleArgGeneric<IRuntimeTimer>>)
 					timerTickSubscription);
 		}

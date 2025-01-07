@@ -3,7 +3,7 @@ using System;
 using HereticalSolutions.Allocations;
 using HereticalSolutions.Allocations.Factories;
 using HereticalSolutions.Collections;
-using HereticalSolutions.Delegates.Pinging;
+using HereticalSolutions.Delegates;
 
 using HereticalSolutions.Pools;
 using HereticalSolutions.Pools.Factories;
@@ -19,13 +19,15 @@ namespace HereticalSolutions.Delegates.Factories
         private const int DEFAULT_PINGER_CAPACITY = 16;
 
         //TODO: make thread safe
-        private static ManagedPoolBuilder<ISubscription> managedPoolBuilder;
+        private static ManagedPoolBuilder<INonAllocSubscription> managedPoolBuilder;
 
         #region Pinger
         
-        public static Pinger BuildPinger()
+        public static Pinger BuildPinger(
+            IPool<PingerInvocationContext> contextPool)
         {
-            return new Pinger();
+            return new Pinger(
+                contextPool);
         }
 
         #endregion
@@ -35,12 +37,12 @@ namespace HereticalSolutions.Delegates.Factories
         public static NonAllocPinger BuildNonAllocPinger(
             ILoggerResolver loggerResolver = null)
         {
-            Func<ISubscription> valueAllocationDelegate = AllocationsFactory.NullAllocationDelegate<ISubscription>;
+            Func<INonAllocSubscription> valueAllocationDelegate = AllocationsFactory.NullAllocationDelegate<INonAllocSubscription>;
 
             if (managedPoolBuilder == null)
-                managedPoolBuilder = new ManagedPoolBuilder<ISubscription>(
+                managedPoolBuilder = new ManagedPoolBuilder<INonAllocSubscription>(
                     loggerResolver,
-                    loggerResolver?.GetLogger<ManagedPoolBuilder<ISubscription>>());
+                    loggerResolver?.GetLogger<ManagedPoolBuilder<INonAllocSubscription>>());
             
             managedPoolBuilder.Initialize(
                 valueAllocationDelegate,
@@ -75,12 +77,12 @@ namespace HereticalSolutions.Delegates.Factories
             AllocationCommandDescriptor additional,
             ILoggerResolver loggerResolver = null)
         {
-            Func<ISubscription> valueAllocationDelegate = AllocationsFactory.NullAllocationDelegate<ISubscription>;
+            Func<INonAllocSubscription> valueAllocationDelegate = AllocationsFactory.NullAllocationDelegate<INonAllocSubscription>;
 
             if (managedPoolBuilder == null)
-                managedPoolBuilder = new ManagedPoolBuilder<ISubscription>(
+                managedPoolBuilder = new ManagedPoolBuilder<INonAllocSubscription>(
                     loggerResolver,
-                    loggerResolver?.GetLogger<ManagedPoolBuilder<ISubscription>>());
+                    loggerResolver?.GetLogger<ManagedPoolBuilder<INonAllocSubscription>>());
             
             managedPoolBuilder.Initialize(
                 valueAllocationDelegate,
@@ -103,15 +105,15 @@ namespace HereticalSolutions.Delegates.Factories
         }
 
         public static NonAllocPinger BuildNonAllocPinger(
-            IManagedPool<ISubscription> subscriptionsPool,
+            IManagedPool<INonAllocSubscription> subscriptionsPool,
             ILoggerResolver loggerResolver = null)
         {
             ILogger logger =
                 loggerResolver?.GetLogger<NonAllocPinger>()
                 ?? null;
 
-            IDynamicArray<IPoolElementFacade<ISubscription>> subscriptionsContents =
-                subscriptionsPool as IDynamicArray<IPoolElementFacade<ISubscription>>;
+            IDynamicArray<IPoolElementFacade<INonAllocSubscription>> subscriptionsContents =
+                subscriptionsPool as IDynamicArray<IPoolElementFacade<INonAllocSubscription>>;
             
             return new NonAllocPinger(
                 subscriptionsPool,

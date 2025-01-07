@@ -6,14 +6,14 @@ namespace HereticalSolutions.Delegates
     {
         TInvokable Delegate { get; }
 
-        IPoolElementFacade<ISubscription> PoolElement { get; }
+        IPoolElementFacade<INonAllocSubscription> PoolElement { get; }
 
         bool ValidateActivation(
             INonAllocSubscribable publisher);
 
         void Activate(
             INonAllocSubscribable publisher,
-            IPoolElementFacade<ISubscription> poolElement);
+            IPoolElementFacade<INonAllocSubscription> poolElement);
 
         bool ValidateTermination(
             INonAllocSubscribable publisher);

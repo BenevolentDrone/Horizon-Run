@@ -1,6 +1,7 @@
 using System;
-using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 using HereticalSolutions.Allocations;
 
@@ -61,7 +62,11 @@ namespace HereticalSolutions.AssetImport
 
 		public async Task<IResourceVariantData> Import<TImporter>(
 			Action<TImporter> initializationDelegate = null,
-			IProgress<float> progress = null)
+
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null)
 			where TImporter : AAssetImporter
 		{
 			logger?.Log(
@@ -97,7 +102,10 @@ namespace HereticalSolutions.AssetImport
 					//would a user come up with its usage
 					var postProcessorTask = postProcessors[i].OnImport(
 						result,
-						progress);
+
+						cancellationToken,
+						progress,
+						progressLogger);
 
 					await postProcessorTask;
 						//.ConfigureAwait(false);
@@ -121,7 +129,12 @@ namespace HereticalSolutions.AssetImport
 		}
 
 		public async Task RegisterPostProcessor<TImporter, TPostProcessor>(
-			TPostProcessor instance)
+			TPostProcessor instance,
+
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null)
 			where TImporter : AAssetImporter
 			where TPostProcessor : AAssetImportPostProcessor
 		{
@@ -141,14 +154,24 @@ namespace HereticalSolutions.AssetImport
 
 		#region IAssetImporterPool
 
-		public async Task<IPoolElementFacade<AAssetImporter>> PopImporter<TImporter>()
+		public async Task<IPoolElementFacade<AAssetImporter>> PopImporter<TImporter>(
+
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null)
 			where TImporter : AAssetImporter
 		{
 			return PopImporterSync<TImporter>();
 		}
 
 		public async Task PushImporter(
-			IPoolElementFacade<AAssetImporter> pooledImporter)
+			IPoolElementFacade<AAssetImporter> pooledImporter,
+
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null)
 		{
 			pooledImporter.Value.Cleanup();
 

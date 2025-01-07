@@ -1,6 +1,6 @@
 # ISubscribableNoArgs
 
-Represents an interface for objects that can be subscribed to without any arguments. Inherits from [`ISubscribable`](ISubscribable.md). For the non-allocating version, see [`INonAllocSubscribableNoArgs`](INonAllocSubscribableNoArgs.md).
+Represents an interface for objects that can be subscribed to without any arguments. Inherits from [`ISubscribable`](ISubscribable.md). For the non-allocating version, see [`INonAllocSubscribable`](INonAllocSubscribable.md).
 
 ## Methods
 

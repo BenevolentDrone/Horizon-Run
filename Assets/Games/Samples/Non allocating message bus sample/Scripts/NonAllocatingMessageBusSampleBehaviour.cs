@@ -21,7 +21,7 @@ namespace HereticalSolutions.Samples.NonAllocatingMessageBusSample
 		private INonAllocMessageReceiver messageBusAsReceiver;
 
 
-		private ISubscription subscription;
+		private INonAllocSubscription subscription;
 
 
 		private readonly string messageText1 = "Generic message";

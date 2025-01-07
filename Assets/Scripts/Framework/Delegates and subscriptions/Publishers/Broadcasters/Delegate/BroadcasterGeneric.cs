@@ -7,7 +7,7 @@ using HereticalSolutions.LifetimeManagement;
 
 using HereticalSolutions.Logging;
 
-namespace HereticalSolutions.Delegates.Broadcasting
+namespace HereticalSolutions.Delegates
 {
     public class BroadcasterGeneric<TValue>
         : IPublisherSingleArgGeneric<TValue>,
@@ -34,7 +34,7 @@ namespace HereticalSolutions.Delegates.Broadcasting
         public void Publish(TValue value)
         {
             //If any delegate that is invoked attempts to unsubscribe itself, it would produce an error because the collection
-            //should NOT be changed during the invokation
+            //should NOT be changed during the invocation
             //That's why we'll copy the multicast delegate to a local variable and invoke it from there
             //multicastDelegate?.Invoke(value);
 
@@ -117,7 +117,7 @@ namespace HereticalSolutions.Delegates.Broadcasting
                 return multicastDelegate?
                     .GetInvocationList()
                     //.Cast<Action<TValue>>() //LINQ
-                    .CastInvokationListToGenericActions<TValue>()
+                    .CastInvocationListToGenericActions<TValue>()
                     //?? Enumerable.Empty<Action<TValue>>(); //LINQ
                     ?? new Action<TValue>[0];
             }
@@ -205,7 +205,7 @@ namespace HereticalSolutions.Delegates.Broadcasting
             return multicastDelegate?
                 .GetInvocationList()
                 //.Cast<Action<TArgument>>() //LINQ
-                .CastInvokationListToGenericActions<TArgument>()
+                .CastInvocationListToGenericActions<TArgument>()
                 //?? Enumerable.Empty<Action<TArgument>>(); //LINQ
                 ?? new Action<TArgument>[0];
         }
@@ -216,7 +216,7 @@ namespace HereticalSolutions.Delegates.Broadcasting
             return multicastDelegate?
                 .GetInvocationList()
                 //.Cast<object>() //LINQ
-                .CastInvokationListToObjects()
+                .CastInvocationListToObjects()
                 //?? Enumerable.Empty<object>(); //LINQ
                 ?? new object[0];
         }
@@ -233,7 +233,7 @@ namespace HereticalSolutions.Delegates.Broadcasting
                 return multicastDelegate?
                     .GetInvocationList()
                     //.Cast<object>() //LINQ
-                    .CastInvokationListToObjects()
+                    .CastInvocationListToObjects()
                     //?? Enumerable.Empty<object>(); //LINQ
                     ?? new object[0];
             }

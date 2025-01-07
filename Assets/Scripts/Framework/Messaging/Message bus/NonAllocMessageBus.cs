@@ -4,7 +4,7 @@ using HereticalSolutions.Collections;
 
 using HereticalSolutions.Delegates;
 
-using HereticalSolutions.Delegates.Broadcasting;
+using HereticalSolutions.Delegates;
 
 using HereticalSolutions.Pools;
 
@@ -232,37 +232,37 @@ namespace HereticalSolutions.Messaging
 
         #region IMessageReceiverNonAlloc
         
-        public void SubscribeTo<TMessage>(ISubscription subscription) where TMessage : IMessage
+        public void SubscribeTo<TMessage>(INonAllocSubscription subscription) where TMessage : IMessage
         {
             broadcaster.Subscribe<TMessage>(
-                (ISubscriptionHandler<INonAllocSubscribableSingleArgGeneric<TMessage>, IInvokableSingleArgGeneric<TMessage>>)
+                (INonAllocSubscriptionContext<>)
                     subscription);
         }
         
         public void SubscribeTo(
             Type messageType,
-            ISubscription subscription)
+            INonAllocSubscription subscription)
         {
             broadcaster.Subscribe(
                 messageType,
-                (ISubscriptionHandler<INonAllocSubscribableSingleArg, IInvokableSingleArg>)
+                (INonAllocSubscriptionContext<>)
                     subscription);
         }
 
-        public void UnsubscribeFrom<TMessage>(ISubscription subscription) where TMessage : IMessage
+        public void UnsubscribeFrom<TMessage>(INonAllocSubscription subscription) where TMessage : IMessage
         {
             broadcaster.Unsubscribe<TMessage>(
-                (ISubscriptionHandler<INonAllocSubscribableSingleArgGeneric<TMessage>, IInvokableSingleArgGeneric<TMessage>>)
+                (INonAllocSubscriptionContext<>)
                     subscription);
         }
         
         public void UnsubscribeFrom(
             Type messageType,
-            ISubscription subscription)
+            INonAllocSubscription subscription)
         {
             broadcaster.Unsubscribe(
                 messageType,
-                (ISubscriptionHandler<INonAllocSubscribableSingleArg, IInvokableSingleArg>)
+                (INonAllocSubscriptionContext<>)
                     subscription);
         }
         

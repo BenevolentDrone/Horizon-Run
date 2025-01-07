@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 using System.Net;
@@ -27,7 +28,7 @@ namespace HereticalSolutions.Networking.LiteNetLib
         private readonly NetworkTickSettings tickSettings;
 
 
-        private readonly INonAllocSubscribableNoArgs pinger;
+        private readonly INonAllocSubscribable pinger;
         
         #region Message bus
 
@@ -68,13 +69,13 @@ namespace HereticalSolutions.Networking.LiteNetLib
 
         #region Subscriptions
 
-        private ISubscription pingSubscription;
+        private INonAllocSubscription pingSubscription;
         
-        private ISubscription startServerSubscription;
+        private INonAllocSubscription startServerSubscription;
         
-        private ISubscription stopServerSubscription;
+        private INonAllocSubscription stopServerSubscription;
         
-        private ISubscription sendPacketSubscription;
+        private INonAllocSubscription sendPacketSubscription;
         
         #endregion
 
@@ -84,7 +85,7 @@ namespace HereticalSolutions.Networking.LiteNetLib
             NetworkDefaultConnectionValuesSettings defaultConnectionValuesSettings,
             NetworkTickSettings tickSettings,
 
-            INonAllocSubscribableNoArgs pinger,
+            INonAllocSubscribable pinger,
             
             INonAllocMessageSender networkBusAsSender,
             INonAllocMessageReceiver networkBusAsReceiver,
@@ -170,7 +171,12 @@ namespace HereticalSolutions.Networking.LiteNetLib
 
         public async Task Start(
             int port,
-            bool reserveSlotForSelf = false)
+            bool reserveSlotForSelf = false,
+
+            //Async tail
+            CancellationToken cancellationToken = default,
+            IProgress<float> progress = null,
+            ILogger progressLogger = null)
         {
             if (status != EHostStatus.OFFLINE)
             {
@@ -187,7 +193,7 @@ namespace HereticalSolutions.Networking.LiteNetLib
                 logger?.LogError<NetworkHost>(
                     $"PING SUBSCRIPTION IS STILL ACTIVE");
                 
-                (pingSubscription as ISubscriptionHandler<INonAllocSubscribableNoArgs, IInvokableNoArgs>).Terminate();
+                pingSubscription.Unsubscribe();
             }
             
             pinger.Subscribe(
@@ -215,7 +221,12 @@ namespace HereticalSolutions.Networking.LiteNetLib
                     message);
         }
 
-        public async Task Stop()
+        public async Task Stop(
+
+            //Async tail
+            CancellationToken cancellationToken = default,
+            IProgress<float> progress = null,
+            ILogger progressLogger = null)
         {
             if (status == EHostStatus.OFFLINE)
             {

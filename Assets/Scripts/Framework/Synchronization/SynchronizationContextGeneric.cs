@@ -20,7 +20,7 @@ namespace HereticalSolutions.Synchronization
 
 		private readonly IPublisherSingleArgGeneric<TDelta> broadcasterAsPublisher;
 
-		private readonly INonAllocSubscribableSingleArgGeneric<TDelta> broadcasterAsSubscribable;
+		private readonly INonAllocSubscribable broadcasterAsSubscribable;
 
 
 		private SynchronizationDescriptor descriptor;
@@ -29,7 +29,7 @@ namespace HereticalSolutions.Synchronization
 			SynchronizationDescriptor descriptor,
 			IStronglyTypedMetadata metadata,
 			IPublisherSingleArgGeneric<TDelta> broadcasterAsPublisher,
-			INonAllocSubscribableSingleArgGeneric<TDelta> broadcasterAsSubscribable)
+			INonAllocSubscribable broadcasterAsSubscribable)
 		{
 			this.descriptor = descriptor;
 
@@ -95,20 +95,20 @@ namespace HereticalSolutions.Synchronization
 
 		#region ISynchronizationProvider
 
-		public void Subscribe(ISubscription subscription)
+		public void Subscribe(INonAllocSubscription subscription)
 		{
 			broadcasterAsSubscribable.Subscribe(
-				(ISubscriptionHandler<
-					INonAllocSubscribableSingleArgGeneric<TDelta>,
+				(INonAllocSubscriptionHandler<
+					INonAllocSubscribable,
 					IInvokableSingleArgGeneric<TDelta>>)
 				subscription);
 		}
 
-		public void Unsubscribe(ISubscription subscription)
+		public void Unsubscribe(INonAllocSubscription subscription)
 		{
 			broadcasterAsSubscribable.Unsubscribe(
-				(ISubscriptionHandler<
-					INonAllocSubscribableSingleArgGeneric<TDelta>,
+				(INonAllocSubscriptionHandler<
+					INonAllocSubscribable,
 					IInvokableSingleArgGeneric<TDelta>>)
 				subscription);
 		}

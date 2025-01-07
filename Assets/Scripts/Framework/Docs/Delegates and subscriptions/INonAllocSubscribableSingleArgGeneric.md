@@ -6,16 +6,16 @@ Represents a non-allocating subscribable interface with a single generic argumen
 
 Method | Description
 --- | ---
-`void Subscribe(ISubscriptionHandler<INonAllocSubscribableSingleArgGeneric<T>, IInvokableSingleArgGeneric<T>> subscription)` | Subscribes a subscription handler to this subscribable
-`void Unsubscribe(ISubscriptionHandler<INonAllocSubscribableSingleArgGeneric<T>, IInvokableSingleArgGeneric<T>> subscription)` | Unsubscribes a subscription handler from this subscribable
-`IEnumerable<ISubscriptionHandler<INonAllocSubscribableSingleArgGeneric<T>, IInvokableSingleArgGeneric<T>>> AllSubscriptions { get; }` | Gets all the subscriptions currently registered with this subscribable
+`void Subscribe(INonAllocSubscriptionHandler<INonAllocSubscribable, IInvokableSingleArgGeneric<T>> subscription)` | Subscribes a subscription handler to this subscribable
+`void Unsubscribe(INonAllocSubscriptionHandler<INonAllocSubscribable, IInvokableSingleArgGeneric<T>> subscription)` | Unsubscribes a subscription handler from this subscribable
+`IEnumerable<INonAllocSubscriptionHandler<INonAllocSubscribable, IInvokableSingleArgGeneric<T>>> AllSubscriptions { get; }` | Gets all the subscriptions currently registered with this subscribable
 
 ## Using INonAllocSubscribableSingleArgGeneric\<T\>
 
 ### List all subscriptions
 
 ```csharp
-INonAllocSubscribableSingleArgGeneric<T> foo;
+INonAllocSubscribable foo;
 
 var allSubscriptions = foo.AllSubscriptions;
 ```
@@ -23,18 +23,18 @@ var allSubscriptions = foo.AllSubscriptions;
 ### Subscribe a subscription
 
 ```csharp
-INonAllocSubscribableSingleArgGeneric<T> foo;
+INonAllocSubscribable foo;
 
 void Bar(T argument);
 
 //Create a subscription with a single generic argument
-ISubscription subscription = DelegatesFactory.BuildSubscriptionSingleArgGeneric<T>(
+INonAllocSubscription subscription = DelegatesFactory.BuildSubscriptionSingleArgGeneric<T>(
 	Bar,
 	loggerResolver);
 
 foo.Subscribe(
-	(ISubscriptionHandler<
-		INonAllocSubscribableSingleArgGeneric<TDelta>,
+	(INonAllocSubscriptionHandler<
+		INonAllocSubscribable,
 		IInvokableSingleArgGeneric<TDelta>>)
 		subscription);
 ```
@@ -42,13 +42,13 @@ foo.Subscribe(
 ### Unsubscribe a subscription
 
 ```csharp
-INonAllocSubscribableSingleArgGeneric<T> foo;
+INonAllocSubscribable foo;
 
-ISubscription subscription;
+INonAllocSubscription subscription;
 
 foo.Unsubscribe(
-	(ISubscriptionHandler<
-		INonAllocSubscribableSingleArgGeneric<TDelta>,
+	(INonAllocSubscriptionHandler<
+		INonAllocSubscribable,
 		IInvokableSingleArgGeneric<TDelta>>)
 		subscription);
 ```
@@ -60,7 +60,7 @@ foo.Unsubscribe(
 ILoggerResolver loggerResolver;
 
 //Create a non alloc subscribable with a single generic argument
-INonAllocSubscribableSingleArgGeneric<T> foo = DelegatesFactory.BuildNonAllocBroadcasterGeneric<T>(loggerResolver);
+INonAllocSubscribable foo = DelegatesFactory.BuildNonAllocBroadcasterGeneric<T>(loggerResolver);
 ```
 
 ## Implementing INonAllocSubscribableSingleArgGeneric\<T\>
@@ -69,8 +69,8 @@ INonAllocSubscribableSingleArgGeneric<T> foo = DelegatesFactory.BuildNonAllocBro
 #region INonAllocSubscribableSingleArgGeneric
 
 public void Subscribe(
-	ISubscriptionHandler<
-		INonAllocSubscribableSingleArgGeneric<T>,
+	INonAllocSubscriptionHandler<
+		INonAllocSubscribable,
 		IInvokableSingleArgGeneric<T>>
 		subscription)
 {
@@ -79,23 +79,23 @@ public void Subscribe(
 
 	var subscriptionElement = subscriptionsPool.Pop();
 
-	var subscriptionState = (ISubscriptionState<IInvokableSingleArgGeneric<T>>)subscription;
+	var subscriptionState = (INonAllocSubscriptionState<IInvokableSingleArgGeneric<T>>)subscription;
 
-	subscriptionElement.Value = (ISubscription)subscriptionState;
+	subscriptionElement.Value = (INonAllocSubscription)subscriptionState;
 
 	subscription.Activate(this, subscriptionElement);
 }
 
 public void Unsubscribe(
-	ISubscriptionHandler<
-		INonAllocSubscribableSingleArgGeneric<T>,
+	INonAllocSubscriptionHandler<
+		INonAllocSubscribable,
 		IInvokableSingleArgGeneric<T>>
 		subscription)
 {
 	if (!subscription.ValidateTermination(this))
 		return;
 
-	var poolElement = ((ISubscriptionState<IInvokableSingleArgGeneric<T>>)subscription).PoolElement;
+	var poolElement = ((INonAllocSubscriptionState<IInvokableSingleArgGeneric<T>>)subscription).PoolElement;
 
 	poolElement.Value = null;
 
@@ -105,21 +105,21 @@ public void Unsubscribe(
 }
 
 IEnumerable<
-	ISubscriptionHandler<
-		INonAllocSubscribableSingleArgGeneric<T>,
+	INonAllocSubscriptionHandler<
+		INonAllocSubscribable,
 		IInvokableSingleArgGeneric<T>>>
-		INonAllocSubscribableSingleArgGeneric<T>.AllSubscriptions
+		INonAllocSubscribable.AllSubscriptions
 {
 	get
 	{
-		var allSubscriptions = new ISubscriptionHandler<
-			INonAllocSubscribableSingleArgGeneric<T>,
+		var allSubscriptions = new INonAllocSubscriptionHandler<
+			INonAllocSubscribable,
 			IInvokableSingleArgGeneric<T>>
 			[subscriptionsAsIndexable.Count];
 
 		for (int i = 0; i < allSubscriptions.Length; i++)
-			allSubscriptions[i] = (ISubscriptionHandler<
-				INonAllocSubscribableSingleArgGeneric<T>,
+			allSubscriptions[i] = (INonAllocSubscriptionHandler<
+				INonAllocSubscribable,
 				IInvokableSingleArgGeneric<T>>)
 				subscriptionsAsIndexable[i].Value;
 

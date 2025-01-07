@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-using HereticalSolutions.Delegates.Broadcasting;
+using HereticalSolutions.Delegates;
 
 using HereticalSolutions.Pools;
 

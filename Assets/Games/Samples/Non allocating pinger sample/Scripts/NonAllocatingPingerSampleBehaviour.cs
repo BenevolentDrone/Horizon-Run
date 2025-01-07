@@ -13,9 +13,9 @@ namespace HereticalSolutions.Samples.NonAllocatingPingerSample
 	{
 		private IPublisherNoArgs pingerAsPublisher;
 
-		private INonAllocSubscribableNoArgs pingerAsSubscribable;
+		private INonAllocSubscribable pingerAsSubscribable;
 
-		private ISubscription subscription;
+		private INonAllocSubscription subscription;
 
 
 		private ILoggerResolver loggerResolver;
@@ -52,7 +52,7 @@ namespace HereticalSolutions.Samples.NonAllocatingPingerSample
 
 			pingerAsPublisher = (IPublisherNoArgs)pinger;
 
-			pingerAsSubscribable = (INonAllocSubscribableNoArgs)pinger;
+			pingerAsSubscribable = (INonAllocSubscribable)pinger;
 
 			#endregion
 

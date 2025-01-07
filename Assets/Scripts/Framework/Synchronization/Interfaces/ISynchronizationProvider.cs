@@ -4,9 +4,9 @@ namespace HereticalSolutions.Synchronization
 {
     public interface ISynchronizationProvider
     {
-        void Subscribe(ISubscription subscription);
+        void Subscribe(INonAllocSubscription subscription);
 
-        void Unsubscribe(ISubscription subscription);
+        void Unsubscribe(INonAllocSubscription subscription);
 
         void UnsubscribeAll();
     }

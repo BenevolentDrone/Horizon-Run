@@ -1,4 +1,4 @@
-# INonAllocSubscribableMultipleArgs
+# INonAllocSubscribable
 
 Represents an interface for a non-allocating subscribable with multiple arguments. Arguments are passed as an array of objects. Inherits from [`INonAllocSubscribable`](INonAllocSubscribable.md). For the allocating version see [`ISubscribableMultipleArgs`](ISubscribableMultipleArgs.md).
 
@@ -6,16 +6,16 @@ Represents an interface for a non-allocating subscribable with multiple argument
 
 Method | Description
 --- | ---
-`void Subscribe(ISubscriptionHandler<INonAllocSubscribableMultipleArgs, IInvokableMultipleArgs> subscription)` | Subscribes a subscription handler to the non-allocating subscribable
-`void Unsubscribe(ISubscriptionHandler<INonAllocSubscribableMultipleArgs, IInvokableMultipleArgs> subscription)` | Unsubscribes a subscription handler from the non-allocating subscribable
-`IEnumerable<ISubscriptionHandler<INonAllocSubscribableMultipleArgs, IInvokableMultipleArgs>> AllSubscriptions { get; }` | Gets all the subscriptions of the non-allocating subscribable
+`void Subscribe(INonAllocSubscriptionHandler<INonAllocSubscribable, IInvokableMultipleArgs> subscription)` | Subscribes a subscription handler to the non-allocating subscribable
+`void Unsubscribe(INonAllocSubscriptionHandler<INonAllocSubscribable, IInvokableMultipleArgs> subscription)` | Unsubscribes a subscription handler from the non-allocating subscribable
+`IEnumerable<INonAllocSubscriptionHandler<INonAllocSubscribable, IInvokableMultipleArgs>> AllSubscriptions { get; }` | Gets all the subscriptions of the non-allocating subscribable
 
-## Using INonAllocSubscribableMultipleArgs
+## Using INonAllocSubscribable
 
 ### List all subscriptions
 
 ```csharp
-INonAllocSubscribableMultipleArgs foo;
+INonAllocSubscribable foo;
 
 var allSubscriptions = foo.AllSubscriptions;
 ```
@@ -23,18 +23,18 @@ var allSubscriptions = foo.AllSubscriptions;
 ### Subscribe a subscription
 
 ```csharp
-INonAllocSubscribableMultipleArgs foo;
+INonAllocSubscribable foo;
 
 void Bar(object[] arguments);
 
 //Create a subscription with multiple arguments
-ISubscription subscription = DelegatesFactory.BuildSubscriptionMultipleArgs(
+INonAllocSubscription subscription = DelegatesFactory.BuildSubscriptionMultipleArgs(
     Bar,
     loggerResolver)
 
 foo.Subscribe(
-	(ISubscriptionHandler<
-        INonAllocSubscribableMultipleArgs,
+	(INonAllocSubscriptionHandler<
+        INonAllocSubscribable,
         IInvokableMultipleArgs>)
 		subscription);
 ```
@@ -42,35 +42,35 @@ foo.Subscribe(
 ### Unsubscribe a subscription
 
 ```csharp
-INonAllocSubscribableMultipleArgs foo;
+INonAllocSubscribable foo;
 
-ISubscription subscription;
+INonAllocSubscription subscription;
 
 foo.Unsubscribe(
-	(ISubscriptionHandler<
-        INonAllocSubscribableMultipleArgs,
+	(INonAllocSubscriptionHandler<
+        INonAllocSubscribable,
         IInvokableMultipleArgs>)
 		subscription);
 ```
 
-## Creating INonAllocSubscribableMultipleArgs
+## Creating INonAllocSubscribable
 
 ```csharp
 //Logger resolver is needed for the pool to log errors
 ILoggerResolver loggerResolver;
 
 //Create a non alloc subscribable with multiple arguments
-INonAllocSubscribableMultipleArgs foo = DelegatesFactory.BuildNonAllocBroadcasterMultipleArgs(loggerResolver);
+INonAllocSubscribable foo = DelegatesFactory.BuildNonAllocBroadcasterMultipleArgs(loggerResolver);
 ```
 
-## Implementing INonAllocSubscribableMultipleArgs
+## Implementing INonAllocSubscribable
 
 ```csharp
-#region INonAllocSubscribableMultipleArgs
+#region INonAllocSubscribable
 
 public void Subscribe(
-	ISubscriptionHandler<
-		INonAllocSubscribableMultipleArgs,
+	INonAllocSubscriptionHandler<
+		INonAllocSubscribable,
 		IInvokableMultipleArgs>
 		subscription)
 {
@@ -79,23 +79,23 @@ public void Subscribe(
 
 	var subscriptionElement = subscriptionsPool.Pop();
 
-	var subscriptionState = (ISubscriptionState<IInvokableMultipleArgs>)subscription;
+	var subscriptionState = (INonAllocSubscriptionState<IInvokableMultipleArgs>)subscription;
 
-	subscriptionElement.Value = (ISubscription)subscriptionState;
+	subscriptionElement.Value = (INonAllocSubscription)subscriptionState;
 
 	subscription.Activate(this, subscriptionElement);
 }
 
 public void Unsubscribe(
-	ISubscriptionHandler<
-		INonAllocSubscribableMultipleArgs,
+	INonAllocSubscriptionHandler<
+		INonAllocSubscribable,
 		IInvokableMultipleArgs>
 		subscription)
 {
 	if (!subscription.ValidateTermination(this))
 		return;
 
-	var poolElement = ((ISubscriptionState<IInvokableMultipleArgs>)subscription).PoolElement;
+	var poolElement = ((INonAllocSubscriptionState<IInvokableMultipleArgs>)subscription).PoolElement;
 
 	poolElement.Value = null;
 
@@ -105,21 +105,21 @@ public void Unsubscribe(
 }
 
 IEnumerable<
-	ISubscriptionHandler<
-		INonAllocSubscribableMultipleArgs,
+	INonAllocSubscriptionHandler<
+		INonAllocSubscribable,
 		IInvokableMultipleArgs>>
-		INonAllocSubscribableMultipleArgs.AllSubscriptions
+		INonAllocSubscribable.AllSubscriptions
 {
 	get
 	{
-		var allSubscriptions = new ISubscriptionHandler<
-			INonAllocSubscribableMultipleArgs,
+		var allSubscriptions = new INonAllocSubscriptionHandler<
+			INonAllocSubscribable,
 			IInvokableMultipleArgs>
 			[subscriptionsAsIndexable.Count];
 
 		for (int i = 0; i < allSubscriptions.Length; i++)
-			allSubscriptions[i] = (ISubscriptionHandler<
-				INonAllocSubscribableMultipleArgs,
+			allSubscriptions[i] = (INonAllocSubscriptionHandler<
+				INonAllocSubscribable,
 				IInvokableMultipleArgs>)
 				subscriptionsAsIndexable[i].Value;
 

@@ -41,7 +41,8 @@ namespace HereticalSolutions.Pools
             
             if (args.TryGetArgument<AppendToPoolArgument>(out var arg))
             {
-                logger?.Log<AppendableStackManagedPool<T>>(
+                logger?.Log(
+                    GetType(),
                     "APPEND ARGUMENT RECEIVED, APPENDING");
 
                 capacity = StackPoolFactory.ResizeStackManagedPool(
@@ -54,12 +55,14 @@ namespace HereticalSolutions.Pools
                 var result = pool.Pop();
                 
                 //Validate pool
+
                 if (result.Pool == null)
                 {
                     result.Pool = this;
                 }
                 
                 //Update facade
+                
                 result.Status = EPoolElementStatus.UNINITIALIZED;
 
                 return result;

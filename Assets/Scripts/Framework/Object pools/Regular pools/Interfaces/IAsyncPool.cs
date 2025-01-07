@@ -6,6 +6,7 @@ using HereticalSolutions.Logging;
 
 namespace HereticalSolutions.Pools
 {
+	//TODO: design this properly
 	public interface IAsyncPool<T>
 	{
 		Task<T> Pop(

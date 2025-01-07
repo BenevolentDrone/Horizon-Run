@@ -1,7 +1,5 @@
 using HereticalSolutions.Collections;
 
-using HereticalSolutions.Repositories;
-
 using HereticalSolutions.Metadata;
 
 namespace HereticalSolutions.Pools

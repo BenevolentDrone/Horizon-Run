@@ -1,7 +1,9 @@
 using System;
 
 using HereticalSolutions.Allocations;
+
 using HereticalSolutions.Collections;
+
 using HereticalSolutions.Pools.Factories;
 
 using HereticalSolutions.Logging;
@@ -43,7 +45,8 @@ namespace HereticalSolutions.Pools
             
             if (args.TryGetArgument<AppendToPoolArgument>(out var arg))
             {
-                logger?.Log<AppendableLinkedListManagedPool<T>>(
+                logger?.Log(
+                    GetType(),
                     "APPEND ARGUMENT RECEIVED, APPENDING");
 
                 LinkedListPoolFactory.ResizeLinkedListManagedPool(
@@ -71,17 +74,20 @@ namespace HereticalSolutions.Pools
                 if (result == null)
                 {
                     throw new Exception(
-                        logger.TryFormatException<AppendableLinkedListManagedPool<T>>(
+                        logger.TryFormatException(
+                            GetType(),
                             "LINKED LIST MANAGED POOL ELEMENT IS NOT A POOL ELEMENT FACADE"));
                 }
                 
                 //Validate pool
+
                 if (result.Pool == null)
                 {
                     result.Pool = this;
                 }
                 
                 //Update facade
+                
                 result.Status = EPoolElementStatus.UNINITIALIZED;
 
                 return result;

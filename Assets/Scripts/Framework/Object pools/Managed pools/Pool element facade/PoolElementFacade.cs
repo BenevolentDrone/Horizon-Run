@@ -1,7 +1,5 @@
 using System;
 
-using HereticalSolutions.Repositories;
-
 using HereticalSolutions.LifetimeManagement;
 
 using HereticalSolutions.Metadata;

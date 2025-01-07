@@ -223,7 +223,85 @@ namespace HereticalSolutions.Pools.Factories
 
             return result;
         }
-        
+
+        public QueueManagedPool<T> BuildQueueManagedPool()
+        {
+            if (valueAllocationDelegate == null)
+                throw new Exception(
+                    logger.TryFormatException<ManagedPoolBuilder<T>>(
+                        "BUILDER NOT INITIALIZED"));
+
+            var metadataDescriptors = BuildMetadataDescriptors();
+
+            var facadeAllocationCallback = BuildFacadeAllocationCallback();
+
+            var valueAllocationCallback = BuildValueAllocationCallback();
+
+            var result = QueuePoolFactory.BuildQueueManagedPool(
+                new AllocationCommand<T>
+                {
+                    Descriptor = initialAllocation,
+
+                    AllocationDelegate = valueAllocationDelegate,
+
+                    AllocationCallback = valueAllocationCallback
+                },
+                new AllocationCommand<T>
+                {
+                    Descriptor = additionalAllocation,
+
+                    AllocationDelegate = valueAllocationDelegate,
+
+                    AllocationCallback = valueAllocationCallback
+                },
+                metadataDescriptors,
+                facadeAllocationCallback,
+                loggerResolver);
+
+            Cleanup();
+
+            return result;
+        }
+
+        public AppendableQueueManagedPool<T> BuildAppendableQueueManagedPool()
+        {
+            if (valueAllocationDelegate == null)
+                throw new Exception(
+                    logger.TryFormatException<ManagedPoolBuilder<T>>(
+                        "BUILDER NOT INITIALIZED"));
+
+            var metadataDescriptors = BuildMetadataDescriptors();
+
+            var facadeAllocationCallback = BuildFacadeAllocationCallback();
+
+            var valueAllocationCallback = BuildValueAllocationCallback();
+
+            var result = QueuePoolFactory.BuildAppendableQueueManagedPool(
+                new AllocationCommand<T>
+                {
+                    Descriptor = initialAllocation,
+
+                    AllocationDelegate = valueAllocationDelegate,
+
+                    AllocationCallback = valueAllocationCallback
+                },
+                new AllocationCommand<T>
+                {
+                    Descriptor = additionalAllocation,
+
+                    AllocationDelegate = valueAllocationDelegate,
+
+                    AllocationCallback = valueAllocationCallback
+                },
+                metadataDescriptors,
+                facadeAllocationCallback,
+                loggerResolver);
+
+            Cleanup();
+
+            return result;
+        }
+
         public LinkedListManagedPool<T> BuildLinkedListManagedPool()
         {
             if (valueAllocationDelegate == null)

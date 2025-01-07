@@ -56,9 +56,11 @@ namespace HereticalSolutions.Pools
         public IPoolElementFacade<T> Pop()
         {
 	        //Retrieve a pooled element
+
 	        IPoolElementFacade<T> result = default;
 
 	        //Resize the pool if necessary
+
 	        if (allocatedCount >= packedArray.Length)
 	        {
 		        packedArray = PackedArrayPoolFactory.ResizePackedArrayManagedPool<T>(
@@ -75,30 +77,33 @@ namespace HereticalSolutions.Pools
 	        allocatedCount++;
 	        
 	        //Update metadata
+
             IPoolElementFacadeWithMetadata<T> resultWithMetadata = result as IPoolElementFacadeWithMetadata<T>;
 
             if (resultWithMetadata == null)
             {
 	            throw new Exception(
-		            logger.TryFormatException<PackedArrayManagedPool<T>>(
+		            logger.TryFormatException(
+						GetType(),
 			            "PACKED ARRAY MANAGED POOL ELEMENT HAS NO METADATA"));
             }
 
             //Update index
-            //var indexMetadata = resultWithMetadata.Metadata.Get<IIndexed>();
             
             var indexedFacade = resultWithMetadata as IIndexed;
 
             if (indexedFacade == null)
             {
 	            throw new Exception(
-		            logger.TryFormatException<PackedArrayManagedPool<T>>(
+		            logger.TryFormatException(
+						GetType(),
 			            "PACKED ARRAY MANAGED POOL ELEMENT HAS NO INDEXED FACADE"));
             }
             
             indexedFacade.Index = index;
 
             //Validate values
+
             if (validateValues
 				&& resultWithMetadata.Status == EPoolElementStatus.UNINITIALIZED)
             {
@@ -110,12 +115,14 @@ namespace HereticalSolutions.Pools
             }
             
             //Validate pool
+
             if (result.Pool == null)
             {
 	            result.Pool = this;
             }
 
             //Update facade
+
             result.Status = EPoolElementStatus.POPPED;
             
             return result;
@@ -132,13 +139,15 @@ namespace HereticalSolutions.Pools
 
 	        if (lastAllocatedItemIndex < 0)
 	        {
-		        logger?.LogError<PackedArrayManagedPool<T>>(
+		        logger?.LogError(
+					GetType(),
 			        $"ATTEMPT TO PUSH AN ITEM WHEN NO ITEMS ARE ALLOCATED");
                 
 		        return;
 	        }
 
 	        // Validate values
+
 	        if (validateValues
 				&& instance.Status != EPoolElementStatus.POPPED)
 	        {
@@ -150,19 +159,20 @@ namespace HereticalSolutions.Pools
 	        if (resultWithMetadata == null)
 	        {
 		        throw new Exception(
-			        logger.TryFormatException<PackedArrayManagedPool<T>>(
+			        logger.TryFormatException(
+						GetType(),
 				        "PACKED ARRAY MANAGED POOL ELEMENT HAS NO METADATA"));
 	        }
 
 	        //Get index
-	        //var indexMetadata = resultWithMetadata.Metadata.Get<IIndexed>();
 	        
 	        var indexedFacade = resultWithMetadata as IIndexed;
 
 	        if (indexedFacade == null)
 	        {
 		        throw new Exception(
-			        logger.TryFormatException<PackedArrayManagedPool<T>>(
+			        logger.TryFormatException(
+						GetType(),
 				        "PACKED ARRAY MANAGED POOL ELEMENT HAS NO INDEXED FACADE"));
 	        }
 
@@ -171,7 +181,8 @@ namespace HereticalSolutions.Pools
 
 	        if (instanceIndex == -1)
 	        {
-		        logger?.LogError<PackedArrayManagedPool<T>>(
+		        logger?.LogError(
+					GetType(),
 			        $"ATTEMPT TO PUSH AN ITEM TO PACKED ARRAY IT DOES NOT BELONG TO");
                 
 		        return;
@@ -179,7 +190,8 @@ namespace HereticalSolutions.Pools
 
 	        if (instanceIndex > lastAllocatedItemIndex)
 	        {
-		        logger?.LogError<PackedArrayManagedPool<T>>(
+		        logger?.LogError(
+					GetType(),
 			        $"ATTEMPT TO PUSH AN ALREADY PUSHED ITEM: {instanceIndex}");
                 
 		        return;
@@ -188,6 +200,7 @@ namespace HereticalSolutions.Pools
 	        if (instanceIndex != lastAllocatedItemIndex)
 	        {
 		        //Update last allocated element's index
+
 		        var lastAllocatedItem = packedArray[lastAllocatedItemIndex];
 		        
 		        IPoolElementFacadeWithMetadata<T> lastAllocatedItemWithMetadata =
@@ -196,24 +209,25 @@ namespace HereticalSolutions.Pools
 		        if (lastAllocatedItemWithMetadata == null)
 		        {
 			        throw new Exception(
-				        logger.TryFormatException<PackedArrayManagedPool<T>>(
+				        logger.TryFormatException(
+							GetType(),
 					        "PACKED ARRAY MANAGED POOL ELEMENT HAS NO METADATA"));
 		        }
 
-		        //var lastAllocatedItemIndexMetadata = lastAllocatedItemWithMetadata.Metadata.Get<IIndexed>();
-		        
 		        var lastAllocatedItemAsIndexable = lastAllocatedItemWithMetadata as IIndexed;
 
 		        if (lastAllocatedItemAsIndexable == null)
 		        {
 			        throw new Exception(
-				        logger.TryFormatException<PackedArrayManagedPool<T>>(
+				        logger.TryFormatException(
+							GetType(),
 					        "PACKED ARRAY MANAGED POOL ELEMENT HAS NO INDEXED FACADE"));
 		        }
 
 		        lastAllocatedItemAsIndexable.Index = instanceIndex;        
 	            
 	            //Swap pushed element and last allocated element
+
 		        var swap = packedArray[instanceIndex];
 
 		        packedArray[instanceIndex] = packedArray[lastAllocatedItemIndex];
@@ -222,9 +236,11 @@ namespace HereticalSolutions.Pools
 	        }
 
 	        //Update index
+
 	        indexedFacade.Index = -1;
 	        
 	        //Update facade
+
 	        instance.Status = EPoolElementStatus.PUSHED;
 
 	        allocatedCount--;
@@ -262,7 +278,8 @@ namespace HereticalSolutions.Pools
 	        {
 		        if (index >= allocatedCount || index < 0)
 			        throw new Exception(
-				        logger.TryFormatException<PackedArrayManagedPool<T>>(
+				        logger.TryFormatException(
+							GetType(),
 					        $"INVALID INDEX: {index} COUNT: {allocatedCount} CAPACITY: {Capacity}"));
 
 		        return packedArray[index];
@@ -273,7 +290,8 @@ namespace HereticalSolutions.Pools
         {
 	        if (index >= allocatedCount || index < 0)
 		        throw new Exception(
-			        logger.TryFormatException<PackedArrayPool<T>>(
+			        logger.TryFormatException(
+						GetType(),
 				        $"INVALID INDEX: {index} COUNT: {allocatedCount} CAPACITY: {Capacity}"));
 
 	        return packedArray[index];

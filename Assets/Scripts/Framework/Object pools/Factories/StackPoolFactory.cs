@@ -10,9 +10,6 @@ using HereticalSolutions.Logging;
 
 namespace HereticalSolutions.Pools.Factories
 {
-    /// <summary>
-    /// Represents a factory for creating various types of object pools.
-    /// </summary>
     public static class StackPoolFactory
     {
         #region Build

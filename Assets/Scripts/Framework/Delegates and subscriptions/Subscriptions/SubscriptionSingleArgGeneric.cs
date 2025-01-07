@@ -2,8 +2,6 @@ using System;
 
 using HereticalSolutions.Delegates.Factories;
 
-using HereticalSolutions.Pools;
-
 using HereticalSolutions.LifetimeManagement;
 
 using HereticalSolutions.Logging;
@@ -23,7 +21,7 @@ namespace HereticalSolutions.Delegates.Subscriptions
 
         private INonAllocSubscribable publisher;
 
-        private IPoolElementFacade<INonAllocSubscription> poolElement;
+        //private IPoolElementFacade<INonAllocSubscription> poolElement;
 
         public SubscriptionSingleArgGeneric(
             Action<TValue> @delegate,
@@ -38,7 +36,7 @@ namespace HereticalSolutions.Delegates.Subscriptions
 
             publisher = null;
 
-            poolElement = null;
+            //poolElement = null;
         }
 
         #region INonAllocSubscription
@@ -77,10 +75,10 @@ namespace HereticalSolutions.Delegates.Subscriptions
             get => @delegate;
         }
 
-        public IPoolElementFacade<INonAllocSubscription> PoolElement
-        {
-            get => poolElement;
-        }
+        //public IPoolElementFacade<INonAllocSubscription> PoolElement
+        //{
+        //    get => poolElement;
+        //}
 
         public bool ValidateActivation(
             INonAllocSubscribable publisher)
@@ -103,14 +101,14 @@ namespace HereticalSolutions.Delegates.Subscriptions
                 return false;
             }
 
-            if (poolElement != null)
-            {
-                logger?.LogError(
-                    GetType(),
-                    $"SUBSCRIPTION ALREADY HAS A POOL ELEMENT: {this.GetHashCode()}");
-
-                return false;
-            }
+            //if (poolElement != null)
+            //{
+            //    logger?.LogError(
+            //        GetType(),
+            //        $"SUBSCRIPTION ALREADY HAS A POOL ELEMENT: {this.GetHashCode()}");
+            //
+            //    return false;
+            //}
 
             if (@delegate == null)
             {
@@ -137,10 +135,10 @@ namespace HereticalSolutions.Delegates.Subscriptions
         }
 
         public void Activate(
-            INonAllocSubscribable publisher,
-            IPoolElementFacade<INonAllocSubscription> poolElement)
+            INonAllocSubscribable publisher)
+            //IPoolElementFacade<INonAllocSubscription> poolElement)
         {
-            this.poolElement = poolElement;
+            //this.poolElement = poolElement;
 
             this.publisher = publisher;
 
@@ -172,21 +170,21 @@ namespace HereticalSolutions.Delegates.Subscriptions
                 return false;
             }
 
-            if (poolElement == null)
-            {
-                logger?.LogError(
-                    GetType(),
-                    $"INVALID POOL ELEMENT: {this.GetHashCode()}");
-
-                return false;
-            }
+            //if (poolElement == null)
+            //{
+            //    logger?.LogError(
+            //        GetType(),
+            //        $"INVALID POOL ELEMENT: {this.GetHashCode()}");
+            //
+            //    return false;
+            //}
 
             return true;
         }
 
         public void Terminate()
         {
-            poolElement = null;
+            //poolElement = null;
 
             publisher = null;
 

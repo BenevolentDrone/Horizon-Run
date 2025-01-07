@@ -28,45 +28,10 @@ namespace HereticalSolutions.Delegates
             this.logger = logger;
         }
 
-        #region IPublisherSingleArg
-
-        public void Publish<TValue>(TValue value)
-        {
-            var valueType = typeof(TValue);
-            
-            if (!broadcasterRepository.TryGet(
-                    valueType,
-                    out object broadcasterObject))
-                throw new Exception(
-                    logger.TryFormatException<BroadcasterWithRepository>(
-                        $"INVALID VALUE TYPE: \"{valueType.Name}\""));
-
-            var broadcaster = (IPublisherSingleArgGeneric<TValue>)broadcasterObject;
-            
-            broadcaster.Publish(value);
-        }
-        
-        public void Publish(
-            Type valueType,
-            object value)
-        {
-            if (!broadcasterRepository.TryGet(
-                    valueType,
-                    out object broadcasterObject))
-                throw new Exception(
-                    logger.TryFormatException<BroadcasterWithRepository>(
-                        $"INVALID VALUE TYPE: \"{valueType.Name}\""));
-
-            var broadcaster = (IPublisherSingleArg)broadcasterObject;
-            
-            broadcaster.Publish(valueType, value);
-        }
-
-        #endregion
-
         #region ISubscribableSingleArg
 		
-        public void Subscribe<TValue>(Action<TValue> @delegate)
+        public void Subscribe<TValue>(
+            Action<TValue> @delegate)
         {
             var valueType = typeof(TValue);
             
@@ -74,7 +39,8 @@ namespace HereticalSolutions.Delegates
                     valueType,
                     out object broadcasterObject))
                 throw new Exception(
-                    logger.TryFormatException<BroadcasterWithRepository>(
+                    logger.TryFormatException(
+                        GetType(),
                         $"INVALID VALUE TYPE: \"{valueType.Name}\""));
 
             var broadcaster = (ISubscribableSingleArgGeneric<TValue>)broadcasterObject;
@@ -90,7 +56,8 @@ namespace HereticalSolutions.Delegates
                     valueType,
                     out object broadcasterObject))
                 throw new Exception(
-                    logger.TryFormatException<BroadcasterWithRepository>(
+                    logger.TryFormatException(
+                        GetType(),
                         $"INVALID VALUE TYPE: \"{valueType.Name}\""));
 
             var broadcaster = (ISubscribableSingleArg)broadcasterObject;
@@ -98,7 +65,8 @@ namespace HereticalSolutions.Delegates
             broadcaster.Subscribe(valueType, @delegate);
         }
 
-        public void Unsubscribe<TValue>(Action<TValue> @delegate)
+        public void Unsubscribe<TValue>(
+            Action<TValue> @delegate)
         {
             var valueType = typeof(TValue);
             
@@ -106,7 +74,8 @@ namespace HereticalSolutions.Delegates
                     valueType,
                     out object broadcasterObject))
                 throw new Exception(
-                    logger.TryFormatException<BroadcasterWithRepository>(
+                    logger.TryFormatException(
+                        GetType(),
                         $"INVALID VALUE TYPE: \"{valueType.Name}\""));
 
             var broadcaster = (ISubscribableSingleArgGeneric<TValue>)broadcasterObject;
@@ -122,7 +91,8 @@ namespace HereticalSolutions.Delegates
                     valueType,
                     out object broadcasterObject))
                 throw new Exception(
-                    logger.TryFormatException<BroadcasterWithRepository>(
+                    logger.TryFormatException(
+                        GetType(),
                         $"INVALID VALUE TYPE: \"{valueType.Name}\""));
 
             var broadcaster = (ISubscribableSingleArg)broadcasterObject;
@@ -138,7 +108,8 @@ namespace HereticalSolutions.Delegates
                     valueType,
                     out object broadcasterObject))
                 throw new Exception(
-                    logger.TryFormatException<BroadcasterWithRepository>(
+                    logger.TryFormatException(
+                        GetType(),
                         $"INVALID VALUE TYPE: \"{valueType.Name}\""));
 
             var broadcaster = (ISubscribableSingleArgGeneric<TValue>)broadcasterObject;
@@ -146,13 +117,15 @@ namespace HereticalSolutions.Delegates
             return broadcaster.AllSubscriptions;
         }
 
-        public IEnumerable<object> GetAllSubscriptions(Type valueType)
+        public IEnumerable<object> GetAllSubscriptions(
+            Type valueType)
         {
             if (!broadcasterRepository.TryGet(
                     valueType,
                     out object broadcasterObject))
                 throw new Exception(
-                    logger.TryFormatException<BroadcasterWithRepository>(
+                    logger.TryFormatException(
+                        GetType(),
                         $"INVALID VALUE TYPE: \"{valueType.Name}\""));
 
             var broadcaster = (ISubscribable)broadcasterObject;
@@ -166,6 +139,7 @@ namespace HereticalSolutions.Delegates
         {
             get
             {
+                //TODO: consider yield instead
                 List<object> result = new List<object>();
 
                 foreach (var broadcaster in broadcasterRepository.Keys)
@@ -190,6 +164,45 @@ namespace HereticalSolutions.Delegates
         }
 
         #endregion
+
+        #endregion
+
+        #region IPublisherSingleArg
+
+        public void Publish<TValue>(
+            TValue value)
+        {
+            var valueType = typeof(TValue);
+
+            if (!broadcasterRepository.TryGet(
+                    valueType,
+                    out object broadcasterObject))
+                throw new Exception(
+                    logger.TryFormatException(
+                        GetType(),
+                        $"INVALID VALUE TYPE: \"{valueType.Name}\""));
+
+            var broadcaster = (IPublisherSingleArgGeneric<TValue>)broadcasterObject;
+
+            broadcaster.Publish(value);
+        }
+
+        public void Publish(
+            Type valueType,
+            object value)
+        {
+            if (!broadcasterRepository.TryGet(
+                    valueType,
+                    out object broadcasterObject))
+                throw new Exception(
+                    logger.TryFormatException(
+                        GetType(),
+                        $"INVALID VALUE TYPE: \"{valueType.Name}\""));
+
+            var broadcaster = (IPublisherSingleArg)broadcasterObject;
+
+            broadcaster.Publish(valueType, value);
+        }
 
         #endregion
 

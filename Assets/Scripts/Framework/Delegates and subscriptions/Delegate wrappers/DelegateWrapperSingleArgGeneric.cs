@@ -23,6 +23,8 @@ namespace HereticalSolutions.Delegates.Wrappers
 
         #region IInvokableSingleArgGeneric
         
+        public Type ValueType => typeof(TValue);
+
         public void Invoke(TValue argument)
         {
             @delegate?.Invoke(argument);
@@ -50,7 +52,8 @@ namespace HereticalSolutions.Delegates.Wrappers
                 default:
 
                     throw new Exception(
-                        logger.TryFormatException<DelegateWrapperSingleArgGeneric<TValue>>(
+                        logger.TryFormatException(
+                            GetType(),
                             $"INVALID ARGUMENT TYPE. EXPECTED: \"{typeof(TValue).Name}\" RECEIVED: \"{typeof(TArgument).Name}\""));
             }
         }
@@ -68,7 +71,8 @@ namespace HereticalSolutions.Delegates.Wrappers
                 default:
 
                     throw new Exception(
-                        logger.TryFormatException<DelegateWrapperSingleArgGeneric<TValue>>(
+                        logger.TryFormatException(
+                            GetType(),
                             $"INVALID ARGUMENT TYPE. EXPECTED: \"{typeof(TValue).Name}\" RECEIVED: \"{valueType.Name}\""));
             }
         }

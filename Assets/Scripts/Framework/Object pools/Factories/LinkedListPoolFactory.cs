@@ -3,7 +3,9 @@ using System.Collections.Generic;
 
 using HereticalSolutions.Allocations;
 using HereticalSolutions.Allocations.Factories;
+
 using HereticalSolutions.Collections;
+
 using HereticalSolutions.Metadata.Allocations;
 
 using HereticalSolutions.Logging;
@@ -12,6 +14,71 @@ namespace HereticalSolutions.Pools.Factories
 {
     public static class LinkedListPoolFactory
     {
+        #region Build
+
+        #region LinkedList pool
+
+        public static LinkedListPool<T> BuildLinkedListPool<T>(
+            AllocationCommand<T> initialAllocationCommand,
+            AllocationCommand<T> additionalAllocationCommand,
+            ILoggerResolver loggerResolver = null)
+        {
+            ILogger logger =
+                loggerResolver?.GetLogger<LinkedListPool<T>>()
+                ?? null;
+
+            var linkedList = new LinkedList<T>();
+
+            PerformInitialAllocation<T>(
+                linkedList,
+                initialAllocationCommand,
+                logger);
+
+            return new LinkedListPool<T>(
+                linkedList,
+                additionalAllocationCommand);
+        }
+
+        private static void PerformInitialAllocation<T>(
+            LinkedList<T> linkedList,
+            AllocationCommand<T> initialAllocationCommand,
+            ILogger logger = null)
+        {
+            int initialAmount = -1;
+
+            switch (initialAllocationCommand.Descriptor.Rule)
+            {
+                case EAllocationAmountRule.ZERO:
+                    initialAmount = 0;
+                    break;
+
+                case EAllocationAmountRule.ADD_ONE:
+                    initialAmount = 1;
+                    break;
+
+                case EAllocationAmountRule.ADD_PREDEFINED_AMOUNT:
+                    initialAmount = initialAllocationCommand.Descriptor.Amount;
+                    break;
+
+                default:
+                    throw new Exception(
+                        logger.TryFormatException(
+                            $"[LinkedListPoolFactory] INVALID INITIAL ALLOCATION COMMAND RULE: {initialAllocationCommand.Descriptor.Rule.ToString()}"));
+            }
+
+            for (int i = 0; i < initialAmount; i++)
+            {
+                var newElement = initialAllocationCommand.AllocationDelegate();
+
+                initialAllocationCommand.AllocationCallback?.OnAllocated(newElement);
+
+                linkedList.AddFirst(
+                    newElement);
+            }
+        }
+
+        #endregion
+
         #region LinkedListManagedPool
 
         public static LinkedListManagedPool<T> BuildLinkedListManagedPool<T>(
@@ -189,10 +256,53 @@ namespace HereticalSolutions.Pools.Factories
                 capacity,
                 logger);
         }
-        
+
         #endregion
-        
+
+        #endregion
+
         #region Resize
+
+        public static int ResizeLinkedListPool<T>(
+            LinkedList<T> linkedList,
+            int currentCapacity,
+            AllocationCommand<T> allocationCommand,
+            ILogger logger = null)
+        {
+            int addedCapacity = -1;
+
+            switch (allocationCommand.Descriptor.Rule)
+            {
+                case EAllocationAmountRule.ADD_ONE:
+                    addedCapacity = 1;
+                    break;
+
+                case EAllocationAmountRule.DOUBLE_AMOUNT:
+                    addedCapacity = currentCapacity * 2;
+                    break;
+
+                case EAllocationAmountRule.ADD_PREDEFINED_AMOUNT:
+                    addedCapacity = allocationCommand.Descriptor.Amount;
+                    break;
+
+                default:
+                    throw new Exception(
+                        logger.TryFormatException(
+                            $"[LinkedListPoolFactory] INVALID RESIZE ALLOCATION COMMAND RULE FOR STACK: {allocationCommand.Descriptor.Rule.ToString()}"));
+            }
+
+            for (int i = 0; i < addedCapacity; i++)
+            {
+                var newElement = allocationCommand.AllocationDelegate();
+
+                allocationCommand.AllocationCallback?.OnAllocated(newElement);
+
+                linkedList.AddFirst(
+                    newElement);
+            }
+
+            return currentCapacity + addedCapacity;
+        }
 
         public static void ResizeLinkedListManagedPool<T>(
             ref ILinkedListLink<T> firstElement,

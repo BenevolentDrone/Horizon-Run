@@ -70,7 +70,8 @@ namespace HereticalSolutions.Pools
 
             if (lastAllocatedItemIndex < 0)
             {
-                logger?.LogError<PackedArrayPool<T>>(
+                logger?.LogError(
+                    GetType(),
                     $"ATTEMPT TO PUSH AN ITEM WHEN NO ITEMS ARE ALLOCATED");
                 
                 return;
@@ -82,7 +83,8 @@ namespace HereticalSolutions.Pools
 
             if (instanceIndex == -1)
             {
-                logger?.LogError<PackedArrayPool<T>>(
+                logger?.LogError(
+                    GetType(),
                     $"ATTEMPT TO PUSH AN ITEM TO PACKED ARRAY IT DOES NOT BELONG TO");
                 
                 return;
@@ -90,7 +92,8 @@ namespace HereticalSolutions.Pools
 
             if (instanceIndex > lastAllocatedItemIndex)
             {
-                logger?.LogError<PackedArrayPool<T>>(
+                logger?.LogError(
+                    GetType(),
                     $"ATTEMPT TO PUSH AN ALREADY PUSHED ITEM: {instanceIndex}");
                 
                 return;

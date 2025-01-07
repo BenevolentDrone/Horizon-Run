@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 
-using HereticalSolutions.Collections;
-
 using HereticalSolutions.Pools;
+
+using HereticalSolutions.Bags;
 
 using HereticalSolutions.LifetimeManagement;
 
@@ -15,319 +15,243 @@ namespace HereticalSolutions.Delegates
         : IPublisherSingleArgGeneric<TValue>,
           IPublisherSingleArg,
           INonAllocSubscribable,
-          INonAllocSubscribableSingleArg,
           ICleanuppable,
           IDisposable
     {
-        #region Subscriptions
+        private readonly IBag<INonAllocSubscription> subscriptionsBag;
 
-        private readonly IManagedPool<INonAllocSubscription> subscriptionsPool;
-
-        private readonly IDynamicArray<IPoolElementFacade<INonAllocSubscription>> subscriptionsContents;
-        
-        #endregion
+        private readonly IPool<NonAllocBroadcasterGenericInvocationContext> contextPool;
 
         private readonly ILogger logger;
 
-        #region Buffer
-
-        private INonAllocSubscription[] currentSubscriptionsBuffer;
-
-        private int currentSubscriptionsBufferCount = -1;
-
-        #endregion
-
-        private bool broadcastInProgress = false;
-
         public NonAllocBroadcasterGeneric(
-            IManagedPool<INonAllocSubscription> subscriptionsPool,
-            IDynamicArray<IPoolElementFacade<INonAllocSubscription>> subscriptionsContents,
+            IBag<INonAllocSubscription> subscriptionsBag,
+            IPool<NonAllocBroadcasterGenericInvocationContext> contextPool,
             ILogger logger = null)
         {
-            this.subscriptionsPool = subscriptionsPool;
+            this.subscriptionsBag = subscriptionsBag;
+
+            this.contextPool = contextPool;
 
             this.logger = logger;
-
-            this.subscriptionsContents = subscriptionsContents;
-
-            currentSubscriptionsBuffer = new INonAllocSubscription[subscriptionsContents.Capacity];
         }
-
-        #region INonAllocSubscribableSingleArgGeneric
-
-        public void Subscribe(
-            INonAllocSubscription subscription)
-        {
-            if (!subscription.ValidateActivation(this))
-                return;
-
-            var subscriptionElement = subscriptionsPool.Pop();
-
-            var subscriptionState = (INonAllocSubscriptionState<IInvokableSingleArgGeneric<TValue>>)subscription;
-
-            subscriptionElement.Value = (INonAllocSubscription)subscriptionState;
-
-            subscription.Activate(this, subscriptionElement);
-
-            logger?.Log<NonAllocBroadcasterGeneric<TValue>>(
-                $"SUBSCRIPTION ADDED: {subscriptionElement.Value.GetHashCode()} <{typeof(TValue).Name}>");
-        }
-
-        public void Unsubscribe(
-            INonAllocSubscription subscription)
-        {
-            if (!subscription.ValidateTermination(this))
-                return;
-
-            var poolElement = ((INonAllocSubscriptionState<IInvokableSingleArgGeneric<TValue>>)subscription).PoolElement;
-
-            TryRemoveFromBuffer(poolElement);
-
-            var previousValue = poolElement.Value;
-
-            poolElement.Value = null;
-
-            subscriptionsPool.Push(poolElement);
-
-            subscription.Terminate();
-
-            logger?.Log<NonAllocBroadcasterGeneric<TValue>>(
-                $"SUBSCRIPTION REMOVED: {previousValue.GetHashCode()} <{typeof(TValue).Name}>");
-        }
-
-        IEnumerable<INonAllocSubscription> INonAllocSubscribable.AllSubscriptions
-        {
-            get
-            {
-                var allSubscriptions = new INonAllocSubscriptionHandler<
-                    INonAllocSubscribable,
-                    IInvokableSingleArgGeneric<TValue>>
-                    [subscriptionsContents.Count];
-
-                for (int i = 0; i < allSubscriptions.Length; i++)
-                    allSubscriptions[i] = (INonAllocSubscriptionHandler<
-                        INonAllocSubscribable,
-                        IInvokableSingleArgGeneric<TValue>>)
-                        subscriptionsContents[i].Value;
-
-                return allSubscriptions;
-            }
-        }
-
-        #endregion
-
-        #region INonAllocSubscribableSingleArg
-
-        public void Subscribe<TArgument>(
-            INonAllocSubscriptionHandler<
-                INonAllocSubscribable,
-                IInvokableSingleArgGeneric<TArgument>>
-                subscription)
-        {
-            switch (subscription)
-            {
-                case INonAllocSubscriptionHandler<
-                    INonAllocSubscribable,
-                    IInvokableSingleArgGeneric<TValue>> tValueSubscription:
-
-                    Subscribe(tValueSubscription);
-
-                    break;
-
-                default:
-
-                    throw new Exception(
-                        logger.TryFormatException<NonAllocBroadcasterGeneric<TValue>>(
-                            $"INVALID ARGUMENT TYPE. EXPECTED: \"{typeof(TValue).Name}\" RECEIVED: \"{typeof(TArgument).Name}\""));
-            }
-        }
-
-        public void Subscribe(
-            Type valueType,
-            INonAllocSubscriptionHandler<
-                INonAllocSubscribableSingleArg,
-                IInvokableSingleArg>
-                subscription)
-        {
-            switch (subscription)
-            {
-                case INonAllocSubscriptionHandler<
-                    INonAllocSubscribable,
-                    IInvokableSingleArgGeneric<TValue>>
-                    tValueSubscription:
-
-                    Subscribe(tValueSubscription);
-
-                    break;
-
-                default:
-
-                    throw new Exception(
-                        logger.TryFormatException<NonAllocBroadcasterGeneric<TValue>>(
-                            $"INVALID ARGUMENT TYPE. EXPECTED: \"{typeof(TValue).Name}\" RECEIVED: \"{valueType.Name}\""));
-            }
-        }
-
-        public void Unsubscribe<TArgument>(
-            INonAllocSubscriptionHandler<
-                INonAllocSubscribable,
-                IInvokableSingleArgGeneric<TArgument>>
-                subscription)
-        {
-            switch (subscription)
-            {
-                case INonAllocSubscriptionHandler<
-                    INonAllocSubscribable,
-                    IInvokableSingleArgGeneric<TValue>>
-                    tValueSubscription:
-
-                    Unsubscribe(tValueSubscription);
-
-                    break;
-
-                default:
-
-                    throw new Exception(
-                        logger.TryFormatException<NonAllocBroadcasterGeneric<TValue>>(
-                            $"INVALID ARGUMENT TYPE. EXPECTED: \"{typeof(TValue).Name}\" RECEIVED: \"{typeof(TArgument).Name}\""));
-            }
-        }
-
-        public void Unsubscribe(
-            Type valueType,
-            INonAllocSubscriptionHandler<
-                INonAllocSubscribableSingleArg,
-                IInvokableSingleArg>
-                subscription)
-        {
-            switch (subscription)
-            {
-                case INonAllocSubscriptionHandler<
-                    INonAllocSubscribable,
-                    IInvokableSingleArgGeneric<TValue>>
-                    tValueSubscription:
-
-                    Unsubscribe(tValueSubscription);
-
-                    break;
-
-                default:
-
-                    throw new Exception(
-                        logger.TryFormatException<NonAllocBroadcasterGeneric<TValue>>(
-                            $"INVALID ARGUMENT TYPE. EXPECTED: \"{typeof(TValue).Name}\" RECEIVED: \"{valueType.Name}\""));
-            }
-        }
-
-        IEnumerable<
-            INonAllocSubscriptionHandler<
-                INonAllocSubscribable,
-                IInvokableSingleArgGeneric<TValue>>>
-                INonAllocSubscribableSingleArg.GetAllSubscriptions<TValue>()
-        {
-            var allSubscriptions = new INonAllocSubscriptionHandler<
-                INonAllocSubscribable,
-                IInvokableSingleArgGeneric<TValue>>
-                [subscriptionsContents.Count];
-
-            for (int i = 0; i < allSubscriptions.Length; i++)
-                allSubscriptions[i] = (INonAllocSubscriptionHandler<
-                    INonAllocSubscribable,
-                    IInvokableSingleArgGeneric<TValue>>)
-                    subscriptionsContents[i].Value;
-
-            return allSubscriptions;
-        }
-
-        public IEnumerable<INonAllocSubscription> GetAllSubscriptions(Type valueType)
-        {
-            INonAllocSubscription[] allSubscriptions = new INonAllocSubscription[subscriptionsContents.Count];
-
-            for (int i = 0; i < allSubscriptions.Length; i++)
-                allSubscriptions[i] = subscriptionsContents[i].Value;
-
-            return allSubscriptions;
-        }
-
-        IEnumerable<
-            INonAllocSubscriptionHandler<
-                INonAllocSubscribableSingleArg,
-                IInvokableSingleArg>>
-                INonAllocSubscribableSingleArg.AllSubscriptions
-        {
-            get
-            {
-                var allSubscriptions = new INonAllocSubscriptionHandler<
-                    INonAllocSubscribableSingleArg,
-                    IInvokableSingleArg>
-                    [subscriptionsContents.Count];
-
-                for (int i = 0; i < allSubscriptions.Length; i++)
-                    allSubscriptions[i] = (INonAllocSubscriptionHandler<
-                        INonAllocSubscribableSingleArg,
-                        IInvokableSingleArg>)
-                        subscriptionsContents[i].Value;
-
-                return allSubscriptions;
-            }
-        }
-
-        #endregion
 
         #region INonAllocSubscribable
 
+        public bool Subscribe(
+            INonAllocSubscription subscription)
+        {
+            switch (subscription)
+            {
+                case INonAllocSubscriptionContext<IInvokableSingleArgGeneric<TValue>> singleArgGenericSubscriptionContext:
+                    if (!singleArgGenericSubscriptionContext.ValidateActivation(this))
+                        return false;
+
+                    if (!subscriptionsBag.Push(
+                        subscription))
+                        return false;
+
+                    singleArgGenericSubscriptionContext.Activate(
+                        this);
+
+                    break;
+
+                case INonAllocSubscriptionContext<IInvokableSingleArg> singleArgSubscriptionContext:
+                    if (!singleArgSubscriptionContext.ValidateActivation(this))
+                        return false;
+
+                    if (!subscriptionsBag.Push(
+                        subscription))
+                        return false;
+
+                    singleArgSubscriptionContext.Activate(
+                        this);
+
+                    break;
+
+                default:
+                    logger?.LogError(
+                        GetType(),
+                        $"INVALID SUBSCRIPTION TYPE: \"{subscription.GetType().Name}\"");
+
+                    return false;
+            }
+
+            logger?.Log(
+                GetType(),
+                $"SUBSCRIPTION {subscription.GetHashCode()} ADDED: {this.GetHashCode()}");
+
+            return true;
+        }
+
+        public bool Unsubscribe(
+            INonAllocSubscription subscription)
+        {
+            switch (subscription)
+            {
+                case INonAllocSubscriptionContext<IInvokableSingleArgGeneric<TValue>> singleArgGenericSubscriptionContext:
+
+                    if (!singleArgGenericSubscriptionContext.ValidateActivation(this))
+                        return false;
+
+                    if (!subscriptionsBag.Pop(
+                        subscription))
+                        return false;
+
+                    singleArgGenericSubscriptionContext.Terminate();
+
+                    break;
+
+                case INonAllocSubscriptionContext<IInvokableSingleArg> singleArgSubscriptionContext:
+
+                    if (!singleArgSubscriptionContext.ValidateActivation(this))
+                        return false;
+
+                    if (!subscriptionsBag.Pop(
+                        subscription))
+                        return false;
+
+                    singleArgSubscriptionContext.Terminate();
+
+                    break;
+
+                default:
+                    logger?.LogError(
+                        GetType(),
+                        $"INVALID SUBSCRIPTION TYPE: \"{subscription.GetType().Name}\"");
+
+                    return false;
+            }
+
+            logger?.Log(
+                GetType(),
+                $"SUBSCRIPTION {subscription.GetHashCode()} REMOVED: {this.GetHashCode()}");
+
+            return true;
+        }
+
         public IEnumerable<INonAllocSubscription> AllSubscriptions
         {
-            get
-            {
-                INonAllocSubscription[] allSubscriptions = new INonAllocSubscription[subscriptionsContents.Count];
-
-                for (int i = 0; i < allSubscriptions.Length; i++)
-                    allSubscriptions[i] = subscriptionsContents[i].Value;
-
-                return allSubscriptions;
-            }
+            get => subscriptionsBag.All;
         }
 
         public void UnsubscribeAll()
         {
-            while (subscriptionsContents.Count > 0)
+            foreach (var subscription in subscriptionsBag.All)
             {
-                var subscription = (INonAllocSubscriptionHandler<
-                    INonAllocSubscribable,
-                    IInvokableSingleArgGeneric<TValue>>)
-                    subscriptionsContents[0].Value;
+                switch (subscription)
+                {
+                    case INonAllocSubscriptionContext<IInvokableSingleArgGeneric<TValue>> singleArgGenericSubscriptionContext:
 
-                Unsubscribe(subscription);
+                        if (!singleArgGenericSubscriptionContext.ValidateActivation(this))
+                            continue;
+
+                        singleArgGenericSubscriptionContext.Terminate();
+
+                        break;
+
+                    case INonAllocSubscriptionContext<IInvokableSingleArg> singleArgSubscriptionContext:
+
+                        if (!singleArgSubscriptionContext.ValidateActivation(this))
+                            continue;
+
+                        singleArgSubscriptionContext.Terminate();
+
+                        break;
+
+                    default:
+                        continue;
+                }
             }
+
+            subscriptionsBag.Clear();
         }
 
         #endregion
 
         #region IPublisherSingleArgGeneric
 
-        public void Publish(TValue value)
+        public void Publish(
+            TValue value)
         {
-            //If any delegate that is invoked attempts to unsubscribe itself, it would produce an error because the collection
-            //should NOT be changed during the invocation
-            //That's why we'll copy the subscriptions array to buffer and invoke it from there
+            if (subscriptionsBag.Count == 0)
+                return;
 
-            ValidateBufferSize();
+            //Pop context out of the pool and initialize it with values from the bag
 
-            currentSubscriptionsBufferCount = subscriptionsContents.Count;
+            var count = subscriptionsBag.Count;
 
-            CopySubscriptionsToBuffer();
+            var context = contextPool.Pop();
 
-            InvokeSubscriptions(value);
+            bool newBuffer = false;
 
-            EmptyBuffer();
+            if (context.Subscriptions == null)
+            {
+                context.Subscriptions = new INonAllocSubscription[count];
+
+                newBuffer = true;
+            }
+
+            if (context.Subscriptions.Length < subscriptionsBag.Count)
+            {
+                context.Subscriptions = new INonAllocSubscription[subscriptionsBag.Count];
+
+                newBuffer = true;
+            }
+
+            if (!newBuffer)
+            {
+                for (int i = 0; i < context.Count; i++)
+                {
+                    context.Subscriptions[i] = null;
+                }
+            }
+
+            int index = 0;
+
+            //TODO: remove foreach
+            foreach (var subscription in subscriptionsBag.All)
+            {
+                context.Subscriptions[index] = subscription;
+
+                index++;
+            }
+
+            context.Count = count;
+
+
+            //Invoke the delegates in the context
+
+            for (int i = 0; i < context.Count; i++)
+            {
+                var subscriptionContext = context.Subscriptions[i]
+                    as INonAllocSubscriptionContext<IInvokableSingleArgGeneric<TValue>>;
+
+                if (subscriptionContext == null)
+                    continue;
+
+                subscriptionContext.Delegate?.Invoke(value);
+            }
+
+
+            //Clean up and push the context back into the pool
+
+            for (int i = 0; i < count; i++)
+            {
+                context.Subscriptions[i] = null;
+            }
+
+            context.Count = 0;
+
+            contextPool.Push(context);
         }
 
         #endregion
 
         #region IPublisherSingleArg
 
-        public void Publish<TArgument>(TArgument value)
+        public void Publish<TArgument>(
+            TArgument value)
         {
             switch (value)
             {
@@ -345,7 +269,9 @@ namespace HereticalSolutions.Delegates
             }
         }
 
-        public void Publish(Type valueType, object value)
+        public void Publish(
+            Type valueType,
+            object value)
         {
             switch (value)
             {
@@ -369,23 +295,11 @@ namespace HereticalSolutions.Delegates
 
         public void Cleanup()
         {
-            if (subscriptionsPool is ICleanuppable)
-                (subscriptionsPool as ICleanuppable).Cleanup();
+            if (subscriptionsBag is ICleanuppable)
+                (subscriptionsBag as ICleanuppable).Cleanup();
 
-            for (int i = 0; i < currentSubscriptionsBufferCount; i++)
-            {
-                if (currentSubscriptionsBuffer[i] != null
-                    && currentSubscriptionsBuffer[i] is ICleanuppable)
-                {
-                    (currentSubscriptionsBuffer[i] as ICleanuppable).Cleanup();
-                }
-            }
-            
-            EmptyBuffer();
-
-            currentSubscriptionsBufferCount = -1;
-
-            broadcastInProgress = false;
+            if (contextPool is ICleanuppable)
+                (contextPool as ICleanuppable).Cleanup();
         }
 
         #endregion
@@ -394,69 +308,13 @@ namespace HereticalSolutions.Delegates
 
         public void Dispose()
         {
-            if (subscriptionsPool is IDisposable)
-                (subscriptionsPool as IDisposable).Dispose();
+            if (subscriptionsBag is IDisposable)
+                (subscriptionsBag as IDisposable).Dispose();
 
-            for (int i = 0; i < currentSubscriptionsBufferCount; i++)
-            {
-                if (currentSubscriptionsBuffer[i] != null
-                    && currentSubscriptionsBuffer[i] is IDisposable)
-                {
-                    (currentSubscriptionsBuffer[i] as IDisposable).Dispose();
-                }
-            }
+            if (contextPool is IDisposable)
+                (contextPool as IDisposable).Dispose();
         }
 
         #endregion
-
-        private void TryRemoveFromBuffer(IPoolElementFacade<INonAllocSubscription> subscriptionElement)
-        {
-            if (!broadcastInProgress)
-                return;
-
-            for (int i = 0; i < currentSubscriptionsBufferCount; i++)
-            {
-                if (currentSubscriptionsBuffer[i] == subscriptionElement.Value)
-                {
-                    currentSubscriptionsBuffer[i] = null;
-                    return;
-                }
-            }
-        }
-
-        private void ValidateBufferSize()
-        {
-            if (currentSubscriptionsBuffer.Length < subscriptionsContents.Capacity)
-                currentSubscriptionsBuffer = new INonAllocSubscription[subscriptionsContents.Capacity];
-        }
-
-        private void CopySubscriptionsToBuffer()
-        {
-            for (int i = 0; i < currentSubscriptionsBufferCount; i++)
-                currentSubscriptionsBuffer[i] = subscriptionsContents[i].Value;
-        }
-
-        private void InvokeSubscriptions(TValue value)
-        {
-            broadcastInProgress = true;
-
-            for (int i = 0; i < currentSubscriptionsBufferCount; i++)
-            {
-                if (currentSubscriptionsBuffer[i] != null)
-                {
-                    var subscriptionState = (INonAllocSubscriptionContext<TValue>)currentSubscriptionsBuffer[i];
-
-                    subscriptionState.Delegate.Invoke(value);
-                }
-            }
-
-            broadcastInProgress = false;
-        }
-
-        private void EmptyBuffer()
-        {
-            for (int i = 0; i < currentSubscriptionsBufferCount; i++)
-                currentSubscriptionsBuffer[i] = null;
-        }
     }
 }

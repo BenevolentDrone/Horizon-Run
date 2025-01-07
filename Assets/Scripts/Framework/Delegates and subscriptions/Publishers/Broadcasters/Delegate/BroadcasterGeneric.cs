@@ -1,9 +1,9 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-//using System.Linq; //error CS1061: 'Delegate[]' does not contain a definition for 'Cast'
 
 using HereticalSolutions.LifetimeManagement;
+
+using HereticalSolutions.Pools;
 
 using HereticalSolutions.Logging;
 
@@ -17,39 +17,27 @@ namespace HereticalSolutions.Delegates
           ICleanuppable,
           IDisposable
     {
+        private readonly IPool<BroadcasterGenericInvocationContext<TValue>> contextPool;
+
         private readonly ILogger logger;
 
         private Action<TValue> multicastDelegate;
 
         public BroadcasterGeneric(
+            IPool<BroadcasterGenericInvocationContext<TValue>> contextPool,
             ILogger logger = null)
         {
+            this.contextPool = contextPool;
+
             this.logger = logger;
 
             multicastDelegate = null;
         }
 
-        #region IPublisherSingleArgGeneric
-
-        public void Publish(TValue value)
-        {
-            //If any delegate that is invoked attempts to unsubscribe itself, it would produce an error because the collection
-            //should NOT be changed during the invocation
-            //That's why we'll copy the multicast delegate to a local variable and invoke it from there
-            //multicastDelegate?.Invoke(value);
-
-            var multicastDelegateCopy = multicastDelegate;
-
-            multicastDelegateCopy?.Invoke(value);
-
-            multicastDelegateCopy = null;
-        }
-
-        #endregion
-
         #region IPublisherSingleArg
 
-        public void Publish<TArgument>(TArgument value)
+        public void Publish<TArgument>(
+            TArgument value)
         {
             switch (value)
             {
@@ -62,12 +50,15 @@ namespace HereticalSolutions.Delegates
                 default:
 
                     throw new Exception(
-                        logger.TryFormatException<BroadcasterGeneric<TValue>>(
+                        logger.TryFormatException(
+                            GetType(),
                             $"INVALID ARGUMENT TYPE. EXPECTED: \"{typeof(TValue).Name}\" RECEIVED: \"{typeof(TArgument).Name}\""));
             }
         }
 
-        public void Publish(Type valueType, object value)
+        public void Publish(
+            Type valueType,
+            object value)
         {
             switch (value)
             {
@@ -80,7 +71,8 @@ namespace HereticalSolutions.Delegates
                 default:
 
                     throw new Exception(
-                        logger.TryFormatException<BroadcasterGeneric<TValue>>(
+                        logger.TryFormatException(
+                            GetType(),
                             $"INVALID ARGUMENT TYPE. EXPECTED: \"{typeof(TValue).Name}\" RECEIVED: \"{valueType.Name}\""));
             }
         }
@@ -89,22 +81,26 @@ namespace HereticalSolutions.Delegates
 
         #region ISubscribableSingleArgGeneric
 
-        public void Subscribe(Action<TValue> @delegate)
+        public void Subscribe(
+            Action<TValue> @delegate)
         {
             multicastDelegate += @delegate;
         }
 
-        public void Subscribe(object @delegate)
+        public void Subscribe(
+            object @delegate)
         {
             multicastDelegate += (Action<TValue>)@delegate;
         }
 
-        public void Unsubscribe(Action<TValue> @delegate)
+        public void Unsubscribe(
+            Action<TValue> @delegate)
         {
             multicastDelegate -= @delegate;
         }
 
-        public void Unsubscribe(object @delegate)
+        public void Unsubscribe(
+            object @delegate)
         {
             multicastDelegate -= (Action<TValue>)@delegate;
         }
@@ -116,9 +112,7 @@ namespace HereticalSolutions.Delegates
                 //Kudos to Copilot for Cast() and the part after the ?? operator
                 return multicastDelegate?
                     .GetInvocationList()
-                    //.Cast<Action<TValue>>() //LINQ
                     .CastInvocationListToGenericActions<TValue>()
-                    //?? Enumerable.Empty<Action<TValue>>(); //LINQ
                     ?? new Action<TValue>[0];
             }
         }
@@ -127,7 +121,8 @@ namespace HereticalSolutions.Delegates
 
         #region ISubscribableSingleArg
 
-        public void Subscribe<TArgument>(Action<TArgument> @delegate)
+        public void Subscribe<TArgument>(
+            Action<TArgument> @delegate)
         {
             switch (@delegate)
             {
@@ -140,12 +135,15 @@ namespace HereticalSolutions.Delegates
                 default:
 
                     throw new Exception(
-                        logger.TryFormatException<BroadcasterGeneric<TValue>>(
+                        logger.TryFormatException(
+                            GetType(),
                             $"INVALID ARGUMENT TYPE. EXPECTED: \"{typeof(TValue).Name}\" RECEIVED: \"{typeof(TArgument).Name}\""));
             }
         }
 
-        public void Subscribe(Type valueType, object @delegate)
+        public void Subscribe(
+            Type valueType,
+            object @delegate)
         {
             switch (@delegate)
             {
@@ -158,12 +156,14 @@ namespace HereticalSolutions.Delegates
                 default:
 
                     throw new Exception(
-                        logger.TryFormatException<BroadcasterGeneric<TValue>>(
+                        logger.TryFormatException(
+                            GetType(),
                             $"INVALID ARGUMENT TYPE. EXPECTED: \"{typeof(TValue).Name}\" RECEIVED: \"{valueType.Name}\""));
             }
         }
 
-        public void Unsubscribe<TArgument>(Action<TArgument> @delegate)
+        public void Unsubscribe<TArgument>(
+            Action<TArgument> @delegate)
         {
             switch (@delegate)
             {
@@ -176,12 +176,15 @@ namespace HereticalSolutions.Delegates
                 default:
 
                     throw new Exception(
-                        logger.TryFormatException<BroadcasterGeneric<TValue>>(
+                        logger.TryFormatException(
+                            GetType(),
                             $"INVALID ARGUMENT TYPE. EXPECTED: \"{typeof(TValue).Name}\" RECEIVED: \"{typeof(TArgument).Name}\""));
             }
         }
 
-        public void Unsubscribe(Type valueType, object @delegate)
+        public void Unsubscribe(
+            Type valueType,
+            object @delegate)
         {
             switch (@delegate)
             {
@@ -194,7 +197,8 @@ namespace HereticalSolutions.Delegates
                 default:
 
                     throw new Exception(
-                        logger.TryFormatException<BroadcasterGeneric<TValue>>(
+                        logger.TryFormatException(
+                            GetType(),
                             $"INVALID ARGUMENT TYPE. EXPECTED: \"{typeof(TValue).Name}\" RECEIVED: \"{valueType.Name}\""));
             }
         }
@@ -204,20 +208,17 @@ namespace HereticalSolutions.Delegates
             //Kudos to Copilot for Cast() and the part after the ?? operator
             return multicastDelegate?
                 .GetInvocationList()
-                //.Cast<Action<TArgument>>() //LINQ
                 .CastInvocationListToGenericActions<TArgument>()
-                //?? Enumerable.Empty<Action<TArgument>>(); //LINQ
                 ?? new Action<TArgument>[0];
         }
 
-        public IEnumerable<object> GetAllSubscriptions(Type valueType)
+        public IEnumerable<object> GetAllSubscriptions(
+            Type valueType)
         {
             //Kudos to Copilot for Cast() and the part after the ?? operator
             return multicastDelegate?
                 .GetInvocationList()
-                //.Cast<object>() //LINQ
                 .CastInvocationListToObjects()
-                //?? Enumerable.Empty<object>(); //LINQ
                 ?? new object[0];
         }
 
@@ -232,9 +233,7 @@ namespace HereticalSolutions.Delegates
                 //Kudos to Copilot for Cast() and the part after the ?? operator
                 return multicastDelegate?
                     .GetInvocationList()
-                    //.Cast<object>() //LINQ
                     .CastInvocationListToObjects()
-                    //?? Enumerable.Empty<object>(); //LINQ
                     ?? new object[0];
             }
         }
@@ -242,6 +241,29 @@ namespace HereticalSolutions.Delegates
         public void UnsubscribeAll()
         {
             multicastDelegate = null;
+        }
+
+        #endregion
+
+        #region IPublisherSingleArgGeneric
+
+        public void Publish(
+            TValue value)
+        {
+            //If any delegate that is invoked attempts to unsubscribe itself, it would produce an error because the collection
+            //should NOT be changed during the invocation
+            //That's why we'll copy the multicast delegate to a local variable and invoke it from there
+            //multicastDelegate?.Invoke(value);
+
+            var context = contextPool.Pop();
+
+            context.Delegate = multicastDelegate;
+
+            context.Delegate?.Invoke(value);
+
+            context.Delegate = null;
+
+            contextPool.Push(context);
         }
 
         #endregion

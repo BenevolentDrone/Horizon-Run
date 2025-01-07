@@ -44,12 +44,14 @@ namespace HereticalSolutions.Pools
             
             if (args.TryGetArgument<AppendToPoolArgument>(out var arg))
             {
-                logger?.Log<AppendablePackedArrayManagedPool<T>>(
+                logger?.Log(
+                    GetType(),
                     "APPEND ARGUMENT RECEIVED, APPENDING");
 
                 int firstNonAllocatedItemIndex = allocatedCount;
                 
                 //Find first uninitialized item
+
                 int firstUninitializedItemIndex = allocatedCount;
 
                 while (packedArray[firstUninitializedItemIndex].Status != EPoolElementStatus.UNINITIALIZED)
@@ -67,9 +69,11 @@ namespace HereticalSolutions.Pools
                 }
                 
                 //Swap
+
                 if (firstUninitializedItemIndex != firstNonAllocatedItemIndex)
                 {
                     //Swap the current element with the first non-allocated item
+
                     var swap = packedArray[firstNonAllocatedItemIndex];
 
                     packedArray[firstNonAllocatedItemIndex] = packedArray[firstUninitializedItemIndex];
@@ -84,35 +88,40 @@ namespace HereticalSolutions.Pools
                 allocatedCount++;
 	        
                 //Update metadata
+
                 IPoolElementFacadeWithMetadata<T> resultWithMetadata = result as IPoolElementFacadeWithMetadata<T>;
 
                 if (resultWithMetadata == null)
                 {
                     throw new Exception(
-                        logger.TryFormatException<AppendablePackedArrayManagedPool<T>>(
+                        logger.TryFormatException(
+                            GetType(),
                             "PACKED ARRAY MANAGED POOL ELEMENT HAS NO METADATA"));
                 }
 
                 //Update index
-                //var indexMetadata = resultWithMetadata.Metadata.Get<IIndexed>();
+                
                 var indexedFacade = resultWithMetadata as IIndexed;
 
                 if (indexedFacade == null)
                 {
                     throw new Exception(
-                        logger.TryFormatException<AppendablePackedArrayManagedPool<T>>(
+                        logger.TryFormatException(
+                            GetType(),
                             "PACKED ARRAY MANAGED POOL ELEMENT HAS NO INDEXED FACADE"));
                 }
 
                 indexedFacade.Index = index;
 
                 //Validate pool
+
                 if (result.Pool == null)
                 {
                     result.Pool = this;
                 }
                 
                 //Update facade
+                
                 result.Status = EPoolElementStatus.UNINITIALIZED;
             
                 return result;

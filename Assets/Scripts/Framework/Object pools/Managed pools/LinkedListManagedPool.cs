@@ -80,12 +80,14 @@ namespace HereticalSolutions.Pools
             if (result == null)
             {
                 throw new Exception(
-                    logger.TryFormatException<LinkedListManagedPool<T>>(
+                    logger.TryFormatException(
+                        GetType(),
                         "LINKED LIST MANAGED POOL ELEMENT IS NOT A POOL ELEMENT FACADE"));
             }
             
             
             //Validate values
+
             if (result.Status == EPoolElementStatus.UNINITIALIZED)
             {
                 var newElement = valueAllocationCommand.AllocationDelegate(); 
@@ -96,12 +98,14 @@ namespace HereticalSolutions.Pools
             }
             
             //Validate pool
+
             if (result.Pool == null)
             {
                 result.Pool = this;
             }
 
             //Update facade
+
             result.Status = EPoolElementStatus.POPPED;
             
             return result;
@@ -121,6 +125,7 @@ namespace HereticalSolutions.Pools
             }
             
             //Update facade
+
             instance.Status = EPoolElementStatus.PUSHED;
             
             var instanceAsLinkedListLink = instance as ILinkedListLink<T>;
@@ -128,7 +133,8 @@ namespace HereticalSolutions.Pools
             if (instanceAsLinkedListLink == null)
             {
                 throw new Exception(
-                    logger.TryFormatException<LinkedListManagedPool<T>>(
+                    logger.TryFormatException(
+                        GetType(),
                         "LINKED LIST MANAGED POOL ELEMENT IS NOT A LINKED LIST LINK"));
             }
 
@@ -173,7 +179,8 @@ namespace HereticalSolutions.Pools
                 if (currentElement == null)
                 {
                     throw new Exception(
-                        logger.TryFormatException<LinkedListManagedPool<T>>(
+                        logger.TryFormatException(
+                            GetType(),
                             "LINKED LIST MANAGED POOL ELEMENT IS NOT A POOL ELEMENT FACADE"));
                 }
                 
@@ -199,7 +206,8 @@ namespace HereticalSolutions.Pools
                 if (currentElement == null)
                 {
                     throw new Exception(
-                        logger.TryFormatException<LinkedListManagedPool<T>>(
+                        logger.TryFormatException(
+                            GetType(),
                             "LINKED LIST MANAGED POOL ELEMENT IS NOT A POOL ELEMENT FACADE"));
                 }
                 

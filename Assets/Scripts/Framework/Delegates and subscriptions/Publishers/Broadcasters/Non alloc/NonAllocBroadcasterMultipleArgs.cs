@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 
-using HereticalSolutions.Collections;
-
 using HereticalSolutions.Pools;
+
+using HereticalSolutions.Bags;
 
 using HereticalSolutions.LifetimeManagement;
 
@@ -17,160 +17,186 @@ namespace HereticalSolutions.Delegates
           ICleanuppable,
           IDisposable
     {
-        #region Subscriptions
+        private readonly IBag<INonAllocSubscription> subscriptionsBag;
 
-        private readonly IManagedPool<INonAllocSubscription> subscriptionsPool;
-
-        private readonly IDynamicArray<IPoolElementFacade<INonAllocSubscription>> subscriptionsContents;
-
-        #endregion
+        private readonly IPool<NonAllocBroadcasterMultipleArgsInvocationContext> contextPool;
 
         private readonly ILogger logger;
 
-        #region Buffer
-
-        private INonAllocSubscription[] currentSubscriptionsBuffer;
-
-        private int currentSubscriptionsBufferCount = -1;
-
-        #endregion
-
-        private bool broadcastInProgress = false;
-
         public NonAllocBroadcasterMultipleArgs(
-            IManagedPool<INonAllocSubscription> subscriptionsPool,
-            IDynamicArray<IPoolElementFacade<INonAllocSubscription>> subscriptionsContents,
+            IBag<INonAllocSubscription> subscriptionsBag,
+            IPool<NonAllocBroadcasterMultipleArgsInvocationContext> contextPool,
             ILogger logger = null)
         {
-            this.subscriptionsPool = subscriptionsPool;
+            this.subscriptionsBag = subscriptionsBag;
+
+            this.contextPool = contextPool;
 
             this.logger = logger;
-
-            this.subscriptionsContents = subscriptionsContents;
-
-            currentSubscriptionsBuffer = new INonAllocSubscription[subscriptionsContents.Capacity];
         }
 
         #region INonAllocSubscribable
 
-        public void Subscribe(
-            INonAllocSubscriptionHandler<
-                INonAllocSubscribable,
-                IInvokableMultipleArgs>
-                subscription)
+        public bool Subscribe(
+            INonAllocSubscription subscription)
         {
-            if (!subscription.ValidateActivation(this))
-                return;
+            var subscriptionContext = subscription as INonAllocSubscriptionContext<IInvokableMultipleArgs>;
 
-            var subscriptionElement = subscriptionsPool.Pop();
-
-            var subscriptionState = (INonAllocSubscriptionState<IInvokableMultipleArgs>)subscription;
-
-            subscriptionElement.Value = (INonAllocSubscription)subscriptionState;
-
-            subscription.Activate(this, subscriptionElement);
-
-            logger?.Log<NonAllocBroadcasterMultipleArgs>(
-                $"SUBSCRIPTION ADDED: {subscriptionElement.Value.GetHashCode()}");
-        }
-
-        public void Unsubscribe(
-            INonAllocSubscriptionHandler<
-                INonAllocSubscribable,
-                IInvokableMultipleArgs>
-                subscription)
-        {
-            if (!subscription.ValidateTermination(this))
-                return;
-
-            var poolElement = ((INonAllocSubscriptionState<IInvokableMultipleArgs>)subscription).PoolElement;
-
-            TryRemoveFromBuffer(poolElement);
-
-            var previousValue = poolElement.Value;
-
-            poolElement.Value = null;
-
-            subscriptionsPool.Push(poolElement);
-
-            subscription.Terminate();
-
-            logger?.Log<NonAllocBroadcasterMultipleArgs>(
-                $"SUBSCRIPTION REMOVED: {previousValue.GetHashCode()}");
-        }
-
-        IEnumerable<
-            INonAllocSubscriptionHandler<
-                INonAllocSubscribable,
-                IInvokableMultipleArgs>>
-                INonAllocSubscribable.AllSubscriptions
-        {
-            get
+            if (subscriptionContext == null)
             {
-                var allSubscriptions = new INonAllocSubscriptionHandler<
-                    INonAllocSubscribable,
-                    IInvokableMultipleArgs>
-                    [subscriptionsContents.Count];
+                logger?.LogError(
+                    GetType(),
+                    $"INVALID SUBSCRIPTION TYPE: \"{subscription.GetType().Name}\"");
 
-                for (int i = 0; i < allSubscriptions.Length; i++)
-                    allSubscriptions[i] = (INonAllocSubscriptionHandler<
-                        INonAllocSubscribable,
-                        IInvokableMultipleArgs>)
-                        subscriptionsContents[i].Value;
-
-                return allSubscriptions;
+                return false;
             }
+
+            if (!subscriptionContext.ValidateActivation(this))
+                return false;
+
+            if (!subscriptionsBag.Push(
+                subscription))
+                return false;
+
+            subscriptionContext.Activate(
+                this);
+
+            logger?.Log(
+                GetType(),
+                $"SUBSCRIPTION {subscription.GetHashCode()} ADDED: {this.GetHashCode()}");
+
+            return true;
         }
 
-        #region INonAllocSubscribable
-
-        IEnumerable<INonAllocSubscription> INonAllocSubscribable.AllSubscriptions
+        public bool Unsubscribe(
+            INonAllocSubscription subscription)
         {
-            get
+            var subscriptionContext = subscription as INonAllocSubscriptionContext<IInvokableMultipleArgs>;
+
+            if (subscriptionContext == null)
             {
-                INonAllocSubscription[] allSubscriptions = new INonAllocSubscription[subscriptionsContents.Count];
+                logger?.LogError(
+                    GetType(),
+                    $"INVALID SUBSCRIPTION TYPE: \"{subscription.GetType().Name}\"");
 
-                for (int i = 0; i < allSubscriptions.Length; i++)
-                    allSubscriptions[i] = subscriptionsContents[i].Value;
-
-                return allSubscriptions;
+                return false;
             }
+
+            if (!subscriptionContext.ValidateActivation(this))
+                return false;
+
+            if (!subscriptionsBag.Pop(
+                subscription))
+                return false;
+
+            subscriptionContext.Terminate();
+
+            logger?.Log(
+                GetType(),
+                $"SUBSCRIPTION {subscription.GetHashCode()} REMOVED: {this.GetHashCode()}");
+
+            return true;
+        }
+
+        public IEnumerable<INonAllocSubscription> AllSubscriptions
+        {
+            get => subscriptionsBag.All;
         }
 
         public void UnsubscribeAll()
         {
-            while (subscriptionsContents.Count > 0)
+            foreach (var subscription in subscriptionsBag.All)
             {
-                var subscription = (INonAllocSubscriptionHandler<
-                    INonAllocSubscribable,
-                    IInvokableMultipleArgs>)
-                    subscriptionsContents[0].Value;
+                var subscriptionContext = subscription as INonAllocSubscriptionContext<IInvokableMultipleArgs>;
 
-                Unsubscribe(subscription);
+                if (subscriptionContext == null)
+                    continue;
+
+                if (!subscriptionContext.ValidateActivation(this))
+                    continue;
+
+                subscriptionContext.Terminate();
             }
-        }
 
-        #endregion
+            subscriptionsBag.Clear();
+        }
 
         #endregion
 
         #region IPublisherMultipleArgs
 
-        public void Publish(object[] value)
+        public void Publish(
+            object[] values)
         {
-            //If any delegate that is invoked attempts to unsubscribe itself, it would produce an error because the collection
-            //should NOT be changed during the invocation
-            //That's why we'll copy the subscriptions array to buffer and invoke it from there
+            if (subscriptionsBag.Count == 0)
+                return;
 
-            ValidateBufferSize();
+            //Pop context out of the pool and initialize it with values from the bag
 
-            currentSubscriptionsBufferCount = subscriptionsContents.Count;
+            var count = subscriptionsBag.Count;
 
-            CopySubscriptionsToBuffer();
+            var context = contextPool.Pop();
 
-            InvokeSubscriptions(value);
+            bool newBuffer = false;
 
-            EmptyBuffer();
+            if (context.Subscriptions == null)
+            {
+                context.Subscriptions = new INonAllocSubscription[count];
+
+                newBuffer = true;
+            }
+
+            if (context.Subscriptions.Length < subscriptionsBag.Count)
+            {
+                context.Subscriptions = new INonAllocSubscription[subscriptionsBag.Count];
+
+                newBuffer = true;
+            }
+
+            if (!newBuffer)
+            {
+                for (int i = 0; i < context.Count; i++)
+                {
+                    context.Subscriptions[i] = null;
+                }
+            }
+
+            int index = 0;
+
+            //TODO: remove foreach
+            foreach (var subscription in subscriptionsBag.All)
+            {
+                context.Subscriptions[index] = subscription;
+
+                index++;
+            }
+
+            context.Count = count;
+
+
+            //Invoke the delegates in the context
+
+            for (int i = 0; i < context.Count; i++)
+            {
+                var subscriptionContext = context.Subscriptions[i] as INonAllocSubscriptionContext<IInvokableMultipleArgs>;
+
+                if (subscriptionContext == null)
+                    continue;
+
+                subscriptionContext.Delegate?.Invoke(values);
+            }
+
+
+            //Clean up and push the context back into the pool
+
+            for (int i = 0; i < count; i++)
+            {
+                context.Subscriptions[i] = null;
+            }
+
+            context.Count = 0;
+
+            contextPool.Push(context);
         }
 
         #endregion
@@ -179,23 +205,11 @@ namespace HereticalSolutions.Delegates
 
         public void Cleanup()
         {
-            if (subscriptionsPool is ICleanuppable)
-                (subscriptionsPool as ICleanuppable).Cleanup();
+            if (subscriptionsBag is ICleanuppable)
+                (subscriptionsBag as ICleanuppable).Cleanup();
 
-            for (int i = 0; i < currentSubscriptionsBufferCount; i++)
-            {
-                if (currentSubscriptionsBuffer[i] != null
-                    && currentSubscriptionsBuffer[i] is ICleanuppable)
-                {
-                    (currentSubscriptionsBuffer[i] as ICleanuppable).Cleanup();
-                }
-            }
-
-            EmptyBuffer();
-
-            currentSubscriptionsBufferCount = -1;
-
-            broadcastInProgress = false;
+            if (contextPool is ICleanuppable)
+                (contextPool as ICleanuppable).Cleanup();
         }
 
         #endregion
@@ -204,69 +218,13 @@ namespace HereticalSolutions.Delegates
 
         public void Dispose()
         {
-            if (subscriptionsPool is IDisposable)
-                (subscriptionsPool as IDisposable).Dispose();
+            if (subscriptionsBag is IDisposable)
+                (subscriptionsBag as IDisposable).Dispose();
 
-            for (int i = 0; i < currentSubscriptionsBufferCount; i++)
-            {
-                if (currentSubscriptionsBuffer[i] != null
-                    && currentSubscriptionsBuffer[i] is IDisposable)
-                {
-                    (currentSubscriptionsBuffer[i] as IDisposable).Dispose();
-                }
-            }
+            if (contextPool is IDisposable)
+                (contextPool as IDisposable).Dispose();
         }
 
         #endregion
-
-        private void TryRemoveFromBuffer(IPoolElementFacade<INonAllocSubscription> subscriptionElement)
-        {
-            if (!broadcastInProgress)
-                return;
-
-            for (int i = 0; i < currentSubscriptionsBufferCount; i++)
-            {
-                if (currentSubscriptionsBuffer[i] == subscriptionElement.Value)
-                {
-                    currentSubscriptionsBuffer[i] = null;
-                    return;
-                }
-            }
-        }
-
-        private void ValidateBufferSize()
-        {
-            if (currentSubscriptionsBuffer.Length < subscriptionsContents.Capacity)
-                currentSubscriptionsBuffer = new INonAllocSubscription[subscriptionsContents.Capacity];
-        }
-
-        private void CopySubscriptionsToBuffer()
-        {
-            for (int i = 0; i < currentSubscriptionsBufferCount; i++)
-                currentSubscriptionsBuffer[i] = subscriptionsContents[i].Value;
-        }
-
-        private void InvokeSubscriptions(object[] value)
-        {
-            broadcastInProgress = true;
-
-            for (int i = 0; i < currentSubscriptionsBufferCount; i++)
-            {
-                if (currentSubscriptionsBuffer[i] != null)
-                {
-                    var subscriptionState = (INonAllocSubscriptionState<IInvokableMultipleArgs>)currentSubscriptionsBuffer[i];
-
-                    subscriptionState.Invokable.Invoke(value);
-                }
-            }
-
-            broadcastInProgress = false;
-        }
-
-        private void EmptyBuffer()
-        {
-            for (int i = 0; i < currentSubscriptionsBufferCount; i++)
-                currentSubscriptionsBuffer[i] = null;
-        }
     }
 }

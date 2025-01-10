@@ -57,7 +57,7 @@ namespace HereticalSolutions.Time
 
 			do
 			{
-				timerHandle = IDAllocationsFactory.BuildUshort();
+				timerHandle = IDAllocationFactory.BuildUshort();
 			}
 			while (timerHandle == 0
 				|| timerContainerRepository.Has(timerHandle));

@@ -12,7 +12,7 @@ namespace HereticalSolutions.Pools.Factories
             out TArgument instance)
             where TArgument : IPoolPopArgument
         {
-            instance = AllocationsFactory.ActivatorAllocationDelegate<TArgument>();
+            instance = AllocationFactory.ActivatorAllocationDelegate<TArgument>();
 
             argumentChain.Add(instance);
 

@@ -102,6 +102,7 @@ namespace HereticalSolutions.Pools
             if (instanceIndex != lastAllocatedItemIndex)
             {
                 //Swap pushed element and last allocated element
+                
                 var swap = packedArray[instanceIndex];
 
                 packedArray[instanceIndex] = packedArray[lastAllocatedItemIndex];

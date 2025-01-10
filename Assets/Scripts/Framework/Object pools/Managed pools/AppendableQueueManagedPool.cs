@@ -8,8 +8,8 @@ using HereticalSolutions.Logging;
 
 namespace HereticalSolutions.Pools
 {
-	public class AppendableQueueManagedPool<T> :
-		QueueManagedPool<T>
+	public class AppendableQueueManagedPool<T>
+		: QueueManagedPool<T>
 	{
 		private readonly AllocationCommand<IPoolElementFacade<T>> appendFacadeAllocationCommand;
 
@@ -35,7 +35,8 @@ namespace HereticalSolutions.Pools
 			this.nullValueAllocationCommand = nullValueAllocationCommand;
 		}
 
-		public override IPoolElementFacade<T> Pop(IPoolPopArgument[] args)
+		public override IPoolElementFacade<T> Pop(
+			IPoolPopArgument[] args)
 		{
 			#region Append from argument
 

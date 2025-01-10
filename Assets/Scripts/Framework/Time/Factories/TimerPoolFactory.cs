@@ -20,7 +20,7 @@ namespace HereticalSolutions.Time.Factories
 
 		public const int ADDITIONAL_TIMERS_AMOUNT = 100;
 
-		public static IManagedPool<TimerWithSubscriptionsContainer> BuildRuntimeTimersPool(
+		public static IManagedPool<TimerWithSubscriptionsContainer> BuildRuntimeTimerPool(
 			ISynchronizationProvider provider,
 			ILoggerResolver loggerResolver = null)
 		{
@@ -36,7 +36,7 @@ namespace HereticalSolutions.Time.Factories
 
 			// Create a push to decorated pool callback
 			PushToManagedPoolWhenAvailableCallback<TimerWithSubscriptionsContainer> pushCallback =
-				ObjectPoolsAllocationCallbacksFactory.BuildPushToManagedPoolWhenAvailableCallback<TimerWithSubscriptionsContainer>();
+				ObjectPoolAllocationCallbacksFactory.BuildPushToManagedPoolWhenAvailableCallback<TimerWithSubscriptionsContainer>();
 
 			#endregion
 
@@ -45,7 +45,7 @@ namespace HereticalSolutions.Time.Factories
 			// Create an array of metadata descriptor builder functions
 			var metadataDescriptorBuilders = new Func<MetadataAllocationDescriptor>[]
 			{
-				//ObjectPoolsMetadataFactory.BuildIndexedMetadataDescriptor
+				//ObjectPoolMetadataFactory.BuildIndexedMetadataDescriptor
 			};
 
 			#endregion
@@ -54,7 +54,7 @@ namespace HereticalSolutions.Time.Factories
 			Func<TimerWithSubscriptionsContainer> valueAllocationDelegate =
 				() => 
 				{
-					var result = TimeFactory.BuildRuntimeTimerWithSubscriptionsContainer(
+					var result = TimerFactory.BuildRuntimeTimerWithSubscriptionsContainer(
 						provider,
 						loggerResolver: loggerResolver);
 

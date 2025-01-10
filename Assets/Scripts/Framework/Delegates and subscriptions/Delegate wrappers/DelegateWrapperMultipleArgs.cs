@@ -7,12 +7,14 @@ namespace HereticalSolutions.Delegates.Wrappers
     {
         private readonly Action<object[]> @delegate;
 
-        public DelegateWrapperMultipleArgs(Action<object[]> @delegate)
+        public DelegateWrapperMultipleArgs(
+            Action<object[]> @delegate)
         {
             this.@delegate = @delegate;
         }
 
-        public void Invoke(object[] arguments)
+        public void Invoke(
+            object[] arguments)
         {
             @delegate?.Invoke(arguments);
         }

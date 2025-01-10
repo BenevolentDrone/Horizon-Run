@@ -60,7 +60,11 @@ namespace HereticalSolutions.ResourceManagement
 		#endregion
 
 		protected abstract Task<TResource> AllocateResource(
-			IProgress<float> progress = null);
+
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null);
 
 		protected abstract Task FreeResource(
 			TResource resource,
@@ -79,7 +83,7 @@ namespace HereticalSolutions.ResourceManagement
 				.LoadDependency(
 					path,
 					variantID,
-					progress);
+					progress: progress);
 
 			var result = await task;
 				//.ConfigureAwait(false);

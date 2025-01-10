@@ -43,7 +43,7 @@ namespace HereticalSolutions.Synchronization
 			this.deltaToFloatDelegate = deltaToFloatDelegate;
 
 
-			synchronizeFixedScubscription = DelegatesFactory.BuildSubscriptionSingleArgGeneric<IRuntimeTimer>(
+			synchronizeFixedScubscription = DelegateWrapperFactory.BuildSubscriptionSingleArgGeneric<IRuntimeTimer>(
 				SynchronizeFixed,
 				loggerResolver);
 

@@ -243,7 +243,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Factories
 			ILoggerResolver loggerResolver = null)
 		{
 			Func<TEntityListResource> valueAllocationDelegate =
-				AllocationsFactory.ActivatorAllocationDelegate<TEntityListResource>;
+				AllocationFactory.ActivatorAllocationDelegate<TEntityListResource>;
 
 			var initialAllocationCommand = new AllocationCommand<TEntityListResource>
 			{
@@ -287,7 +287,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Factories
 			ILoggerResolver loggerResolver = null)
 		{
 			Func<TEntityHierarchyResource> valueAllocationDelegate =
-				() => AllocationsFactory.FuncAllocationDelegate<TEntityHierarchyResource, HierarchyNode<TEntity>>(
+				() => AllocationFactory.FuncAllocationDelegate<TEntityHierarchyResource, HierarchyNode<TEntity>>(
 					() =>
 					{
 						return new HierarchyNode<TEntity>(
@@ -342,7 +342,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Factories
 			ILoggerResolver loggerResolver = null)
 		{
 			Func<TEntityRelationsResource> valueAllocationDelegate =
-				() => AllocationsFactory.FuncAllocationDelegate<
+				() => AllocationFactory.FuncAllocationDelegate<
 					TEntityRelationsResource,
 					DirectedNamedGraphNode<TEntity>>(
 					() =>

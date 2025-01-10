@@ -39,7 +39,7 @@ namespace HereticalSolutions.Messaging.Factories
 
         public MessageBusBuilder AddMessageType<TMessage>()
         {
-            Func<IMessage> valueAllocationDelegate = AllocationsFactory.ActivatorAllocationDelegate<IMessage, TMessage>;
+            Func<IMessage> valueAllocationDelegate = AllocationFactory.ActivatorAllocationDelegate<IMessage, TMessage>;
 
             var initialAllocationCommand = new AllocationCommand<IMessage>
             {

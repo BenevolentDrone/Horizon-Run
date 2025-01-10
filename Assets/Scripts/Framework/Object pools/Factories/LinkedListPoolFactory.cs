@@ -93,17 +93,17 @@ namespace HereticalSolutions.Pools.Factories
                 ?? null;
             
             Func<IPoolElementFacade<T> > facadeAllocationDelegate = 
-                () => ObjectPoolsAllocationFactory.BuildPoolElementFacadeWithLinkedList<T>(
+                () => ObjectPoolAllocationFactory.BuildPoolElementFacadeWithLinkedList<T>(
                     metadataAllocationDescriptors);
             
             AllocationCommand<IPoolElementFacade<T>> initialFacadeAllocationCommand =
-                ObjectPoolsAllocationCommandFactory.BuildPoolElementFacadeAllocationCommand(
+                ObjectPoolAllocationCommandFactory.BuildPoolElementFacadeAllocationCommand(
                     initialAllocationCommand.Descriptor,
                     facadeAllocationDelegate,
                     facadeAllocationCallback);
             
             AllocationCommand<IPoolElementFacade<T>> additionalFacadeAllocationCommand =
-                ObjectPoolsAllocationCommandFactory.BuildPoolElementFacadeAllocationCommand(
+                ObjectPoolAllocationCommandFactory.BuildPoolElementFacadeAllocationCommand(
                     additionalAllocationCommand.Descriptor,
                     facadeAllocationDelegate,
                     facadeAllocationCallback);
@@ -205,17 +205,17 @@ namespace HereticalSolutions.Pools.Factories
                 ?? null;
             
             Func<IPoolElementFacade<T> > facadeAllocationDelegate = 
-                () => ObjectPoolsAllocationFactory.BuildPoolElementFacadeWithLinkedList<T>(
+                () => ObjectPoolAllocationFactory.BuildPoolElementFacadeWithLinkedList<T>(
                     metadataAllocationDescriptors);
             
             AllocationCommand<IPoolElementFacade<T>> initialFacadeAllocationCommand =
-                ObjectPoolsAllocationCommandFactory.BuildPoolElementFacadeAllocationCommand(
+                ObjectPoolAllocationCommandFactory.BuildPoolElementFacadeAllocationCommand(
                     initialAllocationCommand.Descriptor,
                     facadeAllocationDelegate,
                     facadeAllocationCallback);
             
             AllocationCommand<IPoolElementFacade<T>> additionalFacadeAllocationCommand =
-                ObjectPoolsAllocationCommandFactory.BuildPoolElementFacadeAllocationCommand(
+                ObjectPoolAllocationCommandFactory.BuildPoolElementFacadeAllocationCommand(
                     additionalAllocationCommand.Descriptor,
                     facadeAllocationDelegate,
                     facadeAllocationCallback);
@@ -230,11 +230,11 @@ namespace HereticalSolutions.Pools.Factories
                         Amount = 1
                     },
                     
-                    AllocationDelegate = AllocationsFactory.NullAllocationDelegate<T>
+                    AllocationDelegate = AllocationFactory.NullAllocationDelegate<T>
                 };
 
             AllocationCommand<IPoolElementFacade<T>> appendFacadeAllocationCommand =
-                ObjectPoolsAllocationCommandFactory.BuildPoolElementFacadeAllocationCommand(
+                ObjectPoolAllocationCommandFactory.BuildPoolElementFacadeAllocationCommand(
                     nullValueAllocationCommand.Descriptor,
                     facadeAllocationDelegate,
                     facadeAllocationCallback);

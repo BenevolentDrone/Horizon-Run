@@ -231,7 +231,7 @@ namespace HereticalSolutions.AssetImport
 				.AddVariant(
 					variantData,
 					allocate,
-					progress);
+					progress: progress);
 
 			await task;
 				//.ConfigureAwait(false);
@@ -267,7 +267,7 @@ namespace HereticalSolutions.AssetImport
 				.LoadDependency(
 					path,
 					variantID,
-					progress);
+					progress: progress);
 
 			var result = await task;
 				//.ConfigureAwait(false);

@@ -10,7 +10,8 @@ namespace HereticalSolutions
 	{
 		private const char ADDRESS_SEPARATOR = '/';
 
-		public static string[] SplitAddressBySeparator(this string address)
+		public static string[] SplitAddressBySeparator(
+			this string address)
 		{
 			if (string.IsNullOrEmpty(address))
 				return new string[0];
@@ -25,7 +26,8 @@ namespace HereticalSolutions
 		/// </summary>
 		/// <param name="address">The address to convert.</param>
 		/// <returns>The hash code of the address.</returns>
-		public static int AddressToHash(this string address)
+		public static int AddressToHash(
+			this string address)
 		{
 			return address.GetHashCode();
 		}
@@ -35,7 +37,8 @@ namespace HereticalSolutions
 		/// </summary>
 		/// <param name="address">The address to convert.</param>
 		/// <returns>An array of hash codes representing each part of the address.</returns>
-		public static int[] AddressToHashes(this string address)
+		public static int[] AddressToHashes(
+			this string address)
 		{
 			if (string.IsNullOrEmpty(address))
 				return new int[0];

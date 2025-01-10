@@ -1,6 +1,7 @@
 using System;
-using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
+using System.IO;
 
 using HereticalSolutions.Logging;
 
@@ -260,7 +261,12 @@ namespace HereticalSolutions.Persistence
 
 		#region Read
 
-		public async Task<(bool, TValue)> ReadAsync<TValue>()
+		public async Task<(bool, TValue)> ReadAsync<TValue>(
+
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null)
 		{
 			AssertStrategyIsValid(
 				typeof(TValue),
@@ -300,7 +306,12 @@ namespace HereticalSolutions.Persistence
 		}
 
 		public async Task<(bool, object)> ReadAsync(
-			Type valueType)
+			Type valueType,
+
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null)
 		{
 			AssertStrategyIsValid(
 				valueType,
@@ -344,7 +355,12 @@ namespace HereticalSolutions.Persistence
 		#region Write
 
 		public async Task<bool> WriteAsync<TValue>(
-			TValue value)
+			TValue value,
+
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null)
 		{
 			AssertStrategyIsValid(
 				typeof(TValue),
@@ -367,7 +383,12 @@ namespace HereticalSolutions.Persistence
 
 		public async Task<bool> WriteAsync(
 			Type valueType,
-			object value)
+			object value,
+
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null)
 		{
 			AssertStrategyIsValid(
 				valueType,
@@ -393,7 +414,12 @@ namespace HereticalSolutions.Persistence
 		#region Append
 
 		public async Task<bool> AppendAsync<TValue>(
-			TValue value)
+			TValue value,
+
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null)
 		{
 			AssertStrategyIsValid(
 				typeof(TValue),
@@ -416,7 +442,12 @@ namespace HereticalSolutions.Persistence
 
 		public async Task<bool> AppendAsync(
 			Type valueType,
-			object value)
+			object value,
+
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null)
 		{
 			AssertStrategyIsValid(
 				valueType,
@@ -480,7 +511,12 @@ namespace HereticalSolutions.Persistence
 			}
 		}
 
-		public async Task FlushAsync()
+		public async Task FlushAsync(
+			
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null)
 		{
 			if (!StreamOpen)
 				return;
@@ -780,7 +816,7 @@ namespace HereticalSolutions.Persistence
 
 			int resultLength = memoryStream.Read(
 				result,
-				0,
+				blockOffset,
 				blockSize);
 
 			if (resultLength != blockSize)
@@ -815,7 +851,7 @@ namespace HereticalSolutions.Persistence
 
 			int resultLength = memoryStream.Read(
 				result,
-				0,
+				blockOffset,
 				blockSize);
 
 			if (resultLength != blockSize)
@@ -888,7 +924,12 @@ namespace HereticalSolutions.Persistence
 
 		public async Task<(bool, TValue)> BlockReadAsync<TValue>(
 			int blockOffset,
-			int blockSize)
+			int blockSize,
+
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null)
 		{
 			AssertStrategyIsValid(
 				typeof(TValue),
@@ -899,7 +940,7 @@ namespace HereticalSolutions.Persistence
 
 			int resultLength = await memoryStream.ReadAsync(
 				result,
-				0,
+				blockOffset,
 				blockSize);
 
 			if (resultLength != blockSize)
@@ -922,7 +963,12 @@ namespace HereticalSolutions.Persistence
 		public async Task<(bool, object)> BlockReadAsync(
 			Type valueType,
 			int blockOffset,
-			int blockSize)
+			int blockSize,
+
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null)
 		{
 			AssertStrategyIsValid(
 				valueType,
@@ -933,7 +979,7 @@ namespace HereticalSolutions.Persistence
 
 			int resultLength = await memoryStream.ReadAsync(
 				result,
-				0,
+				blockOffset,
 				blockSize);
 
 			if (resultLength != blockSize)
@@ -960,7 +1006,12 @@ namespace HereticalSolutions.Persistence
 		public async Task<bool> BlockWriteAsync<TValue>(
 			TValue value,
 			int blockOffset,
-			int blockSize)
+			int blockSize,
+
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null)
 		{
 			AssertStrategyIsValid(
 				typeof(TValue),
@@ -980,7 +1031,12 @@ namespace HereticalSolutions.Persistence
 			Type valueType,
 			object value,
 			int blockOffset,
-			int blockSize)
+			int blockSize,
+
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null)
 		{
 			AssertStrategyIsValid(
 				valueType,

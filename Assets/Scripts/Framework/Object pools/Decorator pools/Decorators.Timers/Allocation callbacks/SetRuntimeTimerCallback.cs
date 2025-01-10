@@ -58,7 +58,7 @@ namespace HereticalSolutions.Pools.AllocationCallbacks
 			}
 			
 			// Set the runtime timer
-			var timer = TimeFactory.BuildRuntimeTimer(
+			var timer = TimerFactory.BuildRuntimeTimer(
 				ID,
 				DefaultDuration,
 				loggerResolver);

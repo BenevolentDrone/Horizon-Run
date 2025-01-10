@@ -21,7 +21,7 @@ namespace HereticalSolutions.Samples.ECSCharacterControllerSample.Factories
 		{
 			Func<Guid> allocateIDDelegate = () =>
 			{
-				return IDAllocationsFactory.BuildGUID();
+				return IDAllocationFactory.BuildGUID();
 			};
 
 			Func<GUIDComponent, Guid> getEntityIDFromIDComponentDelegate = (GUIDComponent) =>

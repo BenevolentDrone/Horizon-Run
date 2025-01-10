@@ -169,7 +169,7 @@ public class DODExperimentsBehaviour : MonoBehaviour
         string logFileName = dateTimeNow;
 
 
-        ILoggerBuilder loggerBuilder = LoggersFactory.BuildLoggerBuilder();
+        ILoggerBuilder loggerBuilder = LoggerFactory.BuildLoggerBuilder();
 
         var loggerResolver = loggerBuilder
 
@@ -181,7 +181,7 @@ public class DODExperimentsBehaviour : MonoBehaviour
                 //Wrappers
 
                 .AddWrapperBelow(
-                    LoggersFactory.BuildProxyWrapper())
+                    LoggerFactory.BuildProxyWrapper())
 
                 .Build(); //Preemptively build the logger resolver so that it can be already injected
 
@@ -206,23 +206,23 @@ public class DODExperimentsBehaviour : MonoBehaviour
             //THE EASIEST WAY TO PREVENT THIS IS TO PERFORM A RECURSION GATE BEFORE THE SEMAPHORE
 
             .AddWrapperBelow(
-                LoggersFactory.BuildLoggerWrapperWithRecursionPreventionGate())
+                LoggerFactory.BuildLoggerWrapperWithRecursionPreventionGate())
 
             //Thread safety
 
             .AddWrapperBelow(
-                LoggersFactory.BuildLoggerWrapperWithSemaphoreSlim())
+                LoggerFactory.BuildLoggerWrapperWithSemaphoreSlim())
 
             //Prefixes
 
             .AddWrapperBelow(
-                LoggersFactory.BuildLoggerWrapperWithThreadIndexPrefix())
+                LoggerFactory.BuildLoggerWrapperWithThreadIndexPrefix())
             .AddWrapperBelow(
-                LoggersFactory.BuildLoggerWrapperWithSourceTypePrefix())
+                LoggerFactory.BuildLoggerWrapperWithSourceTypePrefix())
             .AddWrapperBelow(
-                LoggersFactory.BuildLoggerWrapperWithLogTypePrefix())
+                LoggerFactory.BuildLoggerWrapperWithLogTypePrefix())
             .AddWrapperBelow(
-                LoggersFactory.BuildLoggerWrapperWithTimestampPrefix(
+                LoggerFactory.BuildLoggerWrapperWithTimestampPrefix(
                     false))
 
             // File sink
@@ -231,7 +231,7 @@ public class DODExperimentsBehaviour : MonoBehaviour
 
         var branch = loggerBuilder.CurrentLogger;
 
-        var fileSink = LoggersFactory.BuildFileSink(
+        var fileSink = LoggerFactory.BuildFileSink(
             new FileAtApplicationDataPathSettings()
             {
                 RelativePath = $"../Runtime logs/{logFileName}.log"
@@ -250,12 +250,12 @@ public class DODExperimentsBehaviour : MonoBehaviour
         loggerBuilder
 
             .AddWrapperBelow(
-                LoggersFactory.BuildLoggerWrapperWithRecursionPreventionPrefix())
+                LoggerFactory.BuildLoggerWrapperWithRecursionPreventionPrefix())
 
             //Toggling
 
             .AddWrapperBelow(
-                LoggersFactory.BuildLoggerWrapperWithToggling(
+                LoggerFactory.BuildLoggerWrapperWithToggling(
                     true,
                     true,
                     true,
@@ -264,7 +264,7 @@ public class DODExperimentsBehaviour : MonoBehaviour
             // Sink
 
             .AddSink(
-                LoggersFactoryUnity.BuildUnityDebugLogSink());
+                LoggerFactoryUnity.BuildUnityDebugLogSink());
 
         //Open stream
 

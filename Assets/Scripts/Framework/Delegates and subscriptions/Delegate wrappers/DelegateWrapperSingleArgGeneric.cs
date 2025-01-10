@@ -25,12 +25,14 @@ namespace HereticalSolutions.Delegates.Wrappers
         
         public Type ValueType => typeof(TValue);
 
-        public void Invoke(TValue argument)
+        public void Invoke(
+            TValue argument)
         {
             @delegate?.Invoke(argument);
         }
 
-        public void Invoke(object argument)
+        public void Invoke(
+            object argument)
         {
             @delegate?.Invoke((TValue)argument);
         }
@@ -39,7 +41,8 @@ namespace HereticalSolutions.Delegates.Wrappers
 
         #region IInvokableSingleArg
         
-        public void Invoke<TArgument>(TArgument value)
+        public void Invoke<TArgument>(
+            TArgument value)
         {
             switch (value)
             {
@@ -58,7 +61,9 @@ namespace HereticalSolutions.Delegates.Wrappers
             }
         }
 
-        public void Invoke(Type valueType, object value)
+        public void Invoke(
+            Type valueType,
+            object value)
         {
             switch (value)
             {

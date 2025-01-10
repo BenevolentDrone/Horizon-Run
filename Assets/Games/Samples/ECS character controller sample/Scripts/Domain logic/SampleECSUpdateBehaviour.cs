@@ -57,11 +57,11 @@ namespace HereticalSolutions.Samples.ECSCharacterControllerSample
 			this.lateUpdateSystems = lateUpdateSystems;
 
 
-			updateSubscription = DelegatesFactory.BuildSubscriptionSingleArgGeneric<float>(TickUpdateSystems);
+			updateSubscription = DelegateWrapperFactory.BuildSubscriptionSingleArgGeneric<float>(TickUpdateSystems);
 
-			fixedUpdateSubscription = DelegatesFactory.BuildSubscriptionSingleArgGeneric<float>(TickFixedUpdateSystems);
+			fixedUpdateSubscription = DelegateWrapperFactory.BuildSubscriptionSingleArgGeneric<float>(TickFixedUpdateSystems);
 
-			lateUpdateSubscription = DelegatesFactory.BuildSubscriptionSingleArgGeneric<float>(TickLateUpdateSystems);
+			lateUpdateSubscription = DelegateWrapperFactory.BuildSubscriptionSingleArgGeneric<float>(TickLateUpdateSystems);
 
 
 			updateTimeManagerAsProvider?.Subscribe(

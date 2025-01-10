@@ -37,7 +37,7 @@ namespace HereticalSolutions.Samples.ResizableGameObjectPoolSample
 
             // Create a push to decorated pool callback
             PushToManagedPoolWhenAvailableCallback<GameObject> pushCallback =
-                ObjectPoolsAllocationCallbacksFactory.BuildPushToManagedPoolWhenAvailableCallback<GameObject>();
+                ObjectPoolAllocationCallbacksFactory.BuildPushToManagedPoolWhenAvailableCallback<GameObject>();
 
             #endregion
 
@@ -46,7 +46,7 @@ namespace HereticalSolutions.Samples.ResizableGameObjectPoolSample
             // Create an array of metadata descriptor builder functions
             var metadataDescriptorBuilders = new Func<MetadataAllocationDescriptor>[]
             {
-                //ObjectPoolsMetadataFactory.BuildIndexedMetadataDescriptor
+                //ObjectPoolMetadataFactory.BuildIndexedMetadataDescriptor
             };
 
             #endregion
@@ -56,7 +56,7 @@ namespace HereticalSolutions.Samples.ResizableGameObjectPoolSample
 
             // Create a value allocation delegate
             Func<GameObject> valueAllocationDelegate =
-                () => UnityZenjectAllocationsFactory.DIResolveOrInstantiateAllocationDelegate(
+                () => UnityZenjectAllocationFactory.DIResolveOrInstantiateAllocationDelegate(
                     container,
                     prefab);
 
@@ -85,7 +85,7 @@ namespace HereticalSolutions.Samples.ResizableGameObjectPoolSample
             var resizablePool = managedPoolBuilder.BuildLinkedListManagedPool();
 
             // Build the game object pool
-            var gameObjectPool = UnityDecoratorPoolsFactory.BuildGameObjectManagedPool(
+            var gameObjectPool = UnityDecoratorPoolFactory.BuildGameObjectManagedPool(
                 resizablePool,
                 null);
 

@@ -30,7 +30,8 @@ namespace HereticalSolutions.Repositories
             return database.Has(typeof(TValue));
         }
 
-        public bool Has(Type valueType)
+        public bool Has(
+            Type valueType)
         {
             return database.Has(valueType);
         }
@@ -41,13 +42,15 @@ namespace HereticalSolutions.Repositories
             return (TValue)database.Get(typeof(TValue));
         }
 
-        public object Get(Type valueType)
+        public object Get(
+            Type valueType)
         {
             return database.Get(valueType);
         }
 
 
-        public bool TryGet<TValue>(out TValue value)
+        public bool TryGet<TValue>(
+            out TValue value)
         {
             value = default(TValue);
             
@@ -79,7 +82,8 @@ namespace HereticalSolutions.Repositories
 
         #endregion
 
-        public void Add<TValue>(TValue value)
+        public void Add<TValue>(
+            TValue value)
         {
             database.Add(
                 typeof(TValue),
@@ -96,7 +100,8 @@ namespace HereticalSolutions.Repositories
         }
 
 
-        public bool TryAdd<TValue>(TValue value)
+        public bool TryAdd<TValue>(
+            TValue value)
         {
             if (Has<TValue>())
                 return false;
@@ -132,7 +137,8 @@ namespace HereticalSolutions.Repositories
             }
         }
 
-        public void Update<TValue>(TValue value)
+        public void Update<TValue>(
+            TValue value)
         {
             database.Update(
                 typeof(TValue),
@@ -149,7 +155,8 @@ namespace HereticalSolutions.Repositories
         }
 
 
-        public bool TryUpdate<TValue>(TValue value)
+        public bool TryUpdate<TValue>(
+            TValue value)
         {
             if (!Has<TValue>())
                 return false;
@@ -174,7 +181,8 @@ namespace HereticalSolutions.Repositories
         }
 
 
-        public void AddOrUpdate<TValue>(TValue value)
+        public void AddOrUpdate<TValue>(
+            TValue value)
         {
             database.AddOrUpdate(typeof(TValue), value);
         }
@@ -194,7 +202,8 @@ namespace HereticalSolutions.Repositories
             database.Remove(typeof(TValue));
         }
 
-        public void Remove(Type valueType)
+        public void Remove(
+            Type valueType)
         {
             database.Remove(valueType);
         }
@@ -210,7 +219,8 @@ namespace HereticalSolutions.Repositories
             return true;
         }
 
-        public bool TryRemove(Type valueType)
+        public bool TryRemove(
+            Type valueType)
         {
             if (!Has(valueType))
                 return false;

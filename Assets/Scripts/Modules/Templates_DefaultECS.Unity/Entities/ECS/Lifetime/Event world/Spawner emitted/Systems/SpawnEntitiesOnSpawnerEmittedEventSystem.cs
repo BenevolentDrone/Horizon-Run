@@ -65,7 +65,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 						eventEntity,
 						new EntitySpawnedEventComponent
 						{
-							GUID = IDAllocationsFactory.BuildGUID(),
+							GUID = IDAllocationFactory.BuildGUID(),
 
 							PrototypeID = spawnEntitiesComponent.PrototypeID,
 

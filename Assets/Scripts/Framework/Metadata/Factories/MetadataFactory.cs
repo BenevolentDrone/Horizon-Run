@@ -28,7 +28,7 @@ namespace HereticalSolutions.Metadata.Factories
 
 					repository.Add(
 						descriptor.BindingType,
-						AllocationsFactory.ActivatorAllocationDelegate(
+						AllocationFactory.ActivatorAllocationDelegate(
 							descriptor.ConcreteType));
 				}
 

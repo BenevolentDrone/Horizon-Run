@@ -25,14 +25,14 @@ namespace HereticalSolutions.Delegates.Factories
         {
             broadcasterRepository.Add(
                 typeof(TBroadcaster),
-                BroadcastersFactory.BuildNonAllocBroadcasterGeneric<TBroadcaster>(loggerResolver));
+                BroadcasterFactory.BuildNonAllocBroadcasterGeneric<TBroadcaster>(loggerResolver));
 
             return this;
         }
 
         public NonAllocBroadcasterWithRepository Build()
         {
-            return BroadcastersFactory.BuildNonAllocBroadcasterWithRepository(
+            return BroadcasterFactory.BuildNonAllocBroadcasterWithRepository(
                 broadcasterRepository,
                 loggerResolver);
         }

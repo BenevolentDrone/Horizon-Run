@@ -40,20 +40,20 @@ namespace HereticalSolutions.Samples.NonAllocatingMessageBusSample
 		{
 			#region Initiate logger resolver and logger itself
 
-			ILoggerBuilder loggerBuilder = LoggersFactory.BuildLoggerBuilder();
+			ILoggerBuilder loggerBuilder = LoggerFactory.BuildLoggerBuilder();
 
 			loggerResolver = loggerBuilder
 				.NewLogger()
 				.ToggleAllowedByDefault(false)
 				.ToggleLogSource(typeof(NonAllocatingMessageBusSampleBehaviour), true)
 				.AddWrapperBelow(
-					LoggersFactory.BuildLoggerWrapperWithSourceTypePrefix())
+					LoggerFactory.BuildLoggerWrapperWithSourceTypePrefix())
 				.AddWrapperBelow(
-					LoggersFactory.BuildLoggerWrapperWithLogTypePrefix())
+					LoggerFactory.BuildLoggerWrapperWithLogTypePrefix())
 				.AddWrapperBelow(
-					LoggersFactory.BuildLoggerWrapperWithTimestampPrefix(false))
+					LoggerFactory.BuildLoggerWrapperWithTimestampPrefix(false))
 				.AddSink(
-					LoggersFactoryUnity.BuildUnityDebugLogSink())
+					LoggerFactoryUnity.BuildUnityDebugLogSink())
 				.Build();
 
 			logger = loggerResolver.GetLogger<NonAllocatingMessageBusSampleBehaviour>();
@@ -76,7 +76,7 @@ namespace HereticalSolutions.Samples.NonAllocatingMessageBusSample
 
 			#region Subscription
 
-			subscription = DelegatesFactory.BuildSubscriptionSingleArgGeneric<SampleMessage>(Print, loggerResolver);
+			subscription = DelegateWrapperFactory.BuildSubscriptionSingleArgGeneric<SampleMessage>(Print, loggerResolver);
 
 			#endregion
 

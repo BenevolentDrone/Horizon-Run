@@ -7,7 +7,8 @@ namespace HereticalSolutions.Delegates.Wrappers
     {
         private readonly Action @delegate;
 
-        public DelegateWrapperNoArgs(Action @delegate)
+        public DelegateWrapperNoArgs(
+            Action @delegate)
         {
             this.@delegate = @delegate;
         }

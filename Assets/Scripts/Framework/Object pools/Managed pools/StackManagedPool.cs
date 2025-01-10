@@ -68,6 +68,7 @@ namespace HereticalSolutions.Pools
             }
             
             //Validate values
+
             if (result.Status == EPoolElementStatus.UNINITIALIZED)
             {
                 var newElement = valueAllocationCommand.AllocationDelegate(); 
@@ -78,12 +79,14 @@ namespace HereticalSolutions.Pools
             }
             
             //Validate pool
+
             if (result.Pool == null)
             {
                 result.Pool = this;
             }
 
             //Update facade
+
             result.Status = EPoolElementStatus.POPPED;
             
             return result;
@@ -97,12 +100,14 @@ namespace HereticalSolutions.Pools
         public void Push(IPoolElementFacade<T> instance)
         {
             // Validate values
+
             if (instance.Status != EPoolElementStatus.POPPED)
             {
                 return;
             }
             
             //Update facade
+            
             instance.Status = EPoolElementStatus.PUSHED;
             
             pool.Push(instance);

@@ -189,7 +189,7 @@ namespace HereticalSolutions.AssetImport
 
 			if (!importerPoolRepository.Has(typeof(TImporter)))
 			{
-				importerPool = ObjectPoolsFactory.BuildManagedObjectPool<AAssetImporter, TImporter>(
+				importerPool = ObjectPoolFactory.BuildManagedObjectPool<AAssetImporter, TImporter>(
 					initialAllocation,
 					additionalAllocation,
 					loggerResolver,

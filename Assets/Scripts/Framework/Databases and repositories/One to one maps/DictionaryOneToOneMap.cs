@@ -32,22 +32,26 @@ namespace HereticalSolutions.Repositories
 
         #region IReadOnlyOneToOneMap
 
-        public bool HasLeft(TValue1 key)
+        public bool HasLeft(
+            TValue1 key)
         {
             return leftToRightDatabase.ContainsKey(key);
         }
 
-        public bool HasRight(TValue2 key)
+        public bool HasRight(
+            TValue2 key)
         {
             return rightToLeftDatabase.ContainsKey(key);
         }
 
-        public TValue2 GetRight(TValue1 key)
+        public TValue2 GetRight(
+            TValue1 key)
         {
             return leftToRightDatabase[key];
         }
         
-        public TValue1 GetLeft(TValue2 key)
+        public TValue1 GetLeft(
+            TValue2 key)
         {
             return rightToLeftDatabase[key];
         }
@@ -235,7 +239,8 @@ namespace HereticalSolutions.Repositories
                     rightValue);
         }
 
-        public void RemoveByLeft(TValue1 leftValue)
+        public void RemoveByLeft(
+            TValue1 leftValue)
         {
             var previousRightValue = leftToRightDatabase[leftValue];
             
@@ -244,7 +249,8 @@ namespace HereticalSolutions.Repositories
             leftToRightDatabase.Remove(leftValue);
         }
 
-        public void RemoveByRight(TValue2 rightValue)
+        public void RemoveByRight(
+            TValue2 rightValue)
         {
             var previousLeftValue = rightToLeftDatabase[rightValue];
             
@@ -253,7 +259,8 @@ namespace HereticalSolutions.Repositories
             rightToLeftDatabase.Remove(rightValue);
         }
 
-        public bool TryRemoveByLeft(TValue1 leftValue)
+        public bool TryRemoveByLeft(
+            TValue1 leftValue)
         {
             if (!HasLeft(leftValue))
                 return false;
@@ -263,7 +270,8 @@ namespace HereticalSolutions.Repositories
             return true;
         }
 
-        public bool TryRemoveByRight(TValue2 rightValue)
+        public bool TryRemoveByRight(
+            TValue2 rightValue)
         {
             if (!HasRight(rightValue))
                 return false;

@@ -2,7 +2,7 @@ using HereticalSolutions.Metadata.Allocations;
 
 namespace HereticalSolutions.Time.Factories
 {
-	public static partial class TimersDecoratorsPoolsFactory
+	public static partial class TimeMetadataFactory
 	{
 		#region Metadata
 

@@ -149,7 +149,7 @@ namespace HereticalSolutions.Time
                 return false;
             }
 
-            var timer = TimeFactory.BuildPersistentTimer(
+            var timer = TimerFactory.BuildPersistentTimer(
                 castedDTO.ID,
                 castedDTO.DefaultDurationSpan,
                 loggerResolver);
@@ -195,7 +195,7 @@ namespace HereticalSolutions.Time
                 return false;
             }
 
-            var timer = TimeFactory.BuildPersistentTimer(
+            var timer = TimerFactory.BuildPersistentTimer(
                 castedDTO.ID,
                 castedDTO.DefaultDurationSpan,
                 loggerResolver);

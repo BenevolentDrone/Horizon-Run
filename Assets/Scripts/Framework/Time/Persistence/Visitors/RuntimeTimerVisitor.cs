@@ -145,7 +145,7 @@ namespace HereticalSolutions.Time
                 return false;
             }
 
-            var timer = TimeFactory.BuildRuntimeTimer(
+            var timer = TimerFactory.BuildRuntimeTimer(
                 castedDTO.ID,
                 castedDTO.DefaultDuration,
                 loggerResolver);
@@ -187,7 +187,7 @@ namespace HereticalSolutions.Time
                 return false;
             }
 
-            var timer = TimeFactory.BuildRuntimeTimer(
+            var timer = TimerFactory.BuildRuntimeTimer(
                 castedDTO.ID,
                 castedDTO.DefaultDuration,
                 loggerResolver);

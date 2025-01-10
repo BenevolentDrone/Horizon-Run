@@ -44,6 +44,7 @@ namespace HereticalSolutions.Delegates
             switch (subscription)
             {
                 case INonAllocSubscriptionContext<IInvokableSingleArgGeneric<TValue>> singleArgGenericSubscriptionContext:
+                    
                     if (!singleArgGenericSubscriptionContext.ValidateActivation(this))
                         return false;
 
@@ -57,6 +58,7 @@ namespace HereticalSolutions.Delegates
                     break;
 
                 case INonAllocSubscriptionContext<IInvokableSingleArg> singleArgSubscriptionContext:
+                    
                     if (!singleArgSubscriptionContext.ValidateActivation(this))
                         return false;
 
@@ -70,6 +72,7 @@ namespace HereticalSolutions.Delegates
                     break;
 
                 default:
+                    
                     logger?.LogError(
                         GetType(),
                         $"INVALID SUBSCRIPTION TYPE: \"{subscription.GetType().Name}\"");
@@ -264,7 +267,8 @@ namespace HereticalSolutions.Delegates
                 default:
 
                     throw new Exception(
-                        logger.TryFormatException<NonAllocBroadcasterGeneric<TValue>>(
+                        logger.TryFormatException(
+                            GetType(),
                             $"INVALID ARGUMENT TYPE. EXPECTED: \"{typeof(TValue).Name}\" RECEIVED: \"{typeof(TArgument).Name}\""));
             }
         }
@@ -284,7 +288,8 @@ namespace HereticalSolutions.Delegates
                 default:
 
                     throw new Exception(
-                        logger.TryFormatException<NonAllocBroadcasterGeneric<TValue>>(
+                        logger.TryFormatException(
+                            GetType(),
                             $"INVALID ARGUMENT TYPE. EXPECTED: \"{typeof(TValue).Name}\" RECEIVED: \"{valueType.Name}\""));
             }
         }

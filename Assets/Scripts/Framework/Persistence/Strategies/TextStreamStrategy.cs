@@ -1,7 +1,9 @@
 using System;
-using System.IO;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+
+using System.Text;
+using System.IO;
 
 using HereticalSolutions.Logging;
 
@@ -246,7 +248,12 @@ namespace HereticalSolutions.Persistence
 
 		#region Read
 
-		public async Task<(bool, TValue)> ReadAsync<TValue>()
+		public async Task<(bool, TValue)> ReadAsync<TValue>(
+			
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null)
 		{
 			bool resultIsCharArray = typeof(TValue) == typeof(char[]);
 
@@ -278,7 +285,12 @@ namespace HereticalSolutions.Persistence
 		}
 
 		public async Task<(bool, object)> ReadAsync(
-			Type valueType)
+			Type valueType,
+
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null)
 		{
 			bool resultIsCharArray = valueType == typeof(char[]);
 
@@ -314,7 +326,12 @@ namespace HereticalSolutions.Persistence
 		#region Write
 
 		public async Task<bool> WriteAsync<TValue>(
-			TValue value)
+			TValue value,
+
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null)
 		{
 			bool resultIsCharArray = typeof(TValue) == typeof(char[]);
 
@@ -338,7 +355,12 @@ namespace HereticalSolutions.Persistence
 
 		public async Task<bool> WriteAsync(
 			Type valueType,
-			object value)
+			object value,
+
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null)
 		{
 			bool resultIsCharArray = valueType == typeof(char[]);
 
@@ -365,7 +387,12 @@ namespace HereticalSolutions.Persistence
 		#region Append
 
 		public async Task<bool> AppendAsync<TValue>(
-			TValue value)
+			TValue value,
+
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null)
 		{
 			bool resultIsCharArray = typeof(TValue) == typeof(char[]);
 
@@ -389,7 +416,12 @@ namespace HereticalSolutions.Persistence
 
 		public async Task<bool> AppendAsync(
 			Type valueType,
-			object value)
+			object value,
+
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null)
 		{
 			bool resultIsCharArray = valueType == typeof(char[]);
 
@@ -513,7 +545,12 @@ namespace HereticalSolutions.Persistence
 			}
 		}
 
-		public async Task FlushAsync()
+		public async Task FlushAsync(
+			
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null)
 		{
 			if (!StreamOpen)
 				return;
@@ -989,7 +1026,12 @@ namespace HereticalSolutions.Persistence
 
 		public async Task<(bool, TValue)> BlockReadAsync<TValue>(
 			int blockOffset,
-			int blockSize)
+			int blockSize,
+
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null)
 		{
 			bool resultIsCharArray = typeof(TValue) == typeof(char[]);
 
@@ -1040,7 +1082,12 @@ namespace HereticalSolutions.Persistence
 		public async Task<(bool, object)> BlockReadAsync(
 			Type valueType,
 			int blockOffset,
-			int blockSize)
+			int blockSize,
+
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null)
 		{
 			bool resultIsCharArray = valueType == typeof(char[]);
 
@@ -1095,7 +1142,12 @@ namespace HereticalSolutions.Persistence
 		public async Task<bool> BlockWriteAsync<TValue>(
 			TValue value,
 			int blockOffset,
-			int blockSize)
+			int blockSize,
+
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null)
 		{
 			bool resultIsCharArray = typeof(TValue) == typeof(char[]);
 
@@ -1124,7 +1176,12 @@ namespace HereticalSolutions.Persistence
 			Type valueType,
 			object value,
 			int blockOffset,
-			int blockSize)
+			int blockSize,
+
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null)
 		{
 			bool resultIsCharArray = valueType == typeof(char[]);
 

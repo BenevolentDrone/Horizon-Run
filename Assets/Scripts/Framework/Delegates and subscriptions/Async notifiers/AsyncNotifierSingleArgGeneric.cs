@@ -34,7 +34,12 @@ namespace HereticalSolutions.Delegates.Notifiers
 
 		public async Task<TValue> GetValueWhenNotified(
 			TArgument argument = default,
-			bool ignoreKey = false)
+			bool ignoreKey = false,
+
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null)
 		{
 			TaskCompletionSource<TValue> completionSource = new TaskCompletionSource<TValue>();
 
@@ -75,7 +80,12 @@ namespace HereticalSolutions.Delegates.Notifiers
 
 		public async Task<Task<TValue>> GetWaitForNotificationTask(
 			TArgument argument = default,
-			bool ignoreKey = false)
+			bool ignoreKey = false,
+
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null)
 		{
 			TaskCompletionSource<TValue> completionSource = new TaskCompletionSource<TValue>();
 
@@ -104,7 +114,12 @@ namespace HereticalSolutions.Delegates.Notifiers
 		}
 
 		private async Task<TValue> GetValueFromCompletionSource(
-			TaskCompletionSource<TValue> completionSource)
+			TaskCompletionSource<TValue> completionSource,
+
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null)
 		{
 			var task = completionSource
 				.Task;
@@ -122,7 +137,12 @@ namespace HereticalSolutions.Delegates.Notifiers
 
 		public async Task Notify(
 			TArgument argument,
-			TValue value)
+			TValue value,
+
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null)
 		{
 			await semaphore.WaitAsync();
 

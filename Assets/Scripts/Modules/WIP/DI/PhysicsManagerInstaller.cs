@@ -18,7 +18,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.DI
 		private ILoggerResolver loggerResolver;
 
 		[SerializeField]
-		private GameObjectPoolSettings physicsBodiesPoolsSettings;
+		private GameObjectPoolSettings physicsBodiesPoolSettings;
 
 		[SerializeField]
 		private Transform poolParentTransform;
@@ -26,9 +26,9 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.DI
 		public override void InstallBindings()
 		{
 			/*
-			var physicsBodiesPool = UniversalTemplateUnityGameObjectPoolsFactory.BuildPool(
+			var physicsBodiesPool = UniversalTemplateUnityGameObjectPoolFactory.BuildPool(
 				Container,
-				physicsBodiesPoolsSettings,
+				physicsBodiesPoolSettings,
 				poolParentTransform,
 				loggerResolver);
 

@@ -25,7 +25,7 @@ namespace HereticalSolutions.Samples.ECSCharacterControllerSample.Installers
         {
             #region Update
 
-            var updateTimeManager = TimeFactory.BuildTimeManager(loggerResolver);
+            var updateTimeManager = TimerFactory.BuildTimeManager(loggerResolver);
 
             var updateSynchronizableRepository = updateTimeManager as ISynchronizableGenericArgRepository<float>;
 
@@ -49,7 +49,7 @@ namespace HereticalSolutions.Samples.ECSCharacterControllerSample.Installers
 
             #region Fixed update
 
-            var fixedUpdateTimeManager = TimeFactory.BuildTimeManager(loggerResolver);
+            var fixedUpdateTimeManager = TimerFactory.BuildTimeManager(loggerResolver);
 
             var fixedUpdateSynchronizableRepository = fixedUpdateTimeManager as ISynchronizableGenericArgRepository<float>;
 
@@ -73,7 +73,7 @@ namespace HereticalSolutions.Samples.ECSCharacterControllerSample.Installers
 
             #region Late update
 
-            var lateUpdateTimeManager = TimeFactory.BuildTimeManager(loggerResolver);
+            var lateUpdateTimeManager = TimerFactory.BuildTimeManager(loggerResolver);
 
             var lateUpdateSynchronizableRepository = lateUpdateTimeManager as ISynchronizableGenericArgRepository<float>;
 

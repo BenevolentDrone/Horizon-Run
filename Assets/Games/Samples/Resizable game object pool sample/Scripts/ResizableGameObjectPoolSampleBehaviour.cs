@@ -39,20 +39,20 @@ namespace HereticalSolutions.Samples.ResizableGameObjectPoolSample
 		{
 			#region Initiate logger resolver and logger itself
 
-			ILoggerBuilder loggerBuilder = LoggersFactory.BuildLoggerBuilder();
+			ILoggerBuilder loggerBuilder = LoggerFactory.BuildLoggerBuilder();
 
 			loggerResolver = loggerBuilder
 				.NewLogger()
 				.ToggleAllowedByDefault(false)
 				.ToggleLogSource(typeof(ResizableGameObjectPoolSampleBehaviour), true)
 				.AddWrapperBelow(
-					LoggersFactory.BuildLoggerWrapperWithSourceTypePrefix())
+					LoggerFactory.BuildLoggerWrapperWithSourceTypePrefix())
 				.AddWrapperBelow(
-					LoggersFactory.BuildLoggerWrapperWithLogTypePrefix())
+					LoggerFactory.BuildLoggerWrapperWithLogTypePrefix())
 				.AddWrapperBelow(
-					LoggersFactory.BuildLoggerWrapperWithTimestampPrefix(false))
+					LoggerFactory.BuildLoggerWrapperWithTimestampPrefix(false))
 				.AddSink(
-					LoggersFactoryUnity.BuildUnityDebugLogSink())
+					LoggerFactoryUnity.BuildUnityDebugLogSink())
 				.Build();
 
 			logger = loggerResolver.GetLogger<ResizableGameObjectPoolSampleBehaviour>();

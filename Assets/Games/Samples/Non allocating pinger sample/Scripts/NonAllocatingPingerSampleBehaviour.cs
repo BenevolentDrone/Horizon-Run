@@ -26,20 +26,20 @@ namespace HereticalSolutions.Samples.NonAllocatingPingerSample
 		{
 			#region Initiate logger resolver and logger itself
 
-			ILoggerBuilder loggerBuilder = LoggersFactory.BuildLoggerBuilder();
+			ILoggerBuilder loggerBuilder = LoggerFactory.BuildLoggerBuilder();
 
 			loggerResolver = loggerBuilder
 				.NewLogger()
 				.ToggleAllowedByDefault(false)
 				.ToggleLogSource(typeof(NonAllocatingPingerSampleBehaviour), true)
 				.AddWrapperBelow(
-					LoggersFactory.BuildLoggerWrapperWithSourceTypePrefix())
+					LoggerFactory.BuildLoggerWrapperWithSourceTypePrefix())
 				.AddWrapperBelow(
-					LoggersFactory.BuildLoggerWrapperWithLogTypePrefix())
+					LoggerFactory.BuildLoggerWrapperWithLogTypePrefix())
 				.AddWrapperBelow(
-					LoggersFactory.BuildLoggerWrapperWithTimestampPrefix(false))
+					LoggerFactory.BuildLoggerWrapperWithTimestampPrefix(false))
 				.AddSink(
-					LoggersFactoryUnity.BuildUnityDebugLogSink())
+					LoggerFactoryUnity.BuildUnityDebugLogSink())
 				.Build();
 
 			logger = loggerResolver.GetLogger<NonAllocatingPingerSampleBehaviour>();
@@ -48,7 +48,7 @@ namespace HereticalSolutions.Samples.NonAllocatingPingerSample
 
 			#region Pinger
 
-			var pinger = PingersFactory.BuildNonAllocPinger(loggerResolver);
+			var pinger = PingerFactory.BuildNonAllocPinger(loggerResolver);
 
 			pingerAsPublisher = (IPublisherNoArgs)pinger;
 
@@ -58,7 +58,7 @@ namespace HereticalSolutions.Samples.NonAllocatingPingerSample
 
 			#region Subscription
 
-			subscription = DelegatesFactory.BuildSubscriptionNoArgs(Print, loggerResolver);
+			subscription = DelegateWrapperFactory.BuildSubscriptionNoArgs(Print, loggerResolver);
 
 			#endregion
 		}

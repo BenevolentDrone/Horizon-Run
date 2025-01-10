@@ -20,13 +20,11 @@ namespace HereticalSolutions.Delegates.Subscriptions
         
         private INonAllocSubscribable publisher;
 
-        //private IPoolElementFacade<INonAllocSubscription> poolElement;
-        
         public SubscriptionNoArgs(
             Action @delegate,
             ILogger logger = null)
         {
-            this.@delegate = DelegatesFactory.BuildDelegateWrapperNoArgs(
+            this.@delegate = DelegateWrapperFactory.BuildDelegateWrapperNoArgs(
                 @delegate);
 
             this.logger = logger;
@@ -34,8 +32,6 @@ namespace HereticalSolutions.Delegates.Subscriptions
             Active = false;
 
             publisher = null;
-
-            //poolElement = null;
         }
 
         #region INonAllocSubscription
@@ -69,11 +65,6 @@ namespace HereticalSolutions.Delegates.Subscriptions
             get => @delegate;
         }
 
-        //public IPoolElementFacade<INonAllocSubscription> PoolElement
-        //{
-        //    get => poolElement;
-        //}
-
         public bool ValidateActivation(
             INonAllocSubscribable publisher)
         {
@@ -94,15 +85,6 @@ namespace HereticalSolutions.Delegates.Subscriptions
 
                 return false;
             }
-
-            //if (poolElement != null)
-            //{
-            //    logger?.LogError(
-            //        GetType(),
-            //        $"SUBSCRIPTION ALREADY HAS A POOL ELEMENT: {this.GetHashCode()}");
-            //
-            //    return false;
-            //}
 
             if (@delegate == null)
             {
@@ -128,10 +110,7 @@ namespace HereticalSolutions.Delegates.Subscriptions
 
         public void Activate(
             INonAllocSubscribable publisher)
-            //IPoolElementFacade<INonAllocSubscription> poolElement)
         {
-            //this.poolElement = poolElement;
-
             this.publisher = publisher;
 
             Active = true;
@@ -162,22 +141,11 @@ namespace HereticalSolutions.Delegates.Subscriptions
                 return false;
             }
 
-            //if (poolElement == null)
-            //{
-            //    logger?.LogError(
-            //        GetType(),
-            //        $"INVALID POOL ELEMENT: {this.GetHashCode()}");
-            //
-            //    return false;
-            //}
-
             return true;
         }
 
         public void Terminate()
         {
-            //poolElement = null;
-
             publisher = null;
 
             Active = false;

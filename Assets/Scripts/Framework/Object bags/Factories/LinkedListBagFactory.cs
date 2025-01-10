@@ -41,7 +41,7 @@ namespace HereticalSolutions.Bags.Factories
 							Amount = 16 //TODO: REMOVE MAGIC
 						},
 						AllocationDelegate =
-							AllocationsFactory
+							AllocationFactory
 								.ActivatorAllocationDelegate<LinkedListNode<T>>
 					},
 					new AllocationCommand<LinkedListNode<T>>
@@ -53,7 +53,7 @@ namespace HereticalSolutions.Bags.Factories
 							Amount = 16 //TODO: REMOVE MAGIC
 						},
 						AllocationDelegate =
-							AllocationsFactory
+							AllocationFactory
 								.ActivatorAllocationDelegate<LinkedListNode<T>>
 					},
 					loggerResolver));

@@ -63,19 +63,19 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Editor
 
 			if (loggerResolver == null)
 			{
-				ILoggerBuilder loggerBuilder = LoggersFactory.BuildLoggerBuilder();
+				ILoggerBuilder loggerBuilder = LoggerFactory.BuildLoggerBuilder();
 
 				loggerResolver = loggerBuilder
 					.NewLogger()
 					.ToggleAllowedByDefault(true)
 					.AddWrapperBelow(
-						LoggersFactory.BuildLoggerWrapperWithSourceTypePrefix())
+						LoggerFactory.BuildLoggerWrapperWithSourceTypePrefix())
 					.AddWrapperBelow(
-						LoggersFactory.BuildLoggerWrapperWithLogTypePrefix())
+						LoggerFactory.BuildLoggerWrapperWithLogTypePrefix())
 					.AddWrapperBelow(
-						LoggersFactory.BuildLoggerWrapperWithTimestampPrefix(false))
+						LoggerFactory.BuildLoggerWrapperWithTimestampPrefix(false))
 					.AddSink(
-						LoggersFactoryUnity.BuildUnityDebugLogSink())
+						LoggerFactoryUnity.BuildUnityDebugLogSink())
 					.Build();
 			}
 

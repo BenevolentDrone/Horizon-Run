@@ -62,7 +62,8 @@ namespace HereticalSolutions.Delegates
 
         #region IPublisherMultipleArgs
 
-        public void Publish(object[] values)
+        public void Publish(
+            object[] values)
         {
             innerBroadcaster.Publish(values);
         }

@@ -1,5 +1,5 @@
 using System;
-
+using System.Threading;
 using System.Threading.Tasks;
 
 using HereticalSolutions.Persistence;
@@ -40,7 +40,11 @@ namespace HereticalSolutions.AssetImport
 		}
 
 		public override async Task<IResourceVariantData> Import(
-			IProgress<float> progress = null)
+
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null)
 		{
 			progress?.Report(0f);
 
@@ -50,7 +54,7 @@ namespace HereticalSolutions.AssetImport
 			var task = AddAssetAsResourceToManager(
 				asset,
 				true,
-				progress);
+				progress: progress);
 
 			var result = await task;
 				//.ConfigureAwait(false);
@@ -75,7 +79,11 @@ namespace HereticalSolutions.AssetImport
 		protected virtual async Task<IResourceVariantData> AddAssetAsResourceToManager(
 			TAsset asset,
 			bool allocate = true,
-			IProgress<float> progress = null)
+
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null)
 		{
 			progress?.Report(0f);
 
@@ -115,7 +123,7 @@ namespace HereticalSolutions.AssetImport
 						loggerResolver),
 #endif
 				allocate,
-				progress);
+				progress: progress);
 
 			var result = await addAsVariantTask;
 				//.ConfigureAwait(false);

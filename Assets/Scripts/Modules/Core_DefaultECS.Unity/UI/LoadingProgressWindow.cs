@@ -45,7 +45,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
 			logger = loggerResolver?.GetLogger(GetType());
 
 
-			ILoggerBuilder loggerBuilder = LoggersFactory.BuildLoggerBuilder();
+			ILoggerBuilder loggerBuilder = LoggerFactory.BuildLoggerBuilder();
 
 			//TODO: refactor
 			//loggerBuilder

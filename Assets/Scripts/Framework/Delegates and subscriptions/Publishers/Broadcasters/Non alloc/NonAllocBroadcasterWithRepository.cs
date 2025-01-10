@@ -38,11 +38,13 @@ namespace HereticalSolutions.Delegates
             switch (subscription)
             {
                 case INonAllocSubscriptionContext<IInvokableSingleArg> singleArgSubscriptionContext:
+
                     valueType = singleArgSubscriptionContext.Delegate.ValueType;
 
                     break;
 
                 default:
+                
                     logger?.LogError(
                         GetType(),
                         $"INVALID SUBSCRIPTION TYPE: \"{subscription.GetType().Name}\"");
@@ -77,11 +79,13 @@ namespace HereticalSolutions.Delegates
             switch (subscription)
             {
                 case INonAllocSubscriptionContext<IInvokableSingleArg> singleArgSubscriptionContext:
+
                     valueType = singleArgSubscriptionContext.Delegate.ValueType;
 
                     break;
 
                 default:
+
                     logger?.LogError(
                         GetType(),
                         $"INVALID SUBSCRIPTION TYPE: \"{subscription.GetType().Name}\"");

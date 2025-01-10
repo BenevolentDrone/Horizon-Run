@@ -25,14 +25,22 @@ namespace HereticalSolutions.ResourceManagement
 		}
 
         protected override async Task<TResource> AllocateResource(
-			IProgress<float> progress = null)
+
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null)
         {
 			return value;
         }
 
         protected override async Task FreeResource(
 			TResource resource,
-			IProgress<float> progress = null)
+
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null)
         {
         }
     }

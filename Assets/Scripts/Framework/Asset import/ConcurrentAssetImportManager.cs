@@ -97,7 +97,7 @@ namespace HereticalSolutions.AssetImport
 				importer.Value as TImporter);
 
 			var importTask = importer.Value.Import(
-				progress);
+				progress: progress);
 
 			var result = await importTask;
 				//.ConfigureAwait(false);
@@ -211,7 +211,7 @@ namespace HereticalSolutions.AssetImport
 			{
 				if (!importerPoolRepository.Has(typeof(TImporter)))
 				{
-					importerPool = ObjectPoolsFactory.BuildManagedObjectPool<AAssetImporter, TImporter>(
+					importerPool = ObjectPoolFactory.BuildManagedObjectPool<AAssetImporter, TImporter>(
 						initialAllocation,
 						additionalAllocation,
 						loggerResolver,

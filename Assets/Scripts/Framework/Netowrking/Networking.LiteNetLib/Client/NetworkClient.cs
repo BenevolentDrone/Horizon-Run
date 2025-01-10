@@ -135,22 +135,22 @@ namespace HereticalSolutions.Networking.LiteNetLib
             packetProcessor.SubscribeReusable<GameStartedPacket>(OnGameStarted);
 
 
-            pingSubscription = DelegatesFactory.BuildSubscriptionNoArgs(
+            pingSubscription = DelegateWrapperFactory.BuildSubscriptionNoArgs(
                 OnPing);
             
-            startClientSubscription = DelegatesFactory.BuildSubscriptionSingleArgGeneric<ClientStartMessage>(
+            startClientSubscription = DelegateWrapperFactory.BuildSubscriptionSingleArgGeneric<ClientStartMessage>(
                 OnClientStartMessage);
             
-            stopClientSubscription = DelegatesFactory.BuildSubscriptionSingleArgGeneric<ClientStopMessage>(
+            stopClientSubscription = DelegateWrapperFactory.BuildSubscriptionSingleArgGeneric<ClientStopMessage>(
                 OnClientStopMessage);
             
-            connectSubscription = DelegatesFactory.BuildSubscriptionSingleArgGeneric<ClientConnectMessage>(
+            connectSubscription = DelegateWrapperFactory.BuildSubscriptionSingleArgGeneric<ClientConnectMessage>(
                 OnClientConnectMessage);
             
-            disconnectSubscription = DelegatesFactory.BuildSubscriptionSingleArgGeneric<ClientDisconnectMessage>(
+            disconnectSubscription = DelegateWrapperFactory.BuildSubscriptionSingleArgGeneric<ClientDisconnectMessage>(
                 OnClientDisconnectMessage);
             
-            sendPacketSubscription = DelegatesFactory.BuildSubscriptionSingleArgGeneric<ClientSendPacketMessage>(
+            sendPacketSubscription = DelegateWrapperFactory.BuildSubscriptionSingleArgGeneric<ClientSendPacketMessage>(
                 OnClientSendPacketMessage);
 
             

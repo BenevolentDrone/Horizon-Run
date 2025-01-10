@@ -14,7 +14,7 @@ namespace HereticalSolutions.Samples.ECSCharacterControllerSample
 #if UNITY_EDITOR
 		protected override Guid AllocateID()
 		{
-			return IDAllocationsFactory.BuildGUID();
+			return IDAllocationFactory.BuildGUID();
 		}
 #endif
 	}

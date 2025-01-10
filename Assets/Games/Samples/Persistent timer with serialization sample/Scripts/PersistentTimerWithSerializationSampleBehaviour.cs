@@ -46,20 +46,20 @@ namespace HereticalSolutions.Samples.PersistentTimerWithSerializationSample
 		{
 			#region Initiate logger resolver and logger itself
 
-			ILoggerBuilder loggerBuilder = LoggersFactory.BuildLoggerBuilder();
+			ILoggerBuilder loggerBuilder = LoggerFactory.BuildLoggerBuilder();
 
 			loggerResolver = loggerBuilder
 				.NewLogger()
 				.ToggleAllowedByDefault(true)
 				//.ToggleLogSource(typeof(PersistentTimerWithSerializationSampleBehaviour), true)
 				.AddWrapperBelow(
-					LoggersFactory.BuildLoggerWrapperWithSourceTypePrefix())
+					LoggerFactory.BuildLoggerWrapperWithSourceTypePrefix())
 				.AddWrapperBelow(
-					LoggersFactory.BuildLoggerWrapperWithLogTypePrefix())
+					LoggerFactory.BuildLoggerWrapperWithLogTypePrefix())
 				.AddWrapperBelow(
-					LoggersFactory.BuildLoggerWrapperWithTimestampPrefix(false))
+					LoggerFactory.BuildLoggerWrapperWithTimestampPrefix(false))
 				.AddSink(
-					LoggersFactoryUnity.BuildUnityDebugLogSink())
+					LoggerFactoryUnity.BuildUnityDebugLogSink())
 				.Build();
 
 			logger = loggerResolver.GetLogger<PersistentTimerWithSerializationSampleBehaviour>();
@@ -67,7 +67,7 @@ namespace HereticalSolutions.Samples.PersistentTimerWithSerializationSample
 			#endregion
 
 			//Initialize timers
-			PersistentTimer = TimeFactory.BuildPersistentTimer(
+			PersistentTimer = TimerFactory.BuildPersistentTimer(
 				"AccumulatingPersistentTimer",
 				default(TimeSpan),
 				loggerResolver);

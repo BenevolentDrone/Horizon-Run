@@ -43,20 +43,20 @@ namespace HereticalSolutions.Samples.RuntimeTimerWithSerializationSample
 		{
 			#region Initiate logger resolver and logger itself
 
-			ILoggerBuilder loggerBuilder = LoggersFactory.BuildLoggerBuilder();
+			ILoggerBuilder loggerBuilder = LoggerFactory.BuildLoggerBuilder();
 
 			loggerResolver = loggerBuilder
 				.NewLogger()
 				.ToggleAllowedByDefault(true)
 				//.ToggleLogSource(typeof(RuntimeTimerWithSerializationSampleBehaviour), true)
 				.AddWrapperBelow(
-					LoggersFactory.BuildLoggerWrapperWithSourceTypePrefix())
+					LoggerFactory.BuildLoggerWrapperWithSourceTypePrefix())
 				.AddWrapperBelow(
-					LoggersFactory.BuildLoggerWrapperWithLogTypePrefix())
+					LoggerFactory.BuildLoggerWrapperWithLogTypePrefix())
 				.AddWrapperBelow(
-					LoggersFactory.BuildLoggerWrapperWithTimestampPrefix(false))
+					LoggerFactory.BuildLoggerWrapperWithTimestampPrefix(false))
 				.AddSink(
-					LoggersFactoryUnity.BuildUnityDebugLogSink())
+					LoggerFactoryUnity.BuildUnityDebugLogSink())
 				.Build();
 
 			logger = loggerResolver.GetLogger<RuntimeTimerWithSerializationSampleBehaviour>();
@@ -64,7 +64,7 @@ namespace HereticalSolutions.Samples.RuntimeTimerWithSerializationSample
 			#endregion
 
 			//Initialize timer
-			RuntimeTimer = TimeFactory.BuildRuntimeTimer(
+			RuntimeTimer = TimerFactory.BuildRuntimeTimer(
 				"AccumulatingRuntimeTimer",
 				0f,
 				loggerResolver);

@@ -135,16 +135,16 @@ namespace HereticalSolutions.Networking.LiteNetLib
             packetProcessor.SubscribeReusable<JoinRequestPacket, NetPeer>(OnJoinRequestReceived);
             
             
-            pingSubscription = DelegatesFactory.BuildSubscriptionNoArgs(
+            pingSubscription = DelegateWrapperFactory.BuildSubscriptionNoArgs(
                 OnPing);
             
-            startServerSubscription = DelegatesFactory.BuildSubscriptionSingleArgGeneric<ServerStartMessage>(
+            startServerSubscription = DelegateWrapperFactory.BuildSubscriptionSingleArgGeneric<ServerStartMessage>(
                 OnServerStartMessage);
             
-            stopServerSubscription = DelegatesFactory.BuildSubscriptionSingleArgGeneric<ServerStopMessage>(
+            stopServerSubscription = DelegateWrapperFactory.BuildSubscriptionSingleArgGeneric<ServerStopMessage>(
                 OnServerStopMessage);
             
-            sendPacketSubscription = DelegatesFactory.BuildSubscriptionSingleArgGeneric<ServerSendPacketMessage>(
+            sendPacketSubscription = DelegateWrapperFactory.BuildSubscriptionSingleArgGeneric<ServerSendPacketMessage>(
                 OnServerSendPacketMessage);
             
             

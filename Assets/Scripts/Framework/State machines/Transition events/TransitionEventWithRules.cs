@@ -2,7 +2,8 @@ using HereticalSolutions.StateMachines;
 
 namespace HereticalSolutions.StateMachines
 {
-    public class TransitionEventWithRules<TBaseState> : ITransitionEvent<TBaseState>
+    public class TransitionEventWithRules<TBaseState>
+        : ITransitionEvent<TBaseState>
         where TBaseState : IState
     {
         public TBaseState From { get; protected set; }

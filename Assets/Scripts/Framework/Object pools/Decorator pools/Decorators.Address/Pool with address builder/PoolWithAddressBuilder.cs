@@ -203,7 +203,7 @@ namespace HereticalSolutions.Pools
             }
 
             if (node.PoolWithAddress == null)
-                node.PoolWithAddress = AddressDecoratorPoolsFactory.BuildPoolWithAddress(
+                node.PoolWithAddress = AddressDecoratorPoolFactory.BuildPoolWithAddress(
                     repository,
                     node.Level,
                     null,

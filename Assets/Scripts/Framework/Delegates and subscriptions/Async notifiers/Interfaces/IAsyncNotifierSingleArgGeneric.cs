@@ -19,7 +19,12 @@ namespace HereticalSolutions.Delegates.Notifiers
 
 		Task<Task<TValue>> GetWaitForNotificationTask(
 			TArgument argument = default,
-			bool ignoreKey = false);
+			bool ignoreKey = false,
+
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null);
 
 		Task Notify(
 			TArgument argument,

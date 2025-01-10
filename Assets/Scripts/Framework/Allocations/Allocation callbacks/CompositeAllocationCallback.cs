@@ -13,12 +13,14 @@ namespace HereticalSolutions.Allocations
             this.callbacks = callbacks;
         }
         
-        public void AddCallback(IAllocationCallback<T> callback)
+        public void AddCallback(
+            IAllocationCallback<T> callback)
         {
             callbacks.Add(callback);
         }
         
-        public void RemoveCallback(IAllocationCallback<T> callback)
+        public void RemoveCallback(
+            IAllocationCallback<T> callback)
         {
             callbacks.Remove(callback);
         }

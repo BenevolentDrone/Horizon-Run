@@ -130,7 +130,7 @@ namespace HereticalSolutions.Logging
 
 		public ILoggerBuilder Branch()
 		{
-			var compositeLogger = LoggersFactory.BuildCompositeLoggerWrapper();
+			var compositeLogger = LoggerFactory.BuildCompositeLoggerWrapper();
 
 			if (currentLogger is ICompositeLoggerWrapper currentCompositeLogger)
 			{
@@ -149,7 +149,7 @@ namespace HereticalSolutions.Logging
 
 		public ILoggerResolver Build()
 		{
-			return LoggersFactory.BuildSharedLoggerResolver(
+			return LoggerFactory.BuildSharedLoggerResolver(
 				rootLogger,
 				explicitLogSourceRules,
 				allowedByDefault);

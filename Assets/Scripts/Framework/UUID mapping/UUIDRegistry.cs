@@ -7,17 +7,19 @@ using HereticalSolutions.Logging;
 
 namespace HereticalSolutions.UUIDMapping
 {
+	//TODO: symlinks, warlinks and wildcards should NOT be t he part of UUID mapping. They don't even deal with UUIDs, only paths
+	//TODO: actually, the PATHING should be extended and UUID mapping should be the part of it and its own namespace
 	public class UUIDRegistry
-		: IUUIDRegistry,
-		  IUUIDRegistryWithSymlinks,
-		  IUUIDRegistryWithVarlinks,
-		  IUUIDRegistryWithWildcards
+		: IUUIDRegistry
+		  //IUUIDRegistryWithSymlinks,
+		  //IUUIDRegistryWithVarlinks,
+		  //IUUIDRegistryWithWildcards
 	{
 		private readonly IOneToOneMap<string, Guid> pathToUUIDMap;
 
-		private readonly IRepository<string, SymlinkDescriptor> symlinkRepository;
+		//private readonly IRepository<string, SymlinkDescriptor> symlinkRepository;
 
-		private readonly IRepository<string, VarlinkDescriptor> varlinkRepository;
+		//private readonly IRepository<string, VarlinkDescriptor> varlinkRepository;
 
 		private readonly ILogger logger;
 
@@ -28,13 +30,15 @@ namespace HereticalSolutions.UUIDMapping
 		public bool HasUUID(
 			Guid uuid)
 		{
-			return pathToUUIDMap.HasRight(uuid);
+			return pathToUUIDMap.HasRight(
+				uuid);
 		}
 
 		public bool HasPath(
 			string path)
 		{
-			return pathToUUIDMap.HasLeft(path);
+			return pathToUUIDMap.HasLeft(
+				path);
 		}
 
 		#endregion
@@ -45,14 +49,18 @@ namespace HereticalSolutions.UUIDMapping
 			string path,
 			out Guid uuid)
 		{
-			return pathToUUIDMap.TryGetRight(path, out uuid);
+			return pathToUUIDMap.TryGetRight(
+				path,
+				out uuid);
 		}
 
 		public bool TryGetPathByUUID(
 			Guid uuid,
 			out string path)
 		{
-			return pathToUUIDMap.TryGetLeft(uuid, out path);
+			return pathToUUIDMap.TryGetLeft(
+				uuid,
+				out path);
 		}
 
 		#endregion
@@ -93,13 +101,15 @@ namespace HereticalSolutions.UUIDMapping
 		public bool TryRemove(
 			Guid uuid)
 		{
-			return pathToUUIDMap.TryRemoveByRight(uuid);
+			return pathToUUIDMap.TryRemoveByRight(
+				uuid);
 		}
 
 		public bool TryRemove(
 			string path)
 		{
-			return pathToUUIDMap.TryRemoveByLeft(path);
+			return pathToUUIDMap.TryRemoveByLeft(
+				path);
 		}
 
 		#endregion
@@ -147,6 +157,7 @@ namespace HereticalSolutions.UUIDMapping
 
 		#endregion
 
+		/*
 		#region IUUIDRegistryWithSymlinks
 
 		#region Has
@@ -154,35 +165,78 @@ namespace HereticalSolutions.UUIDMapping
 		public bool IsSymlink(
 			string path)
 		{
-			
+			return symlinkRepository.Has(
+				path);
 		}
 
 		#endregion
 
 		#region Get
 
-		bool TryGetSymlink(
+		public bool TryGetSymlink(
 			string path,
-			out SymlinkDescriptor symlink);
+			out SymlinkDescriptor symlink)
+		{
+			return symlinkRepository.TryGet(
+				path,
+				out symlink);
+		}
 
 		#endregion
 
 		#region Add
 
-		bool TryAddSymlink(
+		public bool TryAddSymlink(
 			string symlinkPath,
-			string targetPath);
+			string targetPath)
+		{
+			return symlinkRepository.TryAdd(
+				symlinkPath,
+				new SymlinkDescriptor
+				{
+					SymlinkPath = symlinkPath,
 
-		bool TryAddOrUpdateSymlink(
+					TargetPath = targetPath
+				});
+		}
+
+		public bool TryAddOrUpdateSymlink(
 			string symlinkPath,
-			string targetPath);
+			string targetPath)
+		{
+			if (symlinkRepository.Has(
+				symlinkPath))
+			{
+				return symlinkRepository.TryUpdate(
+					symlinkPath,
+					new SymlinkDescriptor
+					{
+						SymlinkPath = symlinkPath,
+
+						TargetPath = targetPath
+					});
+			}
+
+			return symlinkRepository.TryUpdate(
+				symlinkPath,
+				new SymlinkDescriptor
+				{
+					SymlinkPath = symlinkPath,
+
+					TargetPath = targetPath
+				});
+		}
 
 		#endregion
 
 		#region Remove
 
-		bool TryRemoveSymlink(
-			string symlinkPath);
+		public bool TryRemoveSymlink(
+			string symlinkPath)
+		{
+			return symlinkRepository.TryRemove(
+				symlinkPath);
+		}
 
 		#endregion
 
@@ -192,24 +246,43 @@ namespace HereticalSolutions.UUIDMapping
 
 		#region Has
 
-		bool IsVarlink(
-			string path);
+		public bool IsVarlink(
+			string path)
+		{
+			return varlinkRepository.Has(
+				path);
+		}
 
 		#endregion
 
 		#region Get
 
-		bool TryGetVarlink(
+		public bool TryGetVarlink(
 			string path,
-			out VarlinkDescriptor varlink);
+			out VarlinkDescriptor varlink)
+		{
+			return varlinkRepository.TryGet(
+				path,
+				out varlink);
+		}
 
 		#endregion
 
 		#region Add
 
-		bool TryAddVarlink(
+		public bool TryAddVarlink(
 			string varlinkPath,
-			string targetPath);
+			string targetPath)
+		{
+			return varlinkRepository.TryAdd(
+				varlinkPath,
+				new VarlinkDescriptor
+				{
+					VarlinkPath = varlinkPath,
+
+					TargetPath = targetPath
+				});
+		}
 
 		bool TryAddOrUpdateVarlink(
 			string varlinkPath,
@@ -236,5 +309,6 @@ namespace HereticalSolutions.UUIDMapping
 			Guid[] uuids);
 
 		#endregion
+		*/
 	}
 }

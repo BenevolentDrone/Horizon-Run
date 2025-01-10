@@ -249,7 +249,7 @@ namespace HereticalSolutions.HorizonRun.DI
 
 									Amount = 5 //TODO: REMOVE MAGIC
 								},
-								AllocationDelegate = AllocationsFactory.
+								AllocationDelegate = AllocationFactory.
 									ActivatorAllocationDelegate<List<IReadOnlyHierarchyNode<Entity>>>
 							},
 							new AllocationCommand<List<IReadOnlyHierarchyNode<Entity>>>
@@ -260,7 +260,7 @@ namespace HereticalSolutions.HorizonRun.DI
 
 									Amount = 5 //TODO: REMOVE MAGIC
 								},
-								AllocationDelegate = AllocationsFactory.
+								AllocationDelegate = AllocationFactory.
 									ActivatorAllocationDelegate<List<IReadOnlyHierarchyNode<Entity>>>
 							},
 							loggerResolver)),

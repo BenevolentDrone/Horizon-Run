@@ -31,19 +31,23 @@ namespace HereticalSolutions.Blackboard
             }
         }
 
-        public bool Has(string key)
+        public bool Has(
+            string key)
         {
             return blackboard.Has(key);
         }
 
-        public BlackboardValue Get(string key)
+        public BlackboardValue Get(
+            string key)
         {
             blackboard.TryGet(key, out var result);
 
             return result;
         }
 
-        public void AddOrUpdate(string key, BlackboardValue value)
+        public void AddOrUpdate(
+            string key,
+            BlackboardValue value)
         {
             if (blackboard.Has(key))
                 blackboard.Update(key, value);
@@ -53,7 +57,8 @@ namespace HereticalSolutions.Blackboard
             OnModified?.Invoke(this);
         }
 
-        public void Remove(string key)
+        public void Remove(
+            string key)
         {
             blackboard.TryRemove(key);
             

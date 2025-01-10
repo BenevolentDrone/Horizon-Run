@@ -12,7 +12,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
 #if UNITY_EDITOR
         protected override Guid AllocateID()
         {
-            return IDAllocationsFactory.BuildGUID();
+            return IDAllocationFactory.BuildGUID();
         }
 #endif
     }

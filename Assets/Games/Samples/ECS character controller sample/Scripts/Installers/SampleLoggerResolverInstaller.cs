@@ -14,19 +14,19 @@ namespace HereticalSolutions.Samples.ECSCharacterControllerSample.Installers
 
         public override void InstallBindings()
         {
-            ILoggerBuilder loggerBuilder = LoggersFactory.BuildLoggerBuilder();
+            ILoggerBuilder loggerBuilder = LoggerFactory.BuildLoggerBuilder();
 
             var loggerResolver = loggerBuilder
                 .NewLogger()
                 .ToggleAllowedByDefault(allowedByDefault)
                 .AddWrapperBelow(
-                    LoggersFactory.BuildLoggerWrapperWithSourceTypePrefix())
+                    LoggerFactory.BuildLoggerWrapperWithSourceTypePrefix())
                 .AddWrapperBelow(
-                    LoggersFactory.BuildLoggerWrapperWithLogTypePrefix())
+                    LoggerFactory.BuildLoggerWrapperWithLogTypePrefix())
                 .AddWrapperBelow(
-                    LoggersFactory.BuildLoggerWrapperWithTimestampPrefix(false))
+                    LoggerFactory.BuildLoggerWrapperWithTimestampPrefix(false))
                 .AddSink(
-                    LoggersFactoryUnity.BuildUnityDebugLogSink())
+                    LoggerFactoryUnity.BuildUnityDebugLogSink())
                 .Build();
 
             Container

@@ -10,7 +10,7 @@ using HereticalSolutions.Logging;
 
 namespace HereticalSolutions.Time.Factories
 {
-    public static partial class TimeFactory
+    public static partial class TimeManagementFactory
     {
         public const string APPLICATION_RUNTIME_TIMER_ID = "Application runtime timer";
 
@@ -19,7 +19,7 @@ namespace HereticalSolutions.Time.Factories
         public static TimeManager BuildTimeManager(
             ILoggerResolver loggerResolver = null)
         {
-            var applicationActiveTimer = TimeFactory.BuildRuntimeTimer(
+            var applicationActiveTimer = TimerFactory.BuildRuntimeTimer(
                 APPLICATION_RUNTIME_TIMER_ID,
                 0f,
                 loggerResolver);
@@ -28,7 +28,7 @@ namespace HereticalSolutions.Time.Factories
 
             applicationActiveTimer.Start();
 
-            var applicationPersistentTimer = TimeFactory.BuildPersistentTimer(
+            var applicationPersistentTimer = TimerFactory.BuildPersistentTimer(
                 APPLICATION_PERSISTENT_TIMER_ID,
                 default,
                 loggerResolver);
@@ -53,7 +53,7 @@ namespace HereticalSolutions.Time.Factories
                 managerID,
                 RepositoriesFactory.BuildDictionaryRepository<int, IPoolElementFacade<TimerWithSubscriptionsContainer>>(),
                 RepositoriesFactory.BuildDictionaryRepository<string, List<DurationHandlePair>>(),
-                TimerPoolFactory.BuildRuntimeTimersPool(
+                TimerPoolFactory.BuildRuntimeTimerPool(
                     provider,
                     loggerResolver),
                 renameTimersOnPop);

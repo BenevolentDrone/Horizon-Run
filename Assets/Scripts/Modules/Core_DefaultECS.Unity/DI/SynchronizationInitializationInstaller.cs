@@ -21,7 +21,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.DI
         {
             #region Update
 
-            var updatePinger = PingersFactory.BuildNonAllocPinger(loggerResolver);
+            var updatePinger = PingerFactory.BuildNonAllocPinger(loggerResolver);
 
             Container
                 .Bind<IPublisherNoArgs>()
@@ -39,7 +39,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.DI
 
             #region Fixed update
 
-            var fixedUpdatePinger = PingersFactory.BuildNonAllocPinger(loggerResolver);
+            var fixedUpdatePinger = PingerFactory.BuildNonAllocPinger(loggerResolver);
 
             Container
                 .Bind<IPublisherNoArgs>()
@@ -57,7 +57,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.DI
 
             #region Late update
 
-            var lateUpdatePinger = PingersFactory.BuildNonAllocPinger(loggerResolver);
+            var lateUpdatePinger = PingerFactory.BuildNonAllocPinger(loggerResolver);
 
             Container
                 .Bind<IPublisherNoArgs>()

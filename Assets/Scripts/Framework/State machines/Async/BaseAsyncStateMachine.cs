@@ -7,11 +7,8 @@ using HereticalSolutions.Repositories;
 
 namespace HereticalSolutions.StateMachines
 {
-    /// <summary>
-    /// Represents a base asynchronous state machine implementation
-    /// </summary>
-    /// <typeparam name="TBaseState">The base state type.</typeparam>
-    public class BaseAsyncStateMachine<TBaseState> : IAsyncStateMachine<TBaseState>
+    public class BaseAsyncStateMachine<TBaseState>
+        : IAsyncStateMachine<TBaseState>
         where TBaseState : IState
     {
         private readonly IReadOnlyRepository<Type, TBaseState> states;
@@ -24,30 +21,27 @@ namespace HereticalSolutions.StateMachines
 
         private readonly EAsyncTransitionRules defaultAsyncTransitionRules;
 
+        private readonly object lockObject;
+
         private readonly ILogger logger;
 
 
         private Task processTransitionQueueTask;
 
-        private readonly object lockObject;
-
         private CancellationTokenSource processTransitionQueueCancellationTokenSource;
 
         private CancellationTokenSource transitToImmediatelyCancellationTokenSource;
 
+
+
+
         private bool transitionInProgress;
 
+        private TBaseState currentState;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="BaseAsyncStateMachine{TBaseState}"/> class
-        /// </summary>
-        /// <param name="states">The repository of all states.</param>
-        /// <param name="events">The repository of all transition events.</param>
-        /// <param name="transitionRequestsQueue">The queue of transition requests.</param>
-        /// <param name="transitionController">The transition controller.</param>
-        /// <param name="defaultAsyncTransitionRules">The default asynchronous transition rules.</param>
-        /// <param name="currentState">The current state of the state machine.</param>
-        /// <param name="logger">The logger.</param>
+
+
+
         public BaseAsyncStateMachine(
             IReadOnlyRepository<Type, TBaseState> states,
             IReadOnlyRepository<Type, ITransitionEvent<TBaseState>> events,
@@ -70,6 +64,9 @@ namespace HereticalSolutions.StateMachines
             this.logger = logger;
 
 
+            lockObject = new object();
+
+
             CurrentState = currentState;
 
             OnCurrentStateChangeStarted = null;
@@ -77,43 +74,43 @@ namespace HereticalSolutions.StateMachines
             OnCurrentStateChangeFinished = null;
 
             transitionInProgress = false;
-
-            lockObject = new object();
         }
 
         #region IAsyncStateMachine
 
-        /// <summary>
-        /// Gets a value indicating whether a transition is currently in progress
-        /// </summary>
-        public bool TransitionInProgress => transitionInProgress;
+        public bool TransitionInProgress
+        {
+            get
+            {
+                lock (lockObject)
+                {
+                    return transitionInProgress;
+                }
+            }
+        }
 
         #region Current state
 
-        /// <summary>
-        /// Gets or sets the current state of the state machine
-        /// </summary>
-        public TBaseState CurrentState { get; private set; }
+        public TBaseState CurrentState
+        {
+            get
+            {
+                lock (lockObject)
+                {
+                    return currentState;
+                }
+            }
+        }
+        //TODO: FINISH THE REST OF THE CLASS REFACTORING
 
-        /// <summary>
-        /// Gets or sets the action invoked when the current state change is started
-        /// </summary>
         public Action<TBaseState, TBaseState> OnCurrentStateChangeStarted { get; set; }
 
-        /// <summary>
-        /// Gets or sets the action invoked when the current state change is finished
-        /// </summary>
         public Action<TBaseState, TBaseState> OnCurrentStateChangeFinished { get; set; }
 
         #endregion
 
         #region All states
 
-        /// <summary>
-        /// Gets the state of the specified concrete type
-        /// </summary>
-        /// <typeparam name="TConcreteState">The concrete state type.</typeparam>
-        /// <returns>The state instance.</returns>
         public TBaseState GetState<TConcreteState>()
         {
             if (!states.TryGet(typeof(TConcreteState), out var result))
@@ -161,7 +158,7 @@ namespace HereticalSolutions.StateMachines
         public async Task Handle<TEvent>(
             IProgress<float> stateExitProgress = null,
             IProgress<float> stateEnterProgress = null,
-            TransitionProtocol protocol = null)
+            TransitionSupervisor protocol = null)
         {
             ITransitionEvent<TBaseState> @event;
 
@@ -193,8 +190,8 @@ namespace HereticalSolutions.StateMachines
                 }
             }
 
-            while (request.TransitionState != EAsyncTransitionState.ABORTED
-                   && request.TransitionState != EAsyncTransitionState.COMPLETED)
+            while (request.TransitionState != ETransitionState.ABORTED
+                   && request.TransitionState != ETransitionState.COMPLETED)
             {
                 await Task.Yield();
             }
@@ -212,7 +209,7 @@ namespace HereticalSolutions.StateMachines
             Type eventType,
             IProgress<float> stateExitProgress = null,
             IProgress<float> stateEnterProgress = null,
-            TransitionProtocol protocol = null)
+            TransitionSupervisor protocol = null)
         {
             ITransitionEvent<TBaseState> @event;
 
@@ -244,8 +241,8 @@ namespace HereticalSolutions.StateMachines
                 }
             }
 
-            while (request.TransitionState != EAsyncTransitionState.ABORTED
-                   && request.TransitionState != EAsyncTransitionState.COMPLETED)
+            while (request.TransitionState != ETransitionState.ABORTED
+                   && request.TransitionState != ETransitionState.COMPLETED)
             {
                 await Task.Yield();
             }
@@ -264,7 +261,7 @@ namespace HereticalSolutions.StateMachines
             CancellationToken cancellationToken,
             IProgress<float> stateExitProgress = null,
             IProgress<float> stateEnterProgress = null,
-            TransitionProtocol protocol = null)
+            TransitionSupervisor protocol = null)
         {
             ITransitionEvent<TBaseState> @event;
 
@@ -298,8 +295,8 @@ namespace HereticalSolutions.StateMachines
                 }
             }
 
-            while (request.TransitionState != EAsyncTransitionState.ABORTED
-                   && request.TransitionState != EAsyncTransitionState.COMPLETED)
+            while (request.TransitionState != ETransitionState.ABORTED
+                   && request.TransitionState != ETransitionState.COMPLETED)
             {
                 await Task.Yield();
             }
@@ -319,7 +316,7 @@ namespace HereticalSolutions.StateMachines
             CancellationToken cancellationToken,
             IProgress<float> stateExitProgress = null,
             IProgress<float> stateEnterProgress = null,
-            TransitionProtocol protocol = null)
+            TransitionSupervisor protocol = null)
         {
             ITransitionEvent<TBaseState> @event;
 
@@ -353,8 +350,8 @@ namespace HereticalSolutions.StateMachines
                 }
             }
 
-            while (request.TransitionState != EAsyncTransitionState.ABORTED
-                   && request.TransitionState != EAsyncTransitionState.COMPLETED)
+            while (request.TransitionState != ETransitionState.ABORTED
+                   && request.TransitionState != ETransitionState.COMPLETED)
             {
                 await Task.Yield();
             }
@@ -380,7 +377,7 @@ namespace HereticalSolutions.StateMachines
         public async Task TransitToImmediately<TState>(
             IProgress<float> stateExitProgress = null,
             IProgress<float> stateEnterProgress = null,
-            TransitionProtocol protocol = null)
+            TransitionSupervisor protocol = null)
         {
             if (!states.Has(typeof(TState)))
                 throw new Exception(
@@ -436,7 +433,7 @@ namespace HereticalSolutions.StateMachines
             Type stateType,
             IProgress<float> stateExitProgress = null,
             IProgress<float> stateEnterProgress = null,
-            TransitionProtocol protocol = null)
+            TransitionSupervisor protocol = null)
         {
             if (!states.Has(stateType))
                 throw new Exception(
@@ -493,7 +490,7 @@ namespace HereticalSolutions.StateMachines
             CancellationToken cancellationToken,
             IProgress<float> stateExitProgress = null,
             IProgress<float> stateEnterProgress = null,
-            TransitionProtocol protocol = null)
+            TransitionSupervisor protocol = null)
         {
             if (!states.Has(typeof(TState)))
                 throw new Exception(
@@ -551,7 +548,7 @@ namespace HereticalSolutions.StateMachines
             CancellationToken cancellationToken,
             IProgress<float> stateExitProgress = null,
             IProgress<float> stateEnterProgress = null,
-            TransitionProtocol protocol = null)
+            TransitionSupervisor protocol = null)
         {
             if (!states.Has(stateType))
                 throw new Exception(
@@ -615,7 +612,7 @@ namespace HereticalSolutions.StateMachines
                     nextRequest = transitionRequestsQueue.Dequeue();
                 }
 
-                nextRequest.TransitionState = EAsyncTransitionState.IN_PROGRESS;
+                nextRequest.TransitionState = ETransitionState.IN_PROGRESS;
 
                 using (CancellationTokenSource combinedTokenSource =
                        CancellationTokenSource.CreateLinkedTokenSource(
@@ -629,7 +626,7 @@ namespace HereticalSolutions.StateMachines
                             nextRequest.CancellationTokenSource.Token,
                             nextRequest.StateExitProgress,
                             nextRequest.StateEnterProgress,
-                            nextRequest.TransitionProtocol);
+                            nextRequest.TransitionController);
 
                         await task;
                             //.ConfigureAwait(false);
@@ -641,17 +638,17 @@ namespace HereticalSolutions.StateMachines
                     }
                     catch (Exception e)
                     {
-                        nextRequest.TransitionState = EAsyncTransitionState.ABORTED;
+                        nextRequest.TransitionState = ETransitionState.ABORTED;
                     }
                     finally
                     {
                         if (combinedTokenSource.Token.IsCancellationRequested)
                         {
-                            nextRequest.TransitionState = EAsyncTransitionState.ABORTED;
+                            nextRequest.TransitionState = ETransitionState.ABORTED;
                         }
                         else
                         {
-                            nextRequest.TransitionState = EAsyncTransitionState.COMPLETED;
+                            nextRequest.TransitionState = ETransitionState.COMPLETED;
                         }
 
                         combinedTokenSource?.Dispose();
@@ -674,7 +671,7 @@ namespace HereticalSolutions.StateMachines
             {
                 foreach (var request in transitionRequestsQueue)
                 {
-                    request.TransitionState = EAsyncTransitionState.ABORTED;
+                    request.TransitionState = ETransitionState.ABORTED;
                 }
 
                 transitionRequestsQueue.Clear();
@@ -693,7 +690,7 @@ namespace HereticalSolutions.StateMachines
             CancellationToken cancellationToken,
             IProgress<float> stateExitProgress = null,
             IProgress<float> stateEnterProgress = null,
-            TransitionProtocol protocol = null)
+            TransitionSupervisor protocol = null)
         {
             if (!EqualityComparer<TBaseState>.Default.Equals(CurrentState, @event.From))
             {
@@ -743,7 +740,7 @@ namespace HereticalSolutions.StateMachines
             CancellationToken cancellationToken,
             IProgress<float> stateExitProgress = null,
             IProgress<float> stateEnterProgress = null,
-            TransitionProtocol protocol = null)
+            TransitionSupervisor protocol = null)
         {
             try
             {
@@ -896,7 +893,7 @@ namespace HereticalSolutions.StateMachines
             TBaseState previousState,
             CancellationToken cancellationToken,
             IProgress<float> stateExitProgress = null,
-            TransitionProtocol protocol = null)
+            TransitionSupervisor protocol = null)
         {
             if (protocol != null)
             {
@@ -951,7 +948,7 @@ namespace HereticalSolutions.StateMachines
             TBaseState newState,
             CancellationToken cancellationToken,
             IProgress<float> stateEnterProgress = null,
-            TransitionProtocol protocol = null)
+            TransitionSupervisor protocol = null)
         {
             if (protocol != null)
             {

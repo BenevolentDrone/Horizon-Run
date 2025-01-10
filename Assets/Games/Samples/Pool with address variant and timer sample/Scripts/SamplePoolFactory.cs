@@ -42,7 +42,7 @@ namespace HereticalSolutions.Samples.PoolWithAddressVariantAndTimerSample
 
             // Create a push to decorated pool callback
             PushToManagedPoolWhenAvailableCallback<GameObject> pushCallback =
-                ObjectPoolsAllocationCallbacksFactory.BuildPushToManagedPoolWhenAvailableCallback<GameObject>();
+                ObjectPoolAllocationCallbacksFactory.BuildPushToManagedPoolWhenAvailableCallback<GameObject>();
 
             #endregion
 
@@ -51,7 +51,7 @@ namespace HereticalSolutions.Samples.PoolWithAddressVariantAndTimerSample
             // Create an array of metadata descriptor builder functions
             var metadataDescriptorBuilders = new Func<MetadataAllocationDescriptor>[]
             {
-                //ObjectPoolsMetadataFactory.BuildIndexedMetadataDescriptor,
+                //ObjectPoolMetadataFactory.BuildIndexedMetadataDescriptor,
                 AddressDecoratorMetadataFactory.BuildAddressMetadataDescriptor,
                 VariantDecoratorMetadataFactory.BuildVariantMetadataDescriptor,
                 TimerDecoratorMetadataFactory.BuildRuntimeTimerWithPushSubscriptionMetadataDescriptor
@@ -60,7 +60,7 @@ namespace HereticalSolutions.Samples.PoolWithAddressVariantAndTimerSample
             #endregion
 
             ManagedPoolWithAddress<GameObject> poolWithAddress =
-                AddressDecoratorPoolsFactory.BuildPoolWithAddress<GameObject>(
+                AddressDecoratorPoolFactory.BuildPoolWithAddress<GameObject>(
                     loggerResolver);
 
             foreach (var element in settings.Elements)
@@ -75,7 +75,7 @@ namespace HereticalSolutions.Samples.PoolWithAddressVariantAndTimerSample
 
                 // Build a set address callback
                 SetAddressCallback<GameObject> setAddressCallback =
-                    AddressDecoratorAllocationCallbacksFactory.BuildSetAddressCallback<GameObject>(
+                    AddressDecoratorAllocationCallbackFactory.BuildSetAddressCallback<GameObject>(
                         fullAddress,
                         addressHashes);
 
@@ -83,7 +83,7 @@ namespace HereticalSolutions.Samples.PoolWithAddressVariantAndTimerSample
 
                 // Initialize the pool with variants builder
                 ManagedPoolWithVariants<GameObject> poolWithVariants =
-                    VariantDecoratorPoolsFactory.BuildPoolWithVariants<GameObject>(
+                    VariantDecoratorPoolFactory.BuildPoolWithVariants<GameObject>(
                         loggerResolver);
 
                 for (int i = 0; i < element.Variants.Length; i++)
@@ -97,7 +97,7 @@ namespace HereticalSolutions.Samples.PoolWithAddressVariantAndTimerSample
 
                     // Build a set variant callback
                     SetVariantCallback<GameObject> setVariantCallback =
-                        VariantDecoratorAllocationCallbacksFactory.BuildSetVariantCallback<GameObject>(i);
+                        VariantDecoratorAllocationCallbackFactory.BuildSetVariantCallback<GameObject>(i);
 
                     // Build a set runtime timer callback
                     SetDurationAndPushSubscriptionCallback<GameObject> setRuntimeTimerWithPushSubscriptionCallback =
@@ -107,7 +107,7 @@ namespace HereticalSolutions.Samples.PoolWithAddressVariantAndTimerSample
 
                     // Build a rename callback
                     RenameByStringAndIndexCallback renameCallback =
-                        UnityDecoratorAllocationCallbacksFactory.BuildRenameByStringAndIndexCallback(currentVariantName);
+                        UnityDecoratorAllocationCallbackFactory.BuildRenameByStringAndIndexCallback(currentVariantName);
 
                     #endregion
 
@@ -135,7 +135,7 @@ namespace HereticalSolutions.Samples.PoolWithAddressVariantAndTimerSample
 
                     // Create a value allocation delegate
                     Func<GameObject> valueAllocationDelegate =
-                        () => UnityZenjectAllocationsFactory.DIResolveOrInstantiateAllocationDelegate(
+                        () => UnityZenjectAllocationFactory.DIResolveOrInstantiateAllocationDelegate(
                             container,
                             prefab);
 
@@ -157,17 +157,17 @@ namespace HereticalSolutions.Samples.PoolWithAddressVariantAndTimerSample
                     var resizablePool = managedPoolBuilder.BuildLinkedListManagedPool();
 
                     // Build the game object pool
-                    var gameObjectPool = UnityDecoratorPoolsFactory.BuildGameObjectManagedPool(
+                    var gameObjectPool = UnityDecoratorPoolFactory.BuildGameObjectManagedPool(
                         resizablePool,
                         parentTransform);
 
                     // Build the prefab instance pool
-                    var prefabInstancePool = UnityDecoratorPoolsFactory.BuildPrefabInstanceManagedPool(
+                    var prefabInstancePool = UnityDecoratorPoolFactory.BuildPrefabInstanceManagedPool(
                         gameObjectPool,
                         prefab);
 
                     // Build the pool with runtime timers
-                    var poolWithRuntimeTimers = TimerDecoratorPoolsFactory.BuildManagedPoolWithRuntimeTimer(
+                    var poolWithRuntimeTimer = TimerDecoratorPoolFactory.BuildManagedPoolWithRuntimeTimer(
                         prefabInstancePool,
                         timerManager,
                         loggerResolver);
@@ -176,7 +176,7 @@ namespace HereticalSolutions.Samples.PoolWithAddressVariantAndTimerSample
                     poolWithVariants.AddVariant(
                         i,
                         currentVariant.Chance,
-                        poolWithRuntimeTimers);
+                        poolWithRuntimeTimer);
                 }
 
                 poolWithAddress.AddPool(

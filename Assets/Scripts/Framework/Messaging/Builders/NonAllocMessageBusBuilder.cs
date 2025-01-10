@@ -55,14 +55,14 @@ namespace HereticalSolutions.Messaging.Factories
 
         public NonAllocMessageBusBuilder AddMessageType<TMessage>()
         {
-            Func<IMessage> valueAllocationDelegate = AllocationsFactory.ActivatorAllocationDelegate<IMessage, TMessage>;
+            Func<IMessage> valueAllocationDelegate = AllocationFactory.ActivatorAllocationDelegate<IMessage, TMessage>;
             
             messagePoolBuilder.Initialize(
                 valueAllocationDelegate,
 
                 new Func<MetadataAllocationDescriptor>[]
                 {
-                    //ObjectPoolsMetadataFactory.BuildIndexedMetadataDescriptor
+                    //ObjectPoolMetadataFactory.BuildIndexedMetadataDescriptor
                 },
                 new AllocationCommandDescriptor
                 {
@@ -90,14 +90,14 @@ namespace HereticalSolutions.Messaging.Factories
 
         public NonAllocMessageBus Build()
         {
-            Func<IPoolElementFacade<IMessage>> valueAllocationDelegate = AllocationsFactory.NullAllocationDelegate<IPoolElementFacade<IMessage>>;
+            Func<IPoolElementFacade<IMessage>> valueAllocationDelegate = AllocationFactory.NullAllocationDelegate<IPoolElementFacade<IMessage>>;
             
             mailboxPoolBuilder.Initialize(
                 valueAllocationDelegate,
 
                 new Func<MetadataAllocationDescriptor>[]
                 {
-                    //ObjectPoolsMetadataFactory.BuildIndexedMetadataDescriptor
+                    //ObjectPoolMetadataFactory.BuildIndexedMetadataDescriptor
                 },
                 new AllocationCommandDescriptor
                 {

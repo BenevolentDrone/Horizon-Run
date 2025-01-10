@@ -27,12 +27,14 @@ namespace HereticalSolutions.Repositories
 
         #region IReadOnlyRepository
 
-        public bool Has(TKey key)
+        public bool Has(
+            TKey key)
         {
             return database.ContainsKey(key);
         }
 
-        public TValue Get(TKey key)
+        public TValue Get(
+            TKey key)
         {
             return database[key];
         }
@@ -119,12 +121,14 @@ namespace HereticalSolutions.Repositories
                     value);
         }
 
-        public void Remove(TKey key)
+        public void Remove(
+            TKey key)
         {
             database.Remove(key);
         }
 
-        public bool TryRemove(TKey key)
+        public bool TryRemove(
+            TKey key)
         {
             if (!Has(key))
                 return false;

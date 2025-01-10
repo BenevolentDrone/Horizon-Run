@@ -75,11 +75,11 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
 			this.logger = logger;
 			
 
-			updateSubscription = DelegatesFactory.BuildSubscriptionSingleArgGeneric<float>(TickUpdate);
+			updateSubscription = DelegateWrapperFactory.BuildSubscriptionSingleArgGeneric<float>(TickUpdate);
 
-			fixedUpdateSubscription = DelegatesFactory.BuildSubscriptionSingleArgGeneric<float>(TickFixedUpdate);
+			fixedUpdateSubscription = DelegateWrapperFactory.BuildSubscriptionSingleArgGeneric<float>(TickFixedUpdate);
 
-			lateUpdateSubscription = DelegatesFactory.BuildSubscriptionSingleArgGeneric<float>(TickLateUpdate);
+			lateUpdateSubscription = DelegateWrapperFactory.BuildSubscriptionSingleArgGeneric<float>(TickLateUpdate);
 		}
 
 		public void StartSimulation()

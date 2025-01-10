@@ -5,7 +5,8 @@ namespace HereticalSolutions.Entities
     {
         public string Path { get; private set; }
 
-        public ComponentAttribute(string path = "")
+        public ComponentAttribute(
+            string path = "")
         {
             Path = path;
         }

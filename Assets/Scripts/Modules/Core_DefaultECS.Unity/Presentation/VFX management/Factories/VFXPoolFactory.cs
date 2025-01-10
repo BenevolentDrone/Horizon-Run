@@ -67,7 +67,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Factories
 
             // Create a push to decorated pool callback
             PushToManagedPoolWhenAvailableCallback<GameObject> pushCallback =
-                ObjectPoolsAllocationCallbacksFactory.BuildPushToManagedPoolWhenAvailableCallback<GameObject>();
+                ObjectPoolAllocationCallbacksFactory.BuildPushToManagedPoolWhenAvailableCallback<GameObject>();
 
             #endregion
 
@@ -76,7 +76,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Factories
             // Create an array of metadata descriptor builder functions
             var metadataDescriptorBuilders = new Func<MetadataAllocationDescriptor>[]
             {
-            //ObjectPoolsMetadataFactory.BuildIndexedMetadataDescriptor,
+            //ObjectPoolMetadataFactory.BuildIndexedMetadataDescriptor,
             AddressDecoratorMetadataFactory.BuildAddressMetadataDescriptor,
             TimerDecoratorMetadataFactory.BuildRuntimeTimerWithPushSubscriptionMetadataDescriptor
             };
@@ -84,7 +84,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Factories
             #endregion
 
             ManagedPoolWithAddress<GameObject> poolWithAddress =
-                AddressDecoratorPoolsFactory.BuildPoolWithAddress<GameObject>(
+                AddressDecoratorPoolFactory.BuildPoolWithAddress<GameObject>(
                     loggerResolver);
 
             foreach (var element in settings.Elements)
@@ -99,7 +99,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Factories
 
                 // Build a set address callback
                 SetAddressCallback<GameObject> setAddressCallback =
-                    AddressDecoratorAllocationCallbacksFactory.BuildSetAddressCallback<GameObject>(
+                    AddressDecoratorAllocationCallbackFactory.BuildSetAddressCallback<GameObject>(
                         fullAddress,
                         addressHashes);
 
@@ -113,7 +113,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Factories
 
                 // Build a rename callback
                 RenameByStringAndIndexCallback renameCallback =
-                    UnityDecoratorAllocationCallbacksFactory.BuildRenameByStringAndIndexCallback(element.Name);
+                    UnityDecoratorAllocationCallbackFactory.BuildRenameByStringAndIndexCallback(element.Name);
 
                 #region Allocation callbacks initialization
 
@@ -139,7 +139,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Factories
 
                 // Create a value allocation delegate
                 Func<GameObject> valueAllocationDelegate =
-                    () => UnityZenjectAllocationsFactory.DIResolveOrInstantiateAllocationDelegate(
+                    () => UnityZenjectAllocationFactory.DIResolveOrInstantiateAllocationDelegate(
                         container,
                         prefab);
 
@@ -161,12 +161,12 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Factories
                 var resizablePool = managedPoolBuilder.BuildLinkedListManagedPool();
 
                 // Build the game object pool
-                var gameObjectPool = UnityDecoratorPoolsFactory.BuildGameObjectManagedPool(
+                var gameObjectPool = UnityDecoratorPoolFactory.BuildGameObjectManagedPool(
                     resizablePool,
                     parentTransform);
 
                 // Build the pool with runtime timers
-                var poolWithRuntimeTimers = TimerDecoratorPoolsFactory.BuildManagedPoolWithRuntimeTimer(
+                var poolWithRuntimeTimer = TimerDecoratorPoolFactory.BuildManagedPoolWithRuntimeTimer(
                     gameObjectPool,
                     timerManager,
                     loggerResolver);
@@ -174,7 +174,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Factories
                 // Parse the address and variant pool to the pool with address builder
                 poolWithAddress.AddPool(
                     fullAddress,
-                    poolWithRuntimeTimers);
+                    poolWithRuntimeTimer);
             }
 
             // Set the root of the push callback

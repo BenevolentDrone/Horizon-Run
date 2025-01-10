@@ -647,7 +647,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
 
             do
             {
-                newID = IDAllocationsFactory.BuildGUID();
+                newID = IDAllocationFactory.BuildGUID();
             }
             while (registryEntityRepository.Has(newID));
 

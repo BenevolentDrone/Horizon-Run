@@ -35,7 +35,7 @@ namespace HereticalSolutions.LifetimeManagement
                                 Amount = 5 //TODO: REMOVE MAGIC
                             },
                             AllocationDelegate =
-                                AllocationsFactory
+                                AllocationFactory
                                     .ActivatorAllocationDelegate<List<IReadOnlyHierarchyNode<ILifetimeable>>>
                         },
                         new AllocationCommand<List<IReadOnlyHierarchyNode<ILifetimeable>>>
@@ -47,7 +47,7 @@ namespace HereticalSolutions.LifetimeManagement
                                 Amount = 5 //TODO: REMOVE MAGIC
                             },
                             AllocationDelegate =
-                                AllocationsFactory
+                                AllocationFactory
                                     .ActivatorAllocationDelegate<List<IReadOnlyHierarchyNode<ILifetimeable>>>
                         },
                         loggerResolver));

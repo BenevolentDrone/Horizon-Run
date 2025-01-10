@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 using HereticalSolutions.ResourceManagement;
@@ -36,7 +37,11 @@ namespace HereticalSolutions.AssetImport
 		}
 
 		public override async Task<IResourceVariantData> Import(
-			IProgress<float> progress = null)
+
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null)
 		{
 			logger?.Log(
 				GetType(),
@@ -78,7 +83,7 @@ namespace HereticalSolutions.AssetImport
 					loggerResolver),
 #endif
 				true,
-				progress);
+				progress: progress);
 
 			var result = await addAsVariantTask;
 				//.ConfigureAwait(false);

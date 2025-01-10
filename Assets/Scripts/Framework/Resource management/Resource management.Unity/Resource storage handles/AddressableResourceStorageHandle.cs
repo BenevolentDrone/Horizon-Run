@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 using HereticalSolutions.Logging;
@@ -23,14 +24,22 @@ namespace HereticalSolutions.ResourceManagement
             this.assetReference = assetReference;
         }
         protected override async Task<TResource> AllocateResource(
-            IProgress<float> progress = null)
+
+            //Async tail
+            CancellationToken cancellationToken = default,
+            IProgress<float> progress = null,
+            ILogger progressLogger = null)
         {
             return await assetReference.LoadAssetAsync<TResource>().Task; //TODO: change to while() loop and report progress from handle
         }
 
         protected override async Task FreeResource(
             TResource resource,
-            IProgress<float> progress = null)
+
+            //Async tail
+            CancellationToken cancellationToken = default,
+            IProgress<float> progress = null,
+            ILogger progressLogger = null)
         {
             assetReference.ReleaseAsset();
         }

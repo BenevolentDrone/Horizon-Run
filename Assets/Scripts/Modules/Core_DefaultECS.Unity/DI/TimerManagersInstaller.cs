@@ -35,7 +35,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.DI
                 "Update",
                 out var updateSynchronizationProvider);
             
-            var simulationUpdateTimerManager = TimeFactory.BuildTimerManager(
+            var simulationUpdateTimerManager = TimerFactory.BuildTimerManager(
                 "Simulation update timer manager",
                 updateSynchronizationProvider,
                 false,
@@ -57,7 +57,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.DI
                 "Fixed update",
                 out var fixedUpdateSynchronizationProvider);
             
-            var simulationFixedUpdateTimerManager = TimeFactory.BuildTimerManager(
+            var simulationFixedUpdateTimerManager = TimerFactory.BuildTimerManager(
                 "Simulation fixed update timer manager",
                 fixedUpdateSynchronizationProvider,
                 false,
@@ -79,7 +79,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.DI
                 "Late update",
                 out var lateUpdateSynchronizationProvider);
             
-            var viewLateUpdateTimerManager = TimeFactory.BuildTimerManager(
+            var viewLateUpdateTimerManager = TimerFactory.BuildTimerManager(
                 "View late update timer manager",
                 lateUpdateSynchronizationProvider,
                 false,

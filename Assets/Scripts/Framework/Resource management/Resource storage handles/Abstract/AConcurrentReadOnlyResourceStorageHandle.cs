@@ -73,7 +73,7 @@ namespace HereticalSolutions.ResourceManagement
 					$"ALLOCATING");
 
 				var task = AllocateResource(
-					progress);
+					progress: progress);
 
 				resource = await task;
 					//.ConfigureAwait(false);
@@ -123,7 +123,7 @@ namespace HereticalSolutions.ResourceManagement
 
 				var task = FreeResource(
 					resource,
-					progress);
+					progress: progress);
 
 				await task;
 					//.ConfigureAwait(false);

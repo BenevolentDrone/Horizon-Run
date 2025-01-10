@@ -48,12 +48,14 @@ namespace HereticalSolutions.Blackboard
             return (TValue)value;
         }
 
-        public void SetValueObject(object newValue)
+        public void SetValueObject(
+            object newValue)
         {
             value = newValue;
         }
 
-        public void SetValue<TValue>(TValue value)
+        public void SetValue<TValue>(
+            TValue value)
         {
             this.value = value;
         }

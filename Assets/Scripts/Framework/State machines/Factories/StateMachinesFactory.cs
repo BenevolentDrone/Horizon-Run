@@ -32,8 +32,7 @@ namespace HereticalSolutions.StateMachines.Factories
             where TBaseState : IState
         {
             ILogger logger =
-                loggerResolver?.GetLogger<BaseAsyncStateMachine<TBaseState>>()
-                ?? null;
+                loggerResolver?.GetLogger<BaseAsyncStateMachine<TBaseState>>();
 
             return new BaseAsyncStateMachine<TBaseState>(
                 states,
@@ -62,8 +61,7 @@ namespace HereticalSolutions.StateMachines.Factories
             where TBaseState : IState
         {
             ILogger logger =
-                loggerResolver?.GetLogger<BaseStateMachine<TBaseState>>()
-                ?? null;
+                loggerResolver?.GetLogger<BaseStateMachine<TBaseState>>();
 
             return new BaseStateMachine<TBaseState>(
                 states,

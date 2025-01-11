@@ -39,7 +39,8 @@ namespace HereticalSolutions.MVVM.UIToolkit
         {
             if (!viewModel.GetObservable<string>(propertyID, out textProperty))
                 throw new Exception(
-                    logger.TryFormatException<LabelView>(
+                    logger.TryFormatException(
+                        GetType(),
                         $"Could not obtain property \"{propertyID}\" from ViewModel \"{viewModel.GetType()}\""));
 
             textProperty.OnValueChanged += OnTextChanged;

@@ -109,8 +109,7 @@ namespace HereticalSolutions.Delegates.Factories
             ILoggerResolver loggerResolver = null)
         {
             ILogger logger =
-                loggerResolver?.GetLogger<NonAllocPinger>()
-                ?? null;
+                loggerResolver?.GetLogger<NonAllocPinger>();
 
             IDynamicArray<IPoolElementFacade<INonAllocSubscription>> subscriptionsContents =
                 subscriptionsPool as IDynamicArray<IPoolElementFacade<INonAllocSubscription>>;

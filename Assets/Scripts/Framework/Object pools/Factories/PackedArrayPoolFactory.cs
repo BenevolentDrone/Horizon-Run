@@ -22,8 +22,7 @@ namespace HereticalSolutions.Pools.Factories
             ILoggerResolver loggerResolver = null)
         {
             ILogger logger =
-                loggerResolver?.GetLogger<PackedArrayPool<T>>()
-                ?? null;
+                loggerResolver?.GetLogger<PackedArrayPool<T>>();
 
             int initialAmount = CountInitialAllocationAmount(
                 initialAllocationCommand.Descriptor);
@@ -96,8 +95,7 @@ namespace HereticalSolutions.Pools.Factories
             ILoggerResolver loggerResolver = null)
         {
             ILogger logger =
-                loggerResolver?.GetLogger<PackedArrayManagedPool<T>>()
-                ?? null;
+                loggerResolver?.GetLogger<PackedArrayManagedPool<T>>();
             
             Func<IPoolElementFacade<T>> facadeAllocationDelegate = 
                 () => ObjectPoolAllocationFactory.BuildPoolElementFacadeWithArrayIndex<T>(
@@ -177,8 +175,7 @@ namespace HereticalSolutions.Pools.Factories
             ILoggerResolver loggerResolver = null)
         {
             ILogger logger =
-                loggerResolver?.GetLogger<AppendablePackedArrayManagedPool<T>>()
-                ?? null;
+                loggerResolver?.GetLogger<AppendablePackedArrayManagedPool<T>>();
 
             Func<IPoolElementFacade<T>> facadeAllocationDelegate = 
                 () => ObjectPoolAllocationFactory.BuildPoolElementFacadeWithArrayIndex<T>(

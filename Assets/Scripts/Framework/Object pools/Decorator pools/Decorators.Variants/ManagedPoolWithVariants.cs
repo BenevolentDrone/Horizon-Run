@@ -43,7 +43,8 @@ namespace HereticalSolutions.Pools.Decorators
                     0,
                     out var currentVariant))
                 throw new Exception(
-                    logger.TryFormatException<ManagedPoolWithVariants<T>>(
+                    logger.TryFormatException(
+                        GetType(),
                         "NO VARIANTS PRESENT"));
 
             #endregion
@@ -63,7 +64,8 @@ namespace HereticalSolutions.Pools.Decorators
                         index,
                         out currentVariant))
                     throw new Exception(
-                        logger.TryFormatException<ManagedPoolWithVariants<T>>(
+                        logger.TryFormatException(
+                            GetType(),
                             "INVALID VARIANT CHANCES"));
             }
 
@@ -86,7 +88,8 @@ namespace HereticalSolutions.Pools.Decorators
                         arg.Variant,
                         out var variant))
                     throw new Exception(
-                        logger.TryFormatException<ManagedPoolWithVariants<T>>(
+                        logger.TryFormatException(
+                            GetType(),
                             $"INVALID VARIANT {{ {arg.Variant} }}"));
 
                 var concreteResult = variant.Pool.Pop(args);
@@ -102,7 +105,8 @@ namespace HereticalSolutions.Pools.Decorators
                     0,
                     out var currentVariant))
                 throw new Exception(
-                    logger.TryFormatException<ManagedPoolWithVariants<T>>(
+                    logger.TryFormatException(
+                        GetType(),
                         "NO VARIANTS PRESENT"));
 
             #endregion
@@ -120,7 +124,8 @@ namespace HereticalSolutions.Pools.Decorators
 
                 if (!innerPoolRepository.TryGet(index, out currentVariant))
                     throw new Exception(
-                        logger.TryFormatException<ManagedPoolWithVariants<T>>(
+                        logger.TryFormatException(
+                            GetType(),
                             "INVALID VARIANT CHANCES"));
             }
 
@@ -140,13 +145,15 @@ namespace HereticalSolutions.Pools.Decorators
             if (instanceWithMetadata == null)
             {
                 throw new Exception(
-                    logger.TryFormatException<ManagedPoolWithVariants<T>>(
+                    logger.TryFormatException(
+                        GetType(),
                         "POOL ELEMENT FACADE HAS NO METADATA"));
             }
 			
             if (!instanceWithMetadata.Metadata.Has<IContainsVariant>())
                 throw new Exception(
-                    logger.TryFormatException<ManagedPoolWithVariants<T>>(
+                    logger.TryFormatException(
+                        GetType(),
                         "POOL ELEMENT FACADE HAS NO VARIANT METADATA"));
             
             var metadata = instanceWithMetadata.Metadata.Get<IContainsVariant>();
@@ -157,7 +164,8 @@ namespace HereticalSolutions.Pools.Decorators
                     variant,
                     out var poolByVariant))
                 throw new Exception(
-                    logger.TryFormatException<ManagedPoolWithVariants<T>>(
+                    logger.TryFormatException(
+                        GetType(),
                         $"INVALID VARIANT {{variant}}"));
 
             poolByVariant.Pool.Push(instance);

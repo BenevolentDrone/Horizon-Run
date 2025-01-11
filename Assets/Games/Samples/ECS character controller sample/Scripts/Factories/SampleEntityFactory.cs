@@ -113,8 +113,7 @@ namespace HereticalSolutions.Samples.ECSCharacterControllerSample.Factories
 			childEntityWorlds.Add(entityWorldRepository.GetWorld(WorldConstants.VIEW_WORLD_ID));
 
 			ILogger logger =
-				loggerResolver?.GetLogger<DefaultECSEntityManager<Guid>>()
-				?? null;
+				loggerResolver?.GetLogger<DefaultECSEntityManager<Guid>>();
 
 			return new SampleEntityManager(
 				allocateIDDelegate,

@@ -42,7 +42,8 @@ namespace HereticalSolutions.MVVM.UIToolkit
                 propertyID,
                 out boolProperty))
                 throw new Exception(
-                    logger.TryFormatException<ToggleButtonView>(
+                    logger.TryFormatException(
+                        GetType(),
                         $"Could not obtain property \"{propertyID}\" from ViewModel \"{viewModel.GetType()}\""));
             
             button.RegisterCallback<ClickEvent>(OnButtonClicked);

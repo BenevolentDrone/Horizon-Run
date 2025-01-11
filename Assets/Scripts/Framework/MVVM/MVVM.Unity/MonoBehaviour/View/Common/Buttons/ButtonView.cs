@@ -44,7 +44,8 @@ namespace HereticalSolutions.MVVM.Mono
 
             if (onClickCommand == null)
                 throw new Exception(
-                    logger.TryFormatException<ButtonView>(
+                    logger.TryFormatException(
+                        GetType(),
                         $"Could not obtain command \"{commandID}\" from ViewModel \"{viewModel.GetType()}\""));
             
             button.onClick.AddListener(OnButtonClicked);

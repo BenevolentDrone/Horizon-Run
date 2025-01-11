@@ -21,8 +21,7 @@ namespace HereticalSolutions.Delegates.Factories
             ILoggerResolver loggerResolver = null)
         {
             ILogger logger =
-                loggerResolver?.GetLogger<DelegateWrapperSingleArgGeneric<TValue>>()
-                ?? null;
+                loggerResolver?.GetLogger<DelegateWrapperSingleArgGeneric<TValue>>();
 
             return new DelegateWrapperSingleArgGeneric<TValue>(
                 @delegate,
@@ -34,8 +33,7 @@ namespace HereticalSolutions.Delegates.Factories
             ILoggerResolver loggerResolver = null)
         {
             ILogger logger =
-                loggerResolver?.GetLogger<DelegateWrapperSingleArgGeneric<TValue>>()
-                ?? null;
+                loggerResolver?.GetLogger<DelegateWrapperSingleArgGeneric<TValue>>();
 
             return new DelegateWrapperSingleArgGeneric<TValue>(
                 @delegate,

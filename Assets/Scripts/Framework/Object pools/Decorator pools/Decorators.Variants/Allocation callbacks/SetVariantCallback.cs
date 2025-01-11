@@ -30,7 +30,8 @@ namespace HereticalSolutions.Pools.AllocationCallbacks
             if (facadeWithMetadata == null)
             {
                 throw new Exception(
-                    logger.TryFormatException<SetVariantCallback<T>>(
+                    logger.TryFormatException(
+                        GetType(),
                         "POOL ELEMENT FACADE HAS NO METADATA"));
             }
             
@@ -40,7 +41,8 @@ namespace HereticalSolutions.Pools.AllocationCallbacks
             if (metadata == null)
             {
                 throw new Exception(
-                    logger.TryFormatException<SetVariantCallback<T>>(
+                    logger.TryFormatException(
+                        GetType(),
                         "POOL ELEMENT FACADE HAS NO VARIANT METADATA"));
             }
             

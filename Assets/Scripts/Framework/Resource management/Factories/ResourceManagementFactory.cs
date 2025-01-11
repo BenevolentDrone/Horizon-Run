@@ -23,8 +23,7 @@ namespace HereticalSolutions.ResourceManagement.Factories
             ILoggerResolver loggerResolver = null)
         {
             ILogger logger =
-                loggerResolver?.GetLogger<RuntimeResourceManager>()
-                ?? null;
+                loggerResolver?.GetLogger<RuntimeResourceManager>();
 
             return new RuntimeResourceManager(
                 RepositoriesFactory.BuildDictionaryRepository<int, string>(),
@@ -36,8 +35,7 @@ namespace HereticalSolutions.ResourceManagement.Factories
             ILoggerResolver loggerResolver = null)
         {
             ILogger logger =
-                loggerResolver?.GetLogger<ConcurrentRuntimeResourceManager>()
-                ?? null;
+                loggerResolver?.GetLogger<ConcurrentRuntimeResourceManager>();
 
             return new ConcurrentRuntimeResourceManager(
                 RepositoriesFactory.BuildConcurrentDictionaryRepository<int, string>(),
@@ -52,8 +50,7 @@ namespace HereticalSolutions.ResourceManagement.Factories
             ILoggerResolver loggerResolver = null)
         {
             ILogger logger =
-                loggerResolver?.GetLogger<ResourceData>()
-                ?? null;
+                loggerResolver?.GetLogger<ResourceData>();
 
             return new ResourceData(
                 descriptor,
@@ -69,8 +66,7 @@ namespace HereticalSolutions.ResourceManagement.Factories
             ILoggerResolver loggerResolver = null)
         {
             ILogger logger =
-                loggerResolver?.GetLogger<ConcurrentResourceData>()
-                ?? null;
+                loggerResolver?.GetLogger<ConcurrentResourceData>();
 
             return new ConcurrentResourceData(
                 descriptor,
@@ -107,8 +103,7 @@ namespace HereticalSolutions.ResourceManagement.Factories
             ILoggerResolver loggerResolver = null)
         {
             ILogger logger =
-                loggerResolver?.GetLogger<PreallocatedResourceStorageHandle<TResource>>()
-                ?? null;
+                loggerResolver?.GetLogger<PreallocatedResourceStorageHandle<TResource>>();
 
             return new PreallocatedResourceStorageHandle<TResource>(
                 resource,
@@ -122,8 +117,7 @@ namespace HereticalSolutions.ResourceManagement.Factories
             ILoggerResolver loggerResolver = null)
         {
             ILogger logger =
-                loggerResolver?.GetLogger<ConcurrentPreallocatedResourceStorageHandle<TResource>>()
-                ?? null;
+                loggerResolver?.GetLogger<ConcurrentPreallocatedResourceStorageHandle<TResource>>();
 
             return new ConcurrentPreallocatedResourceStorageHandle<TResource>(
                 resource,
@@ -138,8 +132,7 @@ namespace HereticalSolutions.ResourceManagement.Factories
             ILoggerResolver loggerResolver = null)
         {
             ILogger logger =
-                loggerResolver?.GetLogger<ReadWriteResourceStorageHandle<TResource>>()
-                ?? null;
+                loggerResolver?.GetLogger<ReadWriteResourceStorageHandle<TResource>>();
 
             return new ReadWriteResourceStorageHandle<TResource>(
                 resource,
@@ -153,8 +146,7 @@ namespace HereticalSolutions.ResourceManagement.Factories
             ILoggerResolver loggerResolver = null)
         {
             ILogger logger =
-                loggerResolver?.GetLogger<ConcurrentReadWriteResourceStorageHandle<TResource>>()
-                ?? null;
+                loggerResolver?.GetLogger<ConcurrentReadWriteResourceStorageHandle<TResource>>();
 
             return new ConcurrentReadWriteResourceStorageHandle<TResource>(
                 resource,

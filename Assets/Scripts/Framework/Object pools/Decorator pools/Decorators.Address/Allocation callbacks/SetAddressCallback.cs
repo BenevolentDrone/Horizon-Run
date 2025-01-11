@@ -7,10 +7,6 @@ using ILogger = HereticalSolutions.Logging.ILogger;
 
 namespace HereticalSolutions.Pools.AllocationCallbacks
 {
-    /// <summary>
-    /// Represents a callback for setting the address of an allocated pool element.
-    /// </summary>
-    /// <typeparam name="T">The type of the pool element.</typeparam>
     public class SetAddressCallback<T>
         : IAllocationCallback<IPoolElementFacade<T>>
     {
@@ -43,7 +39,8 @@ namespace HereticalSolutions.Pools.AllocationCallbacks
             if (facadeWithMetadata == null)
             {
                 throw new Exception(
-                    logger.TryFormatException<SetAddressCallback<T>>(
+                    logger.TryFormatException(
+                        GetType(),
                         "POOL ELEMENT FACADE HAS NO METADATA"));
             }
 			
@@ -53,7 +50,8 @@ namespace HereticalSolutions.Pools.AllocationCallbacks
             if (metadata == null)
             {
                 throw new Exception(
-                    logger.TryFormatException<SetAddressCallback<T>>(
+                    logger.TryFormatException(
+                        GetType(),
                         "POOL ELEMENT FACADE HAS NO ADDRESS METADATA"));
             }
             

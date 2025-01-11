@@ -65,7 +65,8 @@ namespace HereticalSolutions.Messaging
                 messageType,
                 out object messagePoolObject))
                 throw new Exception(
-                    logger.TryFormatException<NonAllocMessageBus>(
+                    logger.TryFormatException(
+                        GetType(),
                         $"INVALID MESSAGE TYPE FOR PARTICULAR MESSAGE BUS: {messageType.Name}"));
 
             IManagedPool<IMessage> messagePool = (IManagedPool<IMessage>)messagePoolObject;
@@ -81,7 +82,8 @@ namespace HereticalSolutions.Messaging
                     typeof(TMessage),
                     out object messagePoolObject))
                 throw new Exception(
-                    logger.TryFormatException<NonAllocMessageBus>(
+                    logger.TryFormatException(
+                        GetType(),
                         $"INVALID MESSAGE TYPE FOR PARTICULAR MESSAGE BUS: {typeof(TMessage).Name}"));
 
             IManagedPool<IMessage> messagePool = (IManagedPool<IMessage>)messagePoolObject;
@@ -101,7 +103,8 @@ namespace HereticalSolutions.Messaging
         {
             if (messageElement == null)
                 throw new Exception(
-                    logger.TryFormatException<NonAllocMessageBus>(
+                    logger.TryFormatException(
+                        GetType(),
                         $"INVALID MESSAGE"));
 
             messageElement.Value.Write(args);
@@ -115,7 +118,8 @@ namespace HereticalSolutions.Messaging
         {
             if (messageElement == null)
                 throw new Exception(
-                    logger.TryFormatException<NonAllocMessageBus>(
+                    logger.TryFormatException(
+                        GetType(),
                         $"INVALID MESSAGE"));
 
             messageElement.Value.Write(args);
@@ -204,7 +208,8 @@ namespace HereticalSolutions.Messaging
                 messageType,
                 out object messagePoolObject))
                 throw new Exception(
-                    logger.TryFormatException<NonAllocMessageBus>(
+                    logger.TryFormatException(
+                        GetType(),
                         $"INVALID MESSAGE TYPE FOR PARTICULAR MESSAGE BUS: {messageType.Name}"));
 
             IManagedPool<IMessage> messagePool = (IManagedPool<IMessage>)messagePoolObject;
@@ -220,7 +225,8 @@ namespace HereticalSolutions.Messaging
                 messageType,
                 out object messagePoolObject))
                 throw new Exception(
-                    logger.TryFormatException<NonAllocMessageBus>(
+                    logger.TryFormatException(
+                        GetType(),
                         $"INVALID MESSAGE TYPE FOR PARTICULAR MESSAGE BUS: {typeof(TMessage).Name}"));
 
             IManagedPool<IMessage> messagePool = (IManagedPool<IMessage>)messagePoolObject;

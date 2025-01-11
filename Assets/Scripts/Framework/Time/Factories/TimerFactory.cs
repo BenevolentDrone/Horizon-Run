@@ -31,8 +31,7 @@ namespace HereticalSolutions.Time.Factories
             var onFinishRepeated = BroadcasterFactory.BuildNonAllocBroadcasterGeneric<IPersistentTimer>(loggerResolver);
             
             ILogger logger =
-                loggerResolver?.GetLogger<PersistentTimer>()
-                ?? null;
+                loggerResolver?.GetLogger<PersistentTimer>();
 
             return new PersistentTimer(
                 id,
@@ -94,8 +93,7 @@ namespace HereticalSolutions.Time.Factories
             var onFinishRepeated = BroadcasterFactory.BuildNonAllocBroadcasterGeneric<IRuntimeTimer>(loggerResolver);
             
             ILogger logger =
-                loggerResolver?.GetLogger<RuntimeTimer>()
-                ?? null;
+                loggerResolver?.GetLogger<RuntimeTimer>();
 
             return new RuntimeTimer(
                 id,
@@ -167,8 +165,7 @@ namespace HereticalSolutions.Time.Factories
             
             
             ILogger logger =
-                loggerResolver?.GetLogger<RuntimeTimer>()
-                ?? null;
+                loggerResolver?.GetLogger<RuntimeTimer>();
 
             return new RuntimeTimer(
                 id,

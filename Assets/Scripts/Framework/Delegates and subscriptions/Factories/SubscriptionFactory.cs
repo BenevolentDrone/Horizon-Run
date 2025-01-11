@@ -15,8 +15,7 @@ namespace HereticalSolutions.Delegates.Factories
             ILoggerResolver loggerResolver = null)
         {
             ILogger logger =
-                loggerResolver?.GetLogger<SubscriptionNoArgs>()
-                ?? null;
+                loggerResolver?.GetLogger<SubscriptionNoArgs>();
 
             return new SubscriptionNoArgs(
                 @delegate,
@@ -28,8 +27,7 @@ namespace HereticalSolutions.Delegates.Factories
             ILoggerResolver loggerResolver = null)
         {
             ILogger logger =
-                loggerResolver?.GetLogger<SubscriptionSingleArgGeneric<TValue>>()
-                ?? null;
+                loggerResolver?.GetLogger<SubscriptionSingleArgGeneric<TValue>>();
 
             return new SubscriptionSingleArgGeneric<TValue>(
                 @delegate,
@@ -41,8 +39,7 @@ namespace HereticalSolutions.Delegates.Factories
             ILoggerResolver loggerResolver = null)
         {
             ILogger logger =
-                loggerResolver?.GetLogger<SubscriptionMultipleArgs>()
-                ?? null;
+                loggerResolver?.GetLogger<SubscriptionMultipleArgs>();
 
             return new SubscriptionMultipleArgs(
                 @delegate,

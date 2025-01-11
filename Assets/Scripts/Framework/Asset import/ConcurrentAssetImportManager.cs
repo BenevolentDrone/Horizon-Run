@@ -218,7 +218,7 @@ namespace HereticalSolutions.AssetImport
 						new object[]
 						{
 							loggerResolver,
-							(loggerResolver?.GetLogger<TImporter>() ?? null)
+							(loggerResolver?.GetLogger<TImporter>())
 						});
 
 					importerPoolRepository.Add(

@@ -22,8 +22,7 @@ namespace HereticalSolutions.Pools.Factories
 			ILoggerResolver loggerResolver = null)
 		{
 			ILogger logger =
-				loggerResolver?.GetLogger<QueuePool<T>>()
-				?? null;
+				loggerResolver?.GetLogger<QueuePool<T>>();
 
 			var queue = new Queue<T>();
 
@@ -87,8 +86,7 @@ namespace HereticalSolutions.Pools.Factories
 			ILoggerResolver loggerResolver = null)
 		{
 			ILogger logger =
-				loggerResolver?.GetLogger<QueueManagedPool<T>>()
-				?? null;
+				loggerResolver?.GetLogger<QueueManagedPool<T>>();
 
 			var queue = new Queue<IPoolElementFacade<T>>();
 
@@ -185,8 +183,7 @@ namespace HereticalSolutions.Pools.Factories
 			ILoggerResolver loggerResolver = null)
 		{
 			ILogger logger =
-				loggerResolver?.GetLogger<QueueManagedPool<T>>()
-				?? null;
+				loggerResolver?.GetLogger<QueueManagedPool<T>>();
 
 			var queue = new Queue<IPoolElementFacade<T>>();
 

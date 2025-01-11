@@ -73,7 +73,8 @@ namespace HereticalSolutions.Blackboard
                 case EComparisons.EQUALS_TO:
                     if (ValueType == EBlackboardValueType.FLAG)
                         throw new Exception(
-                            logger.TryFormatException<BlackboardValue>(
+                            logger.TryFormatException(
+                                GetType(),
                                 $"FLAGS CANNOT BE COMPARED IN ANY FORM OTHER THAN EXISTS"));
 
                     switch (ValueType)
@@ -81,7 +82,8 @@ namespace HereticalSolutions.Blackboard
                         case EBlackboardValueType.STRING:
                             if (valueToCompareType != EBlackboardValueType.STRING)
                                 throw new Exception(
-                                    logger.TryFormatException<BlackboardValue>(
+                                    logger.TryFormatException(
+                                        GetType(),
                                         $"CANNOT COMPARE string TO {valueToCompareType} BY EQUALITY"));
 
                             return GetValue<string>().EqualRaw(valueToCompare);
@@ -90,7 +92,8 @@ namespace HereticalSolutions.Blackboard
                             if (valueToCompareType != EBlackboardValueType.INT
                                 && valueToCompareType != EBlackboardValueType.FLOAT)
                                 throw new Exception(
-                                    logger.TryFormatException<BlackboardValue>(
+                                    logger.TryFormatException(
+                                        GetType(),
                                         $"CANNOT COMPARE int TO {valueToCompareType} BY EQUALITY"));
 
                             if (valueToCompareType == EBlackboardValueType.INT)
@@ -106,7 +109,8 @@ namespace HereticalSolutions.Blackboard
                             if (valueToCompareType != EBlackboardValueType.INT
                                 && valueToCompareType != EBlackboardValueType.FLOAT)
                                 throw new Exception(
-                                    logger.TryFormatException<BlackboardValue>(
+                                    logger.TryFormatException(
+                                        GetType(),
                                         $"CANNOT COMPARE float TO {valueToCompareType} BY EQUALITY"));
 
                             return value.EqualInFloat(
@@ -118,14 +122,16 @@ namespace HereticalSolutions.Blackboard
                         case EBlackboardValueType.BOOL:
                             if (valueToCompareType != EBlackboardValueType.BOOL)
                                 throw new Exception(
-                                    logger.TryFormatException<BlackboardValue>(
+                                    logger.TryFormatException(
+                                        GetType(),
                                         $"CANNOT COMPARE bool TO {valueToCompareType} BY EQUALITY"));
 
                             return GetValue<bool>().EqualRaw(valueToCompare);
 
                         default:
                             throw new Exception(
-                                logger.TryFormatException<BlackboardValue>(
+                                logger.TryFormatException(
+                                    GetType(),
                                     "INVALID VALUE TYPE"));
                     }
 
@@ -138,17 +144,20 @@ namespace HereticalSolutions.Blackboard
                 case EComparisons.LESS_THAN:
                     if (ValueType == EBlackboardValueType.FLAG)
                         throw new Exception(
-                            logger.TryFormatException<BlackboardValue>(
+                            logger.TryFormatException(
+                                GetType(),
                                 $"FLAGS CANNOT BE COMPARED IN ANY FORM OTHER THAN EXISTS"));
 
                     if (ValueType == EBlackboardValueType.STRING)
                         throw new Exception(
-                            logger.TryFormatException<BlackboardValue>(
+                            logger.TryFormatException(
+                                GetType(),
                                 $"STRINGS CANNOT BE COMPARED IN ANY FORM OTHER THAN EXISTS, EQUAL AND NOT_EQUAL"));
 
                     if (ValueType == EBlackboardValueType.BOOL)
                         throw new Exception(
-                            logger.TryFormatException<BlackboardValue>(
+                            logger.TryFormatException(
+                                GetType(),
                                 $"BOOLS CANNOT BE COMPARED IN ANY FORM OTHER THAN EXISTS, EQUAL AND NOT_EQUAL"));
 
                     switch (ValueType)
@@ -157,7 +166,8 @@ namespace HereticalSolutions.Blackboard
                             if (valueToCompareType != EBlackboardValueType.INT
                                 && valueToCompareType != EBlackboardValueType.FLOAT)
                                 throw new Exception(
-                                    logger.TryFormatException<BlackboardValue>(
+                                    logger.TryFormatException(
+                                        GetType(),
                                         $"CANNOT COMPARE int TO {valueToCompareType} BY LESS OR MORE THAN"));
 
                             if (valueToCompareType == EBlackboardValueType.INT)
@@ -173,7 +183,8 @@ namespace HereticalSolutions.Blackboard
                             if (valueToCompareType != EBlackboardValueType.INT
                                 && valueToCompareType != EBlackboardValueType.FLOAT)
                                 throw new Exception(
-                                    logger.TryFormatException<BlackboardValue>(
+                                    logger.TryFormatException(
+                                        GetType(),
                                         $"CANNOT COMPARE float TO {valueToCompareType} BY LESS OR MORE THAN"));
 
                             return value.LessInFloat(
@@ -184,7 +195,8 @@ namespace HereticalSolutions.Blackboard
 
                         default:
                             throw new Exception(
-                                logger.TryFormatException<BlackboardValue>(
+                                logger.TryFormatException(
+                                    GetType(),
                                     "INVALID VALUE TYPE"));
                     }
 
@@ -216,7 +228,8 @@ namespace HereticalSolutions.Blackboard
 
                 default:
                     throw new Exception(
-                        logger.TryFormatException<BlackboardValue>(
+                        logger.TryFormatException(
+                            GetType(),
                             "INVALID COMPARISON TYPE"));
             }
         }

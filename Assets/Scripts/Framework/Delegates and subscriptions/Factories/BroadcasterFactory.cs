@@ -94,8 +94,7 @@ namespace HereticalSolutions.Delegates.Factories
             ILoggerResolver loggerResolver = null)
         {
             ILogger logger =
-                loggerResolver?.GetLogger<BroadcasterWithRepository>()
-                ?? null;
+                loggerResolver?.GetLogger<BroadcasterWithRepository>();
 
             return new BroadcasterWithRepository(
                 repository,
@@ -115,8 +114,7 @@ namespace HereticalSolutions.Delegates.Factories
                     loggerResolver);
 
             ILogger logger =
-                loggerResolver?.GetLogger<BroadcasterGeneric<T>>()
-                ?? null;
+                loggerResolver?.GetLogger<BroadcasterGeneric<T>>();
 
             return new BroadcasterGeneric<T>(
                 contextPool,
@@ -206,8 +204,7 @@ namespace HereticalSolutions.Delegates.Factories
             ILoggerResolver loggerResolver = null)
         {
             ILogger logger =
-                loggerResolver?.GetLogger<NonAllocBroadcasterMultipleArgs>()
-                ?? null;
+                loggerResolver?.GetLogger<NonAllocBroadcasterMultipleArgs>();
             
             IDynamicArray<IPoolElementFacade<INonAllocSubscription>> subscriptionsContents =
                 subscriptionsPool as IDynamicArray<IPoolElementFacade<INonAllocSubscription>>;
@@ -237,8 +234,7 @@ namespace HereticalSolutions.Delegates.Factories
             ILoggerResolver loggerResolver = null)
         {
             ILogger logger =
-                loggerResolver?.GetLogger<NonAllocBroadcasterWithRepository>()
-                ?? null;
+                loggerResolver?.GetLogger<NonAllocBroadcasterWithRepository>();
 
             return new NonAllocBroadcasterWithRepository(
                 repository,
@@ -328,8 +324,7 @@ namespace HereticalSolutions.Delegates.Factories
             ILoggerResolver loggerResolver = null)
         {
             ILogger logger =
-                loggerResolver?.GetLogger<NonAllocBroadcasterGeneric<T>>()
-                ?? null;
+                loggerResolver?.GetLogger<NonAllocBroadcasterGeneric<T>>();
 
             
 

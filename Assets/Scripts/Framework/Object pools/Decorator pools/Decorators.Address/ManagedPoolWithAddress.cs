@@ -8,10 +8,6 @@ using HereticalSolutions.Logging;
 
 namespace HereticalSolutions.Pools.Decorators
 {
-    /// <summary>
-    /// Represents a decorator for a non-allocating pool with address support.
-    /// </summary>
-    /// <typeparam name="T">The type of object stored in the pool.</typeparam>
     public class ManagedPoolWithAddress<T>
         : IManagedPool<T>,
           ICleanuppable,
@@ -48,7 +44,8 @@ namespace HereticalSolutions.Pools.Decorators
         public IPoolElementFacade<T> Pop()
         {
             throw new Exception(
-                logger.TryFormatException<ManagedPoolWithAddress<T>>(
+                logger.TryFormatException(
+                    GetType(),
                     "ADDRESS ARGUMENT ABSENT"));
         }
 
@@ -59,12 +56,14 @@ namespace HereticalSolutions.Pools.Decorators
             if (args == null
                 || !args.TryGetArgument<AddressArgument>(out var arg))
                 throw new Exception(
-                    logger.TryFormatException<ManagedPoolWithAddress<T>>(
+                    logger.TryFormatException(
+                        GetType(),
                         "ADDRESS ARGUMENT ABSENT"));
 
             if (arg.AddressHashes.Length < level)
                 throw new Exception(
-                    logger.TryFormatException<ManagedPoolWithAddress<T>>(
+                    logger.TryFormatException(
+                        GetType(),
                         $"INVALID ADDRESS DEPTH. LEVEL: {{ {level} }} ADDRESS LENGTH: {{ {arg.AddressHashes.Length} }}"));
 
             #endregion
@@ -79,7 +78,8 @@ namespace HereticalSolutions.Pools.Decorators
                         0,
                         out poolByAddress))
                     throw new Exception(
-                        logger.TryFormatException<ManagedPoolWithAddress<T>>(
+                        logger.TryFormatException(
+                            GetType(),
                             $"NO POOL DETECTED AT THE END OF ADDRESS. LEVEL: {{ {level} }}"));
 
                 var endOfAddressResult = poolByAddress.Pop(args);
@@ -97,7 +97,8 @@ namespace HereticalSolutions.Pools.Decorators
                     currentAddressHash,
                     out poolByAddress))
                 throw new Exception(
-                    logger.TryFormatException<ManagedPoolWithAddress<T>>(
+                    logger.TryFormatException(
+                        GetType(),
                         $"INVALID ADDRESS {{ {arg.FullAddress} }} ADDRESS HASH: {{ {currentAddressHash} }} LEVEL: {{ {level} }}"));
 
             var result = poolByAddress.Pop(args);
@@ -116,13 +117,15 @@ namespace HereticalSolutions.Pools.Decorators
             if (instanceWithMetadata == null)
             {
                 throw new Exception(
-                    logger.TryFormatException<ManagedPoolWithAddress<T>>(
+                    logger.TryFormatException(
+                        GetType(),
                         "POOL ELEMENT FACADE HAS NO METADATA"));
             }
 			
             if (!instanceWithMetadata.Metadata.Has<IContainsAddress>())
                 throw new Exception(
-                    logger.TryFormatException<ManagedPoolWithAddress<T>>(
+                    logger.TryFormatException(
+                        GetType(),
                         "POOL ELEMENT FACADE HAS NO ADDRESS METADATA"));
             
             IManagedPool<T> pool = null;
@@ -135,7 +138,8 @@ namespace HereticalSolutions.Pools.Decorators
                         0,
                         out pool))
                     throw new Exception(
-                        logger.TryFormatException<ManagedPoolWithAddress<T>>(
+                        logger.TryFormatException(
+                            GetType(),
                             $"NO POOL DETECTED AT ADDRESS MAX. DEPTH. LEVEL: {{ {level} }}"));
 
                 pool.Push(instance);
@@ -147,7 +151,8 @@ namespace HereticalSolutions.Pools.Decorators
 
             if (!innerPoolRepository.TryGet(currentAddressHash, out pool))
                 throw new Exception(
-                    logger.TryFormatException<ManagedPoolWithAddress<T>>(
+                    logger.TryFormatException(
+                        GetType(),
                         $"INVALID ADDRESS {{ {currentAddressHash} }}"));
 
             pool.Push(instance);

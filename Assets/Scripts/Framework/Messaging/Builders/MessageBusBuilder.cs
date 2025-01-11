@@ -78,8 +78,7 @@ namespace HereticalSolutions.Messaging.Factories
         public MessageBus Build()
         {
             ILogger logger = 
-                loggerResolver?.GetLogger<MessageBus>()
-                ?? null;
+                loggerResolver?.GetLogger<MessageBus>();
 
             return new MessageBus(
                 broadcasterBuilder.Build(),

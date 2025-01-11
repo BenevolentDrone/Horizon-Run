@@ -32,22 +32,26 @@ namespace HereticalSolutions.Pools.Decorators
 			if (instanceWithMetadata == null)
 			{
 				throw new Exception(
-					logger.TryFormatException<ManagedPoolWithRuntimeTimer<T>>(
+					logger.TryFormatException(
+						GetType(),
 						"POOL ELEMENT FACADE HAS NO METADATA"));
 			}
 			
 			if (!instanceWithMetadata.Metadata.Has<IContainsRuntimeTimer>())
 				throw new Exception(
-					logger.TryFormatException<ManagedPoolWithRuntimeTimer<T>>(
+					logger.TryFormatException(
+						GetType(),
 						"POOL ELEMENT FACADE HAS NO TIMER METADATA"));
 
 			//Get metadata
+
 			var metadata = instanceWithMetadata.Metadata.Get<IContainsRuntimeTimer>();
 
 			var metadataWithPushSubscription = metadata as IPushableOnTimerFinish;
 
 
 			//Calculate duration
+
 			float duration = 0f;
 
 			if (metadataWithPushSubscription != null)
@@ -62,11 +66,13 @@ namespace HereticalSolutions.Pools.Decorators
 
 
 			//Early return
+
 			if (duration < 0f)
 				return;
 
 
 			//Get the timer
+
 			IRuntimeTimer timer;
 
 			if (metadataWithPushSubscription != null)
@@ -90,7 +96,8 @@ namespace HereticalSolutions.Pools.Decorators
 
 			if (timer == null)
 				throw new Exception(
-					logger.TryFormatException<ManagedPoolWithRuntimeTimer<T>>(
+					logger.TryFormatException(
+						GetType(),
 						"INVALID TIMER"));
 			
 
@@ -99,10 +106,6 @@ namespace HereticalSolutions.Pools.Decorators
 			timer.Start();
 		}
 
-		/// <summary>
-		/// Callback method called before an object is pushed back into the pool.
-		/// </summary>
-		/// <param name="instance">The instance that will be pushed back into the pool.</param>
 		protected override void OnBeforePush(IPoolElementFacade<T> instance)
 		{
 			IPoolElementFacadeWithMetadata<T> instanceWithMetadata =
@@ -111,13 +114,15 @@ namespace HereticalSolutions.Pools.Decorators
 			if (instanceWithMetadata == null)
 			{
 				throw new Exception(
-					logger.TryFormatException<ManagedPoolWithRuntimeTimer<T>>(
+					logger.TryFormatException(
+						GetType(),
 						"POOL ELEMENT FACADE HAS NO METADATA"));
 			}
 			
 			if (!instanceWithMetadata.Metadata.Has<IContainsRuntimeTimer>())
 				throw new Exception(
-					logger.TryFormatException<ManagedPoolWithRuntimeTimer<T>>(
+					logger.TryFormatException(
+						GetType(),
 						"POOL ELEMENT FACADE HAS NO TIMER METADATA"));
 
 			var metadata = instanceWithMetadata.Metadata.Get<IContainsRuntimeTimer>();
@@ -130,7 +135,6 @@ namespace HereticalSolutions.Pools.Decorators
 			if (timer != null)
 			{
 				timer.Reset();
-
 
 				if (metadataWithPushSubscription != null)
 				{

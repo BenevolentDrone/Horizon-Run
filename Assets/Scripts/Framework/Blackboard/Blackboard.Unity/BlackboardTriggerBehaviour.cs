@@ -40,7 +40,8 @@ namespace HereticalSolutions.Blackboard
         {
             if (blackboardBehaviour == null)
                 throw new Exception(
-                    logger.TryFormatException<BlackboardTriggerBehaviour>(
+                    logger.TryFormatException(
+                        GetType(),
                         "BLACKBOARD BEHAVIOUR IS NULL"));
             
             blackboardBehaviour.OnModified += PollTriggerConditions;

@@ -43,7 +43,8 @@ namespace HereticalSolutions.MVVM.UIToolkit
                 propertyID,
                 out colorProperty))
                 throw new Exception(
-                    logger.TryFormatException<BackgroundColorView>(
+                    logger.TryFormatException(
+                        GetType(),
                         $"Could not obtain property \"{propertyID}\" from ViewModel \"{viewModel.GetType()}\""));
             
             colorProperty.OnValueChanged += OnColorChanged;

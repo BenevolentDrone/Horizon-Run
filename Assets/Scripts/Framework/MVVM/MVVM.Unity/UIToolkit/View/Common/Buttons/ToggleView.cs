@@ -44,7 +44,8 @@ namespace HereticalSolutions.MVVM.UIToolkit
                 propertyID,
                 out boolProperty))
                 throw new Exception(
-                    logger.TryFormatException<ToggleView>(
+                    logger.TryFormatException(
+                        GetType(),
                         $"Could not obtain property \"{propertyID}\" from ViewModel \"{viewModel.GetType()}\""));
 
             boolProperty.OnValueChanged += OnBoolChanged;

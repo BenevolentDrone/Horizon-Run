@@ -15,8 +15,7 @@ namespace HereticalSolutions.Delegates.Factories
 			where TArgument : IEquatable<TArgument>
 		{
 			ILogger logger =
-				loggerResolver?.GetLogger<AsyncNotifierSingleArgGeneric<TArgument, TValue>>()
-				?? null;
+				loggerResolver?.GetLogger<AsyncNotifierSingleArgGeneric<TArgument, TValue>>();
 
 			return new AsyncNotifierSingleArgGeneric<TArgument, TValue>(
 				new List<NotifyRequestSingleArgGeneric<TArgument, TValue>>(),

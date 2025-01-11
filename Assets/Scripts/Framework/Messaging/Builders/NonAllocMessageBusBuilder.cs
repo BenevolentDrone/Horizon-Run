@@ -115,8 +115,7 @@ namespace HereticalSolutions.Messaging.Factories
             var mailbox = mailboxPoolBuilder.BuildPackedArrayManagedPool();
             
             ILogger logger = 
-                loggerResolver?.GetLogger<NonAllocMessageBus>()
-                ?? null;
+                loggerResolver?.GetLogger<NonAllocMessageBus>();
 
             var mailboxContents =
                 mailbox as IDynamicArray<IPoolElementFacade<IPoolElementFacade<IMessage>>>;

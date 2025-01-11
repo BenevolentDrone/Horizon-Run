@@ -17,8 +17,7 @@ namespace HereticalSolutions.SpacePartitioning.Factories
 			ILoggerResolver loggerResolver = null)
 		{
 			ILogger logger =
-				loggerResolver?.GetLogger<Node<TValue>>()
-				?? null;
+				loggerResolver?.GetLogger<Node<TValue>>();
 
 			return StackPoolFactory.BuildStackPool<Node<TValue>>(
 				new AllocationCommand<Node<TValue>>

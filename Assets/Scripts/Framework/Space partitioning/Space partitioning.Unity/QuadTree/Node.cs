@@ -84,7 +84,8 @@ namespace HereticalSolutions.SpacePartitioning
                 {
                     if (parent == null)
                         throw new Exception(
-                            logger.TryFormatException<Node<TValue>>(
+                            logger.TryFormatException(
+                                GetType(),
                                 $"OUT OF ROOT NODE BOUNDS. BOUNDS: {targetBounds.ToString()} ROOT: {bounds.ToString()}"));
 
                     return parent.GetSuitableNode(

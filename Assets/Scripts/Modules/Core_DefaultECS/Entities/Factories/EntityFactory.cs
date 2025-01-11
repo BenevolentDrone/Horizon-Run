@@ -183,8 +183,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Factories
 			TWorld world = new TWorld();
 
 			ILogger logger =
-				loggerResolver?.GetLogger<EventEntityWorldController>()
-				?? null;
+				loggerResolver?.GetLogger<EventEntityWorldController>();
 
 			return new EventEntityWorldController(
 				world,
@@ -197,8 +196,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Factories
 			TWorld world = new TWorld();
 
 			ILogger logger =
-				loggerResolver?.GetLogger<RegistryWorldController>()
-				?? null;
+				loggerResolver?.GetLogger<RegistryWorldController>();
 
 			return new RegistryWorldController(
 				world,
@@ -219,8 +217,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Factories
 			World world = new World();
 
 			ILogger logger =
-				loggerResolver?.GetLogger<EntityWorldController>()
-				?? null;
+				loggerResolver?.GetLogger<EntityWorldController>();
 
 			return new EntityWorldController(
 					world,
@@ -412,8 +409,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Factories
 				IEntityWorldController<TWorld, TEntity>>();
 
 			ILogger logger =
-				loggerResolver?.GetLogger<EntityWorldRepository>()
-				?? null;
+				loggerResolver?.GetLogger<EntityWorldRepository>();
 
 			return new EntityWorldRepository(
 				worldRepository,

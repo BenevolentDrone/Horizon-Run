@@ -71,7 +71,8 @@ namespace HereticalSolutions.Pools.Factories
         {
             if (valueAllocationDelegate == null)
                 throw new Exception(
-                    logger.TryFormatException<ManagedPoolBuilder<T>>(
+                    logger.TryFormatException(
+                        GetType(),
                         "BUILDER NOT INITIALIZED"));
 
             var metadataDescriptors = BuildMetadataDescriptors();
@@ -111,7 +112,8 @@ namespace HereticalSolutions.Pools.Factories
         {
             if (valueAllocationDelegate == null)
                 throw new Exception(
-                    logger.TryFormatException<ManagedPoolBuilder<T>>(
+                    logger.TryFormatException(
+                        GetType(),
                         "BUILDER NOT INITIALIZED"));
 
             var metadataDescriptors = BuildMetadataDescriptors();
@@ -150,7 +152,8 @@ namespace HereticalSolutions.Pools.Factories
         {
             if (valueAllocationDelegate == null)
                 throw new Exception(
-                    logger.TryFormatException<ManagedPoolBuilder<T>>(
+                    logger.TryFormatException(
+                        GetType(),
                         "BUILDER NOT INITIALIZED"));
 
             var metadataDescriptors = BuildMetadataDescriptors();
@@ -189,7 +192,8 @@ namespace HereticalSolutions.Pools.Factories
         {
             if (valueAllocationDelegate == null)
                 throw new Exception(
-                    logger.TryFormatException<ManagedPoolBuilder<T>>(
+                    logger.TryFormatException(
+                        GetType(),
                         "BUILDER NOT INITIALIZED"));
 
             var metadataDescriptors = BuildMetadataDescriptors();
@@ -228,7 +232,8 @@ namespace HereticalSolutions.Pools.Factories
         {
             if (valueAllocationDelegate == null)
                 throw new Exception(
-                    logger.TryFormatException<ManagedPoolBuilder<T>>(
+                    logger.TryFormatException(
+                        GetType(),
                         "BUILDER NOT INITIALIZED"));
 
             var metadataDescriptors = BuildMetadataDescriptors();
@@ -267,7 +272,8 @@ namespace HereticalSolutions.Pools.Factories
         {
             if (valueAllocationDelegate == null)
                 throw new Exception(
-                    logger.TryFormatException<ManagedPoolBuilder<T>>(
+                    logger.TryFormatException(
+                        GetType(),
                         "BUILDER NOT INITIALIZED"));
 
             var metadataDescriptors = BuildMetadataDescriptors();
@@ -306,7 +312,8 @@ namespace HereticalSolutions.Pools.Factories
         {
             if (valueAllocationDelegate == null)
                 throw new Exception(
-                    logger.TryFormatException<ManagedPoolBuilder<T>>(
+                    logger.TryFormatException(
+                        GetType(),
                         "BUILDER NOT INITIALIZED"));
 
             var metadataDescriptors = BuildMetadataDescriptors();
@@ -345,7 +352,8 @@ namespace HereticalSolutions.Pools.Factories
         {
             if (valueAllocationDelegate == null)
                 throw new Exception(
-                    logger.TryFormatException<ManagedPoolBuilder<T>>(
+                    logger.TryFormatException(
+                        GetType(),
                         "BUILDER NOT INITIALIZED"));
 
             var metadataDescriptors = BuildMetadataDescriptors();

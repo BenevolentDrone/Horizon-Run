@@ -25,14 +25,8 @@ namespace HereticalSolutions.Pools
             this.logger = logger;
         }
 
-        /// <summary>
-        /// The root node of the address tree.
-        /// </summary>
         private AddressTreeNode<T> root;
 
-        /// <summary>
-        /// Initializes the pool builder.
-        /// </summary>
         public void Initialize(
             ManagedPoolWithAddress<T> pool)
         {
@@ -54,11 +48,6 @@ namespace HereticalSolutions.Pools
             };
         }
 
-        /// <summary>
-        /// Parses the address and sets the corresponding pool.
-        /// </summary>
-        /// <param name="address">The address to parse.</param>
-        /// <param name="pool">The pool to set.</param>
         public void Parse(
             string address,
             IManagedPool<T> pool)
@@ -86,12 +75,6 @@ namespace HereticalSolutions.Pools
             currentNode.Pool = pool;
         }
 
-        /// <summary>
-        /// Traverses to the child node with the target address hash.
-        /// </summary>
-        /// <param name="currentNode">The current node.</param>
-        /// <param name="targetAddressHash">The target address hash.</param>
-        /// <returns>True if the child node is found and traversed, false otherwise.</returns>
         private bool TraverseToChildNode(
             ref AddressTreeNode<T> currentNode,
             int targetAddressHash)
@@ -109,13 +92,6 @@ namespace HereticalSolutions.Pools
             return false;
         }
 
-        /// <summary>
-        /// Creates a child node and traverses to it.
-        /// </summary>
-        /// <param name="addressParts">The address parts.</param>
-        /// <param name="addressHashes">The address hashes.</param>
-        /// <param name="currentNode">The current node.</param>
-        /// <param name="targetAddressHash">The target address hash.</param>
         private void CreateAndTraverse(
             string[] addressParts,
             int[] addressHashes,
@@ -147,26 +123,17 @@ namespace HereticalSolutions.Pools
             currentNode = child;
         }
 
-        /// <summary>
-        /// Builds the pool with the address tree.
-        /// </summary>
-        /// <returns>The built pool.</returns>
-        /// <exception cref="Exception">Thrown if the builder is not initialized.</exception>
         public void Validate()
         {
             if (root == null)
                 throw new Exception(
-                    logger.TryFormatException<PoolWithAddressBuilder<T>>(
+                    logger.TryFormatException(
+                        GetType(),
                         "BUILDER NOT INITIALIZED"));
 
             ValidateNode(root);
         }
 
-        /// <summary>
-        /// Recursively builds the pool with the address tree.
-        /// </summary>
-        /// <param name="node">The current node.</param>
-        /// <returns>The built pool.</returns>
         private void ValidateNode(
             AddressTreeNode<T> node)
         {

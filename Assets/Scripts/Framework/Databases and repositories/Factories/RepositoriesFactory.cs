@@ -2,30 +2,20 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
 
+using HereticalSolutions.Logging;
+
 namespace HereticalSolutions.Repositories.Factories
 {
-    /// <summary>
-    /// Represents a factory class for creating repositories.
-    /// </summary>
     public static class RepositoriesFactory
     {
         #region Dictionary object repository
 
-        /// <summary>
-        /// Builds a new instance of <see cref="DictionaryInstanceRepository"/>.
-        /// </summary>
-        /// <returns>A new instance of <see cref="DictionaryInstanceRepository"/>.</returns>
         public static DictionaryInstanceRepository BuildDictionaryInstanceRepository()
         {
             return new DictionaryInstanceRepository(
                 BuildDictionaryRepository<Type, object>());
         }
         
-        /// <summary>
-        /// Builds a new instance of <see cref="DictionaryInstanceRepository"/> with the specified <paramref name="database"/>.
-        /// </summary>
-        /// <param name="database">The repository database.</param>
-        /// <returns>A new instance of <see cref="DictionaryInstanceRepository"/>.</returns>
         public static DictionaryInstanceRepository BuildDictionaryInstanceRepository(
             IRepository<Type, object> database)
         {
@@ -33,11 +23,6 @@ namespace HereticalSolutions.Repositories.Factories
                 database);
         }
 
-        /// <summary>
-        /// Clones an existing <see cref="IRepository{Type, object}"/> and creates a new instance of <see cref="DictionaryInstanceRepository"/>.
-        /// </summary>
-        /// <param name="contents">The repository contents to clone.</param>
-        /// <returns>A new instance of <see cref="DictionaryInstanceRepository"/>.</returns>
         public static DictionaryInstanceRepository CloneDictionaryInstanceRepository(
             IRepository<Type, object> contents)
         {
@@ -49,25 +34,12 @@ namespace HereticalSolutions.Repositories.Factories
         
         #region Dictionary repository
         
-        /// <summary>
-        /// Builds a new instance of <see cref="DictionaryRepository{TKey, TValue}"/>.
-        /// </summary>
-        /// <typeparam name="TKey">The type of the repository key.</typeparam>
-        /// <typeparam name="TValue">The type of the repository value.</typeparam>
-        /// <returns>A new instance of <see cref="DictionaryRepository{TKey, TValue}"/>.</returns>
         public static DictionaryRepository<TKey, TValue> BuildDictionaryRepository<TKey, TValue>()
         {
             return new DictionaryRepository<TKey, TValue>(
                 new Dictionary<TKey, TValue>());
         }
         
-        /// <summary>
-        /// Builds a new instance of <see cref="DictionaryRepository{TKey, TValue}"/> with the specified <paramref name="database"/>.
-        /// </summary>
-        /// <typeparam name="TKey">The type of the repository key.</typeparam>
-        /// <typeparam name="TValue">The type of the repository value.</typeparam>
-        /// <param name="database">The repository database.</param>
-        /// <returns>A new instance of <see cref="DictionaryRepository{TKey, TValue}"/>.</returns>
         public static DictionaryRepository<TKey, TValue> BuildDictionaryRepository<TKey, TValue>(
             Dictionary<TKey, TValue> database)
         {
@@ -75,13 +47,6 @@ namespace HereticalSolutions.Repositories.Factories
                 database);
         }
         
-        /// <summary>
-        /// Builds a new instance of <see cref="DictionaryRepository{TKey, TValue}"/> with the specified <paramref name="comparer"/>.
-        /// </summary>
-        /// <typeparam name="TKey">The type of the repository key.</typeparam>
-        /// <typeparam name="TValue">The type of the repository value.</typeparam>
-        /// <param name="comparer">The key comparer.</param>
-        /// <returns>A new instance of <see cref="DictionaryRepository{TKey, TValue}"/>.</returns>
         public static DictionaryRepository<TKey, TValue> BuildDictionaryRepository<TKey, TValue>(
             IEqualityComparer<TKey> comparer)
         {
@@ -89,13 +54,6 @@ namespace HereticalSolutions.Repositories.Factories
                 new Dictionary<TKey, TValue>(comparer));
         }
         
-        /// <summary>
-        /// Clones an existing <see cref="Dictionary{TKey, TValue}"/> and creates a new instance of <see cref="DictionaryRepository{TKey, TValue}"/>.
-        /// </summary>
-        /// <typeparam name="TKey">The type of the repository key.</typeparam>
-        /// <typeparam name="TValue">The type of the repository value.</typeparam>
-        /// <param name="contents">The repository contents to clone.</param>
-        /// <returns>A new instance of <see cref="DictionaryRepository{TKey, TValue}"/>.</returns>
         public static DictionaryRepository<TKey, TValue> CloneDictionaryRepository<TKey, TValue>(
             Dictionary<TKey, TValue> contents)
         {
@@ -107,33 +65,60 @@ namespace HereticalSolutions.Repositories.Factories
 
         #region Dictionary one to one map
 
-        public static DictionaryOneToOneMap<TValue1, TValue2> BuildDictionaryOneToOneMap<TValue1, TValue2>()
+        public static DictionaryOneToOneMap<TValue1, TValue2> BuildDictionaryOneToOneMap<TValue1, TValue2>(
+            ILoggerResolver loggerResolver = null)
         {
+            ILogger logger = loggerResolver?.GetLogger<DictionaryOneToOneMap<TValue1, TValue2>>();
+
             return new DictionaryOneToOneMap<TValue1, TValue2>(
                 new Dictionary<TValue1, TValue2>(),
-                new Dictionary<TValue2, TValue1>());
+                new Dictionary<TValue2, TValue1>(),
+                logger);
         }
         
         public static DictionaryOneToOneMap<TValue1, TValue2> BuildDictionaryOneToOneMap<TValue1, TValue2>(
             Dictionary<TValue1, TValue2> leftDatabase,
-            Dictionary<TValue2, TValue1> rightDatabase)
+            Dictionary<TValue2, TValue1> rightDatabase,
+            ILoggerResolver loggerResolver = null)
         {
+            ILogger logger = loggerResolver?.GetLogger<DictionaryOneToOneMap<TValue1, TValue2>>();
+
             return new DictionaryOneToOneMap<TValue1, TValue2>(
                 leftDatabase,
-                rightDatabase);
+                rightDatabase,
+                logger);
         }
         
         public static DictionaryOneToOneMap<TValue1, TValue2> BuildDictionaryOneToOneMap<TValue1, TValue2>(
             IEqualityComparer<TValue1> leftComparer,
-            IEqualityComparer<TValue2> rightComparer)
+            IEqualityComparer<TValue2> rightComparer,
+            ILoggerResolver loggerResolver = null)
         {
+            ILogger logger = loggerResolver?.GetLogger<DictionaryOneToOneMap<TValue1, TValue2>>();
+
             return new DictionaryOneToOneMap<TValue1, TValue2>(
                 new Dictionary<TValue1, TValue2>(leftComparer),
-                new Dictionary<TValue2, TValue1>(rightComparer));
+                new Dictionary<TValue2, TValue1>(rightComparer),
+                logger);
+        }
+
+        public static DictionaryOneToOneMap<TValue1, TValue2> CloneDictionaryOneToOneMap<TValue1, TValue2>(
+            Dictionary<TValue1, TValue2> leftToRightDatabase,
+            Dictionary<TValue2, TValue1> rightToLeftDatabase,
+            ILogger logger = null)
+        {
+            return new DictionaryOneToOneMap<TValue1, TValue2>(
+                new Dictionary<TValue1, TValue2>(
+                    leftToRightDatabase,
+                    leftToRightDatabase.Comparer),
+                new Dictionary<TValue2, TValue1>(
+                    rightToLeftDatabase,
+                    rightToLeftDatabase.Comparer),
+                logger);
         }
 
         #endregion
-        
+
         #region Concurrent dictionary object repository
 
         public static ConcurrentDictionaryInstanceRepository BuildConcurrentDictionaryInstanceRepository()
@@ -192,6 +177,66 @@ namespace HereticalSolutions.Repositories.Factories
         {
             return new ConcurrentDictionaryRepository<TKey, TValue>(
                 new ConcurrentDictionary<TKey, TValue>(contents));
+        }
+
+        #endregion
+
+        #region Concurrent dictionary one to one map
+
+        public static ConcurrentDictionaryOneToOneMap<TValue1, TValue2>
+            BuildConcurrentDictionaryOneToOneMap<TValue1, TValue2>(
+            ILoggerResolver loggerResolver = null)
+        {
+            ILogger logger = loggerResolver?.GetLogger<ConcurrentDictionaryOneToOneMap<TValue1, TValue2>>();
+
+            return new ConcurrentDictionaryOneToOneMap<TValue1, TValue2>(
+                new Dictionary<TValue1, TValue2>(),
+                new Dictionary<TValue2, TValue1>(),
+                logger);
+        }
+
+        public static ConcurrentDictionaryOneToOneMap<TValue1, TValue2>
+            BuildConcurrentDictionaryOneToOneMap<TValue1, TValue2>(
+            Dictionary<TValue1, TValue2> leftDatabase,
+            Dictionary<TValue2, TValue1> rightDatabase,
+            ILoggerResolver loggerResolver = null)
+        {
+            ILogger logger = loggerResolver?.GetLogger<ConcurrentDictionaryOneToOneMap<TValue1, TValue2>>();
+
+            return new ConcurrentDictionaryOneToOneMap<TValue1, TValue2>(
+                leftDatabase,
+                rightDatabase,
+                logger);
+        }
+
+        public static ConcurrentDictionaryOneToOneMap<TValue1, TValue2>
+            BuildConcurrentDictionaryOneToOneMap<TValue1, TValue2>(
+            IEqualityComparer<TValue1> leftComparer,
+            IEqualityComparer<TValue2> rightComparer,
+            ILoggerResolver loggerResolver = null)
+        {
+            ILogger logger = loggerResolver?.GetLogger<ConcurrentDictionaryOneToOneMap<TValue1, TValue2>>();
+
+            return new ConcurrentDictionaryOneToOneMap<TValue1, TValue2>(
+                new Dictionary<TValue1, TValue2>(leftComparer),
+                new Dictionary<TValue2, TValue1>(rightComparer),
+                logger);
+        }
+
+        public static ConcurrentDictionaryOneToOneMap<TValue1, TValue2>
+            CloneConcurrentDictionaryOneToOneMap<TValue1, TValue2>(
+            Dictionary<TValue1, TValue2> leftToRightDatabase,
+            Dictionary<TValue2, TValue1> rightToLeftDatabase,
+            ILogger logger = null)
+        {
+            return new ConcurrentDictionaryOneToOneMap<TValue1, TValue2>(
+                new Dictionary<TValue1, TValue2>(
+                    leftToRightDatabase,
+                    leftToRightDatabase.Comparer),
+                new Dictionary<TValue2, TValue1>(
+                    rightToLeftDatabase,
+                    rightToLeftDatabase.Comparer),
+                logger);
         }
 
         #endregion

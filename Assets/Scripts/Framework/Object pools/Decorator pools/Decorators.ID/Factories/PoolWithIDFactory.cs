@@ -19,8 +19,7 @@ namespace HereticalSolutions.Pools.Factories
             ILoggerResolver loggerResolver = null)
         {
             ILogger logger =
-                loggerResolver?.GetLogger<ManagedPoolWithID<T>>()
-                ?? null;
+                loggerResolver?.GetLogger<ManagedPoolWithID<T>>();
 
             return new ManagedPoolWithID<T>(
                 innerPool,

@@ -43,7 +43,8 @@ namespace HereticalSolutions.Pools.AllocationCallbacks
 			if (facadeWithMetadata == null)
 			{
 				throw new Exception(
-					logger.TryFormatException<SetRuntimeTimerCallback<T>>(
+					logger.TryFormatException(
+						GetType(),
 						"POOL ELEMENT FACADE HAS NO METADATA"));
 			}
 			
@@ -53,7 +54,8 @@ namespace HereticalSolutions.Pools.AllocationCallbacks
 			if (metadata == null)
 			{
 				throw new Exception(
-					logger.TryFormatException<SetRuntimeTimerCallback<T>>(
+					logger.TryFormatException(
+						GetType(),
 						"POOL ELEMENT FACADE HAS NO TIMER METADATA"));
 			}
 			

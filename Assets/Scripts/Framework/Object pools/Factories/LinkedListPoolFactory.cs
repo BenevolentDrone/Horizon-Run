@@ -24,8 +24,7 @@ namespace HereticalSolutions.Pools.Factories
             ILoggerResolver loggerResolver = null)
         {
             ILogger logger =
-                loggerResolver?.GetLogger<LinkedListPool<T>>()
-                ?? null;
+                loggerResolver?.GetLogger<LinkedListPool<T>>();
 
             var linkedList = new LinkedList<T>();
 
@@ -89,8 +88,7 @@ namespace HereticalSolutions.Pools.Factories
             ILoggerResolver loggerResolver = null)
         {
             ILogger logger =
-                loggerResolver?.GetLogger<LinkedListManagedPool<T>>()
-                ?? null;
+                loggerResolver?.GetLogger<LinkedListManagedPool<T>>();
             
             Func<IPoolElementFacade<T> > facadeAllocationDelegate = 
                 () => ObjectPoolAllocationFactory.BuildPoolElementFacadeWithLinkedList<T>(
@@ -201,8 +199,7 @@ namespace HereticalSolutions.Pools.Factories
             ILoggerResolver loggerResolver = null)
         {
             ILogger logger =
-                loggerResolver?.GetLogger<StackManagedPool<T>>()
-                ?? null;
+                loggerResolver?.GetLogger<StackManagedPool<T>>();
             
             Func<IPoolElementFacade<T> > facadeAllocationDelegate = 
                 () => ObjectPoolAllocationFactory.BuildPoolElementFacadeWithLinkedList<T>(

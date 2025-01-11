@@ -3,12 +3,15 @@ using System.Collections.Generic;
 
 using HereticalSolutions.LifetimeManagement;
 
+using HereticalSolutions.Repositories.Factories;
+
 using HereticalSolutions.Logging;
 
 namespace HereticalSolutions.Repositories
 {
     public class DictionaryOneToOneMap<TValue1, TValue2> :
         IOneToOneMap<TValue1, TValue2>,
+        IClonableOneToOneMap<TValue1, TValue2>,
         ICleanuppable,
         IDisposable
     {
@@ -80,7 +83,8 @@ namespace HereticalSolutions.Repositories
             {
                 if (leftToRightDatabase.Count != rightToLeftDatabase.Count)
                     throw new Exception(
-                        logger.TryFormatException<DictionaryOneToOneMap<TValue1, TValue2>>(
+                        logger.TryFormatException(
+                            GetType(),
                             $"LEFT TO RIGHT MAP COUNT ({leftToRightDatabase.Count}) IS NOT EQUAL TO RIGHT TO LEFT MAP COUNT ({rightToLeftDatabase.Count})"));
 
                 return leftToRightDatabase.Count;
@@ -286,6 +290,19 @@ namespace HereticalSolutions.Repositories
             leftToRightDatabase.Clear();
             
             rightToLeftDatabase.Clear();
+        }
+
+        #endregion
+
+
+        #region IClonableOneToOneMap
+
+        public IOneToOneMap<TValue1, TValue2> Clone()
+        {
+            return RepositoriesFactory.CloneDictionaryOneToOneMap(
+                leftToRightDatabase,
+                rightToLeftDatabase,
+                logger);
         }
 
         #endregion

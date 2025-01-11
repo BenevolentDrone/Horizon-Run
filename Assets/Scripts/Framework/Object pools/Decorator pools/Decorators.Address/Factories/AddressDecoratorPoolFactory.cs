@@ -13,8 +13,7 @@ namespace HereticalSolutions.Pools.Factories
             ILoggerResolver loggerResolver = null)
         {
             ILogger logger =
-                loggerResolver?.GetLogger<ManagedPoolWithAddress<T>>()
-                ?? null;
+                loggerResolver?.GetLogger<ManagedPoolWithAddress<T>>();
 
             return new ManagedPoolWithAddress<T>(
                 RepositoriesFactory.BuildDictionaryRepository<int, IManagedPool<T>>(),
@@ -32,8 +31,7 @@ namespace HereticalSolutions.Pools.Factories
             ILoggerResolver loggerResolver = null)
         {
             ILogger logger =
-                loggerResolver?.GetLogger<ManagedPoolWithAddress<T>>()
-                ?? null;
+                loggerResolver?.GetLogger<ManagedPoolWithAddress<T>>();
 
             return new ManagedPoolWithAddress<T>(
                 repository,

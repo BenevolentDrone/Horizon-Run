@@ -12,8 +12,7 @@ namespace HereticalSolutions.ResourceManagement.Factories
             ILoggerResolver loggerResolver = null)
         {
             ILogger logger =
-                loggerResolver?.GetLogger<AddressableResourceStorageHandle<TResource>>()
-                ?? null;
+                loggerResolver?.GetLogger<AddressableResourceStorageHandle<TResource>>();
 
             return new AddressableResourceStorageHandle<TResource>(
                 assetReference,

@@ -17,8 +17,7 @@ namespace HereticalSolutions.AssetImport.Factories
 			ILoggerResolver loggerResolver = null)
 		{
 			var logger =
-				loggerResolver?.GetLogger<AssetImportManager>()
-				?? null;
+				loggerResolver?.GetLogger<AssetImportManager>();
 
 			return new AssetImportManager(
 				(IRepository<Type, List<AAssetImportPostProcessor>>)
@@ -33,8 +32,7 @@ namespace HereticalSolutions.AssetImport.Factories
 			ILoggerResolver loggerResolver = null)
 		{
 			var logger =
-				loggerResolver?.GetLogger<AssetImportManager>()
-				?? null;
+				loggerResolver?.GetLogger<AssetImportManager>();
 
 			return new ConcurrentAssetImportManager(
 				(IRepository<Type, List<AAssetImportPostProcessor>>)

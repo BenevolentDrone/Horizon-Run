@@ -22,8 +22,7 @@ namespace HereticalSolutions.Pools.Factories
             ILoggerResolver loggerResolver = null)
         {
             ILogger logger =
-                loggerResolver?.GetLogger<StackPool<T>>()
-                ?? null;
+                loggerResolver?.GetLogger<StackPool<T>>();
             
             var stack = new Stack<T>();
 
@@ -87,8 +86,7 @@ namespace HereticalSolutions.Pools.Factories
             ILoggerResolver loggerResolver = null)
         {
             ILogger logger =
-                loggerResolver?.GetLogger<StackManagedPool<T>>()
-                ?? null;
+                loggerResolver?.GetLogger<StackManagedPool<T>>();
             
             var stack = new Stack<IPoolElementFacade<T>>();
             
@@ -185,8 +183,7 @@ namespace HereticalSolutions.Pools.Factories
             ILoggerResolver loggerResolver = null)
         {
             ILogger logger =
-                loggerResolver?.GetLogger<StackManagedPool<T>>()
-                ?? null;
+                loggerResolver?.GetLogger<StackManagedPool<T>>();
             
             var stack = new Stack<IPoolElementFacade<T>>();
             

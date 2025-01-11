@@ -12,7 +12,18 @@ namespace HereticalSolutions.Allocations
         {
             this.callbacks = callbacks;
         }
-        
+
+        #region IAllocationCallback
+
+        public void OnAllocated(
+            T element)
+        {
+            foreach (var callback in callbacks)
+                callback.OnAllocated(element);
+        }
+
+        #endregion
+
         public void AddCallback(
             IAllocationCallback<T> callback)
         {
@@ -23,13 +34,6 @@ namespace HereticalSolutions.Allocations
             IAllocationCallback<T> callback)
         {
             callbacks.Remove(callback);
-        }
-
-        public void OnAllocated(
-            T element)
-        {
-            foreach (var callback in callbacks)
-                callback.OnAllocated(element);
         }
     }
 }

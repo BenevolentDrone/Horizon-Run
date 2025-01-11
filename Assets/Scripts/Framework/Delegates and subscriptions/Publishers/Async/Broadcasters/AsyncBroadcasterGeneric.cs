@@ -1,4 +1,7 @@
 using System;
+using System.Threading;
+using System.Threading.Tasks;
+
 using System.Collections.Generic;
 
 using HereticalSolutions.Pools;
@@ -11,9 +14,9 @@ using HereticalSolutions.Logging;
 
 namespace HereticalSolutions.Delegates
 {
-	public class ConcurrentNonAllocBroadcasterGeneric<TValue>
-		: IPublisherSingleArgGeneric<TValue>,
-		  IPublisherSingleArg,
+	public class AsyncBroadcasterGeneric<TValue>
+		: IAsyncPublisherSingleArgGeneric<TValue>,
+		  IAsyncPublisherSingleArg,
 		  INonAllocSubscribable,
 		  ICleanuppable,
 		  IDisposable
@@ -26,7 +29,7 @@ namespace HereticalSolutions.Delegates
 
 		private readonly ILogger logger;
 
-		public ConcurrentNonAllocBroadcasterGeneric(
+		public AsyncBroadcasterGeneric(
 			IBag<INonAllocSubscription> subscriptionsBag,
 			IPool<NonAllocBroadcasterGenericInvocationContext> contextPool,
 			ILogger logger = null)
@@ -50,9 +53,9 @@ namespace HereticalSolutions.Delegates
 			{
 				switch (subscription)
 				{
-					case INonAllocSubscriptionContext<IInvokableSingleArgGeneric<TValue>>
+					case INonAllocSubscriptionContext<IAsyncInvokableSingleArgGeneric<TValue>>
 						singleArgGenericSubscriptionContext:
-						
+
 						if (!singleArgGenericSubscriptionContext.ValidateActivation(this))
 							return false;
 
@@ -63,8 +66,8 @@ namespace HereticalSolutions.Delegates
 
 						break;
 
-					case INonAllocSubscriptionContext<IInvokableSingleArg> singleArgSubscriptionContext:
-						
+					case INonAllocSubscriptionContext<IAsyncInvokableSingleArg> singleArgSubscriptionContext:
+
 						if (!singleArgSubscriptionContext.ValidateActivation(this))
 							return false;
 
@@ -99,9 +102,9 @@ namespace HereticalSolutions.Delegates
 			{
 				switch (subscription)
 				{
-					case INonAllocSubscriptionContext<IInvokableSingleArgGeneric<TValue>>
+					case INonAllocSubscriptionContext<IAsyncInvokableSingleArgGeneric<TValue>>
 						singleArgGenericSubscriptionContext:
-						
+
 						if (!singleArgGenericSubscriptionContext.ValidateActivation(this))
 							return false;
 
@@ -109,10 +112,10 @@ namespace HereticalSolutions.Delegates
 							return false;
 
 						singleArgGenericSubscriptionContext.Terminate();
-						
+
 						break;
 
-					case INonAllocSubscriptionContext<IInvokableSingleArg> singleArgSubscriptionContext:
+					case INonAllocSubscriptionContext<IAsyncInvokableSingleArg> singleArgSubscriptionContext:
 
 						if (!singleArgSubscriptionContext.ValidateActivation(this))
 							return false;
@@ -129,7 +132,7 @@ namespace HereticalSolutions.Delegates
 						logger?.LogError(
 							GetType(),
 							$"INVALID SUBSCRIPTION TYPE: \"{subscription.GetType().Name}\"");
-						
+
 						return false;
 				}
 
@@ -160,7 +163,7 @@ namespace HereticalSolutions.Delegates
 				{
 					switch (subscription)
 					{
-						case INonAllocSubscriptionContext<IInvokableSingleArgGeneric<TValue>>
+						case INonAllocSubscriptionContext<IAsyncInvokableSingleArgGeneric<TValue>>
 							singleArgGenericSubscriptionContext:
 
 							if (!singleArgGenericSubscriptionContext.ValidateActivation(this))
@@ -170,7 +173,7 @@ namespace HereticalSolutions.Delegates
 
 							break;
 
-						case INonAllocSubscriptionContext<IInvokableSingleArg> singleArgSubscriptionContext:
+						case INonAllocSubscriptionContext<IAsyncInvokableSingleArg> singleArgSubscriptionContext:
 
 							if (!singleArgSubscriptionContext.ValidateActivation(this))
 								continue;
@@ -190,10 +193,15 @@ namespace HereticalSolutions.Delegates
 
 		#endregion
 
-		#region IPublisherSingleArgGeneric
+		#region IAsyncPublisherSingleArgGeneric
 
-		public void Publish(
-			TValue value)
+		public async Task PublishAsync(
+			TValue value,
+
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null)
 		{
 			NonAllocBroadcasterGenericInvocationContext context = null;
 
@@ -251,12 +259,18 @@ namespace HereticalSolutions.Delegates
 
 			for (int i = 0; i < context.Count; i++)
 			{
-				var subscriptionContext = context.Subscriptions[i] as INonAllocSubscriptionContext<IInvokableSingleArgGeneric<TValue>>;
+				var subscriptionContext = context.Subscriptions[i] as
+					INonAllocSubscriptionContext<IAsyncInvokableSingleArgGeneric<TValue>>;
 
 				if (subscriptionContext == null)
 					continue;
 
-				subscriptionContext.Delegate?.Invoke(value);
+				await subscriptionContext.Delegate?.InvokeAsync(
+					value,
+
+					cancellationToken,
+					progress,
+					progressLogger);
 			}
 
 			lock (lockObject)
@@ -276,51 +290,71 @@ namespace HereticalSolutions.Delegates
 
 		#endregion
 
-		#region IPublisherSingleArg
+		#region IAsyncPublisherSingleArg
 
-		public void Publish<TArgument>(
-			TArgument value)
+		public async Task PublishAsync<TArgument>(
+			TArgument value,
+
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null)
 		{
 			//lock (lockObject)
 			//{
-				switch (value)
-				{
-					case TValue tValue:
+			switch (value)
+			{
+				case TValue tValue:
 
-						Publish(tValue);
+					await PublishAsync(
+						tValue,
+						
+						cancellationToken,
+						progress,
+						progressLogger);
 
-						break;
+					break;
 
-					default:
+				default:
 
-						throw new Exception(
-							logger.TryFormatException(
-								GetType(),
-								$"INVALID ARGUMENT TYPE. EXPECTED: \"{typeof(TValue).Name}\" RECEIVED: \"{typeof(TArgument).Name}\""));
-				}
+					throw new Exception(
+						logger.TryFormatException(
+							GetType(),
+							$"INVALID ARGUMENT TYPE. EXPECTED: \"{typeof(TValue).Name}\" RECEIVED: \"{typeof(TArgument).Name}\""));
+			}
 			//}
 		}
 
-		public void Publish(
+		public async Task PublishAsync(
 			Type valueType,
-			object value)
+			object value,
+
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null)
 		{
 			//lock (lockObject)
 			//{
-				switch (value)
-				{
-					case TValue tValue:
+			switch (value)
+			{
+				case TValue tValue:
 
-						Publish(tValue);
+					await PublishAsync(
+						tValue,
+						
+						cancellationToken,
+						progress,
+						progressLogger);
 
-						break;
+					break;
 
-					default:
-						throw new Exception(
-							logger.TryFormatException(
-								GetType(),
-								$"INVALID ARGUMENT TYPE. EXPECTED: \"{typeof(TValue).Name}\" RECEIVED: \"{valueType.Name}\""));
-				}
+				default:
+					throw new Exception(
+						logger.TryFormatException(
+							GetType(),
+							$"INVALID ARGUMENT TYPE. EXPECTED: \"{typeof(TValue).Name}\" RECEIVED: \"{valueType.Name}\""));
+			}
 			//}
 		}
 

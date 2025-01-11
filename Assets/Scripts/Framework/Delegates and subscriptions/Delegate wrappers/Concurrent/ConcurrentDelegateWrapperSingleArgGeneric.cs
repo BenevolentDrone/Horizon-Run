@@ -22,6 +22,7 @@ namespace HereticalSolutions.Delegates.Wrappers
 
 			this.logger = logger;
 
+
 			lockObject = new object();
 		}
 
@@ -45,14 +46,28 @@ namespace HereticalSolutions.Delegates.Wrappers
 		public void Invoke(
 			object argument)
 		{
-			Action<TValue> copy;
-
-			lock (lockObject)
+			switch (argument)
 			{
-				copy = @delegate;  // Make a thread-safe copy of the delegate.
-			}
+				case TValue tValue:
 
-			copy?.Invoke((TValue)argument);  // Invoke the delegate outside of the lock.
+					Action<TValue> copy;
+
+					lock (lockObject)
+					{
+						copy = @delegate;  // Make a thread-safe copy of the delegate.
+					}
+
+					copy?.Invoke(tValue);  // Invoke the delegate outside of the lock.
+
+					break;
+
+				default:
+
+					throw new ArgumentException(
+						logger.TryFormatException(
+							GetType(),
+							$"INVALID ARGUMENT TYPE. EXPECTED: \"{typeof(TValue).Name}\" RECEIVED: \"{argument.GetType().Name}\""));
+			}
 		}
 
 		#endregion
@@ -79,7 +94,7 @@ namespace HereticalSolutions.Delegates.Wrappers
 
 				default:
 
-					throw new Exception(
+					throw new ArgumentException(
 						logger.TryFormatException(
 							GetType(),
 							$"INVALID ARGUMENT TYPE. EXPECTED: \"{typeof(TValue).Name}\" RECEIVED: \"{typeof(TArgument).Name}\""));
@@ -107,7 +122,7 @@ namespace HereticalSolutions.Delegates.Wrappers
 
 				default:
 
-					throw new Exception(
+					throw new ArgumentException(
 						logger.TryFormatException(
 							GetType(),
 							$"INVALID ARGUMENT TYPE. EXPECTED: \"{typeof(TValue).Name}\" RECEIVED: \"{valueType.Name}\""));

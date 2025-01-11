@@ -1,5 +1,3 @@
-using HereticalSolutions.Pools;
-
 namespace HereticalSolutions.Delegates
 {
     public interface INonAllocSubscriptionContext<TInvokable>

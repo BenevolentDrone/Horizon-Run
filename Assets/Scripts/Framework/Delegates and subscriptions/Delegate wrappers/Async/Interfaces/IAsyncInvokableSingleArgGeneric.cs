@@ -8,7 +8,7 @@ namespace HereticalSolutions.Delegates
 {
 	public interface IAsyncInvokableSingleArgGeneric<TValue>
 	{
-		Task Invoke(
+		Task InvokeAsync(
 			TValue arg,
 
 			//Async tail
@@ -16,7 +16,7 @@ namespace HereticalSolutions.Delegates
 			IProgress<float> progress = null,
 			ILogger progressLogger = null);
 
-		Task Invoke(
+		Task InvokeAsync(
 			object arg,
 
 			//Async tail

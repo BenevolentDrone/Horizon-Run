@@ -97,14 +97,19 @@ namespace HereticalSolutions.Delegates
 
 		public void Publish()
 		{
+			PingerInvocationContext context = null;
+
 			lock (lockObject)
 			{
-				var context = contextPool.Pop();
+				context = contextPool.Pop();
 	
 				context.Delegate = multicastDelegate;
+			}
 	
-				context.Delegate?.Invoke();
+			context.Delegate?.Invoke();
 	
+			lock (lockObject)
+			{
 				context.Delegate = null;
 	
 				contextPool.Push(context);

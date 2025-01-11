@@ -8,7 +8,7 @@ namespace HereticalSolutions.Delegates
 {
 	public interface IAsyncInvokableMultipleArgs
 	{
-		Task Invoke(
+		Task InvokeAsync(
 			object[] args,
 
 			//Async tail

@@ -6,11 +6,10 @@ using HereticalSolutions.Logging;
 
 namespace HereticalSolutions.Delegates
 {
-	public interface IAsyncPublisherMultipleArgs
+	public interface IAsyncPublisherNoArgs
 	{
-		Task Publish(
-			object[] values,
-
+		Task PublishAsync(
+			
 			//Async tail
 			CancellationToken cancellationToken = default,
 			IProgress<float> progress = null,

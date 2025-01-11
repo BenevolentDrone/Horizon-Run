@@ -145,6 +145,10 @@ namespace HereticalSolutions.Delegates
 		public void Publish(
 			object[] values)
 		{
+			NonAllocBroadcasterMultipleArgsInvocationContext context = null;
+
+			int count  = -1;
+
 			lock (lockObject)
 			{
 				if (subscriptionsBag.Count == 0)
@@ -152,9 +156,9 @@ namespace HereticalSolutions.Delegates
 
 				// Pop context out of the pool and initialize it with values from the bag
 
-				var count = subscriptionsBag.Count;
+				count = subscriptionsBag.Count;
 
-				var context = contextPool.Pop();
+				context = contextPool.Pop();
 
 				bool newBuffer = false;
 
@@ -191,20 +195,23 @@ namespace HereticalSolutions.Delegates
 				}
 
 				context.Count = count;
+			}
 
-				// Invoke the delegates in the context
+			// Invoke the delegates in the context
 
-				for (int i = 0; i < context.Count; i++)
-				{
-					var subscriptionContext = context.Subscriptions[i]
-						as INonAllocSubscriptionContext<IInvokableMultipleArgs>;
+			for (int i = 0; i < context.Count; i++)
+			{
+				var subscriptionContext = context.Subscriptions[i]
+					as INonAllocSubscriptionContext<IInvokableMultipleArgs>;
 
-					if (subscriptionContext == null)
-						continue;
+				if (subscriptionContext == null)
+					continue;
 
-					subscriptionContext.Delegate?.Invoke(values);
-				}
+				subscriptionContext.Delegate?.Invoke(values);
+			}
 
+			lock (lockObject)
+			{
 				// Clean up and push the context back into the pool
 
 				for (int i = 0; i < count; i++)

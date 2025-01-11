@@ -1,4 +1,7 @@
 using System;
+using System.Threading;
+using System.Threading.Tasks;
+
 using System.Collections.Generic;
 
 using HereticalSolutions.Pools;
@@ -11,23 +14,23 @@ using HereticalSolutions.Logging;
 
 namespace HereticalSolutions.Delegates
 {
-	public class ConcurrentNonAllocPinger
-		: IPublisherNoArgs,
+	public class AsyncBroadcasterMultipleArgs
+		: IAsyncPublisherMultipleArgs,
 		  INonAllocSubscribable,
 		  ICleanuppable,
 		  IDisposable
 	{
 		private readonly IBag<INonAllocSubscription> subscriptionsBag;
 
-		private readonly IPool<NonAllocPingerInvocationContext> contextPool;
+		private readonly IPool<NonAllocBroadcasterMultipleArgsInvocationContext> contextPool;
 
 		private readonly object lockObject;
 
 		private readonly ILogger logger;
 
-		public ConcurrentNonAllocPinger(
+		public AsyncBroadcasterMultipleArgs(
 			IBag<INonAllocSubscription> subscriptionsBag,
-			IPool<NonAllocPingerInvocationContext> contextPool,
+			IPool<NonAllocBroadcasterMultipleArgsInvocationContext> contextPool,
 			ILogger logger = null)
 		{
 			this.subscriptionsBag = subscriptionsBag;
@@ -47,10 +50,16 @@ namespace HereticalSolutions.Delegates
 		{
 			lock (lockObject)
 			{
-				var subscriptionContext = subscription as INonAllocSubscriptionContext<IInvokableNoArgs>;
+				var subscriptionContext = subscription as INonAllocSubscriptionContext<IAsyncInvokableMultipleArgs>;
 
 				if (subscriptionContext == null)
+				{
+					logger?.LogError(
+						GetType(),
+						$"INVALID SUBSCRIPTION TYPE: \"{subscription.GetType().Name}\"");
+
 					return false;
+				}
 
 				if (!subscriptionContext.ValidateActivation(this))
 					return false;
@@ -73,10 +82,16 @@ namespace HereticalSolutions.Delegates
 		{
 			lock (lockObject)
 			{
-				var subscriptionContext = subscription as INonAllocSubscriptionContext<IInvokableNoArgs>;
+				var subscriptionContext = subscription as INonAllocSubscriptionContext<IAsyncInvokableMultipleArgs>;
 
 				if (subscriptionContext == null)
+				{
+					logger?.LogError(
+						GetType(),
+						$"INVALID SUBSCRIPTION TYPE: \"{subscription.GetType().Name}\"");
+
 					return false;
+				}
 
 				if (!subscriptionContext.ValidateActivation(this))
 					return false;
@@ -111,7 +126,7 @@ namespace HereticalSolutions.Delegates
 			{
 				foreach (var subscription in subscriptionsBag.All)
 				{
-					var subscriptionContext = subscription as INonAllocSubscriptionContext<IInvokableNoArgs>;
+					var subscriptionContext = subscription as INonAllocSubscriptionContext<IAsyncInvokableMultipleArgs>;
 
 					if (subscriptionContext == null)
 						continue;
@@ -128,11 +143,17 @@ namespace HereticalSolutions.Delegates
 
 		#endregion
 
-		#region IPublisherNoArgs
+		#region IAsyncPublisherMultipleArgs
 
-		public void Publish()
+		public async Task PublishAsync(
+			object[] values,
+
+			//Async tail
+			CancellationToken cancellationToken = default,
+			IProgress<float> progress = null,
+			ILogger progressLogger = null)
 		{
-			NonAllocPingerInvocationContext context = null;
+			NonAllocBroadcasterMultipleArgsInvocationContext context = null;
 
 			int count = -1;
 
@@ -152,6 +173,7 @@ namespace HereticalSolutions.Delegates
 				if (context.Subscriptions == null)
 				{
 					context.Subscriptions = new INonAllocSubscription[count];
+
 					newBuffer = true;
 				}
 
@@ -172,6 +194,7 @@ namespace HereticalSolutions.Delegates
 
 				int index = 0;
 
+				// TODO: Remove foreach
 				foreach (var subscription in subscriptionsBag.All)
 				{
 					context.Subscriptions[index] = subscription;
@@ -186,12 +209,18 @@ namespace HereticalSolutions.Delegates
 
 			for (int i = 0; i < context.Count; i++)
 			{
-				var subscriptionContext = context.Subscriptions[i] as INonAllocSubscriptionContext<IInvokableNoArgs>;
+				var subscriptionContext = context.Subscriptions[i]
+					as INonAllocSubscriptionContext<IAsyncInvokableMultipleArgs>;
 
 				if (subscriptionContext == null)
 					continue;
 
-				subscriptionContext.Delegate?.Invoke();
+				await subscriptionContext.Delegate?.InvokeAsync(
+					values,
+
+					cancellationToken,
+					progress,
+					progressLogger);
 			}
 
 			lock (lockObject)

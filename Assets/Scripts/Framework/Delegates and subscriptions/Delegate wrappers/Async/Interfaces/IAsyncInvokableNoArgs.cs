@@ -8,7 +8,7 @@ namespace HereticalSolutions.Delegates
 {
 	public interface IAsyncInvokableNoArgs
 	{
-		Task Invoke(
+		Task InvokeAsync(
 			
 			//Async tail
 			CancellationToken cancellationToken = default,

@@ -64,19 +64,21 @@ namespace HereticalSolutions.Pools
             return result;
         }
         
-        public T Pop(IPoolPopArgument[] args)
+        public T Pop(
+            IPoolPopArgument[] args)
         {
             return Pop();
         }
 
-        public void Push(T instance)
+        public void Push(
+            T instance)
         {
             pool.Push(instance);
         }
-        
+
         #endregion
 
-        #region IResizeable
+        #region IAllocationResizeable
 
         public void Resize()
         {

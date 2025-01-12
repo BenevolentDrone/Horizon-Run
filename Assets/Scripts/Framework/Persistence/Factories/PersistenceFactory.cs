@@ -180,7 +180,7 @@ namespace HereticalSolutions.Persistence.Factories
                 == -1) // to avoid using linq's Contains
             {
                 throw new Exception(
-                    $"TYPE {typeof(TSerializationArgument).Name} IS NOT A VALID SERIALIZATION ARGUMENT TYPE");
+                    $"TYPE {nameof(TSerializationArgument)} IS NOT A VALID SERIALIZATION ARGUMENT TYPE");
             }
 
             arguments = TryAppendLogger(
@@ -268,7 +268,7 @@ namespace HereticalSolutions.Persistence.Factories
                 == -1) // to avoid using linq's Contains
             {
                 throw new Exception(
-                    $"TYPE {typeof(TFormatSerializer).Name} IS NOT A VALID FORMAT SERIALIZER TYPE");
+                    $"TYPE {nameof(TFormatSerializer)} IS NOT A VALID FORMAT SERIALIZER TYPE");
             }
 
             arguments = TryAppendLogger(
@@ -367,7 +367,7 @@ namespace HereticalSolutions.Persistence.Factories
                 == -1) // to avoid using linq's Contains
             {
                 throw new Exception(
-                    $"TYPE {typeof(TSerializationStrategy).Name} IS NOT A VALID SERIALIZATION STRATEGY TYPE");
+                    $"TYPE {nameof(TSerializationStrategy)} IS NOT A VALID SERIALIZATION STRATEGY TYPE");
             }
 
             arguments = TryAppendLogger(

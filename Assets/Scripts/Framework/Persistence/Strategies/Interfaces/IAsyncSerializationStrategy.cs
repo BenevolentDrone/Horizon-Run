@@ -1,8 +1,7 @@
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 
-using HereticalSolutions.Logging;
+using HereticalSolutions.Asynchronous;
 
 namespace HereticalSolutions.Persistence
 {
@@ -14,17 +13,13 @@ namespace HereticalSolutions.Persistence
 		Task<(bool, TValue)> ReadAsync<TValue>(
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null);
+			AsyncExecutionContext asyncContext);
 
 		Task<(bool, object)> ReadAsync(
 			Type valueType,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null);
+			AsyncExecutionContext asyncContext);
 
 		#endregion
 
@@ -34,18 +29,14 @@ namespace HereticalSolutions.Persistence
 			TValue value,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null);
+			AsyncExecutionContext asyncContext);
 
 		Task<bool> WriteAsync(
 			Type valueType,
 			object value,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null);
+			AsyncExecutionContext asyncContext);
 
 		#endregion
 
@@ -55,18 +46,14 @@ namespace HereticalSolutions.Persistence
 			TValue value,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null);
+			AsyncExecutionContext asyncContext);
 
 		Task<bool> AppendAsync(
 			Type valueType,
 			object value,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null);
+			AsyncExecutionContext asyncContext);
 
 		#endregion
 	}

@@ -1,18 +1,17 @@
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 
-using HereticalSolutions.Logging;
+using HereticalSolutions.Asynchronous;
 
 namespace HereticalSolutions.Delegates.Wrappers
 {
 	public class TaskWrapperNoArgs
 		: IAsyncInvokableNoArgs
 	{
-		private readonly Func<CancellationToken, IProgress<float>, ILogger, Task> taskFactory;
+		private readonly Func<AsyncExecutionContext, Task> taskFactory;
 
 		public TaskWrapperNoArgs(
-			Func<CancellationToken, IProgress<float>, ILogger, Task> taskFactory)
+			Func<AsyncExecutionContext, Task> taskFactory)
 		{
 			this.taskFactory = taskFactory;
 		}
@@ -20,14 +19,10 @@ namespace HereticalSolutions.Delegates.Wrappers
 		public async Task InvokeAsync(
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 		{
 			await taskFactory(
-				cancellationToken,
-				progress,
-				progressLogger);
+				asyncContext);
 		}
 	}
 }

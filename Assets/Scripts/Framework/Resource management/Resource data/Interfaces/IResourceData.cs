@@ -1,14 +1,9 @@
-using System;
-using System.Threading;
 using System.Threading.Tasks;
 
-using HereticalSolutions.Logging;
+using HereticalSolutions.Asynchronous;
 
 namespace HereticalSolutions.ResourceManagement
 {
-    /// <summary>
-    /// Represents resource data
-    /// </summary>
     public interface IResourceData
         : IReadOnlyResourceData
     {
@@ -17,35 +12,27 @@ namespace HereticalSolutions.ResourceManagement
             bool allocate = true,
 
             //Async tail
-            CancellationToken cancellationToken = default,
-            IProgress<float> progress = null,
-            ILogger progressLogger = null);
+            AsyncExecutionContext asyncContext);
 
         Task RemoveVariant(
             int variantIDHash,
             bool free = true,
 
             //Async tail
-            CancellationToken cancellationToken = default,
-            IProgress<float> progress = null,
-            ILogger progressLogger = null);
+            AsyncExecutionContext asyncContext);
 
         Task RemoveVariant(
             string variantID,
             bool free = true,
 
             //Async tail
-            CancellationToken cancellationToken = default,
-            IProgress<float> progress = null,
-            ILogger progressLogger = null);
+            AsyncExecutionContext asyncContext);
 
         Task ClearAllVariants(
             bool free = true,
 
             //Async tail
-            CancellationToken cancellationToken = default,
-            IProgress<float> progress = null,
-            ILogger progressLogger = null);
+            AsyncExecutionContext asyncContext);
 
         IReadOnlyResourceData ParentResource { set; }
 
@@ -53,42 +40,32 @@ namespace HereticalSolutions.ResourceManagement
             IReadOnlyResourceData nestedResource,
 
             //Async tail
-            CancellationToken cancellationToken = default,
-            IProgress<float> progress = null,
-            ILogger progressLogger = null);
+            AsyncExecutionContext asyncContext);
 
         Task RemoveNestedResource(
             int nestedResourceIDHash,
             bool free = true,
 
             //Async tail
-            CancellationToken cancellationToken = default,
-            IProgress<float> progress = null,
-            ILogger progressLogger = null);
+            AsyncExecutionContext asyncContext);
 
         Task RemoveNestedResource(
             string nestedResourceID,
             bool free = true,
 
             //Async tail
-            CancellationToken cancellationToken = default,
-            IProgress<float> progress = null,
-            ILogger progressLogger = null);
+            AsyncExecutionContext asyncContext);
 
         Task ClearAllNestedResources(
             bool free = true,
 
             //Async tail
-            CancellationToken cancellationToken = default,
-            IProgress<float> progress = null,
-            ILogger progressLogger = null);
+            AsyncExecutionContext asyncContext);
 
         Task Clear(
             bool free = true,
 
             //Async tail
-            CancellationToken cancellationToken = default,
-            IProgress<float> progress = null,
-            ILogger progressLogger = null);
+            AsyncExecutionContext asyncContext);
     }
 }

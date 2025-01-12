@@ -38,7 +38,7 @@ namespace HereticalSolutions.StanleyScript
 					return genericTypeValue;
 
 				default:
-					throw new Exception($"[StanleyCachedVariable] COULD NOT CAST TYPE {value.GetType().Name} TO TYPE {typeof(T).Name}");
+					throw new Exception($"[StanleyCachedVariable] COULD NOT CAST TYPE {value.GetType().Name} TO TYPE {nameof(T)}");
 			}
 		}
 

@@ -1,8 +1,7 @@
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 
-using HereticalSolutions.Logging;
+using HereticalSolutions.Asynchronous;
 
 namespace HereticalSolutions.Delegates
 {
@@ -12,17 +11,13 @@ namespace HereticalSolutions.Delegates
 			TValue value,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null);
+			AsyncExecutionContext asyncContext);
 
 		Task PublishAsync(
 			Type valueType,
 			object value,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null);
+			AsyncExecutionContext asyncContext);
 	}
 }

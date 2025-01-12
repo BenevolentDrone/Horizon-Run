@@ -52,7 +52,7 @@ public bool Save<TArgument>(
 		default:
 
 			throw new Exception(
-				$"INVALID ARGUMENT TYPE. EXPECTED: \"{typeof(TValue).Name}\" RECEIVED: \"{typeof(TArgument).etType().Name}\"");
+				$"INVALID ARGUMENT TYPE. EXPECTED: \"{nameof(TValue)}\" RECEIVED: \"{typeof(TArgument).etType().Name}\"");
 	}
 
 	if (!result)
@@ -88,7 +88,7 @@ public bool Save<TArgument, TDTO>(
 		default:
 
 			throw new Exception(
-				$"INVALID ARGUMENT TYPE. EXPECTED: \"{typeof(TValue).Name}\" RECEIVED: \"{typeof(TArgument).GetType().Name}\"");
+				$"INVALID ARGUMENT TYPE. EXPECTED: \"{nameof(TValue)}\" RECEIVED: \"{nameof(TArgument)}\"");
 	}
 
 	if (!result)
@@ -107,7 +107,7 @@ public bool Save<TArgument, TDTO>(
 		default:
 
 			throw new Exception(
-				$"CANNOT CAST \"{typeof(TDTO).Name}\" TO \"{typeof(TDTO).GetType().Name}\"");
+				$"CANNOT CAST \"{nameof(TDTO)}\" TO \"{nameof(TDTO)}\"");
 	}
 }
 

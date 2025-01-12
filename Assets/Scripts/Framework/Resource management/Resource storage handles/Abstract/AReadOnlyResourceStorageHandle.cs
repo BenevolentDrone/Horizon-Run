@@ -1,6 +1,7 @@
 using System;
-using System.Threading;
 using System.Threading.Tasks;
+
+using HereticalSolutions.Asynchronous;
 
 using HereticalSolutions.Logging;
 
@@ -35,15 +36,13 @@ namespace HereticalSolutions.ResourceManagement
 		public virtual async Task Allocate(
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 		{
-			progress?.Report(0f);
+			asyncContext?.Progress?.Report(0f);
 
 			if (allocated)
 			{
-				progress?.Report(1f);
+				asyncContext?.Progress?.Report(1f);
 
 				return;
 			}
@@ -53,7 +52,7 @@ namespace HereticalSolutions.ResourceManagement
 				$"ALLOCATING");
 
 			var task = AllocateResource(
-				progress: progress);
+				asyncContext);
 
 			resource = await task;
 				//.ConfigureAwait(false);
@@ -69,21 +68,19 @@ namespace HereticalSolutions.ResourceManagement
 				GetType(),
 				$"ALLOCATED");
 
-			progress?.Report(1f);
+			asyncContext?.Progress?.Report(1f);
 		}
 
 		public virtual async Task Free(
-			
+
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 		{
-			progress?.Report(0f);
+			asyncContext?.Progress?.Report(0f);
 
 			if (!allocated)
 			{
-				progress?.Report(1f);
+				asyncContext?.Progress?.Report(1f);
 
 				return;
 			}
@@ -94,7 +91,7 @@ namespace HereticalSolutions.ResourceManagement
 
 			var task = FreeResource(
 				resource,
-				progress: progress);
+				asyncContext);
 
 			await task;
 				//.ConfigureAwait(false);
@@ -112,7 +109,7 @@ namespace HereticalSolutions.ResourceManagement
 				GetType(),
 				$"FREE");
 
-			progress?.Report(1f);
+			asyncContext?.Progress?.Report(1f);
 		}
 
 		#endregion
@@ -150,7 +147,7 @@ namespace HereticalSolutions.ResourceManagement
 					throw new Exception(
 						logger.TryFormatException(
 							GetType(),
-							$"CANNOT GET RESOURCE OF TYPE {typeof(TValue).Name} FROM RESOURCE OF TYPE {typeof(TResource).Name}"));
+							$"CANNOT GET RESOURCE OF TYPE {nameof(TValue)} FROM RESOURCE OF TYPE {nameof(TResource)}"));
 			}
 		}
 
@@ -160,7 +157,7 @@ namespace HereticalSolutions.ResourceManagement
 
 		public new void Cleanup()
 		{
-			Free();
+			Free(null);
 		}
 
 		#endregion
@@ -169,7 +166,7 @@ namespace HereticalSolutions.ResourceManagement
 
 		public new void Dispose()
 		{
-			Free();
+			Free(null);
 		}
 
 		#endregion

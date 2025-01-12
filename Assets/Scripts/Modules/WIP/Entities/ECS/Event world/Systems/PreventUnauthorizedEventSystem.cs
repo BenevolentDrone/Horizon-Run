@@ -41,7 +41,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Networking
                 if (sourceComponent.Source == ENetworkEventSource.SERVER)
                 {
                     logger?.LogError<PreventUnauthorizedEventSystem<TEventComponent, TDelta>>(
-                        $"EVENT ENTITY {typeof(TEventComponent).Name} HAS SERVER AS NETWORK EVENT SOURCE, ABORTING PROCESSING");
+                        $"EVENT ENTITY {nameof(TEventComponent)} HAS SERVER AS NETWORK EVENT SOURCE, ABORTING PROCESSING");
                     
                     entity.Set<EventProcessedComponent>();
 

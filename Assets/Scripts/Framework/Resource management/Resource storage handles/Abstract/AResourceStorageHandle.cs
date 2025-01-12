@@ -1,6 +1,8 @@
 using System;
-using System.Threading;
 using System.Threading.Tasks;
+
+using HereticalSolutions.Asynchronous;
+
 
 using HereticalSolutions.Collections.Managed;
 
@@ -62,28 +64,27 @@ namespace HereticalSolutions.ResourceManagement
 		protected abstract Task<TResource> AllocateResource(
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null);
+			AsyncExecutionContext asyncContext);
 
 		protected abstract Task FreeResource(
 			TResource resource,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null);
+			AsyncExecutionContext asyncContext);
 
 		protected async Task<IReadOnlyResourceStorageHandle> LoadDependency(
 			string path,
 			string variantID = null,
-			IProgress<float> progress = null)
+
+			//Async tail
+			AsyncExecutionContext asyncContext)
 		{
 			var task = ((IContainsDependencyResources)runtimeResourceManager)
 				.LoadDependency(
 					path,
 					variantID,
-					progress: progress);
+					
+					asyncContext);
 
 			var result = await task;
 				//.ConfigureAwait(false);
@@ -101,9 +102,7 @@ namespace HereticalSolutions.ResourceManagement
 			IGenericCircularBuffer<MainThreadCommand> mainThreadCommandBuffer,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 		{
 			var command = new MainThreadCommand(
 				delegateToExecute);
@@ -125,9 +124,7 @@ namespace HereticalSolutions.ResourceManagement
 			IGenericCircularBuffer<MainThreadCommand> mainThreadCommandBuffer,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 		{
 			var command = new MainThreadCommand(
 				asyncDelegateToExecute);

@@ -1,8 +1,7 @@
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 
-using HereticalSolutions.Logging;
+using HereticalSolutions.Asynchronous;
 
 namespace HereticalSolutions.Persistence
 {
@@ -15,9 +14,7 @@ namespace HereticalSolutions.Persistence
 			int blockSize,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null);
+			AsyncExecutionContext asyncContext);
 
 		Task<(bool, object)> BlockReadAsync(
 			Type valueType,
@@ -25,9 +22,7 @@ namespace HereticalSolutions.Persistence
 			int blockSize,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null);
+			AsyncExecutionContext asyncContext);
 
 		#endregion
 
@@ -39,9 +34,7 @@ namespace HereticalSolutions.Persistence
 			int blockSize,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null);
+			AsyncExecutionContext asyncContext);
 
 		Task<bool> BlockWriteAsync(
 			Type valueType,
@@ -50,9 +43,7 @@ namespace HereticalSolutions.Persistence
 			int blockSize,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null);
+			AsyncExecutionContext asyncContext);
 
 		#endregion
 	}

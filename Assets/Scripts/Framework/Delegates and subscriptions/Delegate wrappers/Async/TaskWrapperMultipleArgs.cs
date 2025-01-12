@@ -1,18 +1,17 @@
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 
- using HereticalSolutions.Logging;
+using HereticalSolutions.Asynchronous;
 
 namespace HereticalSolutions.Delegates.Wrappers
 {
 	public class TaskWrapperMultipleArgs
 		: IAsyncInvokableMultipleArgs
 	{
-		private readonly Func<object[], CancellationToken, IProgress<float>, ILogger, Task> taskFactory;
+		private readonly Func<object[], AsyncExecutionContext, Task> taskFactory;
 
 		public TaskWrapperMultipleArgs(
-			Func<object[], CancellationToken, IProgress<float>, ILogger, Task> taskFactory)
+			Func<object[], AsyncExecutionContext, Task> taskFactory)
 		{
 			this.taskFactory = taskFactory;
 		}
@@ -21,15 +20,12 @@ namespace HereticalSolutions.Delegates.Wrappers
 			object[] arguments,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 		{
 			await taskFactory(
 				arguments,
-				cancellationToken,
-				progress,
-				progressLogger);
+				
+				asyncContext);
 		}
 	}
 }

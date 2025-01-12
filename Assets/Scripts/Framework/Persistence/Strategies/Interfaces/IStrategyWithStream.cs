@@ -1,10 +1,8 @@
-using System;
-using System.Threading;
 using System.Threading.Tasks;
 
 using System.IO;
 
-using HereticalSolutions.Logging;
+using HereticalSolutions.Asynchronous;
 
 namespace HereticalSolutions.Persistence
 {
@@ -28,11 +26,9 @@ namespace HereticalSolutions.Persistence
 		void Flush();
 
 		Task FlushAsync(
-			
+
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null);
+			AsyncExecutionContext asyncContext);
 
 		#endregion
 

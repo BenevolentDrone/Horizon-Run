@@ -149,10 +149,10 @@ namespace HereticalSolutions.Pools
             
             instanceAsLinkedListLink.Next = previousFirstElement;
         }
-        
+
         #endregion
 
-        #region IResizeable
+        #region IAllocationResizeable
 
         public void Resize()
         {

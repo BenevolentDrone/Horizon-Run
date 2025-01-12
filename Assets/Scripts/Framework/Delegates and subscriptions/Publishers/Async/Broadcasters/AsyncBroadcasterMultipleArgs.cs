@@ -1,8 +1,9 @@
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 
 using System.Collections.Generic;
+
+using HereticalSolutions.Asynchronous;
 
 using HereticalSolutions.Pools;
 
@@ -149,9 +150,7 @@ namespace HereticalSolutions.Delegates
 			object[] values,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 		{
 			NonAllocBroadcasterMultipleArgsInvocationContext context = null;
 
@@ -218,9 +217,7 @@ namespace HereticalSolutions.Delegates
 				await subscriptionContext.Delegate?.InvokeAsync(
 					values,
 
-					cancellationToken,
-					progress,
-					progressLogger);
+					asyncContext);
 			}
 
 			lock (lockObject)

@@ -1,8 +1,9 @@
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 
 using System.Collections.Generic;
+
+using HereticalSolutions.Asynchronous;
 
 using HereticalSolutions.Pools;
 
@@ -139,9 +140,7 @@ namespace HereticalSolutions.Delegates
 		public async Task PublishAsync(
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 		{
 			NonAllocPingerInvocationContext context = null;
 
@@ -207,9 +206,7 @@ namespace HereticalSolutions.Delegates
 
 				await subscriptionContext.Delegate?.InvokeAsync(
 					
-					cancellationToken,
-					progress,
-					progressLogger);
+					asyncContext);
 			}
 	
 			lock (lockObject)

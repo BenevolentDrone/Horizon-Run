@@ -1,6 +1,7 @@
 using System;
-using System.Threading;
 using System.Threading.Tasks;
+
+using HereticalSolutions.Asynchronous;
 
 using HereticalSolutions.Logging;
 
@@ -10,12 +11,12 @@ namespace HereticalSolutions.Delegates.Wrappers
 		: IAsyncInvokableSingleArgGeneric<TValue>,
 		  IAsyncInvokableSingleArg
 	{
-		private readonly Func<TValue, CancellationToken, IProgress<float>, ILogger, Task> taskFactory;
+		private readonly Func<TValue, AsyncExecutionContext, Task> taskFactory;
 
 		private readonly ILogger logger;
 
 		public TaskWrapperSingleArgGeneric(
-			Func<TValue, CancellationToken, IProgress<float>, ILogger, Task> taskFactory,
+			Func<TValue, AsyncExecutionContext, Task> taskFactory,
 			ILogger logger = null)
 		{
 			this.taskFactory = taskFactory;
@@ -29,24 +30,19 @@ namespace HereticalSolutions.Delegates.Wrappers
 			TValue argument,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 		{
 			await taskFactory(
 				argument,
-				cancellationToken,
-				progress,
-				progressLogger);
+
+				asyncContext);
 		}
 
 		public async Task InvokeAsync(
 			object argument,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 		{
 			switch (argument)
 			{
@@ -54,9 +50,8 @@ namespace HereticalSolutions.Delegates.Wrappers
 
 					await taskFactory(
 						tValue,
-						cancellationToken,
-						progress,
-						progressLogger);
+
+						asyncContext);
 
 						break;
 				
@@ -65,7 +60,7 @@ namespace HereticalSolutions.Delegates.Wrappers
 					throw new ArgumentException(
 						logger.TryFormatException(
 							GetType(),
-							$"INVALID ARGUMENT TYPE. EXPECTED: \"{typeof(TValue).Name}\" RECEIVED: \"{argument.GetType().Name}\""));
+							$"INVALID ARGUMENT TYPE. EXPECTED: \"{nameof(TValue)}\" RECEIVED: \"{argument.GetType().Name}\""));
 			}
 		}
 
@@ -79,9 +74,7 @@ namespace HereticalSolutions.Delegates.Wrappers
 			TArgument value,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 		{
 			switch (value)
 			{
@@ -89,9 +82,8 @@ namespace HereticalSolutions.Delegates.Wrappers
 
 					await taskFactory(
 						tValue,
-						cancellationToken,
-						progress,
-						progressLogger);
+
+						asyncContext);
 
 					break;
 
@@ -100,7 +92,7 @@ namespace HereticalSolutions.Delegates.Wrappers
 					throw new ArgumentException(
 						logger.TryFormatException(
 							GetType(),
-							$"INVALID ARGUMENT TYPE. EXPECTED: \"{typeof(TValue).Name}\" RECEIVED: \"{typeof(TArgument).Name}\""));
+							$"INVALID ARGUMENT TYPE. EXPECTED: \"{nameof(TValue)}\" RECEIVED: \"{nameof(TArgument)}\""));
 			}
 		}
 
@@ -109,9 +101,7 @@ namespace HereticalSolutions.Delegates.Wrappers
 			object value,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 		{
 			switch (value)
 			{
@@ -119,9 +109,8 @@ namespace HereticalSolutions.Delegates.Wrappers
 
 					await taskFactory(
 						tValue,
-						cancellationToken,
-						progress,
-						progressLogger);
+						
+						asyncContext);
 
 					break;
 
@@ -130,7 +119,7 @@ namespace HereticalSolutions.Delegates.Wrappers
 					throw new ArgumentException(
 						logger.TryFormatException(
 							GetType(),
-							$"INVALID ARGUMENT TYPE. EXPECTED: \"{typeof(TValue).Name}\" RECEIVED: \"{valueType.Name}\""));
+							$"INVALID ARGUMENT TYPE. EXPECTED: \"{nameof(TValue)}\" RECEIVED: \"{valueType.Name}\""));
 			}
 		}
 

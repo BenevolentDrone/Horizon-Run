@@ -99,7 +99,7 @@ public bool Accept<TDTO>(
 		default:
 
 			throw new Exception(
-				$"CANNOT CAST RETURN VALUE TYPE \"{typeof(RuntimeTimerDTO).Name}\" TO TYPE \"{typeof(TDTO).GetType().Name}\"");
+				$"CANNOT CAST RETURN VALUE TYPE \"{nameof(RuntimeTimerDTO)}\" TO TYPE \"{nameof(TDTO)}\"");
 	}
 
 	return result;
@@ -132,7 +132,7 @@ public bool Accept<TDTO>(
 		default:
 
 			throw new Exception(
-				$"INVALID ARGUMENT TYPE. EXPECTED: \"{typeof(RuntimeTimerDTO).Name}\" RECEIVED: \"{typeof(TDTO).GetType().Name}\"");
+				$"INVALID ARGUMENT TYPE. EXPECTED: \"{nameof(RuntimeTimerDTO)}\" RECEIVED: \"{nameof(TDTO)}\"");
 	}
 }
 

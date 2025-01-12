@@ -69,7 +69,7 @@ namespace HereticalSolutions.Messaging
                 throw new Exception(
                     logger.TryFormatException(
                         GetType(),
-                        $"INVALID MESSAGE TYPE FOR PARTICULAR MESSAGE BUS: {typeof(TMessage).Name}"));
+                        $"INVALID MESSAGE TYPE FOR PARTICULAR MESSAGE BUS: {nameof(TMessage)}"));
 
             IPool<IMessage> messagePool = (IPool<IMessage>)messagePoolObject;
 
@@ -204,7 +204,7 @@ namespace HereticalSolutions.Messaging
                 throw new Exception(
                     logger.TryFormatException(
                         GetType(),
-                        $"INVALID MESSAGE TYPE FOR PARTICULAR MESSAGE BUS: {typeof(TMessage).Name}"));
+                        $"INVALID MESSAGE TYPE FOR PARTICULAR MESSAGE BUS: {nameof(TMessage)}"));
 
             IPool<IMessage> messagePool = (IPool<IMessage>)messagePoolObject;
 

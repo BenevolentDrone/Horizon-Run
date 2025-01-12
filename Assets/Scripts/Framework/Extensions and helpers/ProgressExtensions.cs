@@ -12,22 +12,18 @@ namespace HereticalSolutions
 			this IProgress<float> progress,
 			ILogger logger = null)
 		{
-			IProgress<float> localProgress = null;
+			if (progress == null)
+				return null;
+			
+			var localProgress = new Progress<float>();
 
-			if (progress != null)
+			localProgress.ProgressChanged += (sender, value) =>
 			{
-				var localProgressInstance = new Progress<float>();
+				logger?.Log(
+					$"PROGRESS: {String.Format("{0:0.00}", value)}");
 
-				localProgressInstance.ProgressChanged += (sender, value) =>
-				{
-					logger?.Log(
-						$"PROGRESS: {String.Format("{0:0.00}", value)}");
-
-					progress.Report(value);
-				};
-
-				localProgress = localProgressInstance;
-			}
+				progress.Report(value);
+			};
 
 			return localProgress;
 		}
@@ -36,16 +32,12 @@ namespace HereticalSolutions
 			this IProgress<float> progress,
 			EventHandler<float> progressChangedHandler)
 		{
-			IProgress<float> localProgress = null;
+			if (progress == null)
+				return null;
 
-			if (progress != null)
-			{
-				var localProgressInstance = new Progress<float>();
+			var localProgress = new Progress<float>();
 
-				localProgressInstance.ProgressChanged += progressChangedHandler;
-
-				localProgress = localProgressInstance;
-			}
+			localProgress.ProgressChanged += progressChangedHandler;
 
 			return localProgress;
 		}
@@ -55,26 +47,22 @@ namespace HereticalSolutions
 			Func<float, float> totalProgressCalculationDelegate,
 			ILogger logger = null)
 		{
-			IProgress<float> localProgress = null;
+			if (progress == null)
+				return null;
 
-			if (progress != null)
+			var localProgress = new Progress<float>();
+
+			localProgress.ProgressChanged += (sender, value) =>
 			{
-				var localProgressInstance = new Progress<float>();
+				var totalProgress = totalProgressCalculationDelegate.Invoke(
+					value);
 
-				localProgressInstance.ProgressChanged += (sender, value) =>
-				{
-					var totalProgress = totalProgressCalculationDelegate.Invoke(
-						value);
+				logger?.Log(
+					$"LOCAL PROGRESS: {String.Format("{0:0.00}", value)} TOTAL PROGRESS: {String.Format("{0:0.00}", totalProgress)}");
 
-					logger?.Log(
-						$"LOCAL PROGRESS: {String.Format("{0:0.00}", value)} PROGRESS: {String.Format("{0:0.00}", totalProgress)}");
-
-					progress.Report(
-						totalProgress);
-				};
-
-				localProgress = localProgressInstance;
-			}
+				progress.Report(
+					totalProgress);
+			};
 
 			return localProgress;
 		}
@@ -85,27 +73,23 @@ namespace HereticalSolutions
 			float totalProgressFinish,
 			ILogger logger = null)
 		{
-			IProgress<float> localProgress = null;
+			if (progress == null)
+				return null;
 
-			if (progress != null)
+			float range = totalProgressFinish - totalProgressStart;
+
+			var localProgress = new Progress<float>();
+
+			localProgress.ProgressChanged += (sender, value) =>
 			{
-				float range = totalProgressFinish - totalProgressStart;
+				var totalProgress = range * value + totalProgressStart;
 
-				var localProgressInstance = new Progress<float>();
+				logger?.Log(
+					$"LOCAL PROGRESS: {String.Format("{0:0.00}", value)} START: {String.Format("{0:0.00}", totalProgressStart)} FINISH: {String.Format("{0:0.00}", totalProgressFinish)} SCALE: {String.Format("{0:0.00}", range)} TOTAL PROGRESS: {String.Format("{0:0.00}", totalProgress)}");
 
-				localProgressInstance.ProgressChanged += (sender, value) =>
-				{
-					var totalProgress = range * value + totalProgressStart;
-
-					logger?.Log(
-						$"LOCAL PROGRESS: {String.Format("{0:0.00}", value)} START: {String.Format("{0:0.00}", totalProgressStart)} FINISH: {String.Format("{0:0.00}", totalProgressFinish)} SCALE: {String.Format("{0:0.00}", range)} PROGRESS: {String.Format("{0:0.00}", totalProgress)}");
-
-					progress.Report(totalProgress);
-				};
-
-				localProgress = localProgressInstance;
-			}
-
+				progress.Report(totalProgress);
+			};
+				
 			return localProgress;
 		}
 
@@ -116,26 +100,22 @@ namespace HereticalSolutions
 			Func<float, float> localProgressCalculationDelegate,
 			ILogger logger = null)
 		{
-			IProgress<float> localProgress = null;
+			if (progress == null)
+				return null;
 
-			if (progress != null)
+			float range = totalProgressFinish - totalProgressStart;
+
+			var localProgress = new Progress<float>();
+
+			localProgress.ProgressChanged += (sender, value) =>
 			{
-				float range = totalProgressFinish - totalProgressStart;
+				var totalProgress = range * localProgressCalculationDelegate.Invoke(value) + totalProgressStart;
 
-				var localProgressInstance = new Progress<float>();
+				logger?.Log(
+					$"LOCAL PROGRESS: {String.Format("{0:0.00}", value)} START: {String.Format("{0:0.00}", totalProgressStart)} FINISH: {String.Format("{0:0.00}", totalProgressFinish)} SCALE: {String.Format("{0:0.00}", range)} TOTAL PROGRESS: {String.Format("{0:0.00}", totalProgress)}");
 
-				localProgressInstance.ProgressChanged += (sender, value) =>
-				{
-					var totalProgress = range * localProgressCalculationDelegate.Invoke(value) + totalProgressStart;
-
-					logger?.Log(
-						$"LOCAL PROGRESS: {String.Format("{0:0.00}", value)} START: {String.Format("{0:0.00}", totalProgressStart)} FINISH: {String.Format("{0:0.00}", totalProgressFinish)} SCALE: {String.Format("{0:0.00}", range)} PROGRESS: {String.Format("{0:0.00}", totalProgress)}");
-
-					progress.Report(totalProgress);
-				};
-
-				localProgress = localProgressInstance;
-			}
+				progress.Report(totalProgress);
+			};
 
 			return localProgress;
 		}
@@ -148,26 +128,22 @@ namespace HereticalSolutions
 			int count,
 			ILogger logger = null)
 		{
-			IProgress<float> localProgress = null;
+			if (progress == null)
+				return null;
 
-			if (progress != null)
+			float range = totalProgressFinish - totalProgressStart;
+
+			var localProgress = new Progress<float>();
+
+			localProgress.ProgressChanged += (sender, value) =>
 			{
-				float range = totalProgressFinish - totalProgressStart;
+				var totalProgress = range * ((value + (float)index) / count) + totalProgressStart;
 
-				var localProgressInstance = new Progress<float>();
+				logger?.Log(
+					$"LOCAL PROGRESS: {String.Format("{0:0.00}", value)} START: {String.Format("{0:0.00}", totalProgressStart)} FINISH: {String.Format("{0:0.00}", totalProgressFinish)} INDEX: {String.Format("{0:0.00}", index)} COUNT: {String.Format("{0:0.00}", count)} RANGE: {String.Format("{0:0.00}", range)} TOTAL PROGRESS: {String.Format("{0:0.00}", totalProgress)}");
 
-				localProgressInstance.ProgressChanged += (sender, value) =>
-				{
-					var totalProgress = range * ((value + (float)index) / count) + totalProgressStart;
-
-					logger?.Log(
-						$"LOCAL PROGRESS: {String.Format("{0:0.00}", value)} START: {String.Format("{0:0.00}", totalProgressStart)} FINISH: {String.Format("{0:0.00}", totalProgressFinish)} INDEX: {String.Format("{0:0.00}", index)} COUNT: {String.Format("{0:0.00}", count)} RANGE: {String.Format("{0:0.00}", range)} PROGRESS: {String.Format("{0:0.00}", totalProgress)}");
-
-					progress.Report(totalProgress);
-				};
-
-				localProgress = localProgressInstance;
-			}
+				progress.Report(totalProgress);
+			};
 
 			return localProgress;
 		}
@@ -181,40 +157,37 @@ namespace HereticalSolutions
 			int count,
 			ILogger logger = null)
 		{
-			IProgress<float> localProgress = null;
+			if (progress == null)
+				return null;
 
-			if (progress != null)
+			float range = totalProgressFinish - totalProgressStart;
+
+
+			localProgressValues.Add(0f);
+
+
+			var localProgress = new Progress<float>();
+
+			localProgress.ProgressChanged += (sender, value) =>
 			{
-				float range = totalProgressFinish - totalProgressStart;
+				localProgressValues[index] = value;
 
 
-				localProgressValues.Add(0f);
+				float totalProgressForList = 0f;
 
-
-				var localProgressInstance = new Progress<float>();
-
-				localProgressInstance.ProgressChanged += (sender, value) =>
+				foreach (var assetImportProgress in localProgressValues)
 				{
-					localProgressValues[index] = value;
+					totalProgressForList += assetImportProgress;
+				}
 
+				var totalProgress = range * (totalProgressForList / (float)count) + totalProgressStart;
 
-					float totalProgressForList = 0f;
+				logger?.Log(
+					$"LOCAL PROGRESS: {String.Format("{0:0.00}", value)} START: {String.Format("{0:0.00}", totalProgressStart)} FINISH: {String.Format("{0:0.00}", totalProgressFinish)} INDEX: {String.Format("{0:0.00}", index)} COUNT: {String.Format("{0:0.00}", count)} RANGE: {String.Format("{0:0.00}", range)} LIST PROGRESS: {String.Format("{0:0.00}", totalProgressForList)} TOTAL PROGRESS: {String.Format("{0:0.00}", totalProgress)}");
 
-					foreach (var assetImportProgress in localProgressValues)
-					{
-						totalProgressForList += assetImportProgress;
-					}
+				progress.Report(totalProgress);
+			};
 
-					var totalProgress = range * (totalProgressForList / (float)count) + totalProgressStart;
-
-					logger?.Log(
-						$"LOCAL PROGRESS: {String.Format("{0:0.00}", value)} START: {String.Format("{0:0.00}", totalProgressStart)} FINISH: {String.Format("{0:0.00}", totalProgressFinish)} INDEX: {String.Format("{0:0.00}", index)} COUNT: {String.Format("{0:0.00}", count)} RANGE: {String.Format("{0:0.00}", range)} LIST PROGRESS: {String.Format("{0:0.00}", totalProgressForList)} PROGRESS: {String.Format("{0:0.00}", totalProgress)}");
-
-					progress.Report(totalProgress);
-				};
-
-				localProgress = localProgressInstance;
-			}
 			
 			return localProgress;
 		}

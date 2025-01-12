@@ -3,6 +3,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 
+using HereticalSolutions.Asynchronous;
+
 using HereticalSolutions.Allocations;
 
 using HereticalSolutions.Pools;
@@ -74,16 +76,15 @@ namespace HereticalSolutions.AssetImport
 			Action<TImporter> initializationDelegate = null,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 			where TImporter : AAssetImporter
 		{
 			logger?.Log(
 				GetType(),
-				$"IMPORTING {typeof(TImporter).Name} INITIATED");
+				$"IMPORTING {nameof(TImporter)} INITIATED");
 
-			var popImporterTask = PopImporter<TImporter>();
+			var popImporterTask = PopImporter<TImporter>(
+				asyncContext);
 
 			var importer = await popImporterTask;
 				//.ConfigureAwait(false);
@@ -97,7 +98,7 @@ namespace HereticalSolutions.AssetImport
 				importer.Value as TImporter);
 
 			var importTask = importer.Value.Import(
-				progress: progress);
+				asyncContext);
 
 			var result = await importTask;
 				//.ConfigureAwait(false);
@@ -137,9 +138,7 @@ namespace HereticalSolutions.AssetImport
 					var postProcessorTask = postProcessors[i].OnImport(
 						result,
 
-						cancellationToken,
-						progress,
-						progressLogger);
+						asyncContext);
 
 					await postProcessorTask;
 						//.ConfigureAwait(false);
@@ -151,11 +150,14 @@ namespace HereticalSolutions.AssetImport
 				}
 			}
 
-			await PushImporter(importer);
+			await PushImporter(
+				importer,
+				
+				asyncContext);
 
 			logger?.Log(
 				GetType(),
-				$"IMPORTING {typeof(TImporter).Name} FINISHED");
+				$"IMPORTING {nameof(TImporter)} FINISHED");
 
 			return result;
 		}
@@ -164,9 +166,7 @@ namespace HereticalSolutions.AssetImport
 			TPostProcessor instance,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 			where TImporter : AAssetImporter
 			where TPostProcessor : AAssetImportPostProcessor
 		{
@@ -198,9 +198,7 @@ namespace HereticalSolutions.AssetImport
 		public async Task<IPoolElementFacade<AAssetImporter>> PopImporter<TImporter>(
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 			where TImporter : AAssetImporter
 		{
 			IManagedPool<AAssetImporter> importerPool;
@@ -243,9 +241,7 @@ namespace HereticalSolutions.AssetImport
 			IPoolElementFacade<AAssetImporter> pooledImporter,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 		{
 			pooledImporter.Value.Cleanup();
 

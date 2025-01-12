@@ -1,6 +1,6 @@
-using System;
-using System.Threading;
 using System.Threading.Tasks;
+
+using HereticalSolutions.Asynchronous;
 
 using HereticalSolutions.Persistence;
 
@@ -42,11 +42,9 @@ namespace HereticalSolutions.AssetImport
 		public override async Task<IResourceVariantData> Import(
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 		{
-			progress?.Report(0f);
+			asyncContext?.Progress?.Report(0f);
 
 			serializer.Deserialize<TAsset>(
 				out var asset);
@@ -54,7 +52,7 @@ namespace HereticalSolutions.AssetImport
 			var task = AddAssetAsResourceToManager(
 				asset,
 				true,
-				progress: progress);
+				asyncContext);
 
 			var result = await task;
 				//.ConfigureAwait(false);
@@ -64,7 +62,7 @@ namespace HereticalSolutions.AssetImport
 					GetType(),
 					logger);
 
-			progress?.Report(1f);
+			asyncContext?.Progress?.Report(1f);
 
 			return result;
 		}
@@ -81,13 +79,14 @@ namespace HereticalSolutions.AssetImport
 			bool allocate = true,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 		{
-			progress?.Report(0f);
+			asyncContext?.Progress?.Report(0f);
 
-			var getOrCreateResourceTask = GetOrCreateResourceData(resourcePath);
+			var getOrCreateResourceTask = GetOrCreateResourceData(
+				resourcePath,
+				
+				asyncContext);
 
 			var resource = await getOrCreateResourceTask;
 				//.ConfigureAwait(false);
@@ -133,7 +132,7 @@ namespace HereticalSolutions.AssetImport
 					GetType(),
 					logger);
 
-			progress?.Report(1f);
+			asyncContext?.Progress?.Report(1f);
 
 			return result;
 		}

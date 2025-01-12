@@ -1,9 +1,10 @@
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 
 using System.Net;
 using System.Net.Sockets;
+
+using HereticalSolutions.Asynchronous;
 
 using HereticalSolutions.Delegates;
 using HereticalSolutions.Delegates.Factories;
@@ -274,9 +275,7 @@ namespace HereticalSolutions.Networking.LiteNetLib
             byte preferredPlayerSlot = byte.MaxValue,
 
             //Async tail
-            CancellationToken cancellationToken = default,
-            IProgress<float> progress = null,
-            ILogger progressLogger = null)
+            AsyncExecutionContext asyncContext)
         {
             if (status != EClientStatus.DISCONNECTED)
             {
@@ -642,7 +641,9 @@ namespace HereticalSolutions.Networking.LiteNetLib
                 message.IP,
                 message.Port,
                 message.Secret,
-                message.PreferredPlayerSlot);
+                message.PreferredPlayerSlot,
+                
+                null);
         }
         
         private void OnClientDisconnectMessage(ClientDisconnectMessage message)
@@ -707,7 +708,7 @@ namespace HereticalSolutions.Networking.LiteNetLib
             {
                 throw new Exception(
                     logger.TryFormatException<NetworkClient>(
-                        $"COULD NOT FIND PACKET ID FOR TYPE: {typeof(T).Name}"));
+                        $"COULD NOT FIND PACKET ID FOR TYPE: {nameof(T)}"));
             }
 
             writer.Put(
@@ -787,7 +788,7 @@ namespace HereticalSolutions.Networking.LiteNetLib
             {
                 throw new Exception(
                     logger.TryFormatException<NetworkClient>(
-                        $"COULD NOT FIND PACKET ID FOR TYPE: {typeof(T).Name}"));
+                        $"COULD NOT FIND PACKET ID FOR TYPE: {nameof(T)}"));
             }
 
             //writer.Put(packetType);

@@ -94,7 +94,7 @@
 					throw new Exception(
 						logger.TryFormatException(
 							GetType(),
-							$"STATE {typeof(TConcreteState).Name} NOT FOUND"));
+							$"STATE {nameof(TConcreteState)} NOT FOUND"));
 
 				return result;
 			}
@@ -131,7 +131,7 @@
 					throw new Exception(
 						logger.TryFormatException(
 							GetType(),
-							$"EVENT {typeof(TEvent).Name} NOT FOUND"));
+							$"EVENT {nameof(TEvent)} NOT FOUND"));
 
 				if (TransitionInProgress)
 					transitionQueue.Enqueue(@event);
@@ -178,7 +178,7 @@
 					throw new Exception(
 						logger.TryFormatException(
 							GetType(),
-							$"STATE {typeof(TState).Name} NOT FOUND"));
+							$"STATE {nameof(TState)} NOT FOUND"));
 
 				var previousState = CurrentState;
 				var newState = states.Get(typeof(TState));

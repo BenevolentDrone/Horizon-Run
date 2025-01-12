@@ -1,8 +1,9 @@
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 
 using System.Collections.Generic;
+
+using HereticalSolutions.Asynchronous;
 
 using HereticalSolutions.Repositories;
 
@@ -166,9 +167,7 @@ namespace HereticalSolutions.Delegates
 			TValue value,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 		{
 			IAsyncPublisherSingleArgGeneric<TValue> broadcaster = null;
 
@@ -190,9 +189,7 @@ namespace HereticalSolutions.Delegates
 			await broadcaster.PublishAsync(
 				value,
 				
-				cancellationToken,
-				progress,
-				progressLogger);
+				asyncContext);
 		}
 
 		public async Task PublishAsync(
@@ -200,9 +197,7 @@ namespace HereticalSolutions.Delegates
 			object value,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 		{
 			IAsyncPublisherSingleArg broadcaster = null;
 
@@ -223,9 +218,7 @@ namespace HereticalSolutions.Delegates
 				valueType,
 				value,
 
-				cancellationToken,
-				progress,
-				progressLogger);
+				asyncContext);
 		}
 
 		#endregion

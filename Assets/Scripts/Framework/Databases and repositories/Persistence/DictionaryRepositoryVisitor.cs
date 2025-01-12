@@ -72,7 +72,7 @@ namespace HereticalSolutions.Repositories
 			{
 				logger?.LogError(
 					GetType(),
-					$"VISITABLE IS NOT OF TYPE: {typeof(RuntimeTimer).Name}");
+					$"VISITABLE IS NOT OF TYPE: {nameof(RuntimeTimer)}");
 
 				dto = null;
 
@@ -104,7 +104,7 @@ namespace HereticalSolutions.Repositories
 			{
 				logger?.LogError(
 					GetType(),
-					$"VISITABLE IS NOT OF TYPE: {typeof(RuntimeTimer).Name}");
+					$"VISITABLE IS NOT OF TYPE: {nameof(RuntimeTimer)}");
 
 				dto = null;
 
@@ -139,7 +139,7 @@ namespace HereticalSolutions.Repositories
 			{
 				logger?.LogError(
 					GetType(),
-					$"DTO IS NOT OF TYPE: {typeof(RuntimeTimerDTO).Name}");
+					$"DTO IS NOT OF TYPE: {nameof(RuntimeTimerDTO)}");
 
 				visitable = default;
 
@@ -181,7 +181,7 @@ namespace HereticalSolutions.Repositories
 			{
 				logger?.LogError(
 					GetType(),
-					$"DTO IS NOT OF TYPE: {typeof(RuntimeTimerDTO).Name}");
+					$"DTO IS NOT OF TYPE: {nameof(RuntimeTimerDTO)}");
 
 				visitableObject = default;
 
@@ -226,7 +226,7 @@ namespace HereticalSolutions.Repositories
 			{
 				logger?.LogError(
 					GetType(),
-					$"DTO IS NOT OF TYPE: {typeof(RuntimeTimerDTO).Name}");
+					$"DTO IS NOT OF TYPE: {nameof(RuntimeTimerDTO)}");
 
 				return false;
 			}
@@ -237,7 +237,7 @@ namespace HereticalSolutions.Repositories
 			{
 				logger?.LogError(
 					GetType(),
-					$"VISITABLE IS NOT OF TYPE: {typeof(RuntimeTimer).Name}");
+					$"VISITABLE IS NOT OF TYPE: {nameof(RuntimeTimer)}");
 
 				return false;
 			}
@@ -270,7 +270,7 @@ namespace HereticalSolutions.Repositories
 			{
 				logger?.LogError(
 					GetType(),
-					$"DTO IS NOT OF TYPE: {typeof(RuntimeTimerDTO).Name}");
+					$"DTO IS NOT OF TYPE: {nameof(RuntimeTimerDTO)}");
 
 				return false;
 			}
@@ -281,7 +281,7 @@ namespace HereticalSolutions.Repositories
 			{
 				logger?.LogError(
 					GetType(),
-					$"VISITABLE IS NOT OF TYPE: {typeof(RuntimeTimer).Name}");
+					$"VISITABLE IS NOT OF TYPE: {nameof(RuntimeTimer)}");
 
 				return false;
 			}

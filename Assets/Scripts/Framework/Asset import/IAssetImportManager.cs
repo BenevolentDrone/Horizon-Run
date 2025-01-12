@@ -1,10 +1,9 @@
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 
-using HereticalSolutions.ResourceManagement;
+using HereticalSolutions.Asynchronous;
 
-using HereticalSolutions.Logging;
+using HereticalSolutions.ResourceManagement;
 
 namespace HereticalSolutions.AssetImport
 {
@@ -15,18 +14,14 @@ namespace HereticalSolutions.AssetImport
 			Action<TImporter> initializationDelegate = null,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 			where TImporter : AAssetImporter;
 
 		Task RegisterPostProcessor<TImporter, TPostProcessor>(
 			TPostProcessor instance,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 			where TImporter : AAssetImporter
 			where TPostProcessor : AAssetImportPostProcessor;
 	}

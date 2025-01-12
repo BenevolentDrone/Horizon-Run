@@ -34,7 +34,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Networking
                 if (sourceComponent.Source == ENetworkEventSource.CLIENT)
                 {
                     logger?.LogError<PreventFromProcessingUnlessOriginatedFromServerEventComponent<TEventComponent, TDelta>>(
-                        $"EVENT ENTITY {typeof(TEventComponent).Name} HAS CLIENT AS NETWORK EVENT SOURCE, ABORTING PROCESSING");
+                        $"EVENT ENTITY {nameof(TEventComponent)} HAS CLIENT AS NETWORK EVENT SOURCE, ABORTING PROCESSING");
                     
                     entity.Set<EventProcessedComponent>();
 
@@ -44,7 +44,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Networking
                 if (sourceComponent.Source == ENetworkEventSource.SERVER)
                 {
                     logger?.Log<PreventFromProcessingUnlessOriginatedFromServerEventComponent<TEventComponent, TDelta>>(
-                        $"PROCESSING EVENT ENTITY SOURCED FROM SERVER: {typeof(TEventComponent).Name}");
+                        $"PROCESSING EVENT ENTITY SOURCED FROM SERVER: {nameof(TEventComponent)}");
                     
                     return;
                 }
@@ -53,7 +53,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Networking
             entity.Set<EventProcessedComponent>();
 
             //logger?.LogError<PreventFromProcessingUnlessOriginatedFromServerEventComponent<TEventComponent, TDelta>>(
-            //    $"EVENT ENTITY {typeof(TEventComponent).Name} WAS PREVENTED FROM PROCESSING," +
+            //    $"EVENT ENTITY {nameof(TEventComponent)} WAS PREVENTED FROM PROCESSING," +
             //    $" PLEASE ENSURE THE EVENT IS NOT FIRED WHERE UNNECESSARY");
         }
     }

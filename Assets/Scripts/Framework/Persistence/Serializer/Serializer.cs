@@ -52,7 +52,7 @@ namespace HereticalSolutions.Persistence
 					{
 						logger?.LogError(
 							GetType(),
-							$"VISIT SAVE FAILED: {typeof(TValue).Name}");
+							$"VISIT SAVE FAILED: {nameof(TValue)}");
 
 						return false;
 					}
@@ -74,7 +74,7 @@ namespace HereticalSolutions.Persistence
 				{
 					logger?.Log(
 						GetType(),
-						$"CANNOT VISIT TYPE: {typeof(TValue).Name}, TRYING TO SERIALIZE AS DTO");
+						$"CANNOT VISIT TYPE: {nameof(TValue)}, TRYING TO SERIALIZE AS DTO");
 
 					if (!context.FormatSerializer.Serialize<TValue>(
 						context.SerializationStrategy,
@@ -83,7 +83,7 @@ namespace HereticalSolutions.Persistence
 					{
 						logger?.LogError(
 							GetType(),
-							$"SERIALIZATION FAILED: {typeof(TValue).Name}");
+							$"SERIALIZATION FAILED: {nameof(TValue)}");
 
 						return false;
 					}
@@ -224,7 +224,7 @@ namespace HereticalSolutions.Persistence
 					{
 						logger?.LogError(
 							GetType(),
-							$"VISIT LOAD FAILED: {typeof(TValue).Name}");
+							$"VISIT LOAD FAILED: {nameof(TValue)}");
 	
 						return false;
 					}
@@ -233,7 +233,7 @@ namespace HereticalSolutions.Persistence
 				{
 					logger?.Log(
 						GetType(),
-						$"CANNOT VISIT TYPE: {typeof(TValue).Name}, TRYING TO DESERIALIZE AS DTO");
+						$"CANNOT VISIT TYPE: {nameof(TValue)}, TRYING TO DESERIALIZE AS DTO");
 
 					var loadVisitor = context.Visitor as ILoadVisitor;
 
@@ -253,7 +253,7 @@ namespace HereticalSolutions.Persistence
 					{
 						logger?.LogError(
 							GetType(),
-							$"DESERIALIZATION FAILED: {typeof(TValue).Name}");
+							$"DESERIALIZATION FAILED: {nameof(TValue)}");
 
 						return false;
 					}
@@ -405,7 +405,7 @@ namespace HereticalSolutions.Persistence
 					{
 						logger?.LogError(
 							GetType(),
-							$"VISIT POPULATE FAILED: {typeof(TValue).Name}");
+							$"VISIT POPULATE FAILED: {nameof(TValue)}");
 	
 						return false;
 					}
@@ -414,7 +414,7 @@ namespace HereticalSolutions.Persistence
 				{
 					logger?.Log(
 						GetType(),
-						$"CANNOT VISIT TYPE: {typeof(TValue).Name}, TRYING TO POPULATE AS DTO");
+						$"CANNOT VISIT TYPE: {nameof(TValue)}, TRYING TO POPULATE AS DTO");
 	
 					var populateVisitor = context.Visitor as IPopulateVisitor;
 	
@@ -434,7 +434,7 @@ namespace HereticalSolutions.Persistence
 					{
 						logger?.LogError(
 							GetType(),
-							$"POPULATING FAILED: {typeof(TValue).Name}");
+							$"POPULATING FAILED: {nameof(TValue)}");
 	
 						return false;
 					}

@@ -1,8 +1,7 @@
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 
-using HereticalSolutions.Logging;
+using HereticalSolutions.Asynchronous;
 
 namespace HereticalSolutions.Messaging.Concurrent
 {
@@ -75,11 +74,9 @@ namespace HereticalSolutions.Messaging.Concurrent
 		}
 
 		public async Task ExecuteAsync(
-			
+
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 		{
 			lock (lockObject)
 			{

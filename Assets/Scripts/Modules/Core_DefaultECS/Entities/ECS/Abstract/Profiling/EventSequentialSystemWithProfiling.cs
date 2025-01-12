@@ -49,7 +49,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
             this.systems = (systems ?? throw new ArgumentNullException(nameof(systems))).Where(s => s != null).ToArray();
 
 #if USE_PROFILING_MARKERS || USE_PROFILING_SAMPLERS || USE_PROFILING_CUSTOM_MARKERS
-            string markerName = $"{typeof(TEvent).Name} event system";
+            string markerName = $"{nameof(TEvent)} event system";
 #endif
             
 #if USE_PROFILING_MARKERS

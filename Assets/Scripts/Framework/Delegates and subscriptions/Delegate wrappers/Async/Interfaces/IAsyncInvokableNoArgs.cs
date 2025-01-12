@@ -1,18 +1,14 @@
-using System;
-using System.Threading;
 using System.Threading.Tasks;
 
-using HereticalSolutions.Logging;
+using HereticalSolutions.Asynchronous;
 
 namespace HereticalSolutions.Delegates
 {
 	public interface IAsyncInvokableNoArgs
 	{
 		Task InvokeAsync(
-			
+
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null);
+			AsyncExecutionContext asyncContext);
 	}
 }

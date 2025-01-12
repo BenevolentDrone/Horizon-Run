@@ -4,6 +4,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Linq; //error CS1061: 'IEnumerable<IReadOnlyResourceData>' does not contain a definition for 'ToArray'
 
+using HereticalSolutions.Asynchronous;
+
 using HereticalSolutions.Repositories;
 
 using HereticalSolutions.LifetimeManagement;
@@ -538,15 +540,13 @@ namespace HereticalSolutions.ResourceManagement
 			bool allocate = true,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 		{
 			logger?.Log(
 				GetType(),
 				$"{Descriptor.ID} ADDING VARIANT {variant.Descriptor.VariantID}");
 
-			progress?.Report(0f);
+			asyncContext?.Progress?.Report(0f);
 
 			await semaphore.WaitAsync(); 
 			
@@ -560,7 +560,7 @@ namespace HereticalSolutions.ResourceManagement
 					variant.Descriptor.VariantIDHash,
 					variant))
 				{
-					progress?.Report(1f);
+					asyncContext?.Progress?.Report(1f);
 
 					return;
 				}
@@ -574,7 +574,8 @@ namespace HereticalSolutions.ResourceManagement
 				var task = variantAddedNotifier
 					.Notify(
 						variant.Descriptor.VariantIDHash,
-						variant);
+						variant,
+						asyncContext);
 
 				await task;
 					//.ConfigureAwait(false);
@@ -595,16 +596,14 @@ namespace HereticalSolutions.ResourceManagement
 
 			if (allocate)
 			{
-				progress?.Report(0.5f);
-
-				IProgress<float> localProgress = progress.CreateLocalProgressWithRange(
-					0.5f,
-					1f);
+				asyncContext?.Progress?.Report(0.5f);
 
 				var task = variant
 					.StorageHandle
 					.Allocate(
-						progress: localProgress);
+						asyncContext.CreateLocalProgressWithRange(
+							0.5f,
+							1f));
 
 				await task;
 					//.ConfigureAwait(false);
@@ -615,7 +614,7 @@ namespace HereticalSolutions.ResourceManagement
 						logger);
 			}
 			
-			progress?.Report(1f);
+			asyncContext?.Progress?.Report(1f);
 		}
 
 		public async Task RemoveVariant(
@@ -623,13 +622,11 @@ namespace HereticalSolutions.ResourceManagement
 			bool free = true,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 		{
 			IResourceVariantData variant = null;
 
-			progress?.Report(0f);
+			asyncContext?.Progress?.Report(0f);
 
 			await semaphore.WaitAsync(); 
 			
@@ -643,7 +640,7 @@ namespace HereticalSolutions.ResourceManagement
 					variantIDHash,
 					out variant))
 				{
-					progress?.Report(1f);
+					asyncContext?.Progress?.Report(1f);
 
 					return;
 				}
@@ -665,16 +662,14 @@ namespace HereticalSolutions.ResourceManagement
 
 			if (free)
 			{
-				progress?.Report(0.5f);
-
-				IProgress<float> localProgress = progress.CreateLocalProgressWithRange(
-					0.5f,
-					1f);
+				asyncContext?.Progress?.Report(0.5f);
 
 				var task = variant
 					.StorageHandle
 					.Free(
-						progress: localProgress);
+						asyncContext.CreateLocalProgressWithRange(
+							0.5f,
+							1f));
 
 				await task;
 					//.ConfigureAwait(false);
@@ -685,7 +680,7 @@ namespace HereticalSolutions.ResourceManagement
 						logger);
 			}
 
-			progress?.Report(1f);
+			asyncContext?.Progress?.Report(1f);
 		}
 
 		public async Task RemoveVariant(
@@ -693,9 +688,7 @@ namespace HereticalSolutions.ResourceManagement
 			bool free = true,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 		{
 			logger?.Log(
 				GetType(),
@@ -704,7 +697,7 @@ namespace HereticalSolutions.ResourceManagement
 			var task = RemoveVariant(
 				variantID.AddressToHash(),
 				free,
-				progress: progress);
+				asyncContext);
 
 			await task;
 				//.ConfigureAwait(false);
@@ -740,11 +733,9 @@ namespace HereticalSolutions.ResourceManagement
 			bool free = true,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 		{
-			progress?.Report(0f);
+			asyncContext?.Progress?.Report(0f);
 
 			IResourceVariantData[] variantsToFree;
 
@@ -779,20 +770,18 @@ namespace HereticalSolutions.ResourceManagement
 
 				int totalStepsCount = variantsToFreeCount + 1; //Clearing the repos counts as a step
 
-				progress?.Report(1f / (float)totalStepsCount);
+				asyncContext?.Progress?.Report(1f / (float)totalStepsCount);
 
 				for (int i = 0; i < variantsToFree.Length; i++)
 				{
-					IProgress<float> localProgress = progress.CreateLocalProgressForStep(
-						(1f / (float)totalStepsCount),
-						1f,
-						i,
-						variantsToFreeCount);
-
 					var task = variantsToFree[i]
 						.StorageHandle
 						.Free(
-							progress: localProgress);
+							asyncContext.CreateLocalProgressForStep(
+								(1f / (float)totalStepsCount),
+								1f,
+								i,
+								variantsToFreeCount));
 
 					await task;
 						//.ConfigureAwait(false);
@@ -802,26 +791,24 @@ namespace HereticalSolutions.ResourceManagement
 							GetType(),
 							logger);
 
-					progress?.Report((float)(i + 2) / (float)totalStepsCount); // +1 for clearing the repo, +1 because the step is actually finished
+					asyncContext?.Progress?.Report((float)(i + 2) / (float)totalStepsCount); // +1 for clearing the repo, +1 because the step is actually finished
 				}
 			}
 
-			progress?.Report(1f);
+			asyncContext?.Progress?.Report(1f);
 		}
 
 		public async Task AddNestedResource(
 			IReadOnlyResourceData nestedResource,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 		{
 			logger?.Log(
 				GetType(),
 				$"{Descriptor.ID} ADDING NESTED RESOURCE {nestedResource.Descriptor.ID}");
 
-			progress?.Report(0f);
+			asyncContext?.Progress?.Report(0f);
 
 			await semaphore.WaitAsync(); 
 			
@@ -835,7 +822,7 @@ namespace HereticalSolutions.ResourceManagement
 					nestedResource.Descriptor.IDHash,
 					nestedResource))
 				{
-					progress?.Report(1f);
+					asyncContext?.Progress?.Report(1f);
 
 					return;
 				}
@@ -849,7 +836,9 @@ namespace HereticalSolutions.ResourceManagement
 				var task = nestedResourceAddedNotifier
 					.Notify(
 						nestedResource.Descriptor.IDHash,
-						nestedResource);
+						nestedResource,
+						
+						asyncContext);
 
 				await task;
 					//.ConfigureAwait(false);
@@ -868,7 +857,7 @@ namespace HereticalSolutions.ResourceManagement
 					$"({Descriptor.ID}) AddNestedResource SEMAPHORE RELEASED");
 			}
 
-			progress?.Report(1f);
+			asyncContext?.Progress?.Report(1f);
 		}
 
 		public async Task RemoveNestedResource(
@@ -876,13 +865,11 @@ namespace HereticalSolutions.ResourceManagement
 			bool free = true,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 		{
 			IReadOnlyResourceData nestedResource;
 
-			progress?.Report(0f);
+			asyncContext?.Progress?.Report(0f);
 
 			await semaphore.WaitAsync(); 
 			
@@ -896,7 +883,7 @@ namespace HereticalSolutions.ResourceManagement
 					nestedResourceIDHash,
 					out nestedResource))
 				{
-					progress?.Report(1f);
+					asyncContext?.Progress?.Report(1f);
 
 					return;
 				}
@@ -918,16 +905,14 @@ namespace HereticalSolutions.ResourceManagement
 
 			if (free)
 			{
-				progress?.Report(0.5f);
-
-				IProgress<float> localProgress = progress.CreateLocalProgressWithRange(
-					0.5f,
-					1f);
+				asyncContext?.Progress?.Report(0.5f);
 
 				var task = ((IResourceData)nestedResource)
 					.Clear(
 						free,
-						progress: localProgress);
+						asyncContext.CreateLocalProgressWithRange(
+							0.5f,
+							1f));
 
 				await task;
 					//.ConfigureAwait(false);
@@ -938,7 +923,7 @@ namespace HereticalSolutions.ResourceManagement
 						logger);
 			}
 			
-			progress?.Report(1f);
+			asyncContext?.Progress?.Report(1f);
 		}
 
 		public async Task RemoveNestedResource(
@@ -946,9 +931,7 @@ namespace HereticalSolutions.ResourceManagement
 			bool free = true,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 		{
 			logger?.Log(
 				GetType(),
@@ -957,7 +940,7 @@ namespace HereticalSolutions.ResourceManagement
 			var task = RemoveNestedResource(
 				nestedResourceID.AddressToHash(),
 				free,
-				progress: progress);
+				asyncContext);
 
 			await task;
 				//.ConfigureAwait(false);
@@ -972,11 +955,9 @@ namespace HereticalSolutions.ResourceManagement
 			bool free = true,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 		{
-			progress?.Report(0f);
+			asyncContext?.Progress?.Report(0f);
 
 			IReadOnlyResourceData[] nestedResourcesToFree;
 
@@ -1009,7 +990,7 @@ namespace HereticalSolutions.ResourceManagement
 
 				int totalStepsCount = nestedResourcesToFreeCount + 1; //Clearing the repos counts as a step
 
-				progress?.Report(1f / (float)totalStepsCount);
+				asyncContext?.Progress?.Report(1f / (float)totalStepsCount);
 
 				for (int i = 0; i < nestedResourcesToFreeCount; i++)
 				{
@@ -1017,16 +998,14 @@ namespace HereticalSolutions.ResourceManagement
 
 					nestedResource.ParentResource = null;
 
-					IProgress<float> localProgress = progress.CreateLocalProgressForStep(
-						(1f / (float)totalStepsCount),
-						1f,
-						i,
-						nestedResourcesToFreeCount);
-
 					var task = nestedResource
 						.Clear(
 							free,
-							progress: localProgress);
+							asyncContext.CreateLocalProgressForStep(
+								(1f / (float)totalStepsCount),
+								1f,
+								i,
+								nestedResourcesToFreeCount));
 
 					await task;
 						//.ConfigureAwait(false);
@@ -1036,30 +1015,26 @@ namespace HereticalSolutions.ResourceManagement
 							GetType(),
 							logger);
 
-					progress?.Report((float)(i + 2) / (float)totalStepsCount); // +1 for clearing the repo, +1 because the step is actually finished
+					asyncContext?.Progress?.Report((float)(i + 2) / (float)totalStepsCount); // +1 for clearing the repo, +1 because the step is actually finished
 				}
 			}
 
-			progress?.Report(1f);
+			asyncContext?.Progress?.Report(1f);
 		}
 
 		public async Task Clear(
 			bool free = true,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 		{
-			progress?.Report(0f);
-
-			IProgress<float> localProgress = progress.CreateLocalProgressWithRange(
-				0f,
-				0.5f);
+			asyncContext?.Progress?.Report(0f);
 
 			var clearVariantsTask = ClearAllVariants(
 				free,
-				progress: localProgress);
+				asyncContext.CreateLocalProgressWithRange(
+					0f,
+					0.5f));
 
 			await clearVariantsTask;
 				//.ConfigureAwait(false);
@@ -1069,15 +1044,13 @@ namespace HereticalSolutions.ResourceManagement
 					GetType(),
 					logger);
 
-			progress?.Report(0.5f);
-
-			localProgress = progress.CreateLocalProgressWithRange(
-				0.5f,
-				1f);
+			asyncContext?.Progress?.Report(0.5f);
 
 			var clearNestedResourcesTask = ClearAllNestedResources(
 				free,
-				progress: localProgress);
+				asyncContext.CreateLocalProgressWithRange(
+					0.5f,
+					1f));
 
 			await clearNestedResourcesTask;
 				//.ConfigureAwait(false);
@@ -1087,7 +1060,7 @@ namespace HereticalSolutions.ResourceManagement
 					GetType(),
 					logger);
 
-			progress?.Report(1f);
+			asyncContext?.Progress?.Report(1f);
 		}
 
 		#endregion
@@ -1097,9 +1070,7 @@ namespace HereticalSolutions.ResourceManagement
 		public async Task<IResourceVariantData> GetDefaultVariantWhenAvailable(
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 		{
 			Task<IResourceVariantData> waitForNotificationTask;
 
@@ -1117,7 +1088,11 @@ namespace HereticalSolutions.ResourceManagement
 				}
 
 				var getWaitForNotificationTask = variantAddedNotifier
-					.GetWaitForNotificationTask(-1, true);
+					.GetWaitForNotificationTask(
+						-1,
+						true,
+						
+						asyncContext);
 
 				waitForNotificationTask = await getWaitForNotificationTask;
 					//.ConfigureAwait(false);
@@ -1164,9 +1139,7 @@ namespace HereticalSolutions.ResourceManagement
 			int variantIDHash,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 		{
 			Task<IResourceVariantData> waitForNotificationTask;
 
@@ -1186,7 +1159,10 @@ namespace HereticalSolutions.ResourceManagement
 				}
 
 				var getWaitForNotificationTask = variantAddedNotifier
-					.GetWaitForNotificationTask(variantIDHash);
+					.GetWaitForNotificationTask(
+						variantIDHash,
+						
+						asyncContext);
 
 				waitForNotificationTask = await getWaitForNotificationTask;
 					//.ConfigureAwait(false);
@@ -1233,12 +1209,12 @@ namespace HereticalSolutions.ResourceManagement
 			string variantID,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 		{
 			var task = GetVariantWhenAvailable(
-				variantID.AddressToHash());
+				variantID.AddressToHash(),
+				
+				asyncContext);
 
 			var result = await task;
 				//.ConfigureAwait(false);
@@ -1259,9 +1235,7 @@ namespace HereticalSolutions.ResourceManagement
 			int nestedResourceIDHash,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 		{
 			Task<IReadOnlyResourceData> waitForNotificationTask;
 
@@ -1281,7 +1255,10 @@ namespace HereticalSolutions.ResourceManagement
 				}
 
 				var getWaitForNotificationTask = nestedResourceAddedNotifier
-					.GetWaitForNotificationTask(nestedResourceIDHash);
+					.GetWaitForNotificationTask(
+						nestedResourceIDHash,
+
+						asyncContext);
 
 				waitForNotificationTask = await getWaitForNotificationTask;
 					//.ConfigureAwait(false);
@@ -1328,12 +1305,12 @@ namespace HereticalSolutions.ResourceManagement
 			string nestedResourceID,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 		{
 			var task = GetNestedResourceWhenAvailable(
-				nestedResourceID.AddressToHash());
+				nestedResourceID.AddressToHash(),
+				
+				asyncContext);
 
 			var result = await task;
 				//.ConfigureAwait(false);
@@ -1354,15 +1331,15 @@ namespace HereticalSolutions.ResourceManagement
 			string variantID = null,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 		{
 			IResourceVariantData dependencyResourceVariant = null;
 
 			if (string.IsNullOrEmpty(variantID))
 			{
-				var task1 = GetDefaultVariantWhenAvailable();
+				var task1 = GetDefaultVariantWhenAvailable(
+
+					asyncContext);
 
 				dependencyResourceVariant = await task1;
 					//.ConfigureAwait(false);
@@ -1375,7 +1352,9 @@ namespace HereticalSolutions.ResourceManagement
 			else
 			{
 				var task2 = GetVariantWhenAvailable(
-					variantID);
+					variantID,
+					
+					asyncContext);
 
 				dependencyResourceVariant = await task2;
 					//.ConfigureAwait(false);

@@ -108,7 +108,7 @@ namespace HereticalSolutions.Delegates.Subscriptions
             {
                 logger?.LogError(
                     GetType(),
-                    $"INVALID PUBLISHER: EXPECTED {typeof(IPublisherSingleArg).Name} OR {typeof(IPublisherSingleArgGeneric<TValue>).Name} OR {typeof(IAsyncPublisherSingleArg).Name} OR {typeof(IAsyncPublisherSingleArgGeneric<TValue>).Name} : {this.GetHashCode()}");
+                    $"INVALID PUBLISHER: EXPECTED {nameof(IPublisherSingleArg)} OR {nameof(IPublisherSingleArgGeneric<TValue>)} OR {nameof(IAsyncPublisherSingleArg)} OR {nameof(IAsyncPublisherSingleArgGeneric<TValue>)} : {this.GetHashCode()}");
 
                 return false;
             }

@@ -1,8 +1,9 @@
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 
 using System.Collections.Generic;
+
+using HereticalSolutions.Asynchronous;
 
 using HereticalSolutions.Pools;
 
@@ -199,9 +200,7 @@ namespace HereticalSolutions.Delegates
 			TValue value,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 		{
 			NonAllocBroadcasterGenericInvocationContext context = null;
 
@@ -268,9 +267,7 @@ namespace HereticalSolutions.Delegates
 				await subscriptionContext.Delegate?.InvokeAsync(
 					value,
 
-					cancellationToken,
-					progress,
-					progressLogger);
+					asyncContext);
 			}
 
 			lock (lockObject)
@@ -296,9 +293,7 @@ namespace HereticalSolutions.Delegates
 			TArgument value,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 		{
 			//lock (lockObject)
 			//{
@@ -309,9 +304,7 @@ namespace HereticalSolutions.Delegates
 					await PublishAsync(
 						tValue,
 						
-						cancellationToken,
-						progress,
-						progressLogger);
+						asyncContext);
 
 					break;
 
@@ -320,7 +313,7 @@ namespace HereticalSolutions.Delegates
 					throw new Exception(
 						logger.TryFormatException(
 							GetType(),
-							$"INVALID ARGUMENT TYPE. EXPECTED: \"{typeof(TValue).Name}\" RECEIVED: \"{typeof(TArgument).Name}\""));
+							$"INVALID ARGUMENT TYPE. EXPECTED: \"{nameof(TValue)}\" RECEIVED: \"{nameof(TArgument)}\""));
 			}
 			//}
 		}
@@ -330,9 +323,7 @@ namespace HereticalSolutions.Delegates
 			object value,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 		{
 			//lock (lockObject)
 			//{
@@ -343,9 +334,7 @@ namespace HereticalSolutions.Delegates
 					await PublishAsync(
 						tValue,
 						
-						cancellationToken,
-						progress,
-						progressLogger);
+						asyncContext);
 
 					break;
 
@@ -353,7 +342,7 @@ namespace HereticalSolutions.Delegates
 					throw new Exception(
 						logger.TryFormatException(
 							GetType(),
-							$"INVALID ARGUMENT TYPE. EXPECTED: \"{typeof(TValue).Name}\" RECEIVED: \"{valueType.Name}\""));
+							$"INVALID ARGUMENT TYPE. EXPECTED: \"{nameof(TValue)}\" RECEIVED: \"{valueType.Name}\""));
 			}
 			//}
 		}

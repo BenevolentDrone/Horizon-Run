@@ -1,7 +1,9 @@
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+
+using System.Collections.Generic;
+
 using HereticalSolutions.Logging;
 using HereticalSolutions.Repositories;
 
@@ -117,7 +119,7 @@ namespace HereticalSolutions.StateMachines
                 throw new Exception(
                     logger.TryFormatException(
                         GetType(),
-                        $"STATE {typeof(TConcreteState).Name} NOT FOUND"));
+                        $"STATE {nameof(TConcreteState)} NOT FOUND"));
 
             return result;
         }
@@ -166,7 +168,7 @@ namespace HereticalSolutions.StateMachines
                 throw new Exception(
                     logger.TryFormatException(
                         GetType(),
-                        $"EVENT {typeof(TEvent).Name} NOT FOUND"));
+                        $"EVENT {nameof(TEvent)} NOT FOUND"));
 
             var request = new TransitionRequest<TBaseState>(
                 @event,
@@ -269,7 +271,7 @@ namespace HereticalSolutions.StateMachines
                 throw new Exception(
                     logger.TryFormatException(
                         GetType(),
-                        $"EVENT {typeof(TEvent).Name} NOT FOUND"));
+                        $"EVENT {nameof(TEvent)} NOT FOUND"));
 
             var cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 
@@ -383,7 +385,7 @@ namespace HereticalSolutions.StateMachines
                 throw new Exception(
                     logger.TryFormatException(
                         GetType(),
-                        $"STATE {typeof(TState).Name} NOT FOUND"));
+                        $"STATE {nameof(TState)} NOT FOUND"));
 
             var previousState = CurrentState;
 
@@ -496,7 +498,7 @@ namespace HereticalSolutions.StateMachines
                 throw new Exception(
                     logger.TryFormatException(
                         GetType(),
-                        $"STATE {typeof(TState).Name} NOT FOUND"));
+                        $"STATE {nameof(TState)} NOT FOUND"));
 
             var previousState = CurrentState;
 

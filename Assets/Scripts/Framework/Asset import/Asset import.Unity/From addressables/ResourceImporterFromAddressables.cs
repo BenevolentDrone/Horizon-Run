@@ -1,6 +1,6 @@
-using System;
-using System.Threading;
 using System.Threading.Tasks;
+
+using HereticalSolutions.Asynchronous;
 
 using HereticalSolutions.ResourceManagement;
 using HereticalSolutions.ResourceManagement.Factories;
@@ -35,9 +35,7 @@ namespace HereticalSolutions.AssetImport
         public override async Task<IResourceVariantData> Import(
 
             //Async tail
-            CancellationToken cancellationToken = default,
-            IProgress<float> progress = null,
-            ILogger progressLogger = null)
+            AsyncExecutionContext asyncContext)
         {
             int resourcesLoaded = 0;
 
@@ -46,7 +44,7 @@ namespace HereticalSolutions.AssetImport
             foreach (var resourceDataSettings in settings.Resources)
                 totalResources += resourceDataSettings.Variants.Length;
 
-            progress?.Report(0f);
+            asyncContext?.Progress?.Report(0f);
 
             foreach (var resourceDataSettings in settings.Resources)
             {
@@ -72,7 +70,7 @@ namespace HereticalSolutions.AssetImport
                         GetType(),
                         $"IMPORTING {resourceID} INITIATED");
 
-                    IProgress<float> localProgress = progress.CreateLocalProgressForStep(
+                    var localAsyncContext = asyncContext.CreateLocalProgressForStep(
                         0f,
                         1f,
                         resourcesLoaded,
@@ -80,7 +78,9 @@ namespace HereticalSolutions.AssetImport
 
 
                     var getOrCreateResourceTask = GetOrCreateResourceData(
-                        resourceID);
+                        resourceID,
+
+                        localAsyncContext);
 
                     var resource = await getOrCreateResourceTask;
                         //.ConfigureAwait(false);
@@ -107,7 +107,7 @@ namespace HereticalSolutions.AssetImport
                             runtimeResourceManager,
                             loggerResolver),
                         true,
-                        localProgress);
+                        localAsyncContext);
 
                     await addAsVariantTask;
                         //.ConfigureAwait(false);
@@ -124,13 +124,13 @@ namespace HereticalSolutions.AssetImport
 
                     resourcesLoaded++;
 
-                    progress?.Report((float)resourcesLoaded / (float)totalResources);
+                    asyncContext?.Progress?.Report((float)resourcesLoaded / (float)totalResources);
 
                     await Task.Yield();
                 }
             }
 
-            progress?.Report(1f);
+            asyncContext?.Progress?.Report(1f);
 
             return null;
         }

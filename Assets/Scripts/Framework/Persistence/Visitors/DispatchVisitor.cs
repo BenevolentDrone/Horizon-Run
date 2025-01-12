@@ -95,7 +95,7 @@ namespace HereticalSolutions.Persistence
 			{
 				logger?.LogError(
 					GetType(),
-					$"NO VISITOR REGISTERED FOR VISITABLE TYPE: {typeof(TVisitable).Name}");
+					$"NO VISITOR REGISTERED FOR VISITABLE TYPE: {nameof(TVisitable)}");
 
 				dto = null;
 
@@ -115,7 +115,7 @@ namespace HereticalSolutions.Persistence
 					
 					logger?.LogError(
 						GetType(),
-						$"FAILED TO SAVE VISITABLE TYPE: {typeof(TVisitable).Name}");
+						$"FAILED TO SAVE VISITABLE TYPE: {nameof(TVisitable)}");
 
 					dto = null;
 
@@ -125,7 +125,7 @@ namespace HereticalSolutions.Persistence
 
 			logger?.LogError(
 				GetType(),
-				$"NO CONCRETE SAVE VISITOR REGISTERED FOR VISITABLE TYPE: {typeof(TVisitable).Name}");
+				$"NO CONCRETE SAVE VISITOR REGISTERED FOR VISITABLE TYPE: {nameof(TVisitable)}");
 
 			dto = default;
 
@@ -195,7 +195,7 @@ namespace HereticalSolutions.Persistence
 			{
 				logger?.LogError(
 					GetType(),
-					$"NO VISITOR REGISTERED FOR VISITABLE TYPE: {typeof(TVisitable).Name}");
+					$"NO VISITOR REGISTERED FOR VISITABLE TYPE: {nameof(TVisitable)}");
 
 				visitable = default;
 
@@ -219,7 +219,7 @@ namespace HereticalSolutions.Persistence
 						
 						logger?.LogError(
 							GetType(),
-							$"FAILED TO CAST VISITABLE {nonCastedVisitable.GetType().Name} TO TYPE: {typeof(TVisitable).Name}");
+							$"FAILED TO CAST VISITABLE {nonCastedVisitable.GetType().Name} TO TYPE: {nameof(TVisitable)}");
 
 						visitable = default;
 
@@ -228,7 +228,7 @@ namespace HereticalSolutions.Persistence
 					
 					logger?.LogError(
 						GetType(),
-						$"FAILED TO LOAD VISITABLE TYPE: {typeof(TVisitable).Name}");
+						$"FAILED TO LOAD VISITABLE TYPE: {nameof(TVisitable)}");
 
 					visitable = default;
 
@@ -238,7 +238,7 @@ namespace HereticalSolutions.Persistence
 
 			logger?.LogError(
 				GetType(),
-				$"NO CONCRETE LOAD VISITOR REGISTERED FOR VISITABLE TYPE: {typeof(TVisitable).Name}");
+				$"NO CONCRETE LOAD VISITOR REGISTERED FOR VISITABLE TYPE: {nameof(TVisitable)}");
 
 			visitable = default;
 
@@ -308,7 +308,7 @@ namespace HereticalSolutions.Persistence
 			{
 				logger?.LogError(
 					GetType(),
-					$"NO VISITOR REGISTERED FOR VISITABLE TYPE: {typeof(TVisitable).Name}");
+					$"NO VISITOR REGISTERED FOR VISITABLE TYPE: {nameof(TVisitable)}");
 
 				return false;
 			}
@@ -328,7 +328,7 @@ namespace HereticalSolutions.Persistence
 					
 					logger?.LogError(
 						GetType(),
-						$"FAILED TO POPULATE VISITABLE TYPE: {typeof(TVisitable).Name}");
+						$"FAILED TO POPULATE VISITABLE TYPE: {nameof(TVisitable)}");
 
 					return false;
 				}
@@ -336,7 +336,7 @@ namespace HereticalSolutions.Persistence
 
 			logger?.LogError(
 				GetType(),
-				$"NO CONCRETE POPULATE VISITOR REGISTERED FOR VISITABLE TYPE: {typeof(TVisitable).Name}");
+				$"NO CONCRETE POPULATE VISITOR REGISTERED FOR VISITABLE TYPE: {nameof(TVisitable)}");
 
 			return false;
 		}

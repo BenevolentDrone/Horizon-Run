@@ -1,10 +1,9 @@
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 
 using System.Collections.Generic;
 
-using HereticalSolutions.Logging;
+using HereticalSolutions.Asynchronous;
 
 namespace HereticalSolutions.StateMachines
 {
@@ -42,9 +41,7 @@ namespace HereticalSolutions.StateMachines
             TransitionSupervisor supervisor = null,
 
             //Async tail
-            CancellationToken cancellationToken = default,
-            IProgress<float> progress = null,
-            ILogger progressLogger = null);
+            AsyncExecutionContext asyncContext);
         
         Task Handle(
             Type eventType,
@@ -54,9 +51,7 @@ namespace HereticalSolutions.StateMachines
             TransitionSupervisor supervisor = null,
 
             //Async tail
-            CancellationToken cancellationToken = default,
-            IProgress<float> progress = null,
-            ILogger progressLogger = null);
+            AsyncExecutionContext asyncContext);
         
         Action<ITransitionEvent<TBaseState>> OnEventFired { get; set; }
         
@@ -70,9 +65,7 @@ namespace HereticalSolutions.StateMachines
             TransitionSupervisor supervisor = null,
 
             //Async tail
-            CancellationToken cancellationToken = default,
-            IProgress<float> progress = null,
-            ILogger progressLogger = null);
+            AsyncExecutionContext asyncContext);
         
         Task TransitToImmediately(
             Type stateType,
@@ -81,9 +74,7 @@ namespace HereticalSolutions.StateMachines
             TransitionSupervisor supervisor = null,
 
             //Async tail
-            CancellationToken cancellationToken = default,
-            IProgress<float> progress = null,
-            ILogger progressLogger = null);
+            AsyncExecutionContext asyncContext);
 
         #endregion
 
@@ -95,9 +86,7 @@ namespace HereticalSolutions.StateMachines
             TransitionSupervisor supervisor = null,
 
             //Async tail
-            CancellationToken cancellationToken = default,
-            IProgress<float> progress = null,
-            ILogger progressLogger = null);
+            AsyncExecutionContext asyncContext);
 
         void ScheduleTransition(
             Type stateType,
@@ -107,9 +96,7 @@ namespace HereticalSolutions.StateMachines
             TransitionSupervisor supervisor = null,
 
             //Async tail
-            CancellationToken cancellationToken = default,
-            IProgress<float> progress = null,
-            ILogger progressLogger = null);
+            AsyncExecutionContext asyncContext);
 
         #endregion
     }

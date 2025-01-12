@@ -1,9 +1,10 @@
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 
 using System.Net;
 using System.Net.Sockets;
+
+using HereticalSolutions.Asynchronous;
 
 using HereticalSolutions.Delegates;
 using HereticalSolutions.Delegates.Factories;
@@ -174,9 +175,7 @@ namespace HereticalSolutions.Networking.LiteNetLib
             bool reserveSlotForSelf = false,
 
             //Async tail
-            CancellationToken cancellationToken = default,
-            IProgress<float> progress = null,
-            ILogger progressLogger = null)
+            AsyncExecutionContext asyncContext)
         {
             if (status != EHostStatus.OFFLINE)
             {
@@ -224,9 +223,7 @@ namespace HereticalSolutions.Networking.LiteNetLib
         public async Task Stop(
 
             //Async tail
-            CancellationToken cancellationToken = default,
-            IProgress<float> progress = null,
-            ILogger progressLogger = null)
+            AsyncExecutionContext asyncContext)
         {
             if (status == EHostStatus.OFFLINE)
             {
@@ -615,7 +612,8 @@ namespace HereticalSolutions.Networking.LiteNetLib
         
         #region Message handlers
 
-        private void OnServerStartMessage(ServerStartMessage message)
+        private void OnServerStartMessage(
+            ServerStartMessage message)
         {
             int port = message.Port;
             
@@ -624,12 +622,15 @@ namespace HereticalSolutions.Networking.LiteNetLib
             
             Start(
                 port,
-                message.ReserveSlotForSelf);
+                message.ReserveSlotForSelf,
+                
+                null);
         }
         
-        private void OnServerStopMessage(ServerStopMessage message)
+        private void OnServerStopMessage(
+            ServerStopMessage message)
         {
-            Stop();
+            Stop(null);
         }
         
         private void OnServerSendPacketMessage(ServerSendPacketMessage message)
@@ -678,7 +679,7 @@ namespace HereticalSolutions.Networking.LiteNetLib
             {
                 throw new Exception(
                     logger.TryFormatException<NetworkHost>(
-                        $"COULD NOT FIND PACKET ID FOR TYPE: {typeof(T).Name}"));
+                        $"COULD NOT FIND PACKET ID FOR TYPE: {nameof(T)}"));
             }
 
             writer.Put(
@@ -699,7 +700,7 @@ namespace HereticalSolutions.Networking.LiteNetLib
             {
                 throw new Exception(
                     logger.TryFormatException<NetworkHost>(
-                        $"COULD NOT FIND PACKET ID FOR TYPE: {typeof(T).Name}"));
+                        $"COULD NOT FIND PACKET ID FOR TYPE: {nameof(T)}"));
             }
 
             writer.Put(
@@ -738,7 +739,7 @@ namespace HereticalSolutions.Networking.LiteNetLib
             {
                 throw new Exception(
                     logger.TryFormatException<NetworkHost>(
-                        $"COULD NOT FIND PACKET ID FOR TYPE: {typeof(T).Name}"));
+                        $"COULD NOT FIND PACKET ID FOR TYPE: {nameof(T)}"));
             }
 
             writer.Put(
@@ -751,7 +752,7 @@ namespace HereticalSolutions.Networking.LiteNetLib
             if (playerSlot != byte.MaxValue)
             {
                 logger?.Log<NetworkHost>(
-                    $"SENDING PACKET: {typeof(T).Name} TO PLAYER SLOT: {playerSlot} PEER: {connections[playerSlot].PeerID}");
+                    $"SENDING PACKET: {nameof(T)} TO PLAYER SLOT: {playerSlot} PEER: {connections[playerSlot].PeerID}");
                 
                 netManager
                     .GetPeerById(connections[playerSlot].PeerID)
@@ -762,7 +763,7 @@ namespace HereticalSolutions.Networking.LiteNetLib
             else
             {
                 logger?.Log<NetworkHost>(
-                    $"SENDING PACKET: {typeof(T).Name} TO ALL CONNECTIONS");
+                    $"SENDING PACKET: {nameof(T)} TO ALL CONNECTIONS");
                 
                 netManager.SendToAll(
                     writer,
@@ -846,7 +847,7 @@ namespace HereticalSolutions.Networking.LiteNetLib
             {
                 throw new Exception(
                     logger.TryFormatException<NetworkHost>(
-                        $"COULD NOT FIND PACKET ID FOR TYPE: {typeof(T).Name}"));
+                        $"COULD NOT FIND PACKET ID FOR TYPE: {nameof(T)}"));
             }
 
             //writer.Put(packetType);
@@ -858,7 +859,7 @@ namespace HereticalSolutions.Networking.LiteNetLib
             if (playerSlot != byte.MaxValue)
             {
                 logger?.Log<NetworkHost>(
-                    $"SENDING PACKET: {typeof(T).Name} TO PLAYER SLOT: {playerSlot} PEER: {connections[playerSlot].PeerID}");
+                    $"SENDING PACKET: {nameof(T)} TO PLAYER SLOT: {playerSlot} PEER: {connections[playerSlot].PeerID}");
                 
                 netManager
                     .GetPeerById(connections[playerSlot].PeerID)
@@ -869,7 +870,7 @@ namespace HereticalSolutions.Networking.LiteNetLib
             else
             {
                 logger?.Log<NetworkHost>(
-                    $"SENDING PACKET: {typeof(T).Name} TO ALL CONNECTIONS");
+                    $"SENDING PACKET: {nameof(T)} TO ALL CONNECTIONS");
                 
                 netManager.SendToAll(
                     writer,

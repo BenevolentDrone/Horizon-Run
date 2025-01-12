@@ -66,7 +66,7 @@ namespace HereticalSolutions.Delegates.Wrappers
 					throw new ArgumentException(
 						logger.TryFormatException(
 							GetType(),
-							$"INVALID ARGUMENT TYPE. EXPECTED: \"{typeof(TValue).Name}\" RECEIVED: \"{argument.GetType().Name}\""));
+							$"INVALID ARGUMENT TYPE. EXPECTED: \"{nameof(TValue)}\" RECEIVED: \"{argument.GetType().Name}\""));
 			}
 		}
 
@@ -97,7 +97,7 @@ namespace HereticalSolutions.Delegates.Wrappers
 					throw new ArgumentException(
 						logger.TryFormatException(
 							GetType(),
-							$"INVALID ARGUMENT TYPE. EXPECTED: \"{typeof(TValue).Name}\" RECEIVED: \"{typeof(TArgument).Name}\""));
+							$"INVALID ARGUMENT TYPE. EXPECTED: \"{nameof(TValue)}\" RECEIVED: \"{nameof(TArgument)}\""));
 			}
 		}
 
@@ -125,7 +125,7 @@ namespace HereticalSolutions.Delegates.Wrappers
 					throw new ArgumentException(
 						logger.TryFormatException(
 							GetType(),
-							$"INVALID ARGUMENT TYPE. EXPECTED: \"{typeof(TValue).Name}\" RECEIVED: \"{valueType.Name}\""));
+							$"INVALID ARGUMENT TYPE. EXPECTED: \"{nameof(TValue)}\" RECEIVED: \"{valueType.Name}\""));
 			}
 		}
 

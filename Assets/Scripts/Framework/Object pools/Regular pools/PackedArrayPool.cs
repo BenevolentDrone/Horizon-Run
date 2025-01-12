@@ -59,12 +59,14 @@ namespace HereticalSolutions.Pools
             return result;
         }
         
-        public T Pop(IPoolPopArgument[] args)
+        public T Pop(
+            IPoolPopArgument[] args)
         {
 	        return Pop();
         }
 
-        public void Push(T instance)
+        public void Push(
+            T instance)
         {
             int lastAllocatedItemIndex = allocatedCount - 1;
 

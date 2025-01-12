@@ -1,6 +1,7 @@
 using System;
-using System.Threading;
 using System.Threading.Tasks;
+
+using HereticalSolutions.Asynchronous;
 
 using HereticalSolutions.ResourceManagement;
 using HereticalSolutions.ResourceManagement.Factories;
@@ -29,9 +30,7 @@ namespace HereticalSolutions.AssetImport
 		public virtual async Task<IResourceVariantData> Import(
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 		{
 			throw new NotImplementedException();
 		}
@@ -50,9 +49,7 @@ namespace HereticalSolutions.AssetImport
 			string fullResourcePath,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 		{
 			if (runtimeResourceManager == null)
 			{
@@ -91,7 +88,9 @@ namespace HereticalSolutions.AssetImport
 #endif
 
 				var addRootResourceTask = runtimeResourceManager.AddRootResource(
-					currentData);
+					currentData,
+					
+					asyncContext);
 
 				await addRootResourceTask;
 					//.ConfigureAwait(false);
@@ -137,7 +136,9 @@ namespace HereticalSolutions.AssetImport
 
 					var addNestedResourceTask = ((IResourceData)currentData)
 						.AddNestedResource(
-							newCurrentData);
+							newCurrentData,
+							
+							asyncContext);
 
 					await addNestedResourceTask;
 						//.ConfigureAwait(false);
@@ -159,12 +160,12 @@ namespace HereticalSolutions.AssetImport
 			string nestedResourceID,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 		{
 			var getOrCreateResourceTask = GetOrCreateResourceData(
-				parentResourcePath);
+				parentResourcePath,
+				
+				asyncContext);
 
 			var parent = await getOrCreateResourceTask;
 				//.ConfigureAwait(false);
@@ -196,7 +197,9 @@ namespace HereticalSolutions.AssetImport
 
 			var addNestedResourceTask = parent
 				.AddNestedResource(
-					child);
+					child,
+					
+					asyncContext);
 
 			await addNestedResourceTask;
 				//.ConfigureAwait(false);
@@ -216,11 +219,9 @@ namespace HereticalSolutions.AssetImport
 			bool allocate = true,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 		{
-			progress?.Report(0f);
+			asyncContext?.Progress?.Report(0f);
 
 			var variantData = ResourceManagementFactory.BuildResourceVariantData(
 				variantDescriptor,
@@ -231,7 +232,8 @@ namespace HereticalSolutions.AssetImport
 				.AddVariant(
 					variantData,
 					allocate,
-					progress: progress);
+					
+					asyncContext);
 
 			await task;
 				//.ConfigureAwait(false);
@@ -241,7 +243,7 @@ namespace HereticalSolutions.AssetImport
 					GetType(),
 					logger);
 
-			progress?.Report(1f);
+			asyncContext?.Progress?.Report(1f);
 
 			return variantData;
 		}
@@ -251,9 +253,7 @@ namespace HereticalSolutions.AssetImport
 			string variantID = null,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 		{
 			if (runtimeResourceManager == null)
 			{
@@ -267,7 +267,8 @@ namespace HereticalSolutions.AssetImport
 				.LoadDependency(
 					path,
 					variantID,
-					progress: progress);
+					
+					asyncContext);
 
 			var result = await task;
 				//.ConfigureAwait(false);

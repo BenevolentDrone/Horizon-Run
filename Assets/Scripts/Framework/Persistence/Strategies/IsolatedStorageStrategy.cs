@@ -1,9 +1,10 @@
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 
 using System.IO;
 using System.IO.IsolatedStorage;
+
+using HereticalSolutions.Asynchronous;
 
 using HereticalSolutions.Logging;
 
@@ -272,11 +273,9 @@ namespace HereticalSolutions.Persistence
 		#region Read
 
 		public async Task<(bool, TValue)> ReadAsync<TValue>(
-			
+
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 		{
 			AssertStrategyIsValid(
 				typeof(TValue),
@@ -319,9 +318,7 @@ namespace HereticalSolutions.Persistence
 			Type valueType,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 		{
 			AssertStrategyIsValid(
 				valueType,
@@ -368,9 +365,7 @@ namespace HereticalSolutions.Persistence
 			TValue value,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 		{
 			AssertStrategyIsValid(
 				typeof(TValue),
@@ -389,7 +384,8 @@ namespace HereticalSolutions.Persistence
 				numBytesToWrite);
 
 			if (flushAutomatically)
-				await FlushAsync();
+				await FlushAsync(
+					asyncContext);
 
 			return true;
 		}
@@ -399,9 +395,7 @@ namespace HereticalSolutions.Persistence
 			object value,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 		{
 			AssertStrategyIsValid(
 				valueType,
@@ -420,7 +414,8 @@ namespace HereticalSolutions.Persistence
 				numBytesToWrite);
 
 			if (flushAutomatically)
-				await FlushAsync();
+				await FlushAsync(
+					asyncContext);
 
 			return true;
 		}
@@ -433,9 +428,7 @@ namespace HereticalSolutions.Persistence
 			TValue value,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 		{
 			AssertStrategyIsValid(
 				typeof(TValue),
@@ -454,7 +447,8 @@ namespace HereticalSolutions.Persistence
 				numBytesToWrite);
 
 			if (flushAutomatically)
-				await FlushAsync();
+				await FlushAsync(
+					asyncContext);
 
 			return true;
 		}
@@ -464,9 +458,7 @@ namespace HereticalSolutions.Persistence
 			object value,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 		{
 			AssertStrategyIsValid(
 				valueType,
@@ -485,7 +477,8 @@ namespace HereticalSolutions.Persistence
 				numBytesToWrite);
 
 			if (flushAutomatically)
-				await FlushAsync();
+				await FlushAsync(
+					asyncContext);
 
 			return true;
 		}
@@ -591,11 +584,9 @@ namespace HereticalSolutions.Persistence
 		}
 
 		public async Task FlushAsync(
-			
+
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 		{
 			if (!StreamOpen)
 				return;
@@ -1012,9 +1003,7 @@ namespace HereticalSolutions.Persistence
 			int blockSize,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 		{
 			AssertStrategyIsValid(
 				typeof(TValue),
@@ -1051,9 +1040,7 @@ namespace HereticalSolutions.Persistence
 			int blockSize,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 		{
 			AssertStrategyIsValid(
 				valueType,
@@ -1094,9 +1081,7 @@ namespace HereticalSolutions.Persistence
 			int blockSize,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 		{
 			AssertStrategyIsValid(
 				typeof(TValue),
@@ -1110,7 +1095,8 @@ namespace HereticalSolutions.Persistence
 				blockSize);
 
 			if (flushAutomatically)
-				await FlushAsync();
+				await FlushAsync(
+					asyncContext);
 
 			return true;
 		}
@@ -1122,9 +1108,7 @@ namespace HereticalSolutions.Persistence
 			int blockSize,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 		{
 			AssertStrategyIsValid(
 				valueType,
@@ -1138,7 +1122,8 @@ namespace HereticalSolutions.Persistence
 				blockSize);
 
 			if (flushAutomatically)
-				await FlushAsync();
+				await FlushAsync(
+					asyncContext);
 
 			return true;
 		}

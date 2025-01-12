@@ -1,10 +1,8 @@
-using System;
-using System.Threading;
 using System.Threading.Tasks;
 
-using HereticalSolutions.Pools;
+using HereticalSolutions.Asynchronous;
 
-using HereticalSolutions. Logging;
+using HereticalSolutions.Pools;
 
 namespace HereticalSolutions.AssetImport
 {
@@ -13,17 +11,13 @@ namespace HereticalSolutions.AssetImport
 		Task<IPoolElementFacade<AAssetImporter>> PopImporter<TImporter>(
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 			where TImporter : AAssetImporter;
 
 		Task PushImporter(
 			IPoolElementFacade<AAssetImporter> pooledImporter,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null);
+			AsyncExecutionContext asyncContext);
 	}
 }

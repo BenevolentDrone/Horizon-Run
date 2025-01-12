@@ -1,8 +1,6 @@
-using System;
-using System.Threading;
 using System.Threading.Tasks;
 
-using HereticalSolutions.Logging;
+using HereticalSolutions.Asynchronous;
 
 namespace HereticalSolutions.StanleyScript
 {
@@ -24,9 +22,7 @@ namespace HereticalSolutions.StanleyScript
 			IRuntimeEnvironment environment,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null);
+			AsyncExecutionContext asyncContext);
 
 		#endregion
 
@@ -170,7 +166,7 @@ namespace HereticalSolutions.StanleyScript
 
 			if (variable.VariableType != typeof(TVariable))
 			{
-				reportable.Log($"INVALID STACK VARIABLE TYPE. EXPECTED: {typeof(string).Name} ACTUAL: {variable.VariableType.Name}");
+				reportable.Log($"INVALID STACK VARIABLE TYPE. EXPECTED: {nameof(string)} ACTUAL: {variable.VariableType.Name}");
 
 				return false;
 			}

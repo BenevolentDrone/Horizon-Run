@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
+using HereticalSolutions.Asynchronous;
+
 using HereticalSolutions.Logging;
 
 namespace HereticalSolutions.Delegates.Notifiers
@@ -37,9 +39,7 @@ namespace HereticalSolutions.Delegates.Notifiers
 			bool ignoreKey = false,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 		{
 			TaskCompletionSource<TValue> completionSource = new TaskCompletionSource<TValue>();
 
@@ -83,9 +83,7 @@ namespace HereticalSolutions.Delegates.Notifiers
 			bool ignoreKey = false,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 		{
 			TaskCompletionSource<TValue> completionSource = new TaskCompletionSource<TValue>();
 
@@ -110,16 +108,17 @@ namespace HereticalSolutions.Delegates.Notifiers
 				$"GetWaitForNotificationTask SEMAPHORE RELEASED");
 
 
-			return GetValueFromCompletionSource(completionSource);
+			return GetValueFromCompletionSource(
+				completionSource,
+				
+				asyncContext);
 		}
 
 		private async Task<TValue> GetValueFromCompletionSource(
 			TaskCompletionSource<TValue> completionSource,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 		{
 			var task = completionSource
 				.Task;
@@ -140,9 +139,7 @@ namespace HereticalSolutions.Delegates.Notifiers
 			TValue value,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 		{
 			await semaphore.WaitAsync();
 

@@ -1,10 +1,8 @@
-using System;
-using System.Threading;
 using System.Threading.Tasks;
 
 using System.Collections.Generic;
 
-using HereticalSolutions.Logging;
+using HereticalSolutions.Asynchronous;
 
 namespace HereticalSolutions.Allocations
 {
@@ -25,17 +23,13 @@ namespace HereticalSolutions.Allocations
 			T element,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 		{
 			foreach (var callback in callbacks)
 				await callback.OnAllocated(
 					element,
 					
-					cancellationToken,
-					progress,
-					progressLogger);
+					asyncContext);
 		}
 
 		#endregion

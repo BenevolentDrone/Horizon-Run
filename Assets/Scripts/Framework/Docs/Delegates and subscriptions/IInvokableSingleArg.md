@@ -60,7 +60,7 @@ public void Invoke<TArgument>(TArgument value)
 		default:
 
 			throw new Exception(
-				$"INVALID ARGUMENT TYPE. EXPECTED: \"{typeof(TValue).Name}\" RECEIVED: \"{typeof(TArgument).Name}\"");
+				$"INVALID ARGUMENT TYPE. EXPECTED: \"{nameof(TValue)}\" RECEIVED: \"{nameof(TArgument)}\"");
 	}
 }
 
@@ -77,7 +77,7 @@ public void Invoke(Type valueType, object value)
 		default:
 
 			throw new Exception(
-				$"INVALID ARGUMENT TYPE. EXPECTED: \"{typeof(TValue).Name}\" RECEIVED: \"{valueType.Name}\"");
+				$"INVALID ARGUMENT TYPE. EXPECTED: \"{nameof(TValue)}\" RECEIVED: \"{valueType.Name}\"");
 	}
 }
 

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using HereticalSolutions.Repositories.Factories;
 
 using HereticalSolutions.LifetimeManagement;
-using HereticalSolutions.Persistence;
+//using HereticalSolutions.Persistence;
 
 namespace HereticalSolutions.Repositories
 {

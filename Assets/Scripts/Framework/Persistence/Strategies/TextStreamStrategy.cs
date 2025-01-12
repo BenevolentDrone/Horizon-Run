@@ -1,9 +1,10 @@
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 
 using System.Text;
 using System.IO;
+
+using HereticalSolutions.Asynchronous;
 
 using HereticalSolutions.Logging;
 
@@ -249,11 +250,9 @@ namespace HereticalSolutions.Persistence
 		#region Read
 
 		public async Task<(bool, TValue)> ReadAsync<TValue>(
-			
+
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 		{
 			bool resultIsCharArray = typeof(TValue) == typeof(char[]);
 
@@ -288,9 +287,7 @@ namespace HereticalSolutions.Persistence
 			Type valueType,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 		{
 			bool resultIsCharArray = valueType == typeof(char[]);
 
@@ -329,9 +326,7 @@ namespace HereticalSolutions.Persistence
 			TValue value,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 		{
 			bool resultIsCharArray = typeof(TValue) == typeof(char[]);
 
@@ -358,9 +353,7 @@ namespace HereticalSolutions.Persistence
 			object value,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 		{
 			bool resultIsCharArray = valueType == typeof(char[]);
 
@@ -390,9 +383,7 @@ namespace HereticalSolutions.Persistence
 			TValue value,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 		{
 			bool resultIsCharArray = typeof(TValue) == typeof(char[]);
 
@@ -419,9 +410,7 @@ namespace HereticalSolutions.Persistence
 			object value,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 		{
 			bool resultIsCharArray = valueType == typeof(char[]);
 
@@ -546,11 +535,9 @@ namespace HereticalSolutions.Persistence
 		}
 
 		public async Task FlushAsync(
-			
+
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 		{
 			if (!StreamOpen)
 				return;
@@ -1029,9 +1016,7 @@ namespace HereticalSolutions.Persistence
 			int blockSize,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 		{
 			bool resultIsCharArray = typeof(TValue) == typeof(char[]);
 
@@ -1085,9 +1070,7 @@ namespace HereticalSolutions.Persistence
 			int blockSize,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 		{
 			bool resultIsCharArray = valueType == typeof(char[]);
 
@@ -1145,9 +1128,7 @@ namespace HereticalSolutions.Persistence
 			int blockSize,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 		{
 			bool resultIsCharArray = typeof(TValue) == typeof(char[]);
 
@@ -1179,9 +1160,7 @@ namespace HereticalSolutions.Persistence
 			int blockSize,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 		{
 			bool resultIsCharArray = valueType == typeof(char[]);
 

@@ -1,8 +1,6 @@
-using System;
-using System.Threading;
 using System.Threading.Tasks;
 
-using HereticalSolutions.Logging;
+using HereticalSolutions.Asynchronous;
 
 namespace HereticalSolutions.ResourceManagement
 {
@@ -13,15 +11,11 @@ namespace HereticalSolutions.ResourceManagement
         Task Allocate(
 
             //Async tail
-            CancellationToken cancellationToken = default,
-            IProgress<float> progress = null,
-            ILogger progressLogger = null);
+            AsyncExecutionContext asyncContext);
 
         Task Free(
-            
+
             //Async tail
-            CancellationToken cancellationToken = default,
-            IProgress<float> progress = null,
-            ILogger progressLogger = null);
+            AsyncExecutionContext asyncContext);
     }
 }

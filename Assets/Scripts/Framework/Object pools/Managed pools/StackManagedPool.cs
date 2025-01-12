@@ -112,10 +112,10 @@ namespace HereticalSolutions.Pools
             
             pool.Push(instance);
         }
-        
+
         #endregion
 
-        #region IResizeable
+        #region IAllocationResizeable
 
         public void Resize()
         {

@@ -100,7 +100,7 @@ namespace HereticalSolutions.Delegates.Subscriptions
             {
                 logger?.LogError(
                     GetType(),
-                    $"INVALID PUBLISHER: EXPECTED {typeof(IPublisherNoArgs).Name} OR {typeof(IAsyncPublisherNoArgs).Name} : {this.GetHashCode()}");
+                    $"INVALID PUBLISHER: EXPECTED {nameof(IPublisherNoArgs)} OR {nameof(IAsyncPublisherNoArgs)} : {this.GetHashCode()}");
 
                 return false;
             }

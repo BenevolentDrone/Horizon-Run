@@ -1,8 +1,6 @@
-using System;
-using System.Threading;
 using System.Threading.Tasks;
 
-using HereticalSolutions.Logging;
+using HereticalSolutions.Asynchronous;
 
 namespace HereticalSolutions.ResourceManagement
 {
@@ -14,33 +12,25 @@ namespace HereticalSolutions.ResourceManagement
 			int rootResourceIDHash,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null);
+			AsyncExecutionContext asyncContext);
 
 		Task<IReadOnlyResourceData> GetRootResourceWhenAvailable(
 			string rootResourceID,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null);
+			AsyncExecutionContext asyncContext);
 
 		Task<IReadOnlyResourceData> GetResourceWhenAvailable(
 			int[] resourcePathPartHashes,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null);
+			AsyncExecutionContext asyncContext);
 
 		Task<IReadOnlyResourceData> GetResourceWhenAvailable(
 			string[] resourcePathParts,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null);
+			AsyncExecutionContext asyncContext);
 
 		#endregion
 
@@ -50,33 +40,25 @@ namespace HereticalSolutions.ResourceManagement
 			int rootResourceIDHash,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null);
+			AsyncExecutionContext asyncContext);
 
 		Task<IResourceVariantData> GetDefaultRootResourceWhenAvailable(
 			string rootResourceID,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null);
+			AsyncExecutionContext asyncContext);
 
 		Task<IResourceVariantData> GetDefaultResourceWhenAvailable(
 			int[] resourcePathPartHashes,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null);
+			AsyncExecutionContext asyncContext);
 
 		Task<IResourceVariantData> GetDefaultResourceWhenAvailable(
 			string[] resourcePathParts,
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null);
+			AsyncExecutionContext asyncContext);
 
 		#endregion
 	}

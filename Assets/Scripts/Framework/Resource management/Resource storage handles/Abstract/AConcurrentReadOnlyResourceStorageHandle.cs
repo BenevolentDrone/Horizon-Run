@@ -2,6 +2,8 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
+using HereticalSolutions.Asynchronous;
+
 using HereticalSolutions.LifetimeManagement;
 
 using HereticalSolutions.Logging;
@@ -51,11 +53,9 @@ namespace HereticalSolutions.ResourceManagement
 		public virtual async Task Allocate(
 
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 		{
-			progress?.Report(0f);
+			asyncContext?.Progress?.Report(0f);
 
 			await semaphore.WaitAsync(); // Acquire the semaphore
 
@@ -63,7 +63,7 @@ namespace HereticalSolutions.ResourceManagement
 			{
 				if (allocated)
 				{
-					progress?.Report(1f);
+					asyncContext?.Progress?.Report(1f);
 
 					return;
 				}
@@ -73,7 +73,7 @@ namespace HereticalSolutions.ResourceManagement
 					$"ALLOCATING");
 
 				var task = AllocateResource(
-					progress: progress);
+					asyncContext);
 
 				resource = await task;
 					//.ConfigureAwait(false);
@@ -93,18 +93,16 @@ namespace HereticalSolutions.ResourceManagement
 			{
 				semaphore.Release(); // Release the semaphore
 
-				progress?.Report(1f);
+				asyncContext?.Progress?.Report(1f);
 			}
 		}
 
 		public async Task Free(
-			
+
 			//Async tail
-			CancellationToken cancellationToken = default,
-			IProgress<float> progress = null,
-			ILogger progressLogger = null)
+			AsyncExecutionContext asyncContext)
 		{
-			progress?.Report(0f);
+			asyncContext?.Progress?.Report(0f);
 
 			await semaphore.WaitAsync(); // Acquire the semaphore
 
@@ -112,7 +110,7 @@ namespace HereticalSolutions.ResourceManagement
 			{
 				if (!allocated)
 				{
-					progress?.Report(1f);
+					asyncContext?.Progress?.Report(1f);
 
 					return;
 				}
@@ -123,7 +121,7 @@ namespace HereticalSolutions.ResourceManagement
 
 				var task = FreeResource(
 					resource,
-					progress: progress);
+					asyncContext);
 
 				await task;
 					//.ConfigureAwait(false);
@@ -145,7 +143,7 @@ namespace HereticalSolutions.ResourceManagement
 			{
 				semaphore.Release(); // Release the semaphore
 
-				progress?.Report(1f);
+				asyncContext?.Progress?.Report(1f);
 			}
 		}
 
@@ -197,7 +195,7 @@ namespace HereticalSolutions.ResourceManagement
 						throw new Exception(
 							logger.TryFormatException(
 								GetType(),
-								$"RESOURCE IS NOT OF TYPE {typeof(TValue).Name}"));
+								$"RESOURCE IS NOT OF TYPE {nameof(TValue)}"));
 				}
 			}
 			finally
@@ -212,7 +210,7 @@ namespace HereticalSolutions.ResourceManagement
 
 		public new void Cleanup()
 		{
-			Free();
+			Free(null);
 		}
 
 		#endregion
@@ -221,7 +219,7 @@ namespace HereticalSolutions.ResourceManagement
 
 		public new void Dispose()
 		{
-			Free();
+			Free(null);
 		}
 
 		#endregion

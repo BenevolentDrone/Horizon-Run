@@ -72,12 +72,14 @@ namespace HereticalSolutions.Pools
 			}
 		}
 
-		public T Pop(IPoolPopArgument[] args)
+		public T Pop(
+			IPoolPopArgument[] args)
 		{
 			return Pop();
 		}
 
-		public void Push(T instance)
+		public void Push(
+			T instance)
 		{
 			lock (lockObject)
 			{
@@ -87,7 +89,7 @@ namespace HereticalSolutions.Pools
 
 		#endregion
 
-		#region IResizeable
+		#region IAllocationResizeable
 
 		public void Resize()
 		{

@@ -54,7 +54,7 @@ public bool Load<TArgument>(
 		default:
 
 			throw new Exception(
-				$"INVALID ARGUMENT TYPE. EXPECTED: \"{typeof(TDTO).Name}\" RECEIVED: \"{DTO.GetType().Name}\"");
+				$"INVALID ARGUMENT TYPE. EXPECTED: \"{nameof(TDTO)}\" RECEIVED: \"{DTO.GetType().Name}\"");
 	}
 
 	if (!result)
@@ -73,7 +73,7 @@ public bool Load<TArgument>(
 		default:
 
 			throw new Exception(
-				$"CANNOT CAST RETURN VALUE TYPE \"{typeof(TValue).Name}\" TO TYPE \"{typeof(TArgument).GetType().Name}\"");
+				$"CANNOT CAST RETURN VALUE TYPE \"{nameof(TValue)}\" TO TYPE \"{nameof(TArgument)}\"");
 	}
 }
 
@@ -100,7 +100,7 @@ public bool Load<TArgument, TDTO>(
 		default:
 
 			throw new Exception(
-				$"INVALID ARGUMENT TYPE. EXPECTED: \"{typeof(TDTO).Name}\" RECEIVED: \"{typeof(TDTO).Name}\"");
+				$"INVALID ARGUMENT TYPE. EXPECTED: \"{nameof(TDTO)}\" RECEIVED: \"{nameof(TDTO)}\"");
 	}
 
 	if (!result)
@@ -119,7 +119,7 @@ public bool Load<TArgument, TDTO>(
 		default:
 
 			throw new Exception(
-				$"CANNOT CAST RETURN VALUE TYPE \"{typeof(TValue).Name}\" TO TYPE \"{typeof(TArgument).Name}\"");
+				$"CANNOT CAST RETURN VALUE TYPE \"{nameof(TValue)}\" TO TYPE \"{nameof(TArgument)}\"");
 	}
 
 	return result;
@@ -142,7 +142,7 @@ public bool Load<TArgument>(
 		default:
 
 			throw new Exception(
-				$"INVALID ARGUMENT TYPE. EXPECTED: \"{typeof(TDTO).Name}\" RECEIVED: \"{DTO.GetType().Name}\"");
+				$"INVALID ARGUMENT TYPE. EXPECTED: \"{nameof(TDTO)}\" RECEIVED: \"{DTO.GetType().Name}\"");
 	}
 
 	switch (valueToPopulate)
@@ -156,7 +156,7 @@ public bool Load<TArgument>(
 		default:
 
 			throw new Exception(
-				$"CANNOT CAST RETURN VALUE TYPE \"{typeof(TValue).Name}\" TO TYPE \"{typeof(TArgument).Name}\"");
+				$"CANNOT CAST RETURN VALUE TYPE \"{nameof(TValue)}\" TO TYPE \"{nameof(TArgument)}\"");
 	}
 }
 
@@ -177,7 +177,7 @@ public bool Load<TArgument, TDTO>(
 		default:
 
 			throw new Exception(
-				$"INVALID ARGUMENT TYPE. EXPECTED: \"{typeof(TDTO).Name}\" RECEIVED: \"{typeof(TDTO).Name}\"");
+				$"INVALID ARGUMENT TYPE. EXPECTED: \"{nameof(TDTO)}\" RECEIVED: \"{nameof(TDTO)}\"");
 	}
 
 	switch (valueToPopulate)
@@ -191,7 +191,7 @@ public bool Load<TArgument, TDTO>(
 		default:
 
 			throw new Exception(
-				$"CANNOT CAST RETURN VALUE TYPE \"{typeof(TValue).Name}\" TO TYPE \"{typeof(TArgument).Name}\"");
+				$"CANNOT CAST RETURN VALUE TYPE \"{nameof(TValue)}\" TO TYPE \"{nameof(TArgument)}\"");
 	}
 }
 

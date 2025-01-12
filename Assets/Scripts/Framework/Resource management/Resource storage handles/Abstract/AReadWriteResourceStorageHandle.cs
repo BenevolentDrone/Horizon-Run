@@ -51,7 +51,7 @@ namespace HereticalSolutions.ResourceManagement
 					throw new Exception(
 						logger.TryFormatException(
 							GetType(),
-							$"CANNOT SET RESOURCE OF TYPE {typeof(TValue).Name} TO RESOURCE OF TYPE {typeof(TResource).Name}"));
+							$"CANNOT SET RESOURCE OF TYPE {nameof(TValue)} TO RESOURCE OF TYPE {nameof(TResource)}"));
 			}
 
 			return true;

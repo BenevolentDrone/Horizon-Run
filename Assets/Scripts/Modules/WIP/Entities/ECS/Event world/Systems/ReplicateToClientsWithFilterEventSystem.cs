@@ -58,7 +58,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Networking
                 if (sourceComponent.Source == ENetworkEventSource.SERVER)
                 {
                     logger?.LogError<ReplicateToClientsWithFilterEventSystem<TEventComponent, TDelta>>(
-                        $"EVENT ENTITY {typeof(TEventComponent).Name} HAS SERVER AS NETWORK EVENT SOURCE, ABORTING PROCESSING");
+                        $"EVENT ENTITY {nameof(TEventComponent)} HAS SERVER AS NETWORK EVENT SOURCE, ABORTING PROCESSING");
                     
                     entity.Set<EventProcessedComponent>();
                     
@@ -69,7 +69,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Networking
                     && !replicateIfOriginatedFromClient)
                 {
                     logger?.Log<ReplicateToClientsWithFilterEventSystem<TEventComponent, TDelta>>(
-                        $"PROCESSING EVENT ENTITY SOURCED FROM CLIENT: {typeof(TEventComponent).Name}");
+                        $"PROCESSING EVENT ENTITY SOURCED FROM CLIENT: {nameof(TEventComponent)}");
                     
                     return;
                 }
@@ -78,13 +78,13 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Networking
             if (!filterDelegate.Invoke(entity))
             {
                 logger?.Log<ReplicateToClientsWithFilterEventSystem<TEventComponent, TDelta>>(
-                    $"FILTER CONDITIONS UNMET FOR EVENT ENTITY: {typeof(TEventComponent).Name}. ABORTING REPLICATION");
+                    $"FILTER CONDITIONS UNMET FOR EVENT ENTITY: {nameof(TEventComponent)}. ABORTING REPLICATION");
                 
                 return;
             }
 
             logger?.Log<ReplicateToClientsWithFilterEventSystem<TEventComponent, TDelta>>(
-                $"REPLICATING EVENT ENTITY: {typeof(TEventComponent).Name}");
+                $"REPLICATING EVENT ENTITY: {nameof(TEventComponent)}");
             
             networkEventEntityManager.ReplicateEventEntity(entity);
 

@@ -163,7 +163,7 @@ namespace HereticalSolutions.Pools
 
 		#endregion
 
-		#region IResizeable
+		#region IAllocationResizeable
 
 		public void Resize()
 		{

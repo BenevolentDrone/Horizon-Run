@@ -30,7 +30,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Networking
             entity.Set<EventProcessedComponent>();
 
             //logger?.LogError<PreventFromProcessingEventSystem<TEventComponent, TDelta>>(
-            //    $"EVENT ENTITY {typeof(TEventComponent).Name} WAS PREVENTED FROM PROCESSING," +
+            //    $"EVENT ENTITY {nameof(TEventComponent)} WAS PREVENTED FROM PROCESSING," +
             //    $" PLEASE ENSURE THE EVENT IS NOT FIRED WHERE UNNECESSARY");
         }
     }

@@ -87,7 +87,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
 			{
 				logger?.LogError(
 					GetType(),
-					$"VISITABLE IS NOT OF TYPE: {typeof(Entity).Name}");
+					$"VISITABLE IS NOT OF TYPE: {nameof(Entity)}");
 
 				dto = null;
 
@@ -142,7 +142,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
 			{
 				logger?.LogError(
 					GetType(),
-					$"VISITABLE IS NOT OF TYPE: {typeof(Entity).Name}");
+					$"VISITABLE IS NOT OF TYPE: {nameof(Entity)}");
 
 				dto = null;
 
@@ -200,7 +200,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
 			{
 				logger?.LogError(
 					GetType(),
-					$"DTO IS NOT OF TYPE: {typeof(EntityPrototypeDTO).Name}");
+					$"DTO IS NOT OF TYPE: {nameof(EntityPrototypeDTO)}");
 
 				visitable = default;
 
@@ -236,7 +236,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
 			{
 				logger?.LogError(
 					GetType(),
-					$"DTO IS NOT OF TYPE: {typeof(EntityPrototypeDTO).Name}");
+					$"DTO IS NOT OF TYPE: {nameof(EntityPrototypeDTO)}");
 
 				visitableObject = default;
 
@@ -275,7 +275,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
 			{
 				logger?.LogError(
 					GetType(),
-					$"VISITABLE IS NOT OF TYPE: {typeof(Entity).Name}");
+					$"VISITABLE IS NOT OF TYPE: {nameof(Entity)}");
 
 				return false;
 			}
@@ -286,7 +286,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
 			{
 				logger?.LogError(
 					GetType(),
-					$"DTO IS NOT OF TYPE: {typeof(EntityPrototypeDTO).Name}");
+					$"DTO IS NOT OF TYPE: {nameof(EntityPrototypeDTO)}");
 
 				return false;
 			}
@@ -314,7 +314,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
 			{
 				logger?.LogError(
 					GetType(),
-					$"VISITABLE IS NOT OF TYPE: {typeof(Entity).Name}");
+					$"VISITABLE IS NOT OF TYPE: {nameof(Entity)}");
 
 				return false;
 			}
@@ -325,7 +325,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
 			{
 				logger?.LogError(
 					GetType(),
-					$"DTO IS NOT OF TYPE: {typeof(EntityPrototypeDTO).Name}");
+					$"DTO IS NOT OF TYPE: {nameof(EntityPrototypeDTO)}");
 
 				return false;
 			}

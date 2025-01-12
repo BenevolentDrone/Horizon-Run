@@ -60,7 +60,7 @@ namespace HereticalSolutions.Delegates
 					throw new Exception(
 						logger.TryFormatException(
 							GetType(),
-							$"INVALID ARGUMENT TYPE. EXPECTED: \"{typeof(TValue).Name}\" RECEIVED: \"{typeof(TArgument).Name}\""));
+							$"INVALID ARGUMENT TYPE. EXPECTED: \"{nameof(TValue)}\" RECEIVED: \"{nameof(TArgument)}\""));
 			}
 		}
 
@@ -83,7 +83,7 @@ namespace HereticalSolutions.Delegates
 					throw new Exception(
 						logger.TryFormatException(
 							GetType(),
-							$"INVALID ARGUMENT TYPE. EXPECTED: \"{typeof(TValue).Name}\" RECEIVED: \"{valueType.Name}\""));
+							$"INVALID ARGUMENT TYPE. EXPECTED: \"{nameof(TValue)}\" RECEIVED: \"{valueType.Name}\""));
 			}
 		}
 
@@ -163,7 +163,7 @@ namespace HereticalSolutions.Delegates
 					throw new Exception(
 						logger.TryFormatException(
 							GetType(),
-							$"INVALID ARGUMENT TYPE. EXPECTED: \"{typeof(TValue).Name}\" RECEIVED: \"{typeof(TArgument).Name}\""));
+							$"INVALID ARGUMENT TYPE. EXPECTED: \"{nameof(TValue)}\" RECEIVED: \"{nameof(TArgument)}\""));
 			}
 		}
 
@@ -186,7 +186,7 @@ namespace HereticalSolutions.Delegates
 					throw new Exception(
 						logger.TryFormatException(
 							GetType(),
-							$"INVALID ARGUMENT TYPE. EXPECTED: \"{typeof(TValue).Name}\" RECEIVED: \"{valueType.Name}\""));
+							$"INVALID ARGUMENT TYPE. EXPECTED: \"{nameof(TValue)}\" RECEIVED: \"{valueType.Name}\""));
 			}
 		}
 
@@ -208,7 +208,7 @@ namespace HereticalSolutions.Delegates
 					throw new Exception(
 						logger.TryFormatException(
 							GetType(),
-							$"INVALID ARGUMENT TYPE. EXPECTED: \"{typeof(TValue).Name}\" RECEIVED: \"{typeof(TArgument).Name}\""));
+							$"INVALID ARGUMENT TYPE. EXPECTED: \"{nameof(TValue)}\" RECEIVED: \"{nameof(TArgument)}\""));
 			}
 		}
 
@@ -231,7 +231,7 @@ namespace HereticalSolutions.Delegates
 					throw new Exception(
 						logger.TryFormatException(
 							GetType(),
-							$"INVALID ARGUMENT TYPE. EXPECTED: \"{typeof(TValue).Name}\" RECEIVED: \"{valueType.Name}\""));
+							$"INVALID ARGUMENT TYPE. EXPECTED: \"{nameof(TValue)}\" RECEIVED: \"{valueType.Name}\""));
 			}
 		}
 

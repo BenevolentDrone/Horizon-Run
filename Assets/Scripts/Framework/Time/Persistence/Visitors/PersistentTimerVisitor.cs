@@ -71,7 +71,7 @@ namespace HereticalSolutions.Time
             {
                 logger?.LogError(
                     GetType(),
-                    $"VISITABLE IS NOT OF TYPE: {typeof(PersistentTimer).Name}");
+                    $"VISITABLE IS NOT OF TYPE: {nameof(PersistentTimer)}");
 
                 dto = null;
 
@@ -105,7 +105,7 @@ namespace HereticalSolutions.Time
             {
                 logger?.LogError(
                     GetType(),
-                    $"VISITABLE IS NOT OF TYPE: {typeof(PersistentTimer).Name}");
+                    $"VISITABLE IS NOT OF TYPE: {nameof(PersistentTimer)}");
 
                 dto = null;
 
@@ -142,7 +142,7 @@ namespace HereticalSolutions.Time
             {
                 logger?.LogError(
                     GetType(),
-                    $"DTO IS NOT OF TYPE: {typeof(PersistentTimerDTO).Name}");
+                    $"DTO IS NOT OF TYPE: {nameof(PersistentTimerDTO)}");
 
                 visitable = default;
 
@@ -188,7 +188,7 @@ namespace HereticalSolutions.Time
             {
                 logger?.LogError(
                     GetType(),
-                    $"DTO IS NOT OF TYPE: {typeof(PersistentTimerDTO).Name}");
+                    $"DTO IS NOT OF TYPE: {nameof(PersistentTimerDTO)}");
 
                 visitableObject = default;
 
@@ -237,7 +237,7 @@ namespace HereticalSolutions.Time
             {
                 logger?.LogError(
                     GetType(),
-                    $"DTO IS NOT OF TYPE: {typeof(PersistentTimerDTO).Name}");
+                    $"DTO IS NOT OF TYPE: {nameof(PersistentTimerDTO)}");
 
                 return false;
             }
@@ -248,7 +248,7 @@ namespace HereticalSolutions.Time
             {
                 logger?.LogError(
                     GetType(),
-                    $"VISITABLE IS NOT OF TYPE: {typeof(PersistentTimer).Name}");
+                    $"VISITABLE IS NOT OF TYPE: {nameof(PersistentTimer)}");
 
                 return false;
             }
@@ -285,7 +285,7 @@ namespace HereticalSolutions.Time
             {
                 logger?.LogError(
                     GetType(),
-                    $"DTO IS NOT OF TYPE: {typeof(PersistentTimerDTO).Name}");
+                    $"DTO IS NOT OF TYPE: {nameof(PersistentTimerDTO)}");
 
                 return false;
             }
@@ -296,7 +296,7 @@ namespace HereticalSolutions.Time
             {
                 logger?.LogError(
                     GetType(),
-                    $"VISITABLE IS NOT OF TYPE: {typeof(PersistentTimer).Name}");
+                    $"VISITABLE IS NOT OF TYPE: {nameof(PersistentTimer)}");
 
                 return false;
             }

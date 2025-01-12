@@ -46,7 +46,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Networking
 				if (sourceComponent.Source == ENetworkEventSource.CLIENT)
 				{
 					logger?.LogError<ReplicateToServerEventSystem<TEventComponent, TDelta>>(
-						$"EVENT ENTITY {typeof(TEventComponent).Name} HAS CLIENT AS NETWORK EVENT SOURCE, ABORTING PROCESSING");
+						$"EVENT ENTITY {nameof(TEventComponent)} HAS CLIENT AS NETWORK EVENT SOURCE, ABORTING PROCESSING");
                     
 					entity.Set<EventProcessedComponent>();
 
@@ -56,7 +56,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Networking
 				if (sourceComponent.Source == ENetworkEventSource.SERVER)
 				{
 					logger?.Log<ReplicateToServerEventSystem<TEventComponent, TDelta>>(
-						$"PROCESSING EVENT ENTITY SOURCED FROM SERVER: {typeof(TEventComponent).Name}");
+						$"PROCESSING EVENT ENTITY SOURCED FROM SERVER: {nameof(TEventComponent)}");
 					
 					return;
 				}

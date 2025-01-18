@@ -38,7 +38,7 @@ namespace HereticalSolutions.Time.Factories
             applicationPersistentTimer.Start();
 
             return new TimeManager(
-                RepositoriesFactory.BuildDictionaryRepository<string, ISynchronizableGenericArg<float>>(),
+                RepositoryFactory.BuildDictionaryRepository<string, ISynchronizableGenericArg<float>>(),
                 applicationActiveTimer,
                 applicationPersistentTimer);
         }
@@ -51,8 +51,8 @@ namespace HereticalSolutions.Time.Factories
         {
             return new TimerManager(
                 managerID,
-                RepositoriesFactory.BuildDictionaryRepository<int, IPoolElementFacade<TimerWithSubscriptionsContainer>>(),
-                RepositoriesFactory.BuildDictionaryRepository<string, List<DurationHandlePair>>(),
+                RepositoryFactory.BuildDictionaryRepository<int, IPoolElementFacade<TimerWithSubscriptionsContainer>>(),
+                RepositoryFactory.BuildDictionaryRepository<string, List<DurationHandlePair>>(),
                 TimerPoolFactory.BuildRuntimeTimerPool(
                     provider,
                     loggerResolver),

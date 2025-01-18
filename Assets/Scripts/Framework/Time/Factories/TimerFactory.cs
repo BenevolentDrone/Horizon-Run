@@ -61,7 +61,7 @@ namespace HereticalSolutions.Time.Factories
         private static IReadOnlyRepository<ETimerState, ITimerStrategy<IPersistentTimerContext, TimeSpan>>
             BuildPersistentStrategyRepository()
         {
-            var repository = RepositoriesFactory.BuildDictionaryRepository<ETimerState, ITimerStrategy<IPersistentTimerContext, TimeSpan>>(
+            var repository = RepositoryFactory.BuildDictionaryRepository<ETimerState, ITimerStrategy<IPersistentTimerContext, TimeSpan>>(
                 new ETimerStateComparer());
             
             repository.Add(ETimerState.INACTIVE, new PersistentInactiveStrategy());
@@ -195,7 +195,7 @@ namespace HereticalSolutions.Time.Factories
         private static IReadOnlyRepository<ETimerState, ITimerStrategy<IRuntimeTimerContext, float>>
             BuildRuntimeStrategyRepository()
         {
-            var repository = RepositoriesFactory.BuildDictionaryRepository<ETimerState, ITimerStrategy<IRuntimeTimerContext, float>>(
+            var repository = RepositoryFactory.BuildDictionaryRepository<ETimerState, ITimerStrategy<IRuntimeTimerContext, float>>(
                 new ETimerStateComparer());
             
             repository.Add(ETimerState.INACTIVE, new RuntimeInactiveStrategy());

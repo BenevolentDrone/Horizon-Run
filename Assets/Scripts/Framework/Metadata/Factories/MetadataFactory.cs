@@ -12,13 +12,13 @@ namespace HereticalSolutions.Metadata.Factories
 		public static StronglyTypedMetadata BuildStronglyTypedMetadata()
 		{
 			return new StronglyTypedMetadata(
-				RepositoriesFactory.BuildDictionaryInstanceRepository());
+				RepositoryFactory.BuildDictionaryInstanceRepository());
 		}
 
 		public static StronglyTypedMetadata BuildStronglyTypedMetadata(
 			MetadataAllocationDescriptor[] metadataDescriptors)
 		{
-			var repository = RepositoriesFactory.BuildDictionaryInstanceRepository();
+			var repository = RepositoryFactory.BuildDictionaryInstanceRepository();
 
 			if (metadataDescriptors != null)
 				foreach (var descriptor in metadataDescriptors)
@@ -39,7 +39,7 @@ namespace HereticalSolutions.Metadata.Factories
 		public static WeaklyTypedMetadata BuildWeaklyTypedMetadata()
 		{
 			return new WeaklyTypedMetadata(
-				RepositoriesFactory.BuildDictionaryRepository<string, object>());
+				RepositoryFactory.BuildDictionaryRepository<string, object>());
 		}
 	}
 }

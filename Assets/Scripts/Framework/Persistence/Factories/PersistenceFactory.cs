@@ -54,7 +54,7 @@ namespace HereticalSolutions.Persistence.Factories
         private static IRepository<Type, IEnumerable<IVisitor>> CreateVisitorRepository()
         {
             IRepository<Type, IEnumerable<IVisitor>> concreteVisitorRepository =
-                RepositoriesFactory.BuildDictionaryRepository<Type, IEnumerable<IVisitor>>();
+                RepositoryFactory.BuildDictionaryRepository<Type, IEnumerable<IVisitor>>();
 
             TypeHelpers.GetTypesWithAttributeInAllAssemblies<VisitorAttribute>(
                 out Type[] visitorTypes);

@@ -18,7 +18,7 @@ namespace HereticalSolutions.Delegates.Factories
         {
             this.loggerResolver = loggerResolver;
 
-            broadcasterRepository = RepositoriesFactory.BuildDictionaryRepository<Type, object>();
+            broadcasterRepository = RepositoryFactory.BuildDictionaryRepository<Type, object>();
         }
 
         public NonAllocBroadcasterWithRepositoryBuilder Add<TBroadcaster>()

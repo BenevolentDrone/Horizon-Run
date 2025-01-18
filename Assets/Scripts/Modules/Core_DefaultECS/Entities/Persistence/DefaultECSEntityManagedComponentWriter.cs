@@ -57,7 +57,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
 				Type[] viewComponentTypes)
 		{
 			IReadOnlyRepository<Type, AddObjectComponentToEntityDelegate> result =
-				RepositoriesFactory.BuildDictionaryRepository<Type, AddObjectComponentToEntityDelegate>();
+				RepositoryFactory.BuildDictionaryRepository<Type, AddObjectComponentToEntityDelegate>();
 
 			for (int i = 0; i < viewComponentTypes.Length; i++)
 			{

@@ -12,13 +12,13 @@ namespace HereticalSolutions.Quests.Factories
             return new ActiveQuestsManager(
                 BuildQuestDatabase(questsSettings),
                 QuestsFactory.BuildPrototypeStages(),
-                RepositoriesFactory.BuildDictionaryRepository<string, ActiveQuest>(),
+                RepositoryFactory.BuildDictionaryRepository<string, ActiveQuest>(),
                 activeQuestObjectivesManager);
         }
 
         public static IReadOnlyRepository<string, Quest> BuildQuestDatabase(QuestsSettings questsSettings)
         {
-            IRepository<string, Quest> database = RepositoriesFactory.BuildDictionaryRepository<string, Quest>();
+            IRepository<string, Quest> database = RepositoryFactory.BuildDictionaryRepository<string, Quest>();
 
             for (int i = 0; i < questsSettings.Quests.Length; i++)
             {

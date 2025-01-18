@@ -39,9 +39,9 @@ namespace HereticalSolutions
             out IReadOnlyRepository<Type, int> typeToHash)
             where TAttribute : System.Attribute
         {
-            hashToType = RepositoriesFactory.BuildDictionaryRepository<int, Type>();
+            hashToType = RepositoryFactory.BuildDictionaryRepository<int, Type>();
 
-            typeToHash = RepositoriesFactory.BuildDictionaryRepository<Type, int>();
+            typeToHash = RepositoryFactory.BuildDictionaryRepository<Type, int>();
 
             List<Type> resultList = new List<Type>();
 

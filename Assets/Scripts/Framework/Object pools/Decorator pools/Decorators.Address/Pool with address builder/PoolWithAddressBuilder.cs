@@ -146,7 +146,7 @@ namespace HereticalSolutions.Pools
             else
             {
                 repository =
-                    RepositoriesFactory.BuildDictionaryRepository<int, IManagedPool<T>>();
+                    RepositoryFactory.BuildDictionaryRepository<int, IManagedPool<T>>();
             }
 
             foreach (var child in node.Children)

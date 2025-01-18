@@ -130,7 +130,7 @@ namespace HereticalSolutions.Synchronization.Factories
 
 		public static SynchronizationManager BuildSynchronizationManager()
 		{
-			var synchroRepository = RepositoriesFactory.BuildDictionaryRepository<string, ISynchronizableNoArgs>();
+			var synchroRepository = RepositoryFactory.BuildDictionaryRepository<string, ISynchronizableNoArgs>();
 
 			return new SynchronizationManager(
 				synchroRepository);

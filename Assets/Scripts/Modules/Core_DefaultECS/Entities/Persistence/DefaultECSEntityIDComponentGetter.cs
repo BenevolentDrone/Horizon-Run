@@ -75,7 +75,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
 			Type[] viewComponentTypes)
 		{
 			IReadOnlyRepository<Type, TryGetIDComponentFromEntityDelegate> result =
-				RepositoriesFactory.BuildDictionaryRepository<Type, TryGetIDComponentFromEntityDelegate>();
+				RepositoryFactory.BuildDictionaryRepository<Type, TryGetIDComponentFromEntityDelegate>();
 
 			for (int i = 0; i < viewComponentTypes.Length; i++)
 			{

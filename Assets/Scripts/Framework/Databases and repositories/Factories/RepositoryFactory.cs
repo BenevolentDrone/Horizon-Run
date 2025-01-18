@@ -6,7 +6,7 @@ using HereticalSolutions.Logging;
 
 namespace HereticalSolutions.Repositories.Factories
 {
-    public static class RepositoriesFactory
+    public static class RepositoryFactory
     {
         #region Dictionary object repository
 

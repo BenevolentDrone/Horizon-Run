@@ -22,8 +22,54 @@ namespace HereticalSolutions.Delegates.Factories
 {
     public static class BroadcasterFactory
     {
-        private const int DEFAULT_BROADCASTER_CAPACITY = 16;
-        
+        #region Factory settings
+
+        #region Broadcaster context pool
+
+        public const int DEFAULT_BROADCASTER_CONTEXT_POOL_SIZE = 32;
+
+        public static AllocationCommandDescriptor BroadcasterContextPoolInitialAllocationDescriptor =
+            new AllocationCommandDescriptor
+            {
+                Rule = EAllocationAmountRule.ADD_PREDEFINED_AMOUNT,
+
+                Amount = DEFAULT_BROADCASTER_CONTEXT_POOL_SIZE
+            };
+
+        public static AllocationCommandDescriptor BroadcasterContextPoolAdditionalAllocationDescriptor =
+            new AllocationCommandDescriptor
+            {
+                Rule = EAllocationAmountRule.ADD_PREDEFINED_AMOUNT,
+
+                Amount = DEFAULT_BROADCASTER_CONTEXT_POOL_SIZE
+            };
+
+        #endregion
+
+        #region Broadcaster subscriptions pool
+
+        private const int DEFAULT_BROADCASTER_SUBSCRIPTION_POOL_SIZE = 32;
+
+        public static AllocationCommandDescriptor BroadcasterSubscriptionPoolInitialAllocationDescriptor =
+            new AllocationCommandDescriptor
+            {
+                Rule = EAllocationAmountRule.ADD_PREDEFINED_AMOUNT,
+
+                Amount = DEFAULT_BROADCASTER_SUBSCRIPTION_POOL_SIZE
+            };
+
+        public static AllocationCommandDescriptor BroadcasterSubscriptionPoolAdditionalAllocationDescriptor =
+            new AllocationCommandDescriptor
+            {
+                Rule = EAllocationAmountRule.ADD_PREDEFINED_AMOUNT,
+
+                Amount = DEFAULT_BROADCASTER_SUBSCRIPTION_POOL_SIZE
+            };
+
+        #endregion
+
+        #endregion
+
         public static ManagedPoolBuilder<T> BuildManagedPoolBuilder<T>(
             ILoggerResolver loggerResolver = null)
         {
@@ -35,30 +81,21 @@ namespace HereticalSolutions.Delegates.Factories
         public static IPool<T> BuildContextPool<T>(
             ILoggerResolver loggerResolver = null)
         {
+            Func<T> valueAllocationDelegate =
+                AllocationFactory.ActivatorAllocationDelegate<T>;
+
             return StackPoolFactory.BuildStackPool<T>(
                 new AllocationCommand<T>
                 {
-                    Descriptor = new AllocationCommandDescriptor
-                    {
-                        Rule = EAllocationAmountRule.ADD_PREDEFINED_AMOUNT,
+                    Descriptor = BroadcasterContextPoolInitialAllocationDescriptor,
 
-                        Amount = 32 //TODO: REMOVE MAGIC
-                    },
-                    AllocationDelegate =
-                        AllocationFactory
-                            .ActivatorAllocationDelegate<T>
+                    AllocationDelegate = valueAllocationDelegate
                 },
                 new AllocationCommand<T>
                 {
-                    Descriptor = new AllocationCommandDescriptor
-                    {
-                        Rule = EAllocationAmountRule.ADD_PREDEFINED_AMOUNT,
-
-                        Amount = 32 //TODO: REMOVE MAGIC
-                    },
-                    AllocationDelegate =
-                        AllocationFactory
-                            .ActivatorAllocationDelegate<T>
+                    Descriptor = BroadcasterContextPoolAdditionalAllocationDescriptor,
+                    
+                    AllocationDelegate = valueAllocationDelegate
                 },
                 loggerResolver);
         }
@@ -84,7 +121,7 @@ namespace HereticalSolutions.Delegates.Factories
             ILoggerResolver loggerResolver = null)
         {
             return BuildBroadcasterWithRepository(
-                RepositoriesFactory.BuildDictionaryInstanceRepository(
+                RepositoryFactory.BuildDictionaryInstanceRepository(
                     broadcasterRepository),
                 loggerResolver);
         }
@@ -148,7 +185,7 @@ namespace HereticalSolutions.Delegates.Factories
                 {
                     Rule = EAllocationAmountRule.ADD_PREDEFINED_AMOUNT,
 
-                    Amount = DEFAULT_BROADCASTER_CAPACITY
+                    Amount = DEFAULT_BROADCASTER_SUBSCRIPTION_POOL_SIZE
                 },
                 new AllocationCommandDescriptor
                 {
@@ -224,7 +261,7 @@ namespace HereticalSolutions.Delegates.Factories
             ILoggerResolver loggerResolver = null)
         {
             return BuildNonAllocBroadcasterWithRepository(
-                RepositoriesFactory.BuildDictionaryInstanceRepository(
+                RepositoryFactory.BuildDictionaryInstanceRepository(
                     broadcasterRepository),
                 loggerResolver);
         }
@@ -263,24 +300,16 @@ namespace HereticalSolutions.Delegates.Factories
                 {
                     //ObjectPoolMetadataFactory.BuildIndexedMetadataDescriptor
                 },
-                new AllocationCommandDescriptor
-                {
-                    Rule = EAllocationAmountRule.ADD_PREDEFINED_AMOUNT,
-
-                    Amount = DEFAULT_BROADCASTER_CAPACITY
-                },
-                new AllocationCommandDescriptor
-                {
-                    Rule = EAllocationAmountRule.DOUBLE_AMOUNT
-                },
+                BroadcasterSubscriptionPoolInitialAllocationDescriptor,
+                BroadcasterSubscriptionPoolAdditionalAllocationDescriptor,
                 
                 null,
                 null);
 
-            var subscriptionsPool = managedPoolBuilder.BuildPackedArrayManagedPool();
+            var subscriptionPool = managedPoolBuilder.BuildPackedArrayManagedPool();
             
             return BuildNonAllocBroadcasterGeneric<T>(
-                subscriptionsPool,
+                subscriptionPool,
                 loggerResolver);
         }
 

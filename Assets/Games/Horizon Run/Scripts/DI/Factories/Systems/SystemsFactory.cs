@@ -239,31 +239,8 @@ namespace HereticalSolutions.HorizonRun.DI
 					{
 						return GUIDComponent.GUID;
 					},
-					new PoolWithListCleanup<List<IReadOnlyHierarchyNode<Entity>>>(
-						StackPoolFactory.BuildStackPool<List<IReadOnlyHierarchyNode<Entity>>>(
-							new AllocationCommand<List<IReadOnlyHierarchyNode<Entity>>>
-							{
-								Descriptor = new AllocationCommandDescriptor
-								{
-									Rule = EAllocationAmountRule.ADD_PREDEFINED_AMOUNT,
-
-									Amount = 5 //TODO: REMOVE MAGIC
-								},
-								AllocationDelegate = AllocationFactory.
-									ActivatorAllocationDelegate<List<IReadOnlyHierarchyNode<Entity>>>
-							},
-							new AllocationCommand<List<IReadOnlyHierarchyNode<Entity>>>
-							{
-								Descriptor = new AllocationCommandDescriptor
-								{
-									Rule = EAllocationAmountRule.ADD_PREDEFINED_AMOUNT,
-
-									Amount = 5 //TODO: REMOVE MAGIC
-								},
-								AllocationDelegate = AllocationFactory.
-									ActivatorAllocationDelegate<List<IReadOnlyHierarchyNode<Entity>>>
-							},
-							loggerResolver)),
+					HierarchyFactory.BuildHierarchyNodeListPool<ILifetimeable>(
+                    	loggerResolver),
 					loggerResolver?.GetLogger<HierarchyDeinitializationSystem<GUIDComponent, Guid>>()),
 
 				// Sensors

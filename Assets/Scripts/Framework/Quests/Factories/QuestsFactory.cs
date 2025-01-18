@@ -75,7 +75,7 @@ namespace HereticalSolutions.Quests.Factories
         public static ActiveQuestObjectivesManager BuildActiveQuestObjectivesManager()
         {
             return new ActiveQuestObjectivesManager(
-                RepositoriesFactory.BuildDictionaryRepository<string, List<ActiveQuestObjective>>());
+                RepositoryFactory.BuildDictionaryRepository<string, List<ActiveQuestObjective>>());
         }
 
         /// <summary>

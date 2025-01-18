@@ -30,7 +30,7 @@ namespace HereticalSolutions.Logging
 		public void Log(
 			string value)
 		{
-			if (value.StartsWith(LoggingConstants.RECURSION_PREVENTION_PREFIX))
+			if (value.StartsWith(LoggingConstants.RecursionPreventionPrefix))
 				return;
 
 			innerLogger.Log(value);
@@ -39,7 +39,7 @@ namespace HereticalSolutions.Logging
 		public void Log<TSource>(
 			string value)
 		{
-			if (value.StartsWith(LoggingConstants.RECURSION_PREVENTION_PREFIX))
+			if (value.StartsWith(LoggingConstants.RecursionPreventionPrefix))
 				return;
 
 			innerLogger.Log<TSource>(value);
@@ -49,7 +49,7 @@ namespace HereticalSolutions.Logging
 			Type logSource,
 			string value)
 		{
-			if (value.StartsWith(LoggingConstants.RECURSION_PREVENTION_PREFIX))
+			if (value.StartsWith(LoggingConstants.RecursionPreventionPrefix))
 				return;
 
 			innerLogger.Log(
@@ -61,7 +61,7 @@ namespace HereticalSolutions.Logging
 			string value,
 			object[] arguments)
 		{
-			if (value.StartsWith(LoggingConstants.RECURSION_PREVENTION_PREFIX))
+			if (value.StartsWith(LoggingConstants.RecursionPreventionPrefix))
 				return;
 
 			innerLogger.Log(
@@ -73,7 +73,7 @@ namespace HereticalSolutions.Logging
 			string value,
 			object[] arguments)
 		{
-			if (value.StartsWith(LoggingConstants.RECURSION_PREVENTION_PREFIX))
+			if (value.StartsWith(LoggingConstants.RecursionPreventionPrefix))
 				return;
 
 			innerLogger.Log<TSource>(
@@ -86,7 +86,7 @@ namespace HereticalSolutions.Logging
 			string value,
 			object[] arguments)
 		{
-			if (value.StartsWith(LoggingConstants.RECURSION_PREVENTION_PREFIX))
+			if (value.StartsWith(LoggingConstants.RecursionPreventionPrefix))
 				return;
 
 			innerLogger.Log(
@@ -102,7 +102,7 @@ namespace HereticalSolutions.Logging
 		public void LogWarning(
 			string value)
 		{
-			if (value.StartsWith(LoggingConstants.RECURSION_PREVENTION_PREFIX))
+			if (value.StartsWith(LoggingConstants.RecursionPreventionPrefix))
 				return;
 
 			innerLogger.LogWarning(
@@ -112,7 +112,7 @@ namespace HereticalSolutions.Logging
 		public void LogWarning<TSource>(
 			string value)
 		{
-			if (value.StartsWith(LoggingConstants.RECURSION_PREVENTION_PREFIX))
+			if (value.StartsWith(LoggingConstants.RecursionPreventionPrefix))
 				return;
 
 			innerLogger.LogWarning<TSource>(value);
@@ -122,7 +122,7 @@ namespace HereticalSolutions.Logging
 			Type logSource,
 			string value)
 		{
-			if (value.StartsWith(LoggingConstants.RECURSION_PREVENTION_PREFIX))
+			if (value.StartsWith(LoggingConstants.RecursionPreventionPrefix))
 				return;
 
 			innerLogger.LogWarning(
@@ -134,7 +134,7 @@ namespace HereticalSolutions.Logging
 			string value,
 			object[] arguments)
 		{
-			if (value.StartsWith(LoggingConstants.RECURSION_PREVENTION_PREFIX))
+			if (value.StartsWith(LoggingConstants.RecursionPreventionPrefix))
 				return;
 
 			innerLogger.LogWarning(
@@ -146,7 +146,7 @@ namespace HereticalSolutions.Logging
 			string value,
 			object[] arguments)
 		{
-			if (value.StartsWith(LoggingConstants.RECURSION_PREVENTION_PREFIX))
+			if (value.StartsWith(LoggingConstants.RecursionPreventionPrefix))
 				return;
 
 			innerLogger.LogWarning<TSource>(
@@ -159,7 +159,7 @@ namespace HereticalSolutions.Logging
 			string value,
 			object[] arguments)
 		{
-			if (value.StartsWith(LoggingConstants.RECURSION_PREVENTION_PREFIX))
+			if (value.StartsWith(LoggingConstants.RecursionPreventionPrefix))
 				return;
 
 			innerLogger.LogWarning(
@@ -175,7 +175,7 @@ namespace HereticalSolutions.Logging
 		public void LogError(
 			string value)
 		{
-			if (value.StartsWith(LoggingConstants.RECURSION_PREVENTION_PREFIX))
+			if (value.StartsWith(LoggingConstants.RecursionPreventionPrefix))
 				return;
 
 			innerLogger.LogError(
@@ -185,7 +185,7 @@ namespace HereticalSolutions.Logging
 		public void LogError<TSource>(
 			string value)
 		{
-			if (value.StartsWith(LoggingConstants.RECURSION_PREVENTION_PREFIX))
+			if (value.StartsWith(LoggingConstants.RecursionPreventionPrefix))
 				return;
 
 			innerLogger.LogError<TSource>(value);
@@ -195,7 +195,7 @@ namespace HereticalSolutions.Logging
 			Type logSource,
 			string value)
 		{
-			if (value.StartsWith(LoggingConstants.RECURSION_PREVENTION_PREFIX))
+			if (value.StartsWith(LoggingConstants.RecursionPreventionPrefix))
 				return;
 
 			innerLogger.LogError(
@@ -207,7 +207,7 @@ namespace HereticalSolutions.Logging
 			string value,
 			object[] arguments)
 		{
-			if (value.StartsWith(LoggingConstants.RECURSION_PREVENTION_PREFIX))
+			if (value.StartsWith(LoggingConstants.RecursionPreventionPrefix))
 				return;
 
 			innerLogger.LogError(
@@ -219,7 +219,7 @@ namespace HereticalSolutions.Logging
 			string value,
 			object[] arguments)
 		{
-			if (value.StartsWith(LoggingConstants.RECURSION_PREVENTION_PREFIX))
+			if (value.StartsWith(LoggingConstants.RecursionPreventionPrefix))
 				return;
 
 			innerLogger.LogError<TSource>(
@@ -232,7 +232,7 @@ namespace HereticalSolutions.Logging
 			string value,
 			object[] arguments)
 		{
-			if (value.StartsWith(LoggingConstants.RECURSION_PREVENTION_PREFIX))
+			if (value.StartsWith(LoggingConstants.RecursionPreventionPrefix))
 				return;
 
 			innerLogger.LogError(

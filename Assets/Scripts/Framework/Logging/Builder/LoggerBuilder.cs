@@ -52,7 +52,7 @@ namespace HereticalSolutions.Logging
 
 		public ILoggerBuilder NewLogger()
 		{
-			explicitLogSourceRules = RepositoriesFactory.BuildDictionaryRepository<Type, bool>();
+			explicitLogSourceRules = RepositoryFactory.BuildDictionaryRepository<Type, bool>();
 
 			rootLogger = null; //LoggersFactory.BuildProxyWrapper();
 

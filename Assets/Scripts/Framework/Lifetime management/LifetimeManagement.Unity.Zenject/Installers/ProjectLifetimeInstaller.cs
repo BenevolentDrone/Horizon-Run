@@ -4,6 +4,7 @@ using HereticalSolutions.Allocations;
 using HereticalSolutions.Allocations.Factories;
 
 using HereticalSolutions.Hierarchy;
+using HereticalSolutions.Hierarchy.Factories;
 
 using HereticalSolutions.LifetimeManagement.Factories;
 
@@ -24,34 +25,9 @@ namespace HereticalSolutions.LifetimeManagement
         public override void InstallBindings()
         {
             IPool<List<IReadOnlyHierarchyNode<ILifetimeable>>> bufferPool =
-                new PoolWithListCleanup<List<IReadOnlyHierarchyNode<ILifetimeable>>>(
-                    StackPoolFactory.BuildStackPool<List<IReadOnlyHierarchyNode<ILifetimeable>>>(
-                        new AllocationCommand<List<IReadOnlyHierarchyNode<ILifetimeable>>>
-                        {
-                            Descriptor = new AllocationCommandDescriptor
-                            {
-                                Rule = EAllocationAmountRule.ADD_PREDEFINED_AMOUNT,
+                HierarchyFactory.BuildHierarchyNodeListPool<ILifetimeable>(
+                    loggerResolver);
 
-                                Amount = 5 //TODO: REMOVE MAGIC
-                            },
-                            AllocationDelegate =
-                                AllocationFactory
-                                    .ActivatorAllocationDelegate<List<IReadOnlyHierarchyNode<ILifetimeable>>>
-                        },
-                        new AllocationCommand<List<IReadOnlyHierarchyNode<ILifetimeable>>>
-                        {
-                            Descriptor = new AllocationCommandDescriptor
-                            {
-                                Rule = EAllocationAmountRule.ADD_PREDEFINED_AMOUNT,
-
-                                Amount = 5 //TODO: REMOVE MAGIC
-                            },
-                            AllocationDelegate =
-                                AllocationFactory
-                                    .ActivatorAllocationDelegate<List<IReadOnlyHierarchyNode<ILifetimeable>>>
-                        },
-                        loggerResolver));
-            
             Container
                 .Bind<IPool<List<IReadOnlyHierarchyNode<ILifetimeable>>>>()
                 .FromInstance(bufferPool)

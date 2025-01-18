@@ -150,7 +150,7 @@ namespace HereticalSolutions.Repositories
 
         public IRepository<TKey, TValue> Clone()
         {
-            return RepositoriesFactory.CloneDictionaryRepository(database);
+            return RepositoryFactory.CloneDictionaryRepository(database);
         }
 
         #endregion

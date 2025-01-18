@@ -99,7 +99,7 @@ namespace HereticalSolutions.ResourceManagement
 
 		protected async Task ExecuteOnMainThread(
 			Action delegateToExecute,
-			IGenericCircularBuffer<MainThreadCommand> mainThreadCommandBuffer,
+			IConcurrentCircularBuffer<MainThreadCommand> mainThreadCommandBuffer,
 
 			//Async tail
 			AsyncExecutionContext asyncContext)
@@ -108,7 +108,8 @@ namespace HereticalSolutions.ResourceManagement
 				delegateToExecute);
 
 			while (!mainThreadCommandBuffer.TryProduce(
-				command))
+				command,
+				out _))
 			{
 				await Task.Yield();
 			}
@@ -121,7 +122,7 @@ namespace HereticalSolutions.ResourceManagement
 
 		protected async Task ExecuteOnMainThread(
 			Func<Task> asyncDelegateToExecute,
-			IGenericCircularBuffer<MainThreadCommand> mainThreadCommandBuffer,
+			IConcurrentCircularBuffer<MainThreadCommand> mainThreadCommandBuffer,
 
 			//Async tail
 			AsyncExecutionContext asyncContext)
@@ -130,7 +131,8 @@ namespace HereticalSolutions.ResourceManagement
 				asyncDelegateToExecute);
 
 			while (!mainThreadCommandBuffer.TryProduce(
-				command))
+				command,
+				out _))
 			{
 				await Task.Yield();
 			}

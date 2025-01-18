@@ -70,7 +70,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Factories
 				|| authoringPreset == EEntityAuthoringPresets.NETWORKING_CLIENT;
 
 
-			var registryEntityRepository = RepositoriesFactory.BuildDictionaryRepository<TEntityID, TEntity>();
+			var registryEntityRepository = RepositoryFactory.BuildDictionaryRepository<TEntityID, TEntity>();
 
 			var entityWorldRepository = BuildEntityWorldRepository(loggerResolver);
 
@@ -265,7 +265,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Factories
 			};
 
 			return new EntityListManager(
-				RepositoriesFactory.BuildDictionaryRepository<TEntityListHandle, TEntityListResource>(),
+				RepositoryFactory.BuildDictionaryRepository<TEntityListHandle, TEntityListResource>(),
 				new Queue<TEntityListHandle>(),
 				(handle) => { return ++handle; },
 				new PoolWithListCleanup<TEntityListResource>(
@@ -314,15 +314,9 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Factories
 			};
 
 			return new EntityHierarchyManager(
-				RepositoriesFactory.BuildDictionaryRepository<TEntityHierarchyHandle, TEntityHierarchyResource>(),
+				RepositoryFactory.BuildDictionaryRepository<TEntityHierarchyHandle, TEntityHierarchyResource>(),
 				new Queue<TEntityHierarchyHandle>(),
 				(handle) => { return ++handle; },
-				//() => AllocationsFactory.FuncAllocationDelegate<IReadOnlyHierarchyNode<Entity>>(
-				//    () =>
-				//    {
-				//        return new HierarchyNode<Entity>(
-				//            new List<IReadOnlyHierarchyNode<Entity>>());
-				//    }),
 				new PoolWithCleanup<TEntityHierarchyResource>(
 					StackPoolFactory.BuildStackPool<TEntityHierarchyResource>(
 						initialAllocationCommand,
@@ -345,7 +339,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Factories
 					() =>
 					{
 						return new DirectedNamedGraphNode<TEntity>(
-							RepositoriesFactory
+							RepositoryFactory
 								.BuildDictionaryRepository<string, TEntityRelationsResource>(),
 							new List<RelationDTO<TEntity>>());
 					});
@@ -373,7 +367,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Factories
 			};
 
 			return new EntityRelationsManager(
-				RepositoriesFactory.BuildDictionaryRepository<TEntityRelationsHandle, TEntityRelationsResource>(),
+				RepositoryFactory.BuildDictionaryRepository<TEntityRelationsHandle, TEntityRelationsResource>(),
 				new Queue<TEntityRelationsHandle>(),
 				(handle) => { return ++handle; },
 				new PoolWithCleanup<TEntityRelationsResource>(
@@ -392,7 +386,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Factories
 		{
 			return new EntityPrototypeRepository(
 				new TWorld(),
-				RepositoriesFactory.BuildDictionaryRepository<TPrototypeID, TEntity>());
+				RepositoryFactory.BuildDictionaryRepository<TPrototypeID, TEntity>());
 		}
 
 		#endregion
@@ -402,9 +396,9 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Factories
 		public static EntityWorldRepository BuildEntityWorldRepository(
 			ILoggerResolver loggerResolver = null)
 		{
-			var worldRepository = RepositoriesFactory.BuildDictionaryRepository<TWorldID, TWorld>();
+			var worldRepository = RepositoryFactory.BuildDictionaryRepository<TWorldID, TWorld>();
 
-			var worldControllerRepository = RepositoriesFactory.BuildDictionaryRepository<
+			var worldControllerRepository = RepositoryFactory.BuildDictionaryRepository<
 				TWorld,
 				IEntityWorldController<TWorld, TEntity>>();
 

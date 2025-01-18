@@ -12,7 +12,7 @@ namespace HereticalSolutions.Blackboard
         [SerializeField]
         private BlackboardKeyValuePair[] serializedData;
 
-        private IRepository<string, BlackboardValue> blackboard = RepositoriesFactory.BuildDictionaryRepository<string, BlackboardValue>();
+        private IRepository<string, BlackboardValue> blackboard = RepositoryFactory.BuildDictionaryRepository<string, BlackboardValue>();
 
         public Action<BlackboardBehaviour> OnModified { get; set; }
 

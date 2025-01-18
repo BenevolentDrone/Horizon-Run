@@ -400,7 +400,7 @@ namespace HereticalSolutions.Repositories
 
 		public IOneToOneMap<TValue1, TValue2> Clone()
 		{
-			return RepositoriesFactory.CloneConcurrentDictionaryOneToOneMap(
+			return RepositoryFactory.CloneConcurrentDictionaryOneToOneMap(
 				leftToRightDatabase,
 				rightToLeftDatabase,
 				logger);

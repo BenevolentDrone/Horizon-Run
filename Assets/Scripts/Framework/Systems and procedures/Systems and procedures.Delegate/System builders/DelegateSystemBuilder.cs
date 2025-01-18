@@ -56,10 +56,10 @@ namespace HereticalSolutions.Systems
 
 
 			IRepository<int, IProcedureNode<TProcedure>> threadStartNodeRepository =
-				RepositoriesFactory.BuildDictionaryRepository<int, IProcedureNode<TProcedure>>();
+				RepositoryFactory.BuildDictionaryRepository<int, IProcedureNode<TProcedure>>();
 
 			IRepository<IProcedureNode<TProcedure>, List<int>> threadsToStartRepository = 
-				RepositoriesFactory.BuildDictionaryRepository<IProcedureNode<TProcedure>, List<int>>();
+				RepositoryFactory.BuildDictionaryRepository<IProcedureNode<TProcedure>, List<int>>();
 
 			List<IProcedureNode<TProcedure>> nodesWithCompletionSource = new List<IProcedureNode<TProcedure>>();
 

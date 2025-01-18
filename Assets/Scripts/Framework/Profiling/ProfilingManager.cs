@@ -9,7 +9,7 @@ namespace HereticalSolutions.Profiling
 	public static class ProfilingManager
 	{
 		private static IRepository<string, ProfilingMarker> markers =
-			RepositoriesFactory.BuildDictionaryRepository<string, ProfilingMarker>();
+			RepositoryFactory.BuildDictionaryRepository<string, ProfilingMarker>();
 
 		private static List<ProfilingMarkerDTO> report = new List<ProfilingMarkerDTO>();
 

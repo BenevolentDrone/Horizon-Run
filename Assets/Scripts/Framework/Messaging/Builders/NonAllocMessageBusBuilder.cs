@@ -39,7 +39,7 @@ namespace HereticalSolutions.Messaging.Factories
         {
             this.loggerResolver = loggerResolver;
 
-            messagePoolRepository = RepositoriesFactory.BuildDictionaryInstanceRepository();
+            messagePoolRepository = RepositoryFactory.BuildDictionaryInstanceRepository();
 
             broadcasterBuilder = new NonAllocBroadcasterWithRepositoryBuilder(
                 loggerResolver);

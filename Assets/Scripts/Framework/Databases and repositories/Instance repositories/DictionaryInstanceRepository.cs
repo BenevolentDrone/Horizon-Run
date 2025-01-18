@@ -242,7 +242,7 @@ namespace HereticalSolutions.Repositories
 
         public IInstanceRepository Clone()
         {
-            return RepositoriesFactory.CloneDictionaryInstanceRepository(database);
+            return RepositoryFactory.CloneDictionaryInstanceRepository(database);
         }
 
         #endregion

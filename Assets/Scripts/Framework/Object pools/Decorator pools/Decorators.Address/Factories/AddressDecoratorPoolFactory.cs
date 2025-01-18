@@ -16,7 +16,7 @@ namespace HereticalSolutions.Pools.Factories
                 loggerResolver?.GetLogger<ManagedPoolWithAddress<T>>();
 
             return new ManagedPoolWithAddress<T>(
-                RepositoriesFactory.BuildDictionaryRepository<int, IManagedPool<T>>(),
+                RepositoryFactory.BuildDictionaryRepository<int, IManagedPool<T>>(),
                 0,
                 new PoolWithAddressBuilder<T>(
                     loggerResolver,

@@ -16,9 +16,31 @@ namespace HereticalSolutions.Time.Factories
 {
 	public static class TimerPoolFactory
 	{
-		public const int INITIAL_TIMERS_AMOUNT = 100;
+		#region Factory settings
 
-		public const int ADDITIONAL_TIMERS_AMOUNT = 100;
+		#region Timer pool
+
+		public const int DEFAULT_TIMER_POOL_SIZE = 32;
+
+		public static AllocationCommandDescriptor TimerPoolInitialAllocationDescriptor =
+			new AllocationCommandDescriptor
+			{
+				Rule = EAllocationAmountRule.ADD_PREDEFINED_AMOUNT,
+
+				Amount = DEFAULT_TIMER_POOL_SIZE
+			};
+
+		public static AllocationCommandDescriptor TimerPoolAdditionalAllocationDescriptor =
+			new AllocationCommandDescriptor
+			{
+				Rule = EAllocationAmountRule.ADD_PREDEFINED_AMOUNT,
+
+				Amount = DEFAULT_TIMER_POOL_SIZE
+			};
+
+		#endregion
+
+		#endregion
 
 		public static IManagedPool<TimerWithSubscriptionsContainer> BuildRuntimeTimerPool(
 			ISynchronizationProvider provider,
@@ -86,19 +108,8 @@ namespace HereticalSolutions.Time.Factories
 
 				metadataDescriptorBuilders,
 
-				new AllocationCommandDescriptor
-				{
-					Rule = EAllocationAmountRule.ADD_PREDEFINED_AMOUNT,
-
-					Amount = INITIAL_TIMERS_AMOUNT
-				},
-				new AllocationCommandDescriptor
-				{
-					Rule = EAllocationAmountRule.ADD_PREDEFINED_AMOUNT,
-
-					Amount = ADDITIONAL_TIMERS_AMOUNT
-				
-				},
+				TimerPoolInitialAllocationDescriptor,
+				TimerPoolAdditionalAllocationDescriptor,
 
 				facadeAllocationCallbacks,
 				null);

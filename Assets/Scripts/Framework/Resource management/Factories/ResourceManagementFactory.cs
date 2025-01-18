@@ -26,8 +26,8 @@ namespace HereticalSolutions.ResourceManagement.Factories
                 loggerResolver?.GetLogger<RuntimeResourceManager>();
 
             return new RuntimeResourceManager(
-                RepositoriesFactory.BuildDictionaryRepository<int, string>(),
-                RepositoriesFactory.BuildDictionaryRepository<int, IReadOnlyResourceData>(),
+                RepositoryFactory.BuildDictionaryRepository<int, string>(),
+                RepositoryFactory.BuildDictionaryRepository<int, IReadOnlyResourceData>(),
                 logger);
         }
 
@@ -38,8 +38,8 @@ namespace HereticalSolutions.ResourceManagement.Factories
                 loggerResolver?.GetLogger<ConcurrentRuntimeResourceManager>();
 
             return new ConcurrentRuntimeResourceManager(
-                RepositoriesFactory.BuildConcurrentDictionaryRepository<int, string>(),
-                RepositoriesFactory.BuildConcurrentDictionaryRepository<int, IReadOnlyResourceData>(),
+                RepositoryFactory.BuildConcurrentDictionaryRepository<int, string>(),
+                RepositoryFactory.BuildConcurrentDictionaryRepository<int, IReadOnlyResourceData>(),
                 NotifierFactory.BuildAsyncNotifierSingleArgGeneric<int, IReadOnlyResourceData>(loggerResolver),
                 new SemaphoreSlim(1, 1),
                 logger);
@@ -54,10 +54,10 @@ namespace HereticalSolutions.ResourceManagement.Factories
 
             return new ResourceData(
                 descriptor,
-                RepositoriesFactory.BuildDictionaryRepository<int, string>(),
-                RepositoriesFactory.BuildDictionaryRepository<int, IResourceVariantData>(),
-                RepositoriesFactory.BuildDictionaryRepository<int, string>(),
-                RepositoriesFactory.BuildDictionaryRepository<int, IReadOnlyResourceData>(),
+                RepositoryFactory.BuildDictionaryRepository<int, string>(),
+                RepositoryFactory.BuildDictionaryRepository<int, IResourceVariantData>(),
+                RepositoryFactory.BuildDictionaryRepository<int, string>(),
+                RepositoryFactory.BuildDictionaryRepository<int, IReadOnlyResourceData>(),
                 logger);
         }
 
@@ -70,11 +70,11 @@ namespace HereticalSolutions.ResourceManagement.Factories
 
             return new ConcurrentResourceData(
                 descriptor,
-                RepositoriesFactory.BuildConcurrentDictionaryRepository<int, string>(),
-                RepositoriesFactory.BuildConcurrentDictionaryRepository<int, IResourceVariantData>(),
+                RepositoryFactory.BuildConcurrentDictionaryRepository<int, string>(),
+                RepositoryFactory.BuildConcurrentDictionaryRepository<int, IResourceVariantData>(),
                 NotifierFactory.BuildAsyncNotifierSingleArgGeneric<int, IResourceVariantData>(loggerResolver),
-                RepositoriesFactory.BuildConcurrentDictionaryRepository<int, string>(),
-                RepositoriesFactory.BuildConcurrentDictionaryRepository<int, IReadOnlyResourceData>(),
+                RepositoryFactory.BuildConcurrentDictionaryRepository<int, string>(),
+                RepositoryFactory.BuildConcurrentDictionaryRepository<int, IReadOnlyResourceData>(),
                 NotifierFactory.BuildAsyncNotifierSingleArgGeneric<int, IReadOnlyResourceData>(loggerResolver),
                 new SemaphoreSlim(1, 1),
                 logger);
@@ -162,7 +162,7 @@ namespace HereticalSolutions.ResourceManagement.Factories
             ILoggerResolver loggerResolver = null)
         {
             return new ManagedTypeResourceManager<TResource, THandle>(
-                RepositoriesFactory.BuildDictionaryRepository<THandle, TResource>(),
+                RepositoryFactory.BuildDictionaryRepository<THandle, TResource>(),
                 new Queue<THandle>(),
                 newHandleAllocationDelegate,
                 newResourceAllocationDelegate,

@@ -20,7 +20,7 @@ namespace HereticalSolutions.Pools.Factories
                 loggerResolver?.GetLogger<ManagedPoolWithVariants<T>>();
 
             return new ManagedPoolWithVariants<T>(
-                RepositoriesFactory.BuildDictionaryRepository<int, VariantContainer<T>>(),
+                RepositoryFactory.BuildDictionaryRepository<int, VariantContainer<T>>(),
                 RandomFactory.BuildSystemRandomGenerator(),
                 logger);
         }

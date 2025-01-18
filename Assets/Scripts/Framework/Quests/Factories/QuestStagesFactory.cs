@@ -29,7 +29,7 @@ namespace HereticalSolutions.Quests.Factories
         public static IReadOnlyRepository<string, QuestStage> BuildPrototypeStages()
         {
             IRepository<string, QuestStage> prototypeStages =
-                RepositoriesFactory.BuildDictionaryRepository<string, QuestStage>();
+                RepositoryFactory.BuildDictionaryRepository<string, QuestStage>();
 
             AddActions(prototypeStages);
             AddTrackers(prototypeStages);

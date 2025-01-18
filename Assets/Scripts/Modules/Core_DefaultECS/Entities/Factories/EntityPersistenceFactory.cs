@@ -44,7 +44,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Factories
 			Type[] componentTypes)
 		{
 			IReadOnlyRepository<Type, WriteComponentToObjectDelegate> result =
-				RepositoriesFactory.BuildDictionaryRepository<Type, WriteComponentToObjectDelegate>();
+				RepositoryFactory.BuildDictionaryRepository<Type, WriteComponentToObjectDelegate>();
 
 			for (int i = 0; i < componentTypes.Length; i++)
 			{

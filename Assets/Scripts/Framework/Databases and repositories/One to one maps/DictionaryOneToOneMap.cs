@@ -299,7 +299,7 @@ namespace HereticalSolutions.Repositories
 
         public IOneToOneMap<TValue1, TValue2> Clone()
         {
-            return RepositoriesFactory.CloneDictionaryOneToOneMap(
+            return RepositoryFactory.CloneDictionaryOneToOneMap(
                 leftToRightDatabase,
                 rightToLeftDatabase,
                 logger);

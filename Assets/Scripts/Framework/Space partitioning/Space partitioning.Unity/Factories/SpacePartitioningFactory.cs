@@ -18,7 +18,7 @@ namespace HereticalSolutions.SpacePartitioning.Factories
 				loggerResolver?.GetLogger<Quadtree<TValue>>();
 
 			var result = new Quadtree<TValue>(
-				RepositoriesFactory.BuildDictionaryRepository<TValue, ValueSpaceData<TValue>>(),
+				RepositoryFactory.BuildDictionaryRepository<TValue, ValueSpaceData<TValue>>(),
 				NodePoolFactory.BuildNodePool<TValue>(
 					loggerResolver),
 				NodePoolFactory.BuildValueDataPool<TValue>(),

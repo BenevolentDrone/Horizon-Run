@@ -62,10 +62,10 @@ namespace HereticalSolutions.Systems.Factories
 			allProcedureNodes = new HashSet<IProcedureNode<TProcedure>>();
 
 			stages =
-				RepositoriesFactory.BuildDictionaryRepository<string, IStageNode<TProcedure>>();
+				RepositoryFactory.BuildDictionaryRepository<string, IStageNode<TProcedure>>();
 
 			procedures =
-				RepositoriesFactory.BuildDictionaryRepository<Type, IList<IProcedureNode<TProcedure>>>();
+				RepositoryFactory.BuildDictionaryRepository<Type, IList<IProcedureNode<TProcedure>>>();
 
 
 			((StageNode<TProcedure>)startNode).SequentialNext = finishNode;

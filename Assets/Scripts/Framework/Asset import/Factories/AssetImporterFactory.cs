@@ -21,9 +21,9 @@ namespace HereticalSolutions.AssetImport.Factories
 
 			return new AssetImportManager(
 				(IRepository<Type, List<AAssetImportPostProcessor>>)
-					RepositoriesFactory.BuildDictionaryRepository<Type, List<AAssetImportPostProcessor>>(),
+					RepositoryFactory.BuildDictionaryRepository<Type, List<AAssetImportPostProcessor>>(),
 				(IRepository<Type, IManagedPool<AAssetImporter>>)
-					RepositoriesFactory.BuildDictionaryRepository<Type, IManagedPool<AAssetImporter>>(),
+					RepositoryFactory.BuildDictionaryRepository<Type, IManagedPool<AAssetImporter>>(),
 				loggerResolver,
 				logger);
 		}
@@ -36,9 +36,9 @@ namespace HereticalSolutions.AssetImport.Factories
 
 			return new ConcurrentAssetImportManager(
 				(IRepository<Type, List<AAssetImportPostProcessor>>)
-					RepositoriesFactory.BuildDictionaryRepository<Type, List<AAssetImportPostProcessor>>(),
+					RepositoryFactory.BuildDictionaryRepository<Type, List<AAssetImportPostProcessor>>(),
 				(IRepository<Type, IManagedPool<AAssetImporter>>)
-					RepositoriesFactory.BuildDictionaryRepository<Type, IManagedPool<AAssetImporter>>(),
+					RepositoryFactory.BuildDictionaryRepository<Type, IManagedPool<AAssetImporter>>(),
 				new SemaphoreSlim(1, 1),
 				new SemaphoreSlim(1, 1),
 				loggerResolver,

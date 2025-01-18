@@ -187,7 +187,7 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 				KEY_HANDLE_TO_BONE_MAP,
 				out var handleToBoneMap))
 			{
-				handleToBoneMap = RepositoriesFactory.BuildDictionaryRepository<int, IReadOnlyHierarchyNode<BoneWrapper>>();
+				handleToBoneMap = RepositoryFactory.BuildDictionaryRepository<int, IReadOnlyHierarchyNode<BoneWrapper>>();
 
 				context.AddOrUpdate<IRepository<int, IReadOnlyHierarchyNode<BoneWrapper>>>(
 					KEY_HANDLE_TO_BONE_MAP,
@@ -834,7 +834,7 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 			SkeletonWrapper skeleton)
 		{
 			IRepository<BoneWrapper, BoneSnapshot> boneSnapshots =
-				RepositoriesFactory.BuildDictionaryRepository<BoneWrapper, BoneSnapshot>();
+				RepositoryFactory.BuildDictionaryRepository<BoneWrapper, BoneSnapshot>();
 
 			var skinnedMeshRenderer = skeleton
 				.RootNode

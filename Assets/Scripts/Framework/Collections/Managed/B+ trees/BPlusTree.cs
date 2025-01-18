@@ -3,101 +3,101 @@ using System.Collections.Generic;
 
 namespace HereticalSolutions.Collections.Managed
 {
+	//Courtesy of https://www.geeksforgeeks.org/implementation-of-b-plus-tree-in-c/
+
 	public class BPlusTree<T>
 		: IBPlusTree<T>
 	{
-		private readonly IComparer<T> comparer;
+		public static readonly IComparer<T> Comparer = Comparer<T>.Default;
+
+		private readonly int degree;
+
+		private readonly int halfDegree;
 
 		private BPlusTreeNode<T> root;
 
-		private int degree;
-
+		//createBTree
 		public BPlusTree(
 			int degree)
 		{
-			comparer = Comparer<T>.Default;
-
 			this.degree = degree;
+
+			//Over here,
+			//https://www.geeksforgeeks.org/insertion-in-a-b-tree/
+			//the half-degree is used with ceil() for odd degrees
+
+			//halfDegree = degree / 2;
+			halfDegree = (int)Math.Ceiling((float)degree / 2);
 
 			root = new BPlusTreeNode<T>(
 				degree,
-				true,
-				comparer);
+				true);
 		}
 
 		#region IBPlusTree
 
-		public void Insert(
-			T key)
-		{
-			BPlusTreeNode<T> node = root;
-
-			// Find the appropriate leaf node where the key should be inserted
-
-			while (!node.IsLeaf)
-			{
-				node = node.GetChildNode(
-					key);
-			}
-
-			// Insert the key in the leaf node
-
-			node.Insert(
-				key);
-
-			// Split the node if it exceeds the maximum number of keys
-
-			if (node.IsOverflow())
-			{
-				Split(node);
-			}
-		}
-
 		public bool Search(
 			T key)
 		{
-			BPlusTreeNode<T> node = root;
-
-			// Traverse the tree to find the leaf node containing the key
-
-			while (!node.IsLeaf)
-			{
-				node = node.GetChildNode(
-					key);
-			}
-
-			// Check if the key is present in the leaf node
-
-			return node.Contains(
+			return Search(
+				root,
 				key);
 		}
 
+		//insert
+		public void Insert(
+			T key)
+		{
+			if (root.KeysCount == degree - 1)
+			{
+				BPlusTreeNode<T> newRoot = AllocateNode(
+					false);
+
+				newRoot.Children[0] = root;
+
+				Split(
+					newRoot,
+					root,
+					0);
+
+				Insert(
+					newRoot,
+					key);
+
+				root = newRoot;
+			}
+			else
+			{
+				Insert(
+					root,
+					key);
+			}
+		}
+
+		//deleteKey
 		public bool Remove(
 			T key)
 		{
-			BPlusTreeNode<T> node = root;
-
-			// Traverse the tree to find the leaf node containing the key
-
-			while (!node.IsLeaf)
-			{
-				node = node.GetChildNode(
-					key);
-			}
-
-			// Remove the key from the leaf node
-
-			bool removed = node.Remove(
+			// Call a helper function to delete the key recursively
+			
+			var result = DeleteKey(
+				root,
 				key);
 
-			// If key was removed, check if node is underfilled
+			// If root has no keys left and it has a child, make its
+			// first child the new root
 
-			if (removed && node.KeysCount < (degree - 1) / 2)
+			if (root.KeysCount == 0
+				&& !root.IsLeaf)
 			{
-				Rebalance(node);
+				var previousRoot = root;
+
+				root = root.Children[0];
+
+				FreeNode(previousRoot);
 			}
 
-			return removed;
+			return result;
 		}
 
 		public int Count
@@ -155,250 +155,700 @@ namespace HereticalSolutions.Collections.Managed
 			}
 		}
 
-		public void InOrderTraversal(
-			Action<T> action)
-		{
-			InOrderTraversal(
-				root,
-				action);
-		}
-
 		public void Clear()
 		{
-			root.RecursiveClear();
+			RecursiveClear(
+				root);
 
-			root = new BPlusTreeNode<T>(
-				degree,
-				true,
-				comparer);
+			root = AllocateNode(
+				true);
 		}
 
 		#endregion
 
-		private void InOrderTraversal(
-			BPlusTreeNode<T> node,
-			Action<T> action)
-		{
-			if (node.IsLeaf)
-			{
-				var current = node;
+		#region Node operations
 
-				while (current != null)
+		#region Allocation and deallocation
+
+		//createNode
+		private BPlusTreeNode<T>  AllocateNode(
+			bool leaf)
+		{
+			BPlusTreeNode<T> newNode = new BPlusTreeNode<T>(
+				degree,
+				leaf);
+
+			return newNode;
+		}
+
+		private void FreeNode(
+			BPlusTreeNode<T> node)
+		{
+			node.Cleanup();
+		}
+
+		#endregion
+
+		#region CRUD operations
+
+		#region Searches
+
+		//findKey
+		private int FindKeyFromStart(
+			BPlusTreeNode<T> node,
+			T key)
+		{
+			int i = 0;
+
+			while (i < node.KeysCount
+				&& Comparer.Compare(
+					key,
+					node.Keys[i])
+					> 0)
+			{
+				i++;
+			}
+
+			return i;
+		}
+
+		private int FindKeyFromFinish(
+			BPlusTreeNode<T> node,
+			T key)
+		{
+			int i = node.KeysCount - 1;
+
+			while (i >= 0
+				&& Comparer.Compare(
+					node.Keys[i],
+					key)
+					> 0)
+			{
+				//node.Keys[i + 1] = node.Keys[i];
+
+				i--;
+			}
+
+			i++;
+
+			return i;
+		}
+
+		//search
+		private bool Search(
+			BPlusTreeNode<T> node,
+			T key)
+		{
+			int i = 0;
+
+			while (i < node.KeysCount)
+			{
+				int compareResult = Comparer.Compare(
+					key,
+					node.Keys[i]);
+
+				if (compareResult == 0)
 				{
-					foreach (var key in current.Keys)
+					return true;
+				}
+
+				if (compareResult > 0)
+				{
+					i++;
+				}
+
+				if (compareResult < 0)
+				{
+					if (node.IsLeaf)
 					{
-						action(key);
+						return false;
 					}
 
-					current = current.Next;
+					return Search(
+						node.Children[i],
+						key);
 				}
+			}
+
+			return false;
+		}
+
+		#endregion
+
+		//insertNonFull
+		private void Insert(
+			BPlusTreeNode<T> node,
+			T key)
+		{
+			//int i = node.KeysCount - 1;
+
+			if (node.IsLeaf)
+			{
+				//while (i >= 0
+				//	&& Comparer.Compare(
+				//		node.Keys[i],
+				//		key)
+				//		> 0)
+				//{
+				//	//node.Keys[i + 1] = node.Keys[i];
+				//
+				//	i--;
+				//}
+				//
+				//Array.Copy(
+				//	node.Keys,
+				//	i + 1,
+				//	node.Keys,
+				//	i + 2,
+				//	node.KeysCount - i - 1);
+				//
+				//node.Keys[i + 1] = key;
+
+				int i = FindKeyFromFinish(
+					node,
+					key);
+
+				Array.Copy(
+					node.Keys,
+					i,
+					node.Keys,
+					i + 1,
+					node.KeysCount - i);
+
+				node.Keys[i] = key;
+
+
+				node.KeysCount++;
 			}
 			else
 			{
-				foreach (var child in node.Children)
+				//while (i >= 0
+				//	&& Comparer.Compare(
+				//		node.Keys[i],
+				//		key)
+				//		> 0)
+				//{
+				//	i--;
+				//}
+				//
+				//i++;
+
+				int i = FindKeyFromFinish(
+					node,
+					key);
+
+				if (node.Children[i].KeysCount == degree - 1)
 				{
-					InOrderTraversal(
-						child,
-						action);
+					Split(
+						node,
+						node.Children[i],
+						i);
+
+					if (Comparer.Compare(
+						node.Keys[i],
+						 key)
+						 < 0)
+					{
+						i++;
+					}
 				}
+
+				Insert(
+					node.Children[i],
+					key);
 			}
 		}
 
-		private void Split(
-			BPlusTreeNode<T> node)
+		//deleteKeyHelper
+		private bool DeleteKey(
+			BPlusTreeNode<T> node,
+			T key)
 		{
-			// Create a new node to split the current node
+			// Find the index of the key in the node
 
-			BPlusTreeNode<T> newNode = new BPlusTreeNode<T>(
-				degree,
-				true,
-				comparer);
+			int keyIndex = FindKeyFromStart(
+				node,
+				key);
 
-			int midIndex = node.KeysCount / 2;
+			// If key is present in this node
 
-			// Transfer keys and children to the new node
+			if (keyIndex < node.KeysCount
+				&& Comparer.Compare(
+					node.Keys[keyIndex],
+					key) == 0)
+			{
+				if (node.IsLeaf)
+				{
+					// If the node is a leaf, simply remove the key
 
-			newNode.Keys = new T[degree - 1];
+					RemoveFromLeaf(
+						node,
+						keyIndex);
+
+					return true;
+				}
+				
+				// If the node is not a leaf, replace the key
+				// with its predecessor/successor
+
+				T predecessor = GetPredecessor(
+					node,
+					keyIndex);
+
+				node.Keys[keyIndex] = predecessor;
+
+				// Recursively delete the predecessor
+				DeleteKey(
+					node.Children[keyIndex],
+					predecessor);
+
+				return true;
+			}
+			
+			// If the key is not present in this node, go down
+			// the appropriate child
+
+			if (node.IsLeaf)
+			{
+				// Key not found in the tree
+
+				return false;
+			}
+
+			bool isLastChild = (keyIndex == node.KeysCount);
+
+			// If the child where the key is supposed to be lies
+			// has less than t keys, fill that child
+
+			if (node.Children[keyIndex].KeysCount < halfDegree)
+			{
+				Rebalance(
+					node,
+					keyIndex);
+			}
+
+			// If the last child has been merged, it must have
+			// merged with the previous child
+
+			// So, we need to recursively delete the key from
+			// the previous child
+
+			if (isLastChild
+				&& keyIndex > node.KeysCount)
+			{
+				return DeleteKey(
+					node.Children[keyIndex - 1],
+					key);
+			}
+			
+			return DeleteKey(
+				node.Children[keyIndex],
+				key);
+		}
+
+		//removeFromLeaf
+		private void RemoveFromLeaf(
+			BPlusTreeNode<T> node,
+			int keyIndex)
+		{
+			//for (int i = keyIndex + 1; i < node.KeysCount; ++i)
+			//{
+			//	node.Keys[i - 1] = node.Keys[i];
+			//}
 
 			Array.Copy(
 				node.Keys,
-				midIndex,
-				newNode.Keys,
-				0,
-				node.KeysCount - midIndex);
+				keyIndex + 1,
+				node.Keys,
+				keyIndex,
+				node.KeysCount - keyIndex - 1);
 
-			node.KeysCount = midIndex;
+			node.KeysCount--;
+		}
 
-			if (node.Children != null)
+		//getPredecessor
+		private T GetPredecessor(
+			BPlusTreeNode<T> node,
+			int keyIndex)
+		{
+			BPlusTreeNode<T> current = node.Children[keyIndex];
+
+			while (!current.IsLeaf)
 			{
-				newNode.Children = new BPlusTreeNode<T>[degree];
+				current = current.Children[current.KeysCount];
+			}
+
+			return current.Keys[current.KeysCount - 1];
+		}
+
+		#endregion
+
+		#region Splits and rebalances
+
+		//splitChild
+		private void Split(
+			BPlusTreeNode<T> parent,
+			BPlusTreeNode<T> node,
+			int i)
+		{
+			BPlusTreeNode<T> newSibling = AllocateNode(
+				node.IsLeaf);
+
+			newSibling.KeysCount = halfDegree - 1;
+
+			//for (int j = 0; j < t - 1; j++)
+			//{
+			//	newChild.Keys[j] = child.Keys[j + t];
+			//}
+
+			Array.Copy(
+				node.Keys,
+				halfDegree,
+				newSibling.Keys,
+				0,
+				halfDegree - 1);
+
+			if (!node.IsLeaf)
+			{
+				//for (int j = 0; j < t; j++)
+				//{
+				//	newChild.Children[j] = child.Children[j + t];
+				//}
 
 				Array.Copy(
 					node.Children,
-					midIndex,
-					newNode.Children,
+					halfDegree,
+					newSibling.Children,
 					0,
-					node.Children.Length - midIndex);
-
-				node.Children = node
-					.Children
-					.AsSpan(
-						0,
-						midIndex
-					).ToArray();
+					halfDegree);
 			}
 
-			// Link the leaf nodes if necessary
+			node.KeysCount = halfDegree - 1;
 
-			if (node.IsLeaf)
+			//We'll trust this one with the safety of the shift operation
+			//https://stackoverflow.com/questions/11149668/is-array-copy-safe-when-the-source-and-destination-are-the-same-array
+
+			//for (int j = parent.KeysCount; j >= i + 1; j--)
+			//{
+			//	parent.Children[j + 1] = parent.Children[j];
+			//}
+
+			Array.Copy(
+				parent.Children,
+				i + 1,
+				parent.Children,
+				i + 2,
+				parent.KeysCount - i);
+
+			parent.Children[i + 1] = newSibling;
+
+			//for (int j = parent.KeysCount - 1; j >= i; j--)
+			//{
+			//	parent.Keys[j + 1] = parent.Keys[j];
+			//}
+
+			Array.Copy(
+				parent.Keys,
+				i,
+				parent.Keys,
+				i + 1,
+				parent.KeysCount - i);
+
+			parent.Keys[i] = node.Keys[halfDegree - 1];
+
+			parent.KeysCount++;
+		}
+
+		//fill
+		private void Rebalance(
+			BPlusTreeNode<T> node,
+			int keyIndex)
+		{
+			if (keyIndex != 0
+				&& node.Children[keyIndex - 1].KeysCount >= halfDegree)
 			{
-				newNode.Next = node.Next;
-
-				node.Next = newNode;
-			}
-
-			// Create a new root node if necessary
-
-			if (node == root)
-			{
-				BPlusTreeNode<T> newRoot = new BPlusTreeNode<T>(
-					degree,
-					false,
-					comparer);
-
-				newRoot.Keys = new T[]
-				{
-					newNode.Keys[0]
-				};
-
-				newRoot.Children = new BPlusTreeNode<T>[]
-				{
+				BorrowFromPrev(
 					node,
-					newNode
-				};
-
-				root = newRoot;
+					keyIndex);
+			}
+			else if (keyIndex != node.KeysCount
+				&& node.Children[keyIndex + 1].KeysCount >= halfDegree)
+			{
+				BorrowFromNext(
+					node,
+					keyIndex);
 			}
 			else
 			{
-				// Insert the middle key from the node into the parent
-				BPlusTreeNode<T> parent = node.Parent;
-
-				parent.Insert(
-					newNode.Keys[0]);
-
-				//LINQ
-				//parent.Children = parent.Children.Concat(new[] { newNode }).ToArray();
-
-				// Manually handle the concatenation of arrays
-
-				BPlusTreeNode<T>[] newChildren = new BPlusTreeNode<T>[parent.Children.Length + 1];
-
-				Array.Copy(
-					parent.Children,
-					0,
-					newChildren,
-					0,
-					parent.Children.Length);
-
-				newChildren[parent.Children.Length] = newNode;
-
-				parent.Children = newChildren;
-
-
-				if (parent.IsOverflow())
+				if (keyIndex != node.KeysCount)
 				{
-					Split(parent);
+					Merge(
+						node,
+						keyIndex);
+				}
+				else
+				{
+					Merge(
+						node,
+						keyIndex - 1);
 				}
 			}
 		}
 
-		private void Rebalance(
-			BPlusTreeNode<T> node)
-		{
-			// Handle underfilled nodes by either merging or borrowing keys
-			BPlusTreeNode<T> parent = node.Parent;
-
-			int indexInParent = Array.IndexOf(
-				parent.Children,
-				node);
-
-			if (indexInParent > 0
-				&& parent.Children[indexInParent - 1].KeysCount > (degree - 1) / 2)
-			{
-				BorrowFromLeft(
-					node,
-					parent,
-					indexInParent);
-			}
-			else if (indexInParent < parent.KeysCount
-				&& parent.Children[indexInParent + 1].KeysCount > (degree - 1) / 2)
-			{
-				BorrowFromRight(
-					node,
-					parent,
-					indexInParent);
-			}
-			else
-			{
-				Merge(
-					node,
-					parent,
-					indexInParent);
-			}
-		}
-
-		private void BorrowFromLeft(
+		//borrowFromPrev
+		private void BorrowFromPrev(
 			BPlusTreeNode<T> node,
-			BPlusTreeNode<T> parent,
-			int indexInParent)
+			int keyIndex)
 		{
-			BPlusTreeNode<T> leftSibling = parent.Children[indexInParent - 1];
+			BPlusTreeNode<T> child = node.Children[keyIndex];
 
-			T borrowedKey = leftSibling.Keys[--leftSibling.KeysCount];
+			BPlusTreeNode<T> sibling = node.Children[keyIndex - 1];
 
-			node.Insert(
-				borrowedKey);
-		}
+			// Move all keys in child one step ahead
 
-		private void BorrowFromRight(
-			BPlusTreeNode<T> node,
-			BPlusTreeNode<T> parent,
-			int indexInParent)
-		{
-			BPlusTreeNode<T> rightSibling = parent.Children[indexInParent + 1];
-
-			T borrowedKey = rightSibling.Keys[--rightSibling.KeysCount];
-
-			node.Insert(
-				borrowedKey);
-		}
-
-		private void Merge(
-			BPlusTreeNode<T> node,
-			BPlusTreeNode<T> parent,
-			int indexInParent)
-		{
-			// Merge the node with its sibling and adjust the parent's keys
-
-			BPlusTreeNode<T> leftSibling = parent.Children[indexInParent - 1];
-
-			BPlusTreeNode<T> rightSibling = parent.Children[indexInParent + 1];
-
-			leftSibling.Insert(
-				parent.Keys[indexInParent]);
+			//for (int i = child.KeysCount - 1; i >= 0; --i)
+			//{
+			//	child.Keys[i + 1] = child.Keys[i];
+			//}
 
 			Array.Copy(
-				rightSibling.Keys,
+				child.Keys,
 				0,
-				leftSibling.Keys,
-				leftSibling.KeysCount,
-				rightSibling.KeysCount);
+				child.Keys,
+				1,
+				child.KeysCount);
 
-			leftSibling.KeysCount += rightSibling.KeysCount;
+			// If child is not a leaf, move its child pointers one
+			// step ahead
 
-			parent.Remove(
-				parent.Keys[indexInParent]);
+			if (!child.IsLeaf)
+			{
+				//for (int i = child.KeysCount; i >= 0; --i)
+				//{
+				//	child.Children[i + 1] = child.Children[i];
+				//}
+
+				Array.Copy(
+					child.Children,
+					0,
+					child.Children,
+					1,
+					child.KeysCount + 1);
+			}
+
+			// Setting child's first key equal to node's key[keyIndex -
+			// 1]
+
+			child.Keys[0] = node.Keys[keyIndex - 1];
+
+			// Moving sibling's last child as child's first child
+
+			if (!child.IsLeaf)
+			{
+				child.Children[0] = sibling.Children[sibling.KeysCount];
+			}
+
+			// Moving the key from the sibling to the parent
+
+			node.Keys[keyIndex - 1] = sibling.Keys[sibling.KeysCount - 1];
+
+			// Incrementing and decrementing the key counts of child
+			// and sibling respectively
+
+			child.KeysCount++;
+
+			sibling.KeysCount--;
 		}
+
+		//borrowFromNext
+		private void BorrowFromNext(
+			BPlusTreeNode<T> node,
+			int keyIndex)
+		{
+			BPlusTreeNode<T> child = node.Children[keyIndex];
+
+			BPlusTreeNode<T> sibling = node.Children[keyIndex + 1];
+
+			// Setting child's (t - 1)th key equal to node's
+			// key[keyIndex]
+
+			child.Keys[child.KeysCount] = node.Keys[keyIndex];
+
+			// If child is not a leaf, move its child pointers one
+			// step ahead
+
+			if (!child.IsLeaf)
+			{
+				child.Children[(child.KeysCount) + 1]
+					= sibling.Children[0];
+			}
+
+			// Setting node's keyIndex-th key equal to sibling's first
+			// key
+
+			node.Keys[keyIndex] = sibling.Keys[0];
+
+			// Moving all keys in sibling one step behind
+
+			//for (int i = 1; i < sibling.KeysCount; ++i)
+			//{
+			//	sibling.Keys[i - 1] = sibling.Keys[i];
+			//}
+
+			Array.Copy(
+				sibling.Keys,
+				1,
+				sibling.Keys,
+				0,
+				sibling.KeysCount - 1);
+
+			// If sibling is not a leaf, move its child pointers one
+			// step behind
+
+			if (!sibling.IsLeaf)
+			{
+				//for (int i = 1; i <= sibling.KeysCount; ++i)
+				//{
+				//	sibling.Children[i - 1] = sibling.Children[i];
+				//}
+
+				Array.Copy(
+					sibling.Children,
+					1,
+					sibling.Children,
+					0,
+					sibling.KeysCount);
+			}
+
+			// Incrementing and decrementing the key counts of child
+			// and sibling respectively
+
+			child.KeysCount++;
+
+			sibling.KeysCount--;
+		}
+
+		//merge
+		private void Merge(
+			BPlusTreeNode<T> node,
+			int keyIndex)
+		{
+			BPlusTreeNode<T> child = node.Children[keyIndex];
+
+			BPlusTreeNode<T> sibling = node.Children[keyIndex + 1];
+
+			// Pulling a key from the current node and inserting it
+			// into (t-1)th position of child
+
+			child.Keys[child.KeysCount] = node.Keys[keyIndex];
+
+			// If child is not a leaf, move its child pointers one
+			// step ahead
+
+			if (!child.IsLeaf)
+			{
+				child.Children[child.KeysCount + 1]
+					= sibling.Children[0];
+			}
+
+			// Copying the keys from sibling to child
+
+			//for (int i = 0; i < sibling.KeysCount; ++i)
+			//{
+			//	child.Keys[i + child.KeysCount + 1] = sibling.Keys[i];
+			//}
+
+			Array.Copy(
+				sibling.Keys,
+				0,
+				child.Keys,
+				child.KeysCount + 1,
+				sibling.KeysCount);
+
+			// If child is not a leaf, copy the children pointers as
+			// well
+
+			if (!child.IsLeaf)
+			{
+				//for (int i = 0; i <= sibling.KeysCount; ++i)
+				//{
+				//	child.Children[i + child.KeysCount + 1]
+				//		= sibling.Children[i];
+				//}
+
+				Array.Copy(
+					sibling.Children,
+					0,
+					child.Children,
+					child.KeysCount + 1,
+					sibling.KeysCount + 1);
+			}
+
+			// Update the key count of child and current node
+
+			child.KeysCount += sibling.KeysCount + 1;
+			
+
+			// Move all keys after keyIndex in the current node one step
+			// before, so as to fill the gap created by moving
+			// keys[keyIndex] to child
+
+			//for (int i = keyIndex + 1; i < node.KeysCount; ++i)
+			//{
+			//	node.Keys[i - 1] = node.Keys[i];
+			//}
+
+			Array.Copy(
+				node.Keys,
+				keyIndex + 1,
+				node.Keys,
+				keyIndex,
+				node.KeysCount - keyIndex - 1);
+
+			// Move the child pointers after (keyIndex + 1) in the
+			// current node one step before
+
+			//for (int i = keyIndex + 2; i <= node.KeysCount; ++i)
+			//{
+			//	node.Children[i - 1] = node.Children[i];
+			//}
+
+			Array.Copy(
+				node.Children,
+				keyIndex + 2,
+				node.Children,
+				keyIndex + 1,
+				node.KeysCount - keyIndex - 1);
+
+			node.KeysCount--;
+
+			// Free the memory occupied by sibling
+			FreeNode(sibling);
+		}
+
+		#endregion
+
+		#region Cleanup
+
+		public void RecursiveClear(
+			BPlusTreeNode<T> node)
+		{
+			if (node.Children != null)
+			{
+				for (int i = 0; i < node.Children.Length; i++)
+				{
+					RecursiveClear(
+						node.Children[i]);
+				}
+			}
+
+			//node.Cleanup();
+
+			FreeNode(node);
+		}
+
+		#endregion
+
+		#endregion
 	}	
 }

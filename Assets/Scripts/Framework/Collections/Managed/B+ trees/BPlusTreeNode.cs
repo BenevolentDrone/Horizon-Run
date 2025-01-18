@@ -1,163 +1,106 @@
 using System;
-using System.Collections.Generic;
+
+using HereticalSolutions.LifetimeManagement;
 
 namespace HereticalSolutions.Collections.Managed
 {
 	public class BPlusTreeNode<T>
+		: ICleanuppable
 	{
-		private readonly IComparer<T> comparer;
+		public bool IsLeaf;
 
-		public bool IsLeaf { get; set; }
+		public T[] Keys;
 
-		public T[] Keys { get; set; }
+		public int KeysCount;
 
-		public BPlusTreeNode<T>[] Children { get; set; }
+		public BPlusTreeNode<T>[] Children;
 
-		public BPlusTreeNode<T> Parent { get; set; }
+		public BPlusTreeNode<T> Next;
 
-		public BPlusTreeNode<T> Next { get; set; }
+		public BPlusTreeNode()
+		{
+			IsLeaf = false;
 
-		public int KeysCount { get; set; }
+			Keys = Array.Empty<T>();
+
+			KeysCount = 0;
+
+			Children = null;
+
+			Next = null;
+		}
 
 		public BPlusTreeNode(
 			int degree,
-			bool isLeaf,
-			IComparer<T> comparer)
+			bool isLeaf)
 		{
-			this.comparer = comparer;
+			Initialize(
+				degree,
+				isLeaf);
+		}
 
+		public void Initialize(
+			int degree,
+			bool isLeaf)
+		{
 			IsLeaf = isLeaf;
 
-			Keys = new T[degree - 1];
-
-			Children = isLeaf
-				? null
-				: new BPlusTreeNode<T>[degree];
-		}
-
-		public void Insert(
-			T key)
-		{
-			//int index = Array.BinarySearch(
-			//	Keys,
-			//	0,
-			//	KeysCount,
-			//	key,
-			//	comparer);
-
-			int index = Array.IndexOf(
-				Keys,
-				key,
-				0,
-				KeysCount);
-
-			if (index < 0)
-				index = ~index;
-
-			Array.Copy(
-				Keys,
-				index,
-				Keys,
-				index + 1,
-				KeysCount - index);
-
-			Keys[index] = key;
-
-			KeysCount++;
-		}
-
-		public bool Contains(
-			T key)
-		{
-			//return Array.BinarySearch(
-			//	Keys,
-			//	0,
-			//	KeysCount,
-			//	key,
-			//	comparer) >= 0;
-
-			return Array.IndexOf(
-				Keys,
-				key,
-				0,
-				KeysCount) >= 0;
-		}
-
-		public bool Remove(
-			T key)
-		{
-			//int index = Array.BinarySearch(
-			//	Keys,
-			//	0,
-			//	KeysCount,
-			//	key,
-			//	comparer);
-
-			int index = Array.IndexOf(
-				Keys,
-				key,
-				0,
-				KeysCount);
-
-			if (index >= 0)
+			if (Keys == null || Keys.Length < degree - 1)
 			{
-				Array.Copy(
+				Keys = new T[degree - 1];
+			}
+			else
+			{
+				Array.Clear(
 					Keys,
-					index + 1,
-					Keys,
-					index,
-					KeysCount - index - 1);
-
-				KeysCount--;
-
-				return true;
+					0,
+					Keys.Length);
 			}
 
-			return false;
-		}
+			KeysCount = 0;
 
-		public bool IsOverflow()
-		{
-			return KeysCount >= Keys.Length;
-		}
-
-		public BPlusTreeNode<T> GetChildNode(
-			T key)
-		{
-			for (int i = 0; i < KeysCount; i++)
+			if (Children == null || Children.Length < degree)
 			{
-				if (comparer.Compare(key, Keys[i]) < 0)
-				{
-					return Children[i];
-				}
+				Children = new BPlusTreeNode<T>[degree];
+			}
+			else
+			{
+				Array.Clear(
+					Children,
+					0,
+					Children.Length);
 			}
 
-			return Children[KeysCount];
+			Next = null;
 		}
 
-		public void RecursiveClear()
+		#region ICleanUppable
+
+		public void Cleanup()
 		{
 			if (Children != null)
 			{
-				foreach (var child in Children)
-				{
-					child?.RecursiveClear(); // Recursively clear child nodes
-				}
-
-				Children = null; // Clear references to child nodes
+				Array.Clear(
+					Children,
+					0,
+					Children.Length);
 			}
-
-			// Optional: Clear other references to allow GC to collect the node
 
 			IsLeaf = false;
 
-			Keys = null;
+			if (Keys != null)
+			{
+				Array.Clear(
+					Keys,
+					0,
+					Keys.Length);
+			}
 
-			Parent = null;
+			KeysCount = 0;
 
 			Next = null;
-
-			KeysCount = -1;
 		}
+
+		#endregion
 	}
 }

@@ -6,97 +6,87 @@ namespace HereticalSolutions.Collections.Managed
 	public class BPlusTreeMap<TKey, TValue>
 		: IBPlusTreeMap<TKey, TValue>
 	{
-		private readonly IComparer<TKey> comparer;
+		public static readonly IComparer<TKey> Comparer = Comparer<TKey>.Default;
+
+		private readonly int degree;
+
+		private readonly int halfDegree;
 
 		private BPlusTreeMapNode<TKey, TValue> root;
 
-		private readonly int degree;
-		
-		public BPlusTreeMap(int degree)
+		public BPlusTreeMap(
+			int degree)
 		{
-			comparer = Comparer<TKey>.Default;
-
 			this.degree = degree;
+
+			halfDegree = (int)Math.Ceiling((float)degree / 2);
 
 			root = new BPlusTreeMapNode<TKey, TValue>(
 				degree,
-				true,
-				comparer);
+				true);
 		}
 
-		#region IBPlusTreeMap
+		#region IBPlusTree
+
+		public bool Search(
+			TKey key,
+			out TValue value)
+		{
+			return Search(
+				root,
+				key,
+				out value);
+		}
 
 		public void Insert(
 			TKey key,
 			TValue value)
 		{
-			BPlusTreeMapNode<TKey, TValue> node = root;
-	
-			// Find the appropriate leaf node where the key should be inserted
-
-			while (!node.IsLeaf)
+			if (root.KeysCount == degree - 1)
 			{
-				node = node.GetChildNode(key);
+				BPlusTreeMapNode<TKey, TValue> newRoot = AllocateNode(false);
+
+				newRoot.Children[0] = root;
+
+				Split(
+					newRoot,
+					root,
+					0);
+
+				Insert(
+					newRoot,
+					key,
+					value);
+
+				root = newRoot;
 			}
-	
-			// Insert the key-value pair in the leaf node
-
-			node.Insert(
-				key,
-				value);
-	
-			// Split the node if it exceeds the maximum number of keys
-
-			if (node.IsOverflow())
+			else
 			{
-				Split(node);
+				Insert(
+					root,
+					key,
+					value);
 			}
 		}
-	
-		public bool Search(
-			TKey key,
-			out TValue value)
-		{
-			BPlusTreeMapNode<TKey, TValue> node = root;
-	
-			// Traverse the tree to find the leaf node containing the key
 
-			while (!node.IsLeaf)
-			{
-				node = node.GetChildNode(key);
-			}
-	
-			// Check if the key is present in the leaf node
-
-			return node.Contains(
-				key,
-				out value);
-		}
-	
 		public bool Remove(
 			TKey key)
 		{
-			BPlusTreeMapNode<TKey, TValue> node = root;
-	
-			// Traverse the tree to find the leaf node containing the key
+			bool result = DeleteKey(
+				root,
+				key);
 
-			while (!node.IsLeaf)
+			if (root.KeysCount == 0
+				&& !root.IsLeaf)
 			{
-				node = node.GetChildNode(key);
-			}
-	
-			// Remove the key from the leaf node
+				var previousRoot = root;
 
-			bool removed = node.Remove(key);
-	
-			// If key was removed, check if node is underfilled
+				root = root.Children[0];
 
-			if (removed && node.KeysCount < (degree - 1) / 2)
-			{
-				Rebalance(node);
+				FreeNode(previousRoot);
 			}
-	
-			return removed;
+
+			return result;
 		}
 
 		public int Count
@@ -107,14 +97,10 @@ namespace HereticalSolutions.Collections.Managed
 
 				BPlusTreeMapNode<TKey, TValue> current = root;
 
-				// Traverse down to the first leaf node
-
 				while (!current.IsLeaf)
 				{
 					current = current.Children[0];  // Go to the leftmost child
 				}
-
-				// Traverse through the leaf nodes and count the key-value pairs
 
 				while (current != null)
 				{
@@ -133,20 +119,16 @@ namespace HereticalSolutions.Collections.Managed
 			{
 				BPlusTreeMapNode<TKey, TValue> current = root;
 
-				// Traverse down to the first leaf node
-
 				while (!current.IsLeaf)
 				{
 					current = current.Children[0];  // Go to the leftmost child
 				}
 
-				// Traverse through the leaf nodes and yield keys
-
 				while (current != null)
 				{
-					foreach (var pair in current.KeyValuePairs)
+					for (int i = 0; i < current.KeysCount; i++)
 					{
-						yield return pair.Key;
+						yield return current.Keys[i];
 					}
 
 					current = current.Next;  // Move to the next leaf node
@@ -160,20 +142,16 @@ namespace HereticalSolutions.Collections.Managed
 			{
 				BPlusTreeMapNode<TKey, TValue> current = root;
 
-				// Traverse down to the first leaf node
-
 				while (!current.IsLeaf)
 				{
 					current = current.Children[0];  // Go to the leftmost child
 				}
 
-				// Traverse through the leaf nodes and yield values
-
 				while (current != null)
 				{
-					foreach (var pair in current.KeyValuePairs)
+					for (int i = 0; i < current.KeysCount; i++)
 					{
-						yield return pair.Value;
+						yield return current.Values[i];
 					}
 
 					current = current.Next;  // Move to the next leaf node
@@ -181,250 +159,558 @@ namespace HereticalSolutions.Collections.Managed
 			}
 		}
 
-		public void InOrderTraversal(
-			Action<TKey, TValue> action)
-		{
-			InOrderTraversal(root, action);
-		}
-
 		public void Clear()
 		{
-			root.RecursiveClear();
+			RecursiveClear(
+				root);
 
-			root = new BPlusTreeMapNode<TKey, TValue>(
-				degree,
-				true,
-				comparer);
+			root = AllocateNode(
+				true);
 		}
 
 		#endregion
 
-		private void InOrderTraversal(
+		#region Node operations
+
+		#region Allocation and deallocation
+
+		private BPlusTreeMapNode<TKey, TValue> AllocateNode(
+			bool leaf)
+		{
+			return new BPlusTreeMapNode<TKey, TValue>(
+				degree,
+				leaf);
+		}
+
+		private void FreeNode(
+			BPlusTreeMapNode<TKey, TValue> node)
+		{
+			node.Cleanup();
+		}
+
+		#endregion
+
+		#region CRUD operations
+
+		#region Searches
+
+		private int FindKeyFromStart(
 			BPlusTreeMapNode<TKey, TValue> node,
-			Action<TKey, TValue> action)
+			TKey key)
+		{
+			int i = 0;
+
+			while (i < node.KeysCount
+				&& Comparer.Compare(
+					key,
+					node.Keys[i])
+					> 0)
+			{
+				i++;
+			}
+
+			return i;
+		}
+
+		private int FindKeyFromFinish(
+			BPlusTreeMapNode<TKey, TValue> node,
+			TKey key)
+		{
+			int i = node.KeysCount - 1;
+
+			while (i >= 0
+				&& Comparer.Compare(
+					node.Keys[i],
+					key)
+					> 0)
+			{
+				i--;
+			}
+
+			return i + 1;
+		}
+
+		private bool Search(
+			BPlusTreeMapNode<TKey, TValue> node,
+			TKey key,
+			out TValue value)
+		{
+			int i = 0;
+
+			while (i < node.KeysCount)
+			{
+				int compareResult = Comparer.Compare(
+					key,
+					node.Keys[i]);
+
+				if (compareResult == 0)
+				{
+					value = node.Values[i];
+
+					return true;
+				}
+
+				if (compareResult > 0)
+				{
+					i++;
+				}
+
+				if (compareResult < 0)
+				{
+					if (node.IsLeaf)
+					{
+						value = default;
+
+						return false;
+					}
+
+					return Search(
+						node.Children[i],
+						key,
+						out value);
+				}
+			}
+
+			value = default;
+
+			return false;
+		}
+
+		#endregion
+
+		private void Insert(
+			BPlusTreeMapNode<TKey, TValue> node,
+			TKey key,
+			TValue value)
 		{
 			if (node.IsLeaf)
 			{
-				var current = node;
+				int i = FindKeyFromFinish(
+					node,
+					key);
 
-				while (current != null)
-				{
-					foreach (var pair in current.KeyValuePairs)
-					{
-						action(pair.Key, pair.Value);
-					}
+				Array.Copy(
+					node.Keys,
+					i,
+					node.Keys,
+					i + 1,
+					node.KeysCount - i);
 
-					current = current.Next;
-				}
+				Array.Copy(
+					node.Values,
+					i,
+					node.Values,
+					i + 1,
+					node.KeysCount - i);
+
+				node.Keys[i] = key;
+
+				node.Values[i] = value;
+
+				node.KeysCount++;
 			}
 			else
+			{
+				int i = FindKeyFromFinish(
+					node,
+					key);
+
+				if (node.Children[i].KeysCount == degree - 1)
+				{
+					Split(
+						node,
+						node.Children[i],
+						i);
+
+					if (Comparer.Compare(
+						node.Keys[i],
+						key)
+						< 0)
+					{
+						i++;
+					}
+				}
+
+				Insert(
+					node.Children[i],
+					key,
+					value);
+			}
+		}
+
+		private bool DeleteKey(
+			BPlusTreeMapNode<TKey, TValue> node,
+			TKey key)
+		{
+			int keyIndex = FindKeyFromStart(
+				node,
+				key);
+
+			if (keyIndex < node.KeysCount
+				&& Comparer.Compare(
+					node.Keys[keyIndex],
+					key)
+					== 0)
+			{
+				if (node.IsLeaf)
+				{
+					RemoveFromLeaf(
+						node,
+						keyIndex);
+
+					return true;
+				}
+
+				TKey predecessor = GetPredecessor(
+					node,
+					keyIndex);
+
+				node.Keys[keyIndex] = predecessor;
+
+				DeleteKey(
+					node.Children[keyIndex],
+					predecessor);
+
+				return true;
+			}
+
+			if (node.IsLeaf)
+				return false;
+
+			bool isLastChild = (keyIndex == node.KeysCount);
+
+			if (node.Children[keyIndex].KeysCount < halfDegree)
+			{
+				Rebalance(
+					node,
+					keyIndex);
+			}
+
+			if (isLastChild
+				&& keyIndex > node.KeysCount)
+			{
+				return DeleteKey(
+					node.Children[keyIndex - 1],
+					key);
+			}
+
+			return DeleteKey(
+				node.Children[keyIndex],
+				key);
+		}
+
+		private void RemoveFromLeaf(
+			BPlusTreeMapNode<TKey, TValue> node,
+			int keyIndex)
+		{
+			Array.Copy(
+				node.Keys,
+				keyIndex + 1,
+				node.Keys,
+				keyIndex,
+				node.KeysCount - keyIndex - 1);
+
+			Array.Copy(
+				node.Values,
+				keyIndex + 1,
+				node.Values,
+				keyIndex,
+				node.KeysCount - keyIndex - 1);
+
+			node.KeysCount--;
+		}
+
+		private TKey GetPredecessor(
+			BPlusTreeMapNode<TKey, TValue> node,
+			int keyIndex)
+		{
+			BPlusTreeMapNode<TKey, TValue> current = node.Children[keyIndex];
+
+			while (!current.IsLeaf)
+			{
+				current = current.Children[current.KeysCount];
+			}
+
+			return current.Keys[current.KeysCount - 1];
+		}
+
+		#endregion
+
+		#region Splits and rebalances
+
+		private void Split(
+			BPlusTreeMapNode<TKey, TValue> parent,
+			BPlusTreeMapNode<TKey, TValue> node,
+			int i)
+		{
+			BPlusTreeMapNode<TKey, TValue> newSibling = AllocateNode(
+				node.IsLeaf);
+
+			newSibling.KeysCount = halfDegree - 1;
+
+			Array.Copy(
+				node.Keys,
+				halfDegree,
+				newSibling.Keys,
+				0,
+				halfDegree - 1);
+
+			Array.Copy(
+				node.Values,
+				halfDegree,
+				newSibling.Values,
+				0,
+				halfDegree - 1);
+
+			if (!node.IsLeaf)
+			{
+				Array.Copy(
+					node.Children,
+					halfDegree,
+					newSibling.Children,
+					0,
+					halfDegree);
+			}
+
+			node.KeysCount = halfDegree - 1;
+
+			Array.Copy(
+				parent.Children,
+				i + 1,
+				parent.Children,
+				i + 2,
+				parent.KeysCount - i);
+
+			parent.Children[i + 1] = newSibling;
+
+			Array.Copy(
+				parent.Keys,
+				i,
+				parent.Keys,
+				i + 1,
+				parent.KeysCount - i);
+
+			parent.Keys[i] = node.Keys[halfDegree - 1];
+
+			parent.KeysCount++;
+		}
+
+		private void Rebalance(
+			BPlusTreeMapNode<TKey, TValue> node,
+			int keyIndex)
+		{
+			if (keyIndex != 0
+				&& node.Children[keyIndex - 1].KeysCount >= halfDegree)
+			{
+				BorrowFromPrev(
+					node,
+					keyIndex);
+			}
+			else if (keyIndex != node.KeysCount
+				&& node.Children[keyIndex + 1].KeysCount >= halfDegree)
+			{
+				BorrowFromNext(
+					node,
+					keyIndex);
+			}
+			else
+			{
+				if (keyIndex != node.KeysCount)
+				{
+					Merge(
+						node,
+						keyIndex);
+				}
+				else
+				{
+					Merge(
+						node,
+						keyIndex - 1);
+				}
+			}
+		}
+
+		private void BorrowFromPrev(
+			BPlusTreeMapNode<TKey, TValue> node,
+			int keyIndex)
+		{
+			BPlusTreeMapNode<TKey, TValue> child = node.Children[keyIndex];
+
+			BPlusTreeMapNode<TKey, TValue> sibling = node.Children[keyIndex - 1];
+
+			Array.Copy(
+				child.Keys,
+				0,
+				child.Keys,
+				1,
+				child.KeysCount);
+
+			Array.Copy(
+				child.Values,
+				0,
+				child.Values,
+				1,
+				child.KeysCount);
+
+			if (!child.IsLeaf)
+			{
+				Array.Copy(
+					child.Children,
+					0,
+					child.Children,
+					1,
+					child.KeysCount + 1);
+			}
+
+			child.Keys[0] = node.Keys[keyIndex - 1];
+
+			child.Values[0] = sibling.Values[sibling.KeysCount - 1];
+
+			if (!child.IsLeaf)
+			{
+				child.Children[0] = sibling.Children[sibling.KeysCount];
+			}
+
+			node.Keys[keyIndex - 1] = sibling.Keys[sibling.KeysCount - 1];
+
+			child.KeysCount++;
+
+			sibling.KeysCount--;
+		}
+
+		private void BorrowFromNext(
+			BPlusTreeMapNode<TKey, TValue> node,
+			int keyIndex)
+		{
+			BPlusTreeMapNode<TKey, TValue> child = node.Children[keyIndex];
+
+			BPlusTreeMapNode<TKey, TValue> sibling = node.Children[keyIndex + 1];
+
+			child.Keys[child.KeysCount] = node.Keys[keyIndex];
+
+			child.Values[child.KeysCount] = sibling.Values[0];
+
+			if (!child.IsLeaf)
+			{
+				child.Children[child.KeysCount + 1] = sibling.Children[0];
+			}
+
+			node.Keys[keyIndex] = sibling.Keys[0];
+
+			Array.Copy(
+				sibling.Keys,
+				1,
+				sibling.Keys,
+				0,
+				sibling.KeysCount - 1);
+
+			Array.Copy(
+				sibling.Values,
+				1,
+				sibling.Values,
+				0,
+				sibling.KeysCount - 1);
+
+			if (!sibling.IsLeaf)
+			{
+				Array.Copy(
+					sibling.Children,
+					1,
+					sibling.Children,
+					0,
+					sibling.KeysCount);
+			}
+
+			child.KeysCount++;
+
+			sibling.KeysCount--;
+		}
+
+		private void Merge(
+			BPlusTreeMapNode<TKey, TValue> node,
+			int keyIndex)
+		{
+			BPlusTreeMapNode<TKey, TValue> child = node.Children[keyIndex];
+			
+			BPlusTreeMapNode<TKey, TValue> sibling = node.Children[keyIndex + 1];
+
+			child.Keys[child.KeysCount] = node.Keys[keyIndex];
+
+			child.Values[child.KeysCount] = sibling.Values[0];
+
+			if (!child.IsLeaf)
+			{
+				child.Children[child.KeysCount + 1] = sibling.Children[0];
+			}
+
+
+			Array.Copy(
+				sibling.Keys,
+				0,
+				child.Keys,
+				child.KeysCount + 1,
+				sibling.KeysCount);
+
+			Array.Copy(
+				sibling.Values,
+				0,
+				child.Values,
+				child.KeysCount + 1,
+				sibling.Values.Length);
+
+			if (!child.IsLeaf)
+			{
+				Array.Copy(
+					sibling.Children,
+					0,
+					child.Children,
+					child.KeysCount + 1,
+					sibling.KeysCount + 1);
+			}
+
+			child.KeysCount += sibling.KeysCount + 1;
+
+
+			Array.Copy(
+				node.Keys,
+				keyIndex + 1,
+				node.Keys,
+				keyIndex,
+				node.KeysCount - keyIndex - 1);
+
+			Array.Copy(
+				node.Children,
+				keyIndex + 2,
+				node.Children,
+				keyIndex + 1,
+				node.KeysCount - keyIndex - 1);
+
+			node.KeysCount--;
+
+			FreeNode(sibling);
+		}
+
+		#endregion
+
+		#region Cleanup
+
+		public void RecursiveClear(
+			BPlusTreeMapNode<TKey, TValue> node)
+		{
+			if (node.Children != null)
 			{
 				foreach (var child in node.Children)
 				{
-					InOrderTraversal(
-						child,
-						action);
+					RecursiveClear(
+						child);
 				}
 			}
+
+			FreeNode(node);
 		}
 
-		private void Split(BPlusTreeMapNode<TKey, TValue> node)
-		{
-			// Create a new node to split the current node
+		#endregion
 
-			BPlusTreeMapNode<TKey, TValue> newNode = new BPlusTreeMapNode<TKey, TValue>(
-				degree,
-				true,
-				comparer);
-
-			int midIndex = node.KeysCount / 2;
-	
-			// Transfer keys and values to the new node
-
-			newNode.KeyValuePairs = new BPlusTreeMapKeyValuePair<TKey, TValue>[degree - 1];
-
-			Array.Copy(
-				node.KeyValuePairs,
-				midIndex,
-				newNode.KeyValuePairs,
-				0,
-				node.KeysCount - midIndex);
-
-			node.KeysCount = midIndex;
-	
-			if (node.Children != null)
-			{
-				newNode.Children = new BPlusTreeMapNode<TKey, TValue>[degree];
-
-				Array.Copy(
-					node.Children,
-					midIndex,
-					newNode.Children,
-					0,
-					node.Children.Length - midIndex);
-
-				node.Children = node
-					.Children
-					.AsSpan(
-						0,
-						midIndex)
-					.ToArray();
-			}
-	
-			// Link the leaf nodes if necessary
-
-			if (node.IsLeaf)
-			{
-				newNode.Next = node.Next;
-
-				node.Next = newNode;
-			}
-	
-			// Create a new root node if necessary
-
-			if (node == root)
-			{
-				BPlusTreeMapNode<TKey, TValue> newRoot = new BPlusTreeMapNode<TKey, TValue>(
-					degree,
-					false,
-					comparer);
-
-				newRoot.KeyValuePairs = new BPlusTreeMapKeyValuePair<TKey, TValue>[]
-				{
-					newNode.KeyValuePairs[0]
-				};
-
-				newRoot.Children = new BPlusTreeMapNode<TKey, TValue>[]
-				{
-					node,
-					newNode
-				};
-
-				root = newRoot;
-			}
-			else
-			{
-				// Insert the middle key from the node into the parent
-
-				BPlusTreeMapNode<TKey, TValue> parent = node.Parent;
-
-				parent.Insert(
-					newNode.KeyValuePairs[0].Key,
-					newNode.KeyValuePairs[0].Value);
-	
-				// Manually handle the concatenation of arrays
-
-				BPlusTreeMapNode<TKey, TValue>[] newChildren =
-					new BPlusTreeMapNode<TKey, TValue>[parent.Children.Length + 1];
-
-				Array.Copy(
-					parent.Children,
-					0,
-					newChildren,
-					0,
-					parent.Children.Length);
-
-				newChildren[parent.Children.Length] = newNode;
-
-				parent.Children = newChildren;
-	
-				if (parent.IsOverflow())
-				{
-					Split(parent);
-				}
-			}
-		}
-	
-		private void Rebalance(
-			BPlusTreeMapNode<TKey, TValue> node)
-		{
-			// Handle underfilled nodes by either merging or borrowing keys
-
-			BPlusTreeMapNode<TKey, TValue> parent = node.Parent;
-			
-			int indexInParent = Array.IndexOf(
-				parent.Children,
-				node);
-	
-			if (indexInParent > 0
-				&& parent.Children[indexInParent - 1].KeysCount > (degree - 1) / 2)
-			{
-				BorrowFromLeft(
-					node,
-					parent,
-					indexInParent);
-			}
-			else if (indexInParent < parent.KeysCount
-				&& parent.Children[indexInParent + 1].KeysCount > (degree - 1) / 2)
-			{
-				BorrowFromRight(
-					node,
-					parent,
-					indexInParent);
-			}
-			else
-			{
-				Merge(
-					node,
-					parent,
-					indexInParent);
-			}
-		}
-	
-		private void BorrowFromLeft(
-			BPlusTreeMapNode<TKey, TValue> node,
-			BPlusTreeMapNode<TKey, TValue> parent,
-			int indexInParent)
-		{
-			BPlusTreeMapNode<TKey, TValue> leftSibling = parent.Children[indexInParent - 1];
-
-			BPlusTreeMapKeyValuePair<TKey, TValue> borrowedKeyValue = leftSibling.KeyValuePairs[--leftSibling.KeysCount];
-
-			node.Insert(
-				borrowedKeyValue.Key,
-				borrowedKeyValue.Value);
-		}
-	
-		private void BorrowFromRight(
-			BPlusTreeMapNode<TKey, TValue> node,
-			BPlusTreeMapNode<TKey, TValue> parent,
-			int indexInParent)
-		{
-			BPlusTreeMapNode<TKey, TValue> rightSibling = parent.Children[indexInParent + 1];
-
-			BPlusTreeMapKeyValuePair<TKey, TValue> borrowedKeyValue = rightSibling.KeyValuePairs[--rightSibling.KeysCount];
-
-			node.Insert(
-				borrowedKeyValue.Key,
-				borrowedKeyValue.Value);
-		}
-	
-		private void Merge(
-			BPlusTreeMapNode<TKey, TValue> node,
-			BPlusTreeMapNode<TKey, TValue> parent,
-			int indexInParent)
-		{
-			// Merge the node with its sibling and adjust the parent's keys
-
-			BPlusTreeMapNode<TKey, TValue> leftSibling = parent.Children[indexInParent - 1];
-
-			BPlusTreeMapNode<TKey, TValue> rightSibling = parent.Children[indexInParent + 1];
-
-			leftSibling.Insert(
-				parent.KeyValuePairs[indexInParent].Key,
-				parent.KeyValuePairs[indexInParent].Value);
-			
-			Array.Copy(
-				rightSibling.KeyValuePairs,
-				0,
-				leftSibling.KeyValuePairs,
-				leftSibling.KeysCount,
-				rightSibling.KeysCount);
-
-			leftSibling.KeysCount += rightSibling.KeysCount;
-
-			parent.Remove(
-				parent.KeyValuePairs[indexInParent].Key);
-		}
+		#endregion
 	}
 }

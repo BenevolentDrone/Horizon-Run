@@ -9,7 +9,7 @@ namespace HereticalSolutions.ResourceManagement.Factories
         public static AddressableResourceStorageHandle<TResource> BuildAddressableResourceStorageHandle<TResource>(
             AssetReference assetReference,
             IRuntimeResourceManager runtimeResourceManager,
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             ILogger logger =
                 loggerResolver?.GetLogger<AddressableResourceStorageHandle<TResource>>();

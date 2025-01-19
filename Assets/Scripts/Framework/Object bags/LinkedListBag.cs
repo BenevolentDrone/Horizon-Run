@@ -52,6 +52,11 @@ namespace HereticalSolutions.Bags
 			}
 		}
 
+		public void Clear()
+		{
+			bag.Clear();
+		}
+
 		#endregion
 
 		#region ICleanUppable
@@ -75,11 +80,6 @@ namespace HereticalSolutions.Bags
 				if (item is IDisposable)
 					(item as IDisposable).Dispose();
 
-			bag.Clear();
-		}
-
-		public void Clear()
-		{
 			bag.Clear();
 		}
 

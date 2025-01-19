@@ -20,8 +20,8 @@ namespace HereticalSolutions.Repositories
 		private readonly ILogger logger;
 
 		public RuntimeTimerVisitor(
-			ILoggerResolver loggerResolver = null,
-			ILogger logger = null)
+			ILoggerResolver loggerResolver,
+			ILogger logger)
 		{
 			this.loggerResolver = loggerResolver;
 

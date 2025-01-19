@@ -22,7 +22,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 			World world,
 			UniversalTemplateEntityManager entityManager,
 			DefaultECSEntityHierarchyManager entityHierarchyManager,
-			ILogger logger = null)
+			ILogger logger)
 			: base(
 				world
 					.GetEntities()

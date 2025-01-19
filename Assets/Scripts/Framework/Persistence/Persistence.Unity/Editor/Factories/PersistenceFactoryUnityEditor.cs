@@ -8,7 +8,7 @@ namespace HereticalSolutions.Persistence.Factories
 
 		public static EditorPrefsStrategy BuildEditorPrefsStrategy(
 			string keyPrefs,
-			ILoggerResolver loggerResolver = null)
+			ILoggerResolver loggerResolver)
 		{
 			return new EditorPrefsStrategy(
 				keyPrefs,
@@ -19,7 +19,7 @@ namespace HereticalSolutions.Persistence.Factories
 			string keyPrefsSerializedValuesList,
 			string keyPrefsValuePrefix,
 			TUUID uuid,
-			ILoggerResolver loggerResolver = null)
+			ILoggerResolver loggerResolver)
 		{
 			return new EditorPrefsWithUUIDStrategy<TUUID>(
 				keyPrefsSerializedValuesList,

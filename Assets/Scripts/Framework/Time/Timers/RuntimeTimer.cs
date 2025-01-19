@@ -48,7 +48,7 @@ namespace HereticalSolutions.Time
 
             IReadOnlyRepository<ETimerState, ITimerStrategy<IRuntimeTimerContext, float>> strategyRepository,
 
-            ILogger logger = null)
+            ILogger logger)
         {
             ID = id;
 

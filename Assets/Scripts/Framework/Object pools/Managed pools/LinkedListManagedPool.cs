@@ -34,7 +34,7 @@ namespace HereticalSolutions.Pools
             AllocationCommand<T> valueAllocationCommand,
             ILinkedListLink<T> firstElement,
             int capacity,
-            ILogger logger = null)
+            ILogger logger)
         {
             this.facadeAllocationCommand = facadeAllocationCommand;
 

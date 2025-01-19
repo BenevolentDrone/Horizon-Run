@@ -32,7 +32,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
 		public EntityWorldRepository(
 			IRepository<TWorldID, TWorld> worldRepository,
 			IRepository<TWorld, IEntityWorldController<TWorld, TEntity>> worldControllerRepository,
-			ILogger logger = null)
+			ILogger logger)
 		{
 			this.worldRepository = worldRepository;
 

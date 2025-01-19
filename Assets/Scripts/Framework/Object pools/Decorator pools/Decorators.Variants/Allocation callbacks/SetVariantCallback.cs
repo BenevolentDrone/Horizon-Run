@@ -15,7 +15,7 @@ namespace HereticalSolutions.Pools.AllocationCallbacks
         
         public SetVariantCallback(
             int variant = -1,
-            ILogger logger = null)
+            ILogger logger)
         {
             Variant = variant;
 

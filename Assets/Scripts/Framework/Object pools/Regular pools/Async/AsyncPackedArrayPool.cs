@@ -32,7 +32,7 @@ namespace HereticalSolutions.Pools
 		public AsyncPackedArrayPool(
 			T[] packedArray,
 			AsyncAllocationCommand<T> allocationCommand,
-			ILogger logger = null)
+			ILogger logger)
 		{
 			this.packedArray = packedArray;
 

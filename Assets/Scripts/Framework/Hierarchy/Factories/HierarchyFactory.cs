@@ -40,7 +40,7 @@ namespace HereticalSolutions.Hierarchy.Factories
 		#endregion
 
 		public static IPool<List<IReadOnlyHierarchyNode<T>>> BuildHierarchyNodeListPool<T>(
-			ILoggerResolver loggerResolver = null)
+			ILoggerResolver loggerResolver)
 		{
 			Func<List<IReadOnlyHierarchyNode<T>>> allocationDelegate = AllocationFactory
 				.ActivatorAllocationDelegate<List<IReadOnlyHierarchyNode<T>>>;

@@ -17,7 +17,7 @@ namespace HereticalSolutions.Time.Factories
         public const string APPLICATION_PERSISTENT_TIMER_ID = "Application persistent timer";
 
         public static TimeManager BuildTimeManager(
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             var applicationActiveTimer = TimerFactory.BuildRuntimeTimer(
                 APPLICATION_RUNTIME_TIMER_ID,
@@ -47,7 +47,7 @@ namespace HereticalSolutions.Time.Factories
             string managerID,
             ISynchronizationProvider provider,
             bool renameTimersOnPop = true,
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             return new TimerManager(
                 managerID,

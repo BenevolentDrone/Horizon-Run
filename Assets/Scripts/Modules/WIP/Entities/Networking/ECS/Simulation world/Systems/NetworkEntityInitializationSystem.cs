@@ -25,7 +25,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Networking
             EntityManager entityManager,
             INetworkEntityRepository<Guid> networkEntityRepository,
             bool isServerOrHost,
-            ILogger logger = null)
+            ILogger logger)
         {
             this.entityManager = entityManager;
 

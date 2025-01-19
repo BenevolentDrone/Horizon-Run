@@ -23,7 +23,7 @@ namespace HereticalSolutions.Delegates
 
 		public ConcurrentNonAllocBroadcasterWithRepository(
 			IReadOnlyInstanceRepository broadcasterRepository,
-			ILogger logger = null)
+			ILogger logger)
 		{
 			this.broadcasterRepository = broadcasterRepository;
 

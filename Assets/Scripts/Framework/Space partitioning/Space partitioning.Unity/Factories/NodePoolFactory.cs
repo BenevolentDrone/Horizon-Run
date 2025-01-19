@@ -14,7 +14,7 @@ namespace HereticalSolutions.SpacePartitioning.Factories
 		private const int INITIAL_NODE_POOL_SIZE = 128;
 
 		public static IPool<Node<TValue>> BuildNodePool<TValue>(
-			ILoggerResolver loggerResolver = null)
+			ILoggerResolver loggerResolver)
 		{
 			ILogger logger =
 				loggerResolver?.GetLogger<Node<TValue>>();

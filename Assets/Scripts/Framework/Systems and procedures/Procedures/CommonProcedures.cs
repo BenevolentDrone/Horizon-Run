@@ -161,7 +161,7 @@ namespace HereticalSolutions.Systems
 		public static async Task RunTasksSequentiallyAsync(
 			IEnumerable<Task> tasksToRun,
 			Type invokerType,
-			ILogger logger = null)
+			ILogger logger)
 		{
 			foreach (var task in tasksToRun)
 			{
@@ -189,7 +189,7 @@ namespace HereticalSolutions.Systems
 
 		public static async Task BuildAndRunTasksSequentiallyAsync<TInvoker>(
 			IEnumerable<Func<Task>> tasksFactories,
-			ILogger logger = null)
+			ILogger logger)
 		{
 			foreach (var taskFactory in tasksFactories)
 			{
@@ -207,7 +207,7 @@ namespace HereticalSolutions.Systems
 		public static async Task BuildAndRunTasksSequentiallyAsync(
 			IEnumerable<Func<Task>> tasksFactories,
 			Type invokerType,
-			ILogger logger = null)
+			ILogger logger)
 		{
 			foreach (var taskFactory in tasksFactories)
 			{

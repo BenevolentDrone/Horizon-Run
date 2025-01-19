@@ -22,7 +22,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 
 		public AttachToHUDCanvasInitializationSystem(
 			Transform hudCanvasTransform,
-			ILogger logger = null)
+			ILogger logger)
 		{
 			this.hudCanvasTransform = hudCanvasTransform;
 

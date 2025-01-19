@@ -25,7 +25,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
 
 		public ResolvePooledGameObjectViewSystem(
 			IManagedPool<GameObject> pool,
-			ILogger logger = null)
+			ILogger logger)
 		{
 			this.pool = pool;
 

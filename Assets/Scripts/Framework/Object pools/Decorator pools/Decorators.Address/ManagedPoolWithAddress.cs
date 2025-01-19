@@ -25,7 +25,7 @@ namespace HereticalSolutions.Pools.Decorators
             IRepository<int, IManagedPool<T>> innerPoolRepository,
             int level,
             PoolWithAddressBuilder<T> builder = null,
-            ILogger logger = null)
+            ILogger logger)
         {
             this.innerPoolRepository = innerPoolRepository;
 

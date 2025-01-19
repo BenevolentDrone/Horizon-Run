@@ -16,7 +16,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Networking
 
         public ServerPositionRotationPresenter3DInitializationSystem(
             UniversalTemplateEntityManager entityManager,
-            ILogger logger = null)
+            ILogger logger)
         {
             this.entityManager = entityManager;
 

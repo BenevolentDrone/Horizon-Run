@@ -85,7 +85,7 @@ namespace HereticalSolutions.Collections.Factories
         }
 
         public static IPool<NonAllocBPlusTreeNode<T>> BuildNonAllocBPlusTreeNodePool<T>(
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             Func<NonAllocBPlusTreeNode<T>> allocationDelegate = AllocationFactory.
                 ActivatorAllocationDelegate<NonAllocBPlusTreeNode<T>>;
@@ -109,7 +109,7 @@ namespace HereticalSolutions.Collections.Factories
         public static NonAllocBPlusTree<T> BuildNonAllocBPlusTree<T>(
             IPool<NonAllocBPlusTreeNode<T>> nodePool = null,
             int degree = DEFAULT_B_PLUS_TREE_DEGREE,
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             if (nodePool != null)
             {
@@ -132,7 +132,7 @@ namespace HereticalSolutions.Collections.Factories
         public static ConcurrentNonAllocBPlusTree<T> BuildConcurrentNonAllocBPlusTree<T>(
             IPool<NonAllocBPlusTreeNode<T>> nodePool = null,
             int degree = DEFAULT_B_PLUS_TREE_DEGREE,
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             if (nodePool != null)
             {
@@ -153,7 +153,7 @@ namespace HereticalSolutions.Collections.Factories
         }
 
         public static IPool<NonAllocBPlusTreeMapNode<TKey, TValue>> BuildNonAllocBPlusTreeMapNodePool<TKey, TValue>(
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             Func<NonAllocBPlusTreeMapNode<TKey, TValue>> allocationDelegate = AllocationFactory.
                 ActivatorAllocationDelegate<NonAllocBPlusTreeMapNode<TKey, TValue>>;
@@ -177,7 +177,7 @@ namespace HereticalSolutions.Collections.Factories
         public static NonAllocBPlusTreeMap<TKey, TValue> BuildNonAllocBPlusTreeMap<TKey, TValue>(
             IPool<NonAllocBPlusTreeMapNode<TKey, TValue>> nodePool = null,
             int degree = DEFAULT_B_PLUS_TREE_DEGREE,
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             if (nodePool != null)
             {
@@ -200,7 +200,7 @@ namespace HereticalSolutions.Collections.Factories
         public static ConcurrentNonAllocBPlusTreeMap<TKey, TValue> BuildConcurrentNonAllocBPlusTreeMap<TKey, TValue>(
             IPool<NonAllocBPlusTreeMapNode<TKey, TValue>> nodePool = null,
             int degree = DEFAULT_B_PLUS_TREE_DEGREE,
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             if (nodePool != null)
             {

@@ -13,7 +13,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
 
         public RelationsDeinitializationSystem(
             EntityRelationsManager entityRelationsManager,
-            ILogger logger = null)
+            ILogger logger)
         {
             this.entityRelationsManager = entityRelationsManager;
 

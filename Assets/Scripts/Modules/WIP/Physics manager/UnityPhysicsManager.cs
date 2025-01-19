@@ -40,7 +40,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 			IManagedPool<GameObject> physicsBodiesPool,
 			Queue<ushort> freeHandles,
 			IRepository<ushort, UnityPhysicsBodyDescriptor> physicsBodyRepository,
-			ILogger logger = null)
+			ILogger logger)
 		{
 			this.physicsBodiesPool = physicsBodiesPool;
 

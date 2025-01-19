@@ -22,7 +22,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
 
 			byte freeThreadIndex = 2,
 
-			ILogger logger = null)
+			ILogger logger)
 			: base(
 				allProcedureNodes,
 				stages,

@@ -16,7 +16,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 
 		public Wheel3DPresenterInitializationSystem(
 			UniversalTemplateEntityManager entityManager,
-			ILogger logger = null)
+			ILogger logger)
 		{
 			this.entityManager = entityManager;
 

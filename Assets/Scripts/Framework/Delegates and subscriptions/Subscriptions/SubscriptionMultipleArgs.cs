@@ -22,7 +22,7 @@ namespace HereticalSolutions.Delegates.Subscriptions
 
         public SubscriptionMultipleArgs(
             Action<object[]> @delegate,
-            ILogger logger = null)
+            ILogger logger)
         {
             this.@delegate = DelegateWrapperFactory.BuildDelegateWrapperMultipleArgs(
                 @delegate);

@@ -40,7 +40,7 @@ namespace HereticalSolutions.Systems.Factories
 			out IStageNode<TProcedure> startNode,
 			out IStageNode<TProcedure> finishNode,
 
-			ILoggerResolver loggerResolver = null)
+			ILoggerResolver loggerResolver)
 		{
 			startNode = BuildStageNode<TProcedure>(
 				SystemConsts.START_NODE_ID,
@@ -88,7 +88,7 @@ namespace HereticalSolutions.Systems.Factories
 		}
 
 		public static DelegateSystemBuilder BuildDelegateSystemBuilder(
-			ILoggerResolver loggerResolver = null)
+			ILoggerResolver loggerResolver)
 		{
 			PrepareSystemBuilderDependencies<Action, Action>(
 				out HashSet<IProcedureNode<Action>> allProcedureNodes,
@@ -112,7 +112,7 @@ namespace HereticalSolutions.Systems.Factories
 		}
 
 		public static AsyncSystemBuilder BuildAsyncSystemBuilder(
-			ILoggerResolver loggerResolver = null)
+			ILoggerResolver loggerResolver)
 		{
 			PrepareSystemBuilderDependencies<Func<Task>, Func<Task>>(
 				out HashSet<IProcedureNode<Func<Task>>> allProcedureNodes,

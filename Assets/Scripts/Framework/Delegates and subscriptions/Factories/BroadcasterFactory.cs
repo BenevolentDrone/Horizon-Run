@@ -71,7 +71,7 @@ namespace HereticalSolutions.Delegates.Factories
         #endregion
 
         public static ManagedPoolBuilder<T> BuildManagedPoolBuilder<T>(
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             return new ManagedPoolBuilder<T>(
                 loggerResolver,
@@ -79,7 +79,7 @@ namespace HereticalSolutions.Delegates.Factories
         }
 
         public static IPool<T> BuildContextPool<T>(
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             Func<T> valueAllocationDelegate =
                 AllocationFactory.ActivatorAllocationDelegate<T>;
@@ -104,7 +104,7 @@ namespace HereticalSolutions.Delegates.Factories
 
         public static BroadcasterMultipleArgs BuildBroadcasterMultipleArgs(
             IPool<BroadcasterGenericInvocationContext<object[]>> contextPool = null,
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             return new BroadcasterMultipleArgs(
                 BuildBroadcasterGeneric<object[]>(
@@ -118,7 +118,7 @@ namespace HereticalSolutions.Delegates.Factories
 
         public static BroadcasterWithRepository BuildBroadcasterWithRepository(
             IRepository<Type, object> broadcasterRepository,
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             return BuildBroadcasterWithRepository(
                 RepositoryFactory.BuildDictionaryInstanceRepository(
@@ -128,7 +128,7 @@ namespace HereticalSolutions.Delegates.Factories
         
         public static BroadcasterWithRepository BuildBroadcasterWithRepository(
             IReadOnlyInstanceRepository repository,
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             ILogger logger =
                 loggerResolver?.GetLogger<BroadcasterWithRepository>();
@@ -144,7 +144,7 @@ namespace HereticalSolutions.Delegates.Factories
 
         public static BroadcasterGeneric<T> BuildBroadcasterGeneric<T>(
             IPool<BroadcasterGenericInvocationContext<T>> contextPool = null,
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             if (contextPool == null)
                 contextPool = BuildContextPool<BroadcasterGenericInvocationContext<T>>(
@@ -164,7 +164,7 @@ namespace HereticalSolutions.Delegates.Factories
         
         public static NonAllocBroadcasterMultipleArgs BuildNonAllocBroadcasterMultipleArgs(
             ManagedPoolBuilder<INonAllocSubscription> managedPoolBuilder,
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             Func<INonAllocSubscription> valueAllocationDelegate =
                 AllocationFactory.NullAllocationDelegate<INonAllocSubscription>;
@@ -206,7 +206,7 @@ namespace HereticalSolutions.Delegates.Factories
             AllocationCommandDescriptor initial,
             AllocationCommandDescriptor additional,
             ManagedPoolBuilder<INonAllocSubscription> managedPoolBuilder = null,
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             Func<INonAllocSubscription> valueAllocationDelegate =
                 AllocationFactory.NullAllocationDelegate<INonAllocSubscription>;
@@ -238,7 +238,7 @@ namespace HereticalSolutions.Delegates.Factories
         
         public static NonAllocBroadcasterMultipleArgs BuildNonAllocBroadcasterMultipleArgs(
             IBag<INonAllocSubscription> subscriptionsPool,
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             ILogger logger =
                 loggerResolver?.GetLogger<NonAllocBroadcasterMultipleArgs>();
@@ -258,7 +258,7 @@ namespace HereticalSolutions.Delegates.Factories
         
         public static NonAllocBroadcasterWithRepository BuildNonAllocBroadcasterWithRepository(
             IRepository<Type, object> broadcasterRepository,
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             return BuildNonAllocBroadcasterWithRepository(
                 RepositoryFactory.BuildDictionaryInstanceRepository(
@@ -268,7 +268,7 @@ namespace HereticalSolutions.Delegates.Factories
         
         public static NonAllocBroadcasterWithRepository BuildNonAllocBroadcasterWithRepository(
             IReadOnlyInstanceRepository repository,
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             ILogger logger =
                 loggerResolver?.GetLogger<NonAllocBroadcasterWithRepository>();
@@ -284,7 +284,7 @@ namespace HereticalSolutions.Delegates.Factories
         
         public static NonAllocBroadcasterGeneric<T> BuildNonAllocBroadcasterGeneric<T>(
             ManagedPoolBuilder<INonAllocSubscription> managedPoolBuilder = null,
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             Func<INonAllocSubscription> valueAllocationDelegate =
                 AllocationFactory.NullAllocationDelegate<INonAllocSubscription>;
@@ -317,7 +317,7 @@ namespace HereticalSolutions.Delegates.Factories
             AllocationCommandDescriptor initial,
             AllocationCommandDescriptor additional,
             ManagedPoolBuilder<INonAllocSubscription> managedPoolBuilder = null,
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             Func<INonAllocSubscription> valueAllocationDelegate =
                 AllocationFactory.NullAllocationDelegate<INonAllocSubscription>;
@@ -350,7 +350,7 @@ namespace HereticalSolutions.Delegates.Factories
         public static NonAllocBroadcasterGeneric<T> BuildNonAllocBroadcasterGeneric<T>(
             IBag<INonAllocSubscription> subscriptionsBag = null,
             IPool<NonAllocBroadcasterGenericInvocationContext> contextPool = null,
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             ILogger logger =
                 loggerResolver?.GetLogger<NonAllocBroadcasterGeneric<T>>();

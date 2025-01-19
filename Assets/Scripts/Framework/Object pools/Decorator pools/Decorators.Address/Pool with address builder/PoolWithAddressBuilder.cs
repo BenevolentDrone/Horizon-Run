@@ -17,8 +17,8 @@ namespace HereticalSolutions.Pools
         private readonly ILogger logger;
 
         public PoolWithAddressBuilder(
-            ILoggerResolver loggerResolver = null,
-            ILogger logger = null)
+            ILoggerResolver loggerResolver,
+            ILogger logger)
         {
             this.loggerResolver = loggerResolver;
 

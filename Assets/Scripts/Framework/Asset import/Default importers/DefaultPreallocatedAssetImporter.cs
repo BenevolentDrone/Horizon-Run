@@ -16,8 +16,8 @@ namespace HereticalSolutions.AssetImport
 		private TAsset preallocatedAsset;
 
 		public DefaultPreallocatedAssetImporter(
-			ILoggerResolver loggerResolver = null,
-			ILogger logger = null)
+			ILoggerResolver loggerResolver,
+			ILogger logger)
 			: base(
 				loggerResolver,
 				logger)

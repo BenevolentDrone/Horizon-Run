@@ -17,7 +17,7 @@ namespace HereticalSolutions.Samples.ECSCharacterControllerSample
 
 		public SampleAnimatorPresenterInitializationSystem(
 			EntityManager entityManager,
-			ILogger logger = null)
+			ILogger logger)
 		{
 			this.entityManager = entityManager;
 

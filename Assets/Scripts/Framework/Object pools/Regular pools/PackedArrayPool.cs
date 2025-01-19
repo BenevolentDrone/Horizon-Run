@@ -27,7 +27,7 @@ namespace HereticalSolutions.Pools
         public PackedArrayPool(
             T[] packedArray,
             AllocationCommand<T> allocationCommand,
-            ILogger logger = null)
+            ILogger logger)
         {
             this.packedArray = packedArray;
 

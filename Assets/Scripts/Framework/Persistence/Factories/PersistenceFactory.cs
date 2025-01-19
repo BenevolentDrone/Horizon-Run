@@ -127,7 +127,7 @@ namespace HereticalSolutions.Persistence.Factories
         #region Visitors
 
         public static DispatchVisitor BuildDispatchVisitor(
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             return new DispatchVisitor(
                 visitorRepository,
@@ -172,7 +172,7 @@ namespace HereticalSolutions.Persistence.Factories
 
         public static TSerializationArgument BuildSerializationArgument<TSerializationArgument>(
             object[] arguments = null,
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             if (Array.IndexOf(
                 serializationArgumentTypes,
@@ -198,14 +198,14 @@ namespace HereticalSolutions.Persistence.Factories
         #region Format serializers
 
         public static ObjectSerializer BuildObjectSerializer(
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             return new ObjectSerializer(
                 loggerResolver?.GetLogger<ObjectSerializer>());
         }
 
         public static BinaryFormatterSerializer BuildBinaryFormatterSerializer(
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             return new BinaryFormatterSerializer(
                 new BinaryFormatter(),
@@ -213,14 +213,14 @@ namespace HereticalSolutions.Persistence.Factories
         }
 
         public static JSONSerializer BuildJSONSerializer(
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             return new JSONSerializer(
                 loggerResolver?.GetLogger<JSONSerializer>());
         }
 
         public static XMLSerializer BuildXMLSerializer(
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             return new XMLSerializer(
                 loggerResolver?.GetLogger<XMLSerializer>());
@@ -229,7 +229,7 @@ namespace HereticalSolutions.Persistence.Factories
 #if CSV_SUPPORT
         public static CSVSerializer BuildCSVSerializer(
             bool includeHeader,
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             return new CSVSerializer(
                 includeHeader,
@@ -239,7 +239,7 @@ namespace HereticalSolutions.Persistence.Factories
 
 #if YAML_SUPPORT
         public static YAMLSerializer BuildYAMLSerializer(
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             return new YAMLSerializer(
                 new YamlSerializerBuilder().Build(),
@@ -250,7 +250,7 @@ namespace HereticalSolutions.Persistence.Factories
 
 #if PROTOBUF_SUPPORT
         public static ProtobufSerializer BuildProtobufSerializer(
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             return new ProtobufSerializer(
                 loggerResolver?.GetLogger<ProtobufSerializer>());
@@ -259,7 +259,7 @@ namespace HereticalSolutions.Persistence.Factories
 
         public static TFormatSerializer BuildFormatSerializer<TFormatSerializer>(
             object[] arguments = null,
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
             where TFormatSerializer : IFormatSerializer
         {
             if (Array.IndexOf(
@@ -286,7 +286,7 @@ namespace HereticalSolutions.Persistence.Factories
         #region Serialization strategies
 
         public static StringStrategy BuildStringStrategy(
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             return new StringStrategy(
                 loggerResolver?.GetLogger<StringStrategy>());
@@ -294,7 +294,7 @@ namespace HereticalSolutions.Persistence.Factories
 
         public static TextFileStrategy BuildTextFileStrategy(
             string fullPath,
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             return new TextFileStrategy(
                 fullPath,
@@ -303,7 +303,7 @@ namespace HereticalSolutions.Persistence.Factories
 
         public static BinaryFileStrategy BuildBinaryFileStrategy(
             string fullPath,
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             return new BinaryFileStrategy(
                 fullPath,
@@ -313,7 +313,7 @@ namespace HereticalSolutions.Persistence.Factories
         public static TextStreamStrategy BuildTextStreamStrategy(
             string fullPath,
             bool flushAutomatically = true,
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             return new TextStreamStrategy(
                 fullPath,
@@ -324,7 +324,7 @@ namespace HereticalSolutions.Persistence.Factories
         public static FileStreamStrategy BuildFileStreamStrategy(
             string fullPath,
             bool flushAutomatically = true,
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             return new FileStreamStrategy(
                 fullPath,
@@ -336,7 +336,7 @@ namespace HereticalSolutions.Persistence.Factories
             byte[] buffer = null,
             int index = -1,
             int count = -1,
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             return new MemoryStreamStrategy(
                 buffer,
@@ -348,7 +348,7 @@ namespace HereticalSolutions.Persistence.Factories
         public static IsolatedStorageStrategy BuildIsolatedStorageStrategy(
             string fullPath,
             bool flushAutomatically = true,
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             return new IsolatedStorageStrategy(
                 fullPath,
@@ -358,7 +358,7 @@ namespace HereticalSolutions.Persistence.Factories
 
         public static TSerializationStrategy BuildSerializationStrategy<TSerializationStrategy>(
             object[] arguments = null,
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
             where TSerializationStrategy : ISerializationStrategy
         {
             if (Array.IndexOf(
@@ -385,7 +385,7 @@ namespace HereticalSolutions.Persistence.Factories
         #region Builder
 
         public static SerializerBuilder BuildSerializerBuilder(
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             return new SerializerBuilder(
                 loggerResolver,

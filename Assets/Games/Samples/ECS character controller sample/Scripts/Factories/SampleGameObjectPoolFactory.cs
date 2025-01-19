@@ -24,7 +24,7 @@ namespace HereticalSolutions.Samples.ECSCharacterControllerSample.Factories
 			DiContainer container,
 			SampleGameObjectPoolSettings settings,
 			Transform parentTransform = null,
-			ILoggerResolver loggerResolver = null)
+			ILoggerResolver loggerResolver)
 		{
 			#region Builders
 

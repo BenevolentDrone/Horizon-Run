@@ -21,7 +21,7 @@ namespace HereticalSolutions.Pools.Factories
         public static LinkedListPool<T> BuildLinkedListPool<T>(
             AllocationCommand<T> initialAllocationCommand,
             AllocationCommand<T> additionalAllocationCommand,
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             ILogger logger =
                 loggerResolver?.GetLogger<LinkedListPool<T>>();
@@ -41,7 +41,7 @@ namespace HereticalSolutions.Pools.Factories
         private static void PerformInitialAllocation<T>(
             LinkedList<T> linkedList,
             AllocationCommand<T> initialAllocationCommand,
-            ILogger logger = null)
+            ILogger logger)
         {
             int initialAmount = -1;
 
@@ -85,7 +85,7 @@ namespace HereticalSolutions.Pools.Factories
             AllocationCommand<T> additionalAllocationCommand,
             MetadataAllocationDescriptor[] metadataAllocationDescriptors = null,
             IAllocationCallback<IPoolElementFacade<T>> facadeAllocationCallback = null,
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             ILogger logger =
                 loggerResolver?.GetLogger<LinkedListManagedPool<T>>();
@@ -124,7 +124,7 @@ namespace HereticalSolutions.Pools.Factories
             AllocationCommand<IPoolElementFacade<T>> facadeAllocationCommand,
             AllocationCommand<T> valueAllocationCommand,
             out int capacity,
-            ILogger logger = null)
+            ILogger logger)
         {
             int initialAmount = -1;
 
@@ -196,7 +196,7 @@ namespace HereticalSolutions.Pools.Factories
             AllocationCommand<T> additionalAllocationCommand,
             MetadataAllocationDescriptor[] metadataAllocationDescriptors = null,
             IAllocationCallback<IPoolElementFacade<T>> facadeAllocationCallback = null,
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             ILogger logger =
                 loggerResolver?.GetLogger<StackManagedPool<T>>();
@@ -264,7 +264,7 @@ namespace HereticalSolutions.Pools.Factories
             LinkedList<T> linkedList,
             int currentCapacity,
             AllocationCommand<T> allocationCommand,
-            ILogger logger = null)
+            ILogger logger)
         {
             int addedCapacity = -1;
 
@@ -306,7 +306,7 @@ namespace HereticalSolutions.Pools.Factories
             ref int currentCapacity,
             AllocationCommand<IPoolElementFacade<T>> facadeAllocationCommand,
             AllocationCommand<T> valueAllocationCommand,
-            ILogger logger = null)
+            ILogger logger)
         {
             int addedCapacity = -1;
 

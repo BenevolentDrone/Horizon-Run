@@ -27,7 +27,7 @@ namespace HereticalSolutions.Delegates.Subscriptions
 
 		public ConcurrentSubscriptionMultipleArgs(
 			Action<object[]> @delegate,
-			ILogger logger = null)
+			ILogger logger)
 		{
 			this.@delegate = DelegateWrapperFactory.BuildDelegateWrapperMultipleArgs(
 				@delegate);

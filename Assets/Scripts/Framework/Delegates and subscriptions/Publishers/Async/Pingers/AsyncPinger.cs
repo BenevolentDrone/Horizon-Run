@@ -21,7 +21,7 @@ namespace HereticalSolutions.Delegates
 		  ICleanuppable,
 		  IDisposable
 	{
-		private readonly IBag<INonAllocSubscription> subscriptionsBag;
+		private readonly IBag<INonAllocSubscription> subscriptionBag;
 
 		private readonly IPool<NonAllocPingerInvocationContext> contextPool;
 
@@ -30,11 +30,11 @@ namespace HereticalSolutions.Delegates
 		private readonly ILogger logger;
 
 		public AsyncPinger(
-			IBag<INonAllocSubscription> subscriptionsBag,
+			IBag<INonAllocSubscription> subscriptionBag,
 			IPool<NonAllocPingerInvocationContext> contextPool,
-			ILogger logger = null)
+			ILogger logger)
 		{
-			this.subscriptionsBag = subscriptionsBag;
+			this.subscriptionBag = subscriptionBag;
 
 			this.contextPool = contextPool;
 
@@ -59,7 +59,7 @@ namespace HereticalSolutions.Delegates
 				if (!subscriptionContext.ValidateActivation(this))
 					return false;
 	
-				if (!subscriptionsBag.Push(
+				if (!subscriptionBag.Push(
 					subscription))
 					return false;
 	
@@ -87,7 +87,7 @@ namespace HereticalSolutions.Delegates
 				if (!subscriptionContext.ValidateActivation(this))
 					return false;
 	
-				if (!subscriptionsBag.Pop(
+				if (!subscriptionBag.Pop(
 					subscription))
 					return false;
 	
@@ -107,7 +107,7 @@ namespace HereticalSolutions.Delegates
 			{
 				lock (lockObject)
 				{
-					return subscriptionsBag.All;
+					return subscriptionBag.All;
 				}
 			}
 		}
@@ -116,7 +116,7 @@ namespace HereticalSolutions.Delegates
 		{
 			lock (lockObject)
 			{
-				foreach (var subscription in subscriptionsBag.All)
+				foreach (var subscription in subscriptionBag.All)
 				{
 					var subscriptionContext = subscription as INonAllocSubscriptionContext<IInvokableNoArgs>;
 	
@@ -129,7 +129,7 @@ namespace HereticalSolutions.Delegates
 					subscriptionContext.Terminate();
 				}
 	
-				subscriptionsBag.Clear();
+				subscriptionBag.Clear();
 			}
 		}
 
@@ -148,12 +148,12 @@ namespace HereticalSolutions.Delegates
 
 			lock (lockObject)
 			{
-				if (subscriptionsBag.Count == 0)
+				if (subscriptionBag.Count == 0)
 					return;
 	
 				//Pop context out of the pool and initialize it with values from the bag
 	
-				count = subscriptionsBag.Count;
+				count = subscriptionBag.Count;
 	
 				context = contextPool.Pop();
 	
@@ -166,9 +166,9 @@ namespace HereticalSolutions.Delegates
 					newBuffer = true;
 				}
 	
-				if (context.Subscriptions.Length < subscriptionsBag.Count)
+				if (context.Subscriptions.Length < subscriptionBag.Count)
 				{
-					context.Subscriptions = new INonAllocSubscription[subscriptionsBag.Count];
+					context.Subscriptions = new INonAllocSubscription[subscriptionBag.Count];
 	
 					newBuffer = true;
 				}
@@ -184,7 +184,7 @@ namespace HereticalSolutions.Delegates
 				int index = 0;
 	
 				//TODO: remove foreach
-				foreach (var subscription in subscriptionsBag.All)
+				foreach (var subscription in subscriptionBag.All)
 				{
 					context.Subscriptions[index] = subscription;
 	
@@ -232,8 +232,8 @@ namespace HereticalSolutions.Delegates
 		{
 			lock (lockObject)
 			{
-				if (subscriptionsBag is ICleanuppable)
-					(subscriptionsBag as ICleanuppable).Cleanup();
+				if (subscriptionBag is ICleanuppable)
+					(subscriptionBag as ICleanuppable).Cleanup();
 	
 				if (contextPool is ICleanuppable)
 					(contextPool as ICleanuppable).Cleanup();
@@ -248,8 +248,8 @@ namespace HereticalSolutions.Delegates
 		{
 			lock (lockObject)
 			{
-				if (subscriptionsBag is IDisposable)
-					(subscriptionsBag as IDisposable).Dispose();
+				if (subscriptionBag is IDisposable)
+					(subscriptionBag as IDisposable).Dispose();
 	
 				if (contextPool is IDisposable)
 					(contextPool as IDisposable).Dispose();

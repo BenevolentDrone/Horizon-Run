@@ -18,7 +18,7 @@ namespace HereticalSolutions.Synchronization.Factories
 		public static SynchronizationContext BuildSynchronizationContext(
 			string id,
 			bool canBeToggled,
-			ILoggerResolver loggerResolver = null)
+			ILoggerResolver loggerResolver)
 		{
 			var descriptor = new SynchronizationDescriptor(
 				id);
@@ -48,7 +48,7 @@ namespace HereticalSolutions.Synchronization.Factories
 			TDelta scale = default,
 			Func<TDelta, TDelta, TDelta> scaleDeltaDelegate = null,
 
-			ILoggerResolver loggerResolver = null)
+			ILoggerResolver loggerResolver)
 		{
 			var descriptor = new SynchronizationDescriptor(
 				id);
@@ -88,7 +88,7 @@ namespace HereticalSolutions.Synchronization.Factories
 			TDelta scale = default,
 			Func<TDelta, TDelta, TDelta> scaleDeltaDelegate = null,
 
-			ILoggerResolver loggerResolver = null)
+			ILoggerResolver loggerResolver)
 		{
 			var descriptor = new SynchronizationDescriptor(
 				id);

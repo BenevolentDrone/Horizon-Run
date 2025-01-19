@@ -59,7 +59,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Networking.Factories
             string relevantWorldID,
             World relevantWorld,
             
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             var result = new NetworkEntityManager(
                 networkTickSettings,
@@ -104,7 +104,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Networking.Factories
             IPool<IComponentSerializer>[] componentSerializersPool,
             ESerializedEntityType serializedEntityType,
             ComponentSerializationContext componentSerializationContext,
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             return new ComponentSerializerManager(
                 componentSerializersPool,
@@ -116,7 +116,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Networking.Factories
         }
 
         public static IPool<IComponentSerializer>[] BuildEventComponentSerializersPool(
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             return new IPool<IComponentSerializer>[]
             {
@@ -134,7 +134,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Networking.Factories
         }
         
         public static IPool<IComponentSerializer>[] BuildEntityComponentSerializersPool(
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             return new IPool<IComponentSerializer>[]
             {
@@ -148,7 +148,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Networking.Factories
         }
         
         private static IPool<IComponentSerializer> BuildComponentSerializerPool<TSerializer>(
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             Func<IComponentSerializer> valueAllocationDelegate =
                 AllocationsFactory.ActivatorAllocationDelegate<IComponentSerializer, TSerializer>;
@@ -195,7 +195,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Networking.Factories
             
             IPacketRepository packetRepository,
             
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             var packetProcessor = new NetPacketProcessor();
             
@@ -258,7 +258,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Networking.Factories
             
             IPacketRepository packetRepository,
             
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             var packetProcessor = new NetPacketProcessor();
             

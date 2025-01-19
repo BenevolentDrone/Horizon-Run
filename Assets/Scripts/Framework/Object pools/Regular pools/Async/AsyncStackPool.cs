@@ -34,7 +34,7 @@ namespace HereticalSolutions.Pools
 		public AsyncStackPool(
 			Stack<T> pool,
 			AsyncAllocationCommand<T> allocationCommand,
-			ILogger logger = null)
+			ILogger logger)
 		{
 			this.pool = pool;
 

@@ -26,7 +26,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
 		/// The EntityPrototypeDTO object representing the entity's prototype.
 		/// </summary>
 		public EntityPrototypeDTO GetPrototypeDTO(
-			ILoggerResolver loggerResolver = null)
+			ILoggerResolver loggerResolver)
 		{
 			if (serializer == null)
 			{

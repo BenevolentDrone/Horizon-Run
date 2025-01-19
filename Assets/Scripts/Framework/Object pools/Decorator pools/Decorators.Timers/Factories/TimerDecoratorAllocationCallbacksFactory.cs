@@ -9,7 +9,7 @@ namespace HereticalSolutions.Pools.Factories
         public static SetRuntimeTimerCallback<T> BuildSetRuntimeTimerCallback<T>(
             string id = TimerDecoratorConsts.POOL_ELEMENT_METADATA_TIMER_ID,
             float defaultDuration = 0f,
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             return new SetRuntimeTimerCallback<T>(
                 id,
@@ -19,7 +19,7 @@ namespace HereticalSolutions.Pools.Factories
 
         public static SetDurationAndPushSubscriptionCallback<T> BuildSetDurationAndPushSubscriptionCallback<T>(
             float duration = 0f,
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             return new SetDurationAndPushSubscriptionCallback<T>(
                 duration,

@@ -28,7 +28,7 @@ namespace HereticalSolutions.Delegates
 		public ConcurrentNonAllocBroadcasterMultipleArgs(
 			IBag<INonAllocSubscription> subscriptionsBag,
 			IPool<NonAllocBroadcasterMultipleArgsInvocationContext> contextPool,
-			ILogger logger = null)
+			ILogger logger)
 		{
 			this.subscriptionsBag = subscriptionsBag;
 

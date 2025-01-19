@@ -42,7 +42,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
 			IRepository<TEntityID, TEntity> registryEntityRepository,
 			IReadOnlyEntityWorldRepository<TWorldID, TWorld, TEntity> entityWorldRepository,
 			TWorldID[] worldsToSpawnEntitiesIn,
-			ILogger logger = null)
+			ILogger logger)
 		{
 			this.registryEntityRepository = registryEntityRepository;
 

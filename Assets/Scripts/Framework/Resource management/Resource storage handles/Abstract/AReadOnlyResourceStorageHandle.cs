@@ -17,7 +17,7 @@ namespace HereticalSolutions.ResourceManagement
 	{
 		public AReadOnlyResourceStorageHandle(
 			IRuntimeResourceManager runtimeResourceManager,
-			ILogger logger = null)
+			ILogger logger)
 			: base (
 				runtimeResourceManager,
 				logger)

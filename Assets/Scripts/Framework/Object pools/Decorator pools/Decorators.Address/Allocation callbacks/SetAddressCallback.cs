@@ -19,7 +19,7 @@ namespace HereticalSolutions.Pools.AllocationCallbacks
         public SetAddressCallback(
             string fullAddress = null,
             int[] addressHashes = null,
-            ILogger logger = null)
+            ILogger logger)
         {
             FullAddress = fullAddress;
             

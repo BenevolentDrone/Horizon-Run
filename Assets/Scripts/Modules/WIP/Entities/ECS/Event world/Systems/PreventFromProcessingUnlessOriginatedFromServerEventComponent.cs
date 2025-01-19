@@ -14,7 +14,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Networking
         
         public PreventFromProcessingUnlessOriginatedFromServerEventComponent(
             World eventWorld,
-            ILogger logger = null)
+            ILogger logger)
             : base(
                 eventWorld
                     .GetEntities()

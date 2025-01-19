@@ -19,7 +19,7 @@ namespace HereticalSolutions.Pools.Factories
 		public static QueuePool<T> BuildQueuePool<T>(
 			AllocationCommand<T> initialAllocationCommand,
 			AllocationCommand<T> additionalAllocationCommand,
-			ILoggerResolver loggerResolver = null)
+			ILoggerResolver loggerResolver)
 		{
 			ILogger logger =
 				loggerResolver?.GetLogger<QueuePool<T>>();
@@ -39,7 +39,7 @@ namespace HereticalSolutions.Pools.Factories
 		private static void PerformInitialAllocation<T>(
 			Queue<T> queue,
 			AllocationCommand<T> initialAllocationCommand,
-			ILogger logger = null)
+			ILogger logger)
 		{
 			int initialAmount = -1;
 
@@ -83,7 +83,7 @@ namespace HereticalSolutions.Pools.Factories
 			AllocationCommand<T> additionalAllocationCommand,
 			MetadataAllocationDescriptor[] metadataAllocationDescriptors = null,
 			IAllocationCallback<IPoolElementFacade<T>> facadeAllocationCallback = null,
-			ILoggerResolver loggerResolver = null)
+			ILoggerResolver loggerResolver)
 		{
 			ILogger logger =
 				loggerResolver?.GetLogger<QueueManagedPool<T>>();
@@ -123,7 +123,7 @@ namespace HereticalSolutions.Pools.Factories
 			Queue<IPoolElementFacade<T>> queue,
 			AllocationCommand<IPoolElementFacade<T>> facadeAllocationCommand,
 			AllocationCommand<T> valueAllocationCommand,
-			ILogger logger = null)
+			ILogger logger)
 		{
 			int initialAmount = -1;
 
@@ -180,7 +180,7 @@ namespace HereticalSolutions.Pools.Factories
 			AllocationCommand<T> additionalAllocationCommand,
 			MetadataAllocationDescriptor[] metadataAllocationDescriptors = null,
 			IAllocationCallback<IPoolElementFacade<T>> facadeAllocationCallback = null,
-			ILoggerResolver loggerResolver = null)
+			ILoggerResolver loggerResolver)
 		{
 			ILogger logger =
 				loggerResolver?.GetLogger<QueueManagedPool<T>>();
@@ -249,7 +249,7 @@ namespace HereticalSolutions.Pools.Factories
 			Queue<T> queue,
 			int currentCapacity,
 			AllocationCommand<T> allocationCommand,
-			ILogger logger = null)
+			ILogger logger)
 		{
 			int addedCapacity = -1;
 
@@ -291,7 +291,7 @@ namespace HereticalSolutions.Pools.Factories
 			int currentCapacity,
 			AllocationCommand<IPoolElementFacade<T>> facadeAllocationCommand,
 			AllocationCommand<T> valueAllocationCommand,
-			ILogger logger = null)
+			ILogger logger)
 		{
 			int addedCapacity = -1;
 

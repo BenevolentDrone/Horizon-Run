@@ -19,7 +19,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Networking
         public PreventUnauthorizedEventSystem(
             World eventWorld,
             Func<Entity, byte> getAuthoringPermissionDelegate,
-            ILogger logger = null)
+            ILogger logger)
             : base(
                 eventWorld
                     .GetEntities()

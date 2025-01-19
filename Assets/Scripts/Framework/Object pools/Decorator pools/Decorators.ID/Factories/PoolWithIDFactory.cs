@@ -16,7 +16,7 @@ namespace HereticalSolutions.Pools.Factories
         public static ManagedPoolWithID<T> BuildManagedPoolWithID<T>(
             IManagedPool<T> innerPool,
             string id,
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             ILogger logger =
                 loggerResolver?.GetLogger<ManagedPoolWithID<T>>();

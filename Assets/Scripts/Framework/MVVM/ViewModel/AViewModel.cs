@@ -24,7 +24,7 @@ namespace HereticalSolutions.MVVM.ViewModel
             IRepository<string, CommandDelegate> commands,
             IRepository<string, CommandWithArgsDelegate> commandsWithArguments,
             IRepository<string, object> observables,
-            ILogger logger = null)
+            ILogger logger)
         {
             this.commands = commands;
 

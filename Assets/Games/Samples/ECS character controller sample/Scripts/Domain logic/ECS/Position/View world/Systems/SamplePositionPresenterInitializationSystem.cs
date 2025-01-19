@@ -17,7 +17,7 @@ namespace HereticalSolutions.Samples.ECSCharacterControllerSample
 
 		public SamplePositionPresenterInitializationSystem(
 			EntityManager entityManager,
-			ILogger logger = null)
+			ILogger logger)
 		{
 			this.entityManager = entityManager;
 

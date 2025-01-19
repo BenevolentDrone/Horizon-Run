@@ -14,8 +14,8 @@ namespace HereticalSolutions.AssetImport
         private ResourcesSettings settings;
 
         public ResourceImporterFromScriptable(
-            ILoggerResolver loggerResolver = null,
-            ILogger logger = null)
+            ILoggerResolver loggerResolver,
+            ILogger logger)
             : base(
                 loggerResolver,
                 logger)

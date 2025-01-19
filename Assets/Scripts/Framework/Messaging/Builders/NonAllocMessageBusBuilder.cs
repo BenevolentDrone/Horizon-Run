@@ -35,7 +35,7 @@ namespace HereticalSolutions.Messaging.Factories
 
 
         public NonAllocMessageBusBuilder(
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             this.loggerResolver = loggerResolver;
 

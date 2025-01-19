@@ -20,7 +20,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Networking
         public ServerPosition2DWriteSystem(
             World world,
             NetworkPositionInterpolationSettings networkPositionInterpolationSettings,
-            ILogger logger = null)
+            ILogger logger)
         {
             this.networkPositionInterpolationSettings = networkPositionInterpolationSettings;
             

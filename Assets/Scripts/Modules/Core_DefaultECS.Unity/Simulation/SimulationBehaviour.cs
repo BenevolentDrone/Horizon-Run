@@ -54,7 +54,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
 			ISystem<float> fixedUpdateSystems,
 			ISystem<float> lateUpdateSystems,
 			
-			ILogger logger = null)
+			ILogger logger)
 		{
 			this.updateTimeManagerAsProvider = updateTimeManagerAsProvider;
 

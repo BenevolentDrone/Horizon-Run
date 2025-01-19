@@ -18,7 +18,7 @@ namespace HereticalSolutions.Persistence
 
 		public DispatchVisitor(
 			IReadOnlyRepository<Type, IEnumerable<IVisitor>> concreteVisitorRepository,
-			ILogger logger = null)
+			ILogger logger)
 		{
 			this.concreteVisitorRepository = concreteVisitorRepository;
 

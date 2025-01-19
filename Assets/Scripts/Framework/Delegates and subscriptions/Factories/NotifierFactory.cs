@@ -11,7 +11,7 @@ namespace HereticalSolutions.Delegates.Factories
 	public static partial class NotifierFactory
 	{
 		public static AsyncNotifierSingleArgGeneric<TArgument, TValue> BuildAsyncNotifierSingleArgGeneric<TArgument, TValue>(
-			ILoggerResolver loggerResolver = null)
+			ILoggerResolver loggerResolver)
 			where TArgument : IEquatable<TArgument>
 		{
 			ILogger logger =

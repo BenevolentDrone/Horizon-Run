@@ -16,7 +16,7 @@ namespace HereticalSolutions.Delegates.Wrappers
 
 		public ConcurrentDelegateWrapperSingleArgGeneric(
 			Action<TValue> @delegate,
-			ILogger logger = null)
+			ILogger logger)
 		{
 			this.@delegate = @delegate;
 

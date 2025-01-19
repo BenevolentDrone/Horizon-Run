@@ -29,7 +29,7 @@ namespace HereticalSolutions.LifetimeManagement
             Action cleanup = null,
             Action tearDown = null,
             
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             var dependencyLifetime = LifetimeFactory.BuildHierarchicalLifetime(
                 target,

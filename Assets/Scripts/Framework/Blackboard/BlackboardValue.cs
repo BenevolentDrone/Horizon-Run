@@ -15,7 +15,7 @@ namespace HereticalSolutions.Blackboard
         public BlackboardValue(
             EBlackboardValueType valueType,
             object value,
-            ILogger logger = null)
+            ILogger logger)
         {
             this.logger = logger;
 
@@ -27,7 +27,7 @@ namespace HereticalSolutions.Blackboard
         public BlackboardValue(
             EBlackboardValueType valueType,
             string serializedValue,
-            ILogger logger = null)
+            ILogger logger)
         {
             this.logger = logger;
 

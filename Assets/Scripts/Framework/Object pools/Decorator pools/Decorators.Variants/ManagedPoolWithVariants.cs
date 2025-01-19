@@ -24,7 +24,7 @@ namespace HereticalSolutions.Pools.Decorators
         public ManagedPoolWithVariants(
             IRepository<int, VariantContainer<T>> innerPoolRepository,
             IRandomGenerator randomGenerator,
-            ILogger logger = null)
+            ILogger logger)
         {
             this.innerPoolRepository = innerPoolRepository;
 

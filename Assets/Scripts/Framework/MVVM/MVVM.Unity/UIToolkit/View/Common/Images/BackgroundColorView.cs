@@ -27,7 +27,7 @@ namespace HereticalSolutions.MVVM.UIToolkit
             IViewModel viewModel,
             string propertyID,
             VisualElement visualElement,
-            ILogger logger = null)
+            ILogger logger)
             : base(
                 viewModel,
                 logger)

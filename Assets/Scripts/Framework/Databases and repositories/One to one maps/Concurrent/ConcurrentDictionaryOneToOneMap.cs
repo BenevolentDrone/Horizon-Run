@@ -27,7 +27,7 @@ namespace HereticalSolutions.Repositories
 		public ConcurrentDictionaryOneToOneMap(
 			Dictionary<TValue1, TValue2> leftToRightDatabase,
 			Dictionary<TValue2, TValue1> rightToLeftDatabase,
-			ILogger logger = null)
+			ILogger logger)
 		{
 			this.leftToRightDatabase = leftToRightDatabase;
 

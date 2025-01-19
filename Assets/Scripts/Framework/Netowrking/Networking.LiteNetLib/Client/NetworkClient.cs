@@ -94,7 +94,7 @@ namespace HereticalSolutions.Networking.LiteNetLib
             NetDataWriter writer,
             NetPacketProcessor packetProcessor,
             
-            ILogger logger = null)
+            ILogger logger)
         {
             this.playerSettings = playerSettings;
             

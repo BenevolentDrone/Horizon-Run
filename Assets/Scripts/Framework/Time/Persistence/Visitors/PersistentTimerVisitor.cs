@@ -19,8 +19,8 @@ namespace HereticalSolutions.Time
         private readonly ILogger logger;
 
         public PersistentTimerVisitor(
-            ILoggerResolver loggerResolver = null,
-            ILogger logger = null)
+            ILoggerResolver loggerResolver,
+            ILogger logger)
         {
             this.loggerResolver = loggerResolver;
 

@@ -26,7 +26,7 @@ namespace HereticalSolutions.Persistence
 
         public CSVSerializer(
             bool includeHeader,
-            ILogger logger = null)
+            ILogger logger)
         {
             this.includeHeader = includeHeader;
 

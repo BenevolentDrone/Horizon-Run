@@ -45,7 +45,7 @@ namespace HereticalSolutions.SpacePartitioning
             IPool<ValueSpaceData<TValue>> valueDataPool,
             IComparer<TValue> comparer,
             Bounds2D lookupBounds,
-            ILogger logger = null)
+            ILogger logger)
         {
             this.registeredValues = registeredValues;
 

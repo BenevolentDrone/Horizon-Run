@@ -18,7 +18,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 		public static Vector2 GetWorldPosition2D(
 			Entity entity,
 			DefaultECSEntityHierarchyManager entityHierarchyManager,
-			ILogger logger = null)
+			ILogger logger)
 		{
 			Vector2 position = Vector2.zero;
 
@@ -47,7 +47,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 			DefaultECSEntityHierarchyManager entityHierarchyManager,
 			out Vector2 worldPosition,
 			out float worldRotation,
-			ILogger logger = null)
+			ILogger logger)
 		{
 			worldPosition = Vector2.zero;
 
@@ -124,7 +124,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 		public static Vector3 GetWorldPosition3D(
 			Entity entity,
 			DefaultECSEntityHierarchyManager entityHierarchyManager,
-			ILogger logger = null)
+			ILogger logger)
 		{
 			Vector3 localPosition = Vector3.zero;
 
@@ -163,7 +163,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 		public static Matrix4x4 GetParentTRSMatrix(
 			Entity entity,
 			DefaultECSEntityHierarchyManager entityHierarchyManager,
-			ILogger logger = null)
+			ILogger logger)
 		{
 			Matrix4x4 parentTRSMatrix = Matrix4x4.identity;
 
@@ -197,7 +197,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 		public static void UpdateTransform2DRecursively(
 			Entity entity,
 			DefaultECSEntityHierarchyManager entityHierarchyManager,
-			ILogger logger = null)
+			ILogger logger)
 		{
 			Vector2 parentPosition = Vector2.zero;
 
@@ -243,7 +243,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 			DefaultECSEntityHierarchyManager entityHierarchyManager,
 			Vector2 parentPosition,
 			float parentRotation,
-			ILogger logger = null)
+			ILogger logger)
 		{
 			ref var transformComponent = ref entity.Get<Transform2DComponent>();
 
@@ -334,7 +334,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 		public static void UpdateTransform3DRecursively(
 			Entity entity,
 			DefaultECSEntityHierarchyManager entityHierarchyManager,
-			ILogger logger = null)
+			ILogger logger)
 		{
 			Matrix4x4 parentTRSMatrix = Matrix4x4.identity;
 
@@ -374,7 +374,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 			Entity entity,
 			DefaultECSEntityHierarchyManager entityHierarchyManager,
 			Matrix4x4 parentTRSMatrix,
-			ILogger logger = null)
+			ILogger logger)
 		{
 			ref var transformComponent = ref entity.Get<Transform3DComponent>();
 

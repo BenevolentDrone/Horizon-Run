@@ -26,7 +26,7 @@ namespace HereticalSolutions.Pools
                 
             ILinkedListLink<T> firstElement,
             int capacity,
-            ILogger logger = null)
+            ILogger logger)
             : base (
                 facadeAllocationCommand,
                 valueAllocationCommand,

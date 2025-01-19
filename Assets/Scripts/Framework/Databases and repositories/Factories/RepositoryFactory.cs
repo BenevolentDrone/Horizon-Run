@@ -66,7 +66,7 @@ namespace HereticalSolutions.Repositories.Factories
         #region Dictionary one to one map
 
         public static DictionaryOneToOneMap<TValue1, TValue2> BuildDictionaryOneToOneMap<TValue1, TValue2>(
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             ILogger logger = loggerResolver?.GetLogger<DictionaryOneToOneMap<TValue1, TValue2>>();
 
@@ -79,7 +79,7 @@ namespace HereticalSolutions.Repositories.Factories
         public static DictionaryOneToOneMap<TValue1, TValue2> BuildDictionaryOneToOneMap<TValue1, TValue2>(
             Dictionary<TValue1, TValue2> leftDatabase,
             Dictionary<TValue2, TValue1> rightDatabase,
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             ILogger logger = loggerResolver?.GetLogger<DictionaryOneToOneMap<TValue1, TValue2>>();
 
@@ -92,7 +92,7 @@ namespace HereticalSolutions.Repositories.Factories
         public static DictionaryOneToOneMap<TValue1, TValue2> BuildDictionaryOneToOneMap<TValue1, TValue2>(
             IEqualityComparer<TValue1> leftComparer,
             IEqualityComparer<TValue2> rightComparer,
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             ILogger logger = loggerResolver?.GetLogger<DictionaryOneToOneMap<TValue1, TValue2>>();
 
@@ -105,7 +105,7 @@ namespace HereticalSolutions.Repositories.Factories
         public static DictionaryOneToOneMap<TValue1, TValue2> CloneDictionaryOneToOneMap<TValue1, TValue2>(
             Dictionary<TValue1, TValue2> leftToRightDatabase,
             Dictionary<TValue2, TValue1> rightToLeftDatabase,
-            ILogger logger = null)
+            ILogger logger)
         {
             return new DictionaryOneToOneMap<TValue1, TValue2>(
                 new Dictionary<TValue1, TValue2>(
@@ -185,7 +185,7 @@ namespace HereticalSolutions.Repositories.Factories
 
         public static ConcurrentDictionaryOneToOneMap<TValue1, TValue2>
             BuildConcurrentDictionaryOneToOneMap<TValue1, TValue2>(
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             ILogger logger = loggerResolver?.GetLogger<ConcurrentDictionaryOneToOneMap<TValue1, TValue2>>();
 
@@ -199,7 +199,7 @@ namespace HereticalSolutions.Repositories.Factories
             BuildConcurrentDictionaryOneToOneMap<TValue1, TValue2>(
             Dictionary<TValue1, TValue2> leftDatabase,
             Dictionary<TValue2, TValue1> rightDatabase,
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             ILogger logger = loggerResolver?.GetLogger<ConcurrentDictionaryOneToOneMap<TValue1, TValue2>>();
 
@@ -213,7 +213,7 @@ namespace HereticalSolutions.Repositories.Factories
             BuildConcurrentDictionaryOneToOneMap<TValue1, TValue2>(
             IEqualityComparer<TValue1> leftComparer,
             IEqualityComparer<TValue2> rightComparer,
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             ILogger logger = loggerResolver?.GetLogger<ConcurrentDictionaryOneToOneMap<TValue1, TValue2>>();
 
@@ -227,7 +227,7 @@ namespace HereticalSolutions.Repositories.Factories
             CloneConcurrentDictionaryOneToOneMap<TValue1, TValue2>(
             Dictionary<TValue1, TValue2> leftToRightDatabase,
             Dictionary<TValue2, TValue1> rightToLeftDatabase,
-            ILogger logger = null)
+            ILogger logger)
         {
             return new ConcurrentDictionaryOneToOneMap<TValue1, TValue2>(
                 new Dictionary<TValue1, TValue2>(

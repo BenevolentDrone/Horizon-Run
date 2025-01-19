@@ -30,7 +30,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
             TWorld world,
             IEntityPrototypeRepositoryWithWorld<TWorld, TPrototypeID, TEntity> prototypeRepository,
             ComponentCloner componentCloner,
-            ILogger logger = null)
+            ILogger logger)
         {
             World = world;
 

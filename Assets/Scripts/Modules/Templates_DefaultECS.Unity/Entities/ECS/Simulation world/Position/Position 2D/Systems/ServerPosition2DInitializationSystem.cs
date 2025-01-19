@@ -21,7 +21,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Networking
         public ServerPosition2DInitializationSystem(
             UniversalTemplateEntityManager entityManager,
             bool isServer,
-            ILogger logger = null)
+            ILogger logger)
         {
             this.entityManager = entityManager;
             

@@ -29,7 +29,7 @@ namespace HereticalSolutions.ResourceManagement
 
 		public AResourceStorageHandle(
 			IRuntimeResourceManager runtimeResourceManager,
-			ILogger logger = null)
+			ILogger logger)
 		{
 			this.runtimeResourceManager = runtimeResourceManager;
 

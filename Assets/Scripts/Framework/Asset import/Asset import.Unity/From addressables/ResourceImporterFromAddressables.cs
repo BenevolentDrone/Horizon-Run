@@ -15,8 +15,8 @@ namespace HereticalSolutions.AssetImport
 
         public ResourceImporterFromAddressables(
             IRuntimeResourceManager runtimeResourceManager,
-            ILoggerResolver loggerResolver = null,
-            ILogger logger = null)
+            ILoggerResolver loggerResolver,
+            ILogger logger)
             : base(
                 loggerResolver,
                 logger)

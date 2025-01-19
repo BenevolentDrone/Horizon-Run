@@ -20,7 +20,7 @@ namespace HereticalSolutions.LifetimeManagement.Factories
             Action cleanup = null,
             Action tearDown = null,
 			
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             ILogger logger = loggerResolver?.GetLogger<Lifetime>();
             
@@ -51,7 +51,7 @@ namespace HereticalSolutions.LifetimeManagement.Factories
             Action cleanup = null,
             Action tearDown = null,
 			
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             ILogger logger = loggerResolver?.GetLogger<Lifetime>();
 

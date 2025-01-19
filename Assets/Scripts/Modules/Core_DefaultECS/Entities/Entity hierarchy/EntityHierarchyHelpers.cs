@@ -12,7 +12,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
             Entity child,
             EntityHierarchyManager entityHierarchyManager,
             out Entity parent,
-            ILogger logger = null)
+            ILogger logger)
         {
             parent = default;
 
@@ -53,7 +53,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
             Entity parent,
             Entity child,
             EntityHierarchyManager entityHierarchyManager,
-            ILogger logger = null)
+            ILogger logger)
         {
             if (!parent.Has<HierarchyComponent>())
             {
@@ -102,7 +102,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
             Entity parent,
             Entity child,
             EntityHierarchyManager entityHierarchyManager,
-            ILogger logger = null)
+            ILogger logger)
         {
             if (!parent.Has<HierarchyComponent>())
             {

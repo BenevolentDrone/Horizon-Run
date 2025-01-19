@@ -78,7 +78,7 @@ namespace HereticalSolutions.Samples.ECSCharacterControllerSample.Installers
 
 		private void ResolveChildren(
 			ASceneEntity parentSceneEntity,
-			ILogger logger = null)
+			ILogger logger)
 		{
 			if (parentSceneEntity.ChildEntities == null)
 				return;

@@ -31,7 +31,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
 			TWorld viewWorld,
 			bool includeViewWorld,
 			ILoggerResolver loggerResolver,
-			ILogger logger = null)
+			ILogger logger)
 		{
 			this.simulationWorld = simulationWorld;
 

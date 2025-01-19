@@ -29,7 +29,7 @@ namespace HereticalSolutions.Pools
         public StackPool(
             Stack<T> pool,
             AllocationCommand<T> allocationCommand,
-            ILogger logger = null)
+            ILogger logger)
         {
             this.pool = pool;
 

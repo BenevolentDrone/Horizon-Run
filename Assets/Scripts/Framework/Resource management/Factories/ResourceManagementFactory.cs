@@ -20,7 +20,7 @@ namespace HereticalSolutions.ResourceManagement.Factories
         /// </summary>
         /// <returns>A new instance of the <see cref="RuntimeResourceManager"/> class.</returns>
         public static RuntimeResourceManager BuildRuntimeResourceManager(
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             ILogger logger =
                 loggerResolver?.GetLogger<RuntimeResourceManager>();
@@ -32,7 +32,7 @@ namespace HereticalSolutions.ResourceManagement.Factories
         }
 
         public static ConcurrentRuntimeResourceManager BuildConcurrentRuntimeResourceManager(
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             ILogger logger =
                 loggerResolver?.GetLogger<ConcurrentRuntimeResourceManager>();
@@ -47,7 +47,7 @@ namespace HereticalSolutions.ResourceManagement.Factories
 
         public static ResourceData BuildResourceData(
             ResourceDescriptor descriptor,
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             ILogger logger =
                 loggerResolver?.GetLogger<ResourceData>();
@@ -63,7 +63,7 @@ namespace HereticalSolutions.ResourceManagement.Factories
 
         public static ConcurrentResourceData BuildConcurrentResourceData(
             ResourceDescriptor descriptor,
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             ILogger logger =
                 loggerResolver?.GetLogger<ConcurrentResourceData>();
@@ -100,7 +100,7 @@ namespace HereticalSolutions.ResourceManagement.Factories
         public static PreallocatedResourceStorageHandle<TResource> BuildPreallocatedResourceStorageHandle<TResource>(
             TResource resource,
             IRuntimeResourceManager runtimeResourceManager,
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             ILogger logger =
                 loggerResolver?.GetLogger<PreallocatedResourceStorageHandle<TResource>>();
@@ -114,7 +114,7 @@ namespace HereticalSolutions.ResourceManagement.Factories
         public static ConcurrentPreallocatedResourceStorageHandle<TResource> BuildConcurrentPreallocatedResourceStorageHandle<TResource>(
             TResource resource,
             IRuntimeResourceManager runtimeResourceManager,
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             ILogger logger =
                 loggerResolver?.GetLogger<ConcurrentPreallocatedResourceStorageHandle<TResource>>();
@@ -129,7 +129,7 @@ namespace HereticalSolutions.ResourceManagement.Factories
         public static ReadWriteResourceStorageHandle<TResource> BuildReadWriteResourceStorageHandle<TResource>(
             TResource resource,
             IRuntimeResourceManager runtimeResourceManager,
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             ILogger logger =
                 loggerResolver?.GetLogger<ReadWriteResourceStorageHandle<TResource>>();
@@ -143,7 +143,7 @@ namespace HereticalSolutions.ResourceManagement.Factories
         public static ConcurrentReadWriteResourceStorageHandle<TResource> BuildConcurrentReadWriteResourceStorageHandle<TResource>(
             TResource resource,
             IRuntimeResourceManager runtimeResourceManager,
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             ILogger logger =
                 loggerResolver?.GetLogger<ConcurrentReadWriteResourceStorageHandle<TResource>>();
@@ -159,7 +159,7 @@ namespace HereticalSolutions.ResourceManagement.Factories
             Func<THandle, THandle> newHandleAllocationDelegate,
             Func<TResource> newResourceAllocationDelegate,
             THandle uninitializedHandle = default,
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             return new ManagedTypeResourceManager<TResource, THandle>(
                 RepositoryFactory.BuildDictionaryRepository<THandle, TResource>(),

@@ -19,7 +19,7 @@ namespace HereticalSolutions.Pools.Factories
         public static PackedArrayPool<T> BuildPackedArrayPool<T>(
             AllocationCommand<T> initialAllocationCommand,
             AllocationCommand<T> additionalAllocationCommand,
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             ILogger logger =
                 loggerResolver?.GetLogger<PackedArrayPool<T>>();
@@ -92,7 +92,7 @@ namespace HereticalSolutions.Pools.Factories
             MetadataAllocationDescriptor[] metadataAllocationDescriptors = null,
             IAllocationCallback<IPoolElementFacade<T>> facadeAllocationCallback = null,
             bool validateValues = true,
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             ILogger logger =
                 loggerResolver?.GetLogger<PackedArrayManagedPool<T>>();
@@ -172,7 +172,7 @@ namespace HereticalSolutions.Pools.Factories
             AllocationCommand<T> additionalAllocationCommand,
             MetadataAllocationDescriptor[] metadataAllocationDescriptors = null,
             IAllocationCallback<IPoolElementFacade<T>> facadeAllocationCallback = null,
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             ILogger logger =
                 loggerResolver?.GetLogger<AppendablePackedArrayManagedPool<T>>();
@@ -243,7 +243,7 @@ namespace HereticalSolutions.Pools.Factories
         public static T[] ResizePackedArrayPool<T>(
             T[] packedArray,
             AllocationCommand<T> allocationCommand,
-            ILogger logger = null)
+            ILogger logger)
         {
             int newCapacity = CountResizeAllocationAmount<T>(
                 packedArray,
@@ -263,7 +263,7 @@ namespace HereticalSolutions.Pools.Factories
         private static int CountResizeAllocationAmount<T>(
             T[] packedArray,
             AllocationCommand<T> allocationCommand,
-            ILogger logger = null)
+            ILogger logger)
         {
             int newCapacity = -1;
 
@@ -313,7 +313,7 @@ namespace HereticalSolutions.Pools.Factories
             IPoolElementFacade<T>[] packedArray,
             AllocationCommand<IPoolElementFacade<T>> facadeAllocationCommand,
             AllocationCommand<T> valueAllocationCommand,
-            ILogger logger = null)
+            ILogger logger)
         {
             int newCapacity = CountResizeAllocationAmount<IPoolElementFacade<T>>(
                 packedArray,

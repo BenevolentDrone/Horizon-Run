@@ -34,7 +34,7 @@ namespace HereticalSolutions.Systems
 
 			byte freeThreadIndex = 2,
 
-			ILogger logger = null)
+			ILogger logger)
 		{
 			this.allProcedureNodes = allProcedureNodes;
 

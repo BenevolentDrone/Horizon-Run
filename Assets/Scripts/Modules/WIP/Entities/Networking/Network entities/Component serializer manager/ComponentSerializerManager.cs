@@ -31,7 +31,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Networking
             ComponentSerializationContext componentSerializationContext,
             List<ushort> serializerIDsCache,
             List<IComponentSerializer> serializersCache,
-            ILogger logger = null)
+            ILogger logger)
         {
             this.componentSerializersPool = componentSerializersPool;
             

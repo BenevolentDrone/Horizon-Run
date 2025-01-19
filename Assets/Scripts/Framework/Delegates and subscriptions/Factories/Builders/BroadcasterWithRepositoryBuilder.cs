@@ -14,7 +14,7 @@ namespace HereticalSolutions.Delegates.Factories
         private readonly ILoggerResolver loggerResolver;
 
         public BroadcasterWithRepositoryBuilder(
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             this.loggerResolver = loggerResolver;
 

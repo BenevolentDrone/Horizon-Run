@@ -14,7 +14,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
         private readonly ILogger logger;
 
         public PushPooledGameObjectViewSystem(
-            ILogger logger = null)
+            ILogger logger)
         {
             this.logger = logger;
         }

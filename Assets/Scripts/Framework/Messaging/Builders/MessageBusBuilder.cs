@@ -27,7 +27,7 @@ namespace HereticalSolutions.Messaging.Factories
         private readonly ILoggerResolver loggerResolver;
 
         public MessageBusBuilder(
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             this.loggerResolver = loggerResolver;
 

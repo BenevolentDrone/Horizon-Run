@@ -33,7 +33,7 @@ namespace HereticalSolutions.ResourceManagement
 			Func<THandle, THandle> newHandleAllocationDelegate,
 			IPool<TResource> resourcePool,
 			THandle uninitializedHandle = default(THandle),
-			ILogger logger = null)
+			ILogger logger)
 		{
 			this.resourceRepository = resourceRepository;
 			

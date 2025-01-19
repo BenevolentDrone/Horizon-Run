@@ -40,7 +40,7 @@ namespace HereticalSolutions.Messaging
             IReadOnlyInstanceRepository messageRepository,
             IManagedPool<IPoolElementFacade<IMessage>> mailbox,
             IDynamicArray<IPoolElementFacade<IPoolElementFacade<IMessage>>> mailboxContents,
-            ILogger logger = null)
+            ILogger logger)
         {
             this.broadcaster = broadcaster;
 

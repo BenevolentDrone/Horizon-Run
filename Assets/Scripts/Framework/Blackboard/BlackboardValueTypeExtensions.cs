@@ -11,7 +11,7 @@ namespace HereticalSolutions.Blackboard
         public static object Parse(
             this string serializedValue,
             EBlackboardValueType valueType,
-            ILogger logger = null)
+            ILogger logger)
         {
             object value = null;
             
@@ -49,7 +49,7 @@ namespace HereticalSolutions.Blackboard
         public static float GetFloat(
             this object value,
             EBlackboardValueType valueType,
-            ILogger logger = null)
+            ILogger logger)
         {
             if (valueType == EBlackboardValueType.INT)
             {
@@ -80,7 +80,7 @@ namespace HereticalSolutions.Blackboard
             EBlackboardValueType valueType,
             object valueToCompare,
             EBlackboardValueType valueToCompareType,
-            ILogger logger = null)
+            ILogger logger)
         {
             float a = value.GetFloat(
                 valueType,
@@ -107,7 +107,7 @@ namespace HereticalSolutions.Blackboard
             EBlackboardValueType valueType,
             object valueToCompare,
             EBlackboardValueType valueToCompareType,
-            ILogger logger = null)
+            ILogger logger)
         {
             float a = value.GetFloat(
                 valueType,

@@ -30,7 +30,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Networking
             INonAllocMessageSender networkBusAsSender,
             List<IDUniformRotationPair> dirtyEntities,
             ILoggerResolver loggerResolver,
-            ILogger logger = null,
+            ILogger logger,
             float controlPacketFrequencyChance = DEFAULT_CONTROL_PACKET_FREQUENCY_CHANCE)
             : base(
                 world,

@@ -14,7 +14,7 @@ namespace HereticalSolutions.AssetImport.Factories
 	public static class AssetImporterFactory
 	{
 		public static AssetImportManager BuildAssetImportManager(
-			ILoggerResolver loggerResolver = null)
+			ILoggerResolver loggerResolver)
 		{
 			var logger =
 				loggerResolver?.GetLogger<AssetImportManager>();
@@ -29,7 +29,7 @@ namespace HereticalSolutions.AssetImport.Factories
 		}
 
 		public static ConcurrentAssetImportManager BuildConcurrentAssetImportManager(
-			ILoggerResolver loggerResolver = null)
+			ILoggerResolver loggerResolver)
 		{
 			var logger =
 				loggerResolver?.GetLogger<AssetImportManager>();

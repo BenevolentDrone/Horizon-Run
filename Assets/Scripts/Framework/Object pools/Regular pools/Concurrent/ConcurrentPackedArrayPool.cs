@@ -29,7 +29,7 @@ namespace HereticalSolutions.Pools
 		public ConcurrentPackedArrayPool(
 			T[] packedArray,
 			AllocationCommand<T> allocationCommand,
-			ILogger logger = null)
+			ILogger logger)
 		{
 			this.packedArray = packedArray;
 

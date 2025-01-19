@@ -27,7 +27,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Factories
             VFXPoolSettings settings,
             ITimerManager timerManager,
             Transform parentTransform = null,
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             var argumentsCache = new ArgumentBuilder()
                 .Add<WorldPositionArgument>(out var worldPositionArgument)
@@ -53,7 +53,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Factories
             VFXPoolSettings settings,
             ITimerManager timerManager,
             Transform parentTransform = null,
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             #region Builders
 

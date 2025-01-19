@@ -39,7 +39,7 @@ namespace HereticalSolutions.ResourceManagement
 			IPool<TResource> resourcePool,
 			SemaphoreSlim semaphore,
 			THandle uninitializedHandle = default(THandle),
-			ILogger logger = null)
+			ILogger logger)
 		{
 			this.resourceRepository = resourceRepository;
 			

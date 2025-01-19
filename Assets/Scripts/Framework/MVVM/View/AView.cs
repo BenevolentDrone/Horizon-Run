@@ -22,7 +22,7 @@ namespace HereticalSolutions.MVVM.View
         /// <param name="logger">The logger to be used for logging.</param>
         public AView(
             IViewModel viewModel,
-            ILogger logger = null)
+            ILogger logger)
         {
             this.viewModel = viewModel;
             

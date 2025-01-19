@@ -32,7 +32,7 @@ namespace HereticalSolutions.Synchronization
 			IRuntimeTimer fixedDeltaTimer,
 			ITickable fixedDeltaTimerAsTickable,
 			Func<TDelta, float> deltaToFloatDelegate,
-			ILoggerResolver loggerResolver = null)
+			ILoggerResolver loggerResolver)
 		{
 			FixedDelta = fixedDelta;
 

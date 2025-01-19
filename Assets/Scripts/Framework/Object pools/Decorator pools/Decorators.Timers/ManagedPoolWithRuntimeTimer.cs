@@ -14,7 +14,7 @@ namespace HereticalSolutions.Pools.Decorators
 		public ManagedPoolWithRuntimeTimer(
 			IManagedPool<T> innerPool,
 			ITimerManager timerManager,
-			ILogger logger = null)
+			ILogger logger)
 			: base(
 				innerPool,
 				logger)

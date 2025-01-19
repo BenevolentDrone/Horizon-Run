@@ -17,7 +17,7 @@ namespace HereticalSolutions.Persistence
 
         public TextFileStrategy(
             string fullPath,
-            ILogger logger = null)
+            ILogger logger)
         {
             FullPath = fullPath;
 

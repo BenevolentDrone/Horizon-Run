@@ -26,7 +26,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
 		public RootEventWorldInitializationSystemsInstaller(
 			TWorld eventWorld,
 			ILoggerResolver loggerResolver,
-			ILogger logger = null)
+			ILogger logger)
 		{
 			this.eventWorld = eventWorld;
 

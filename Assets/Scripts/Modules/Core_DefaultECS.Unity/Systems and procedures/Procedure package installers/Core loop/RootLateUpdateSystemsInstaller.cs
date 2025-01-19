@@ -21,7 +21,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
 
 		public RootLateUpdateSystemsInstaller(
 			ILoggerResolver loggerResolver,
-			ILogger logger = null)
+			ILogger logger)
 		{
 			this.loggerResolver = loggerResolver;
 

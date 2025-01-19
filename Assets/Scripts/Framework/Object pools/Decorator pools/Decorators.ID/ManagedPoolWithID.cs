@@ -9,7 +9,7 @@ namespace HereticalSolutions.Pools.Decorators
         public ManagedPoolWithID(
             IManagedPool<T> innerPool,
             string id,
-            ILogger logger = null)
+            ILogger logger)
             : base(
                 innerPool,
                 logger)

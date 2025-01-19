@@ -15,7 +15,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 
         public QuaternionPresenterInitializationSystem(
             EntityManager entityManager,
-            ILogger logger = null)
+            ILogger logger)
         {
             this.entityManager = entityManager;
 

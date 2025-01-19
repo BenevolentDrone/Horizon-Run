@@ -26,7 +26,7 @@ namespace HereticalSolutions.Persistence
         public YAMLSerializer(
             YamlDotNetSerializer yamlSerializer,
             YamlDotNetDeserializer yamlDeserializer,
-            ILogger logger = null)
+            ILogger logger)
         {
             this.yamlSerializer = yamlSerializer;
 

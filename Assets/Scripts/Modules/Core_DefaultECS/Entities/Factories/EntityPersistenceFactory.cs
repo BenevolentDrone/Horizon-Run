@@ -19,7 +19,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Factories
 	{
 		public static DefaultECSEntityPrototypeVisitor BuildDefaultECSEntityPrototypeVisitor(
 			IEntityPrototypeRepository<TPrototypeID, TEntity> prototypeRepository,
-			ILoggerResolver loggerResolver = null)
+			ILoggerResolver loggerResolver)
 		{
 			TypeHelpers.GetTypesWithAttributeInAllAssemblies<ComponentAttribute>(
 				out Type[] componentTypes);

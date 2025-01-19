@@ -10,7 +10,7 @@ namespace HereticalSolutions.Persistence
 	{
 		public static void EnsureDirectoryExists(
 			string path,
-			ILogger logger = null,
+			ILogger logger,
 			Type callerType = null)
 		{
 			if (string.IsNullOrEmpty(path))
@@ -35,7 +35,7 @@ namespace HereticalSolutions.Persistence
 
 		public static bool FileExists(
 			string path,
-			ILogger logger = null,
+			ILogger logger,
 			Type callerType = null)
 		{
 			if (string.IsNullOrEmpty(path))
@@ -63,7 +63,7 @@ namespace HereticalSolutions.Persistence
 		public static void EnsureDirectoryInIsolatedStorageExists(
 			string path,
 			IsolatedStorageFile isolatedStorageFile,
-			ILogger logger = null,
+			ILogger logger,
 			Type callerType = null)
 		{
 			if (string.IsNullOrEmpty(path))
@@ -91,7 +91,7 @@ namespace HereticalSolutions.Persistence
 		public static bool FileInIsolatedStorageExists(
 			string path,
 			IsolatedStorageFile isolatedStorageFile,
-			ILogger logger = null,
+			ILogger logger,
 			Type callerType = null)
 		{
 			if (string.IsNullOrEmpty(path))

@@ -27,7 +27,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
         /// <param name="world">The world.</param>
         public DespawnSystem(
             World world,
-            ILogger logger = null)
+            ILogger logger)
         {
             this.logger = logger;
             

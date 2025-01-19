@@ -19,7 +19,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 		public Suspension3DSystem(
 			World world,
 			DefaultECSEntityHierarchyManager entityHierarchyManager,
-			ILogger logger = null)
+			ILogger logger)
 			: base(
 				world
 					.GetEntities()

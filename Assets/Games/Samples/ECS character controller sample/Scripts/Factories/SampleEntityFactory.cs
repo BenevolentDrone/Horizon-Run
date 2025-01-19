@@ -17,7 +17,7 @@ namespace HereticalSolutions.Samples.ECSCharacterControllerSample.Factories
 	{
 		/*
 		public static SampleEntityManager BuildSampleEntityManager(
-			ILoggerResolver loggerResolver = null)
+			ILoggerResolver loggerResolver)
 		{
 			Func<Guid> allocateIDDelegate = () =>
 			{

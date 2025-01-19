@@ -29,7 +29,7 @@ namespace HereticalSolutions.Delegates.Subscriptions
 
 		public ConcurrentSubscriptionSingleArgGeneric(
 			Action<TValue> @delegate,
-			ILogger logger = null)
+			ILogger logger)
 		{
 			this.@delegate = DelegateWrapperFactory.BuildDelegateWrapperSingleArgGeneric(
 				@delegate);

@@ -36,7 +36,7 @@ namespace HereticalSolutions.VirtualFileSystem
 		Task<bool> AllocateAsync(
 			CancellationToken cancellationToken = default,
 			IProgress<float> progress = null,
-			ILogger progressLogger = null);
+			ILogger progresslogger);
 
 		#endregion
 
@@ -47,7 +47,7 @@ namespace HereticalSolutions.VirtualFileSystem
 		Task<bool> FreeAsync(
 			CancellationToken cancellationToken = default,
 			IProgress<float> progress = null,
-			ILogger progressLogger = null);
+			ILogger progresslogger);
 
 		#endregion
 		*/

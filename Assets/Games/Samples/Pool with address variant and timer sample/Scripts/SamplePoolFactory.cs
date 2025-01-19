@@ -27,7 +27,7 @@ namespace HereticalSolutions.Samples.PoolWithAddressVariantAndTimerSample
             SamplePoolSettings settings,
             ITimerManager timerManager,
             Transform parentTransform = null,
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             #region Builders
 

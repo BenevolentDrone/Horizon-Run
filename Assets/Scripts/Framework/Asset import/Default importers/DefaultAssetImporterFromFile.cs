@@ -19,8 +19,8 @@ namespace HereticalSolutions.AssetImport
 		protected ISerializer serializer;
 
 		public DefaultAssetImporterFromFile(
-			ILoggerResolver loggerResolver = null,
-			ILogger logger = null)
+			ILoggerResolver loggerResolver,
+			ILogger logger)
 			: base(
 				loggerResolver,
 				logger)

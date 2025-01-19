@@ -160,7 +160,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Networking
             
             string relevantWorldID,
             World relevantWorld,
-            ILogger logger = null)
+            ILogger logger)
         {
             this.networkTickSettings = networkTickSettings;
 

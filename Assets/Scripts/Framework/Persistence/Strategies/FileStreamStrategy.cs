@@ -36,7 +36,7 @@ namespace HereticalSolutions.Persistence
         public FileStreamStrategy(
             string fullPath,
             bool flushAutomatically = true,
-            ILogger logger = null)
+            ILogger logger)
         {
             FullPath = fullPath;
 

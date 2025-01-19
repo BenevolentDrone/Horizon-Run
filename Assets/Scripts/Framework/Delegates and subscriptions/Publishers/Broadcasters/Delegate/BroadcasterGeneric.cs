@@ -25,7 +25,7 @@ namespace HereticalSolutions.Delegates
 
         public BroadcasterGeneric(
             IPool<BroadcasterGenericInvocationContext<TValue>> contextPool,
-            ILogger logger = null)
+            ILogger logger)
         {
             this.contextPool = contextPool;
 

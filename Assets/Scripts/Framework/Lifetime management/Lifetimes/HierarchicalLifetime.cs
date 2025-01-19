@@ -59,7 +59,7 @@ namespace HereticalSolutions.LifetimeManagement
 			Action cleanup = null,
 			Action tearDown = null,
 			
-			ILogger logger = null)
+			ILogger logger)
 		{
 			this.target = target;
 			

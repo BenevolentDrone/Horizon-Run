@@ -12,7 +12,7 @@ namespace HereticalSolutions.SpacePartitioning.Factories
 		public static Quadtree<TValue> BuildQuadtree<TValue>(
 			Vector2 min,
 			Vector2 max,
-			ILoggerResolver loggerResolver = null)
+			ILoggerResolver loggerResolver)
 		{
 			ILogger logger =
 				loggerResolver?.GetLogger<Quadtree<TValue>>();

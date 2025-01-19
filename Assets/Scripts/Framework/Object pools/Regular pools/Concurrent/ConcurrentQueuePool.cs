@@ -30,7 +30,7 @@ namespace HereticalSolutions.Pools
 		public ConcurrentQueuePool(
 			Queue<T> pool,
 			AllocationCommand<T> allocationCommand,
-			ILogger logger = null)
+			ILogger logger)
 		{
 			this.pool = pool;
 

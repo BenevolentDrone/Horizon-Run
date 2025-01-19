@@ -64,7 +64,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
             SetWorldIdentityComponentDelegate<TPrototypeID, TEntity> setWorldIdentityComponentDelegate,
             RemoveWorldIdentityComponentDelegate<TEntity> removeWorldIdentityComponentDelegate,
 
-            ILogger logger = null)
+            ILogger logger)
         {
             World = world;
 

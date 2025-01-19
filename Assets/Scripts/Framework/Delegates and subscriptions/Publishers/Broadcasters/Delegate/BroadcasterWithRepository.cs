@@ -21,7 +21,7 @@ namespace HereticalSolutions.Delegates
 
         public BroadcasterWithRepository(
             IReadOnlyInstanceRepository broadcasterRepository,
-            ILogger logger = null)
+            ILogger logger)
         {
             this.broadcasterRepository = broadcasterRepository;
             

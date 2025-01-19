@@ -21,7 +21,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Networking
         public ServerUniformRotationWriteSystem(
             World world,
             NetworkRotationInterpolationSettings networkRotationInterpolationSettings,
-            ILogger logger = null)
+            ILogger logger)
         {
             this.networkRotationInterpolationSettings = networkRotationInterpolationSettings;
             

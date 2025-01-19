@@ -16,7 +16,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
             string key,
             EntityRelationsManager entityRelationsManager,
             bool force = true,
-            ILogger logger = null)
+            ILogger logger)
         {
             if (!from.Has<RelationsComponent>())
                 throw new Exception(
@@ -73,7 +73,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
             Entity from,
             string key,
             EntityRelationsManager entityRelationsManager,
-            ILogger logger = null)
+            ILogger logger)
         {
             if (!from.Has<RelationsComponent>())
                 throw new Exception(
@@ -105,7 +105,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
             out Entity to,
             string relationPath,
             EntityRelationsManager entityRelationsManager,
-            ILogger logger = null)
+            ILogger logger)
         {
             string[] relationPathParts = relationPath.SplitAddressBySeparator();
             
@@ -122,7 +122,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
             out Entity to,
             string[] relationChain,
             EntityRelationsManager entityRelationsManager,
-            ILogger logger = null)
+            ILogger logger)
         {
             if (relationChain == null
                 || relationChain.Length == 0)

@@ -10,7 +10,7 @@ namespace HereticalSolutions.Pools.Factories
     public static class AddressDecoratorPoolFactory 
     {
         public static ManagedPoolWithAddress<T> BuildPoolWithAddress<T>(
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             ILogger logger =
                 loggerResolver?.GetLogger<ManagedPoolWithAddress<T>>();
@@ -28,7 +28,7 @@ namespace HereticalSolutions.Pools.Factories
             IRepository<int, IManagedPool<T>> repository,
             int level,
             PoolWithAddressBuilder<T> builder = null,
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             ILogger logger =
                 loggerResolver?.GetLogger<ManagedPoolWithAddress<T>>();

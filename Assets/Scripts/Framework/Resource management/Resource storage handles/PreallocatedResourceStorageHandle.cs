@@ -14,7 +14,7 @@ namespace HereticalSolutions.ResourceManagement
         public PreallocatedResourceStorageHandle(
             TResource value,
             IRuntimeResourceManager runtimeResourceManager,
-            ILogger logger = null)
+            ILogger logger)
             : base(
                 runtimeResourceManager,
                 logger)

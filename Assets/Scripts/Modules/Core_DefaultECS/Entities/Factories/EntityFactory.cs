@@ -61,7 +61,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Factories
 
 		public static EntityManager BuildEntityManager(
 			EEntityAuthoringPresets authoringPreset,
-			ILoggerResolver loggerResolver = null)
+			ILoggerResolver loggerResolver)
 		{
 			bool includeSimulationWorld = authoringPreset != EEntityAuthoringPresets.NONE;
 
@@ -178,7 +178,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Factories
 		#region Entity world controllers
 
 		public static EventEntityWorldController BuildEventEntityWorldController(
-			ILoggerResolver loggerResolver = null)
+			ILoggerResolver loggerResolver)
 		{
 			TWorld world = new TWorld();
 
@@ -191,7 +191,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Factories
 		}
 
 		public static RegistryWorldController BuildRegistryWorldController(
-			ILoggerResolver loggerResolver = null)
+			ILoggerResolver loggerResolver)
 		{
 			TWorld world = new TWorld();
 
@@ -212,7 +212,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Factories
 			SetWorldIdentityComponentDelegate<TPrototypeID, TEntity> setWorldIdentityComponentDelegate,
 			RemoveWorldIdentityComponentDelegate<TEntity> removeWorldIdentityComponentDelegate,
 
-			ILoggerResolver loggerResolver = null)
+			ILoggerResolver loggerResolver)
 		{
 			World world = new World();
 
@@ -237,7 +237,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Factories
 		#region Entity list manager
 
 		public static EntityListManager BuildEntityListManager(
-			ILoggerResolver loggerResolver = null)
+			ILoggerResolver loggerResolver)
 		{
 			Func<TEntityListResource> valueAllocationDelegate =
 				AllocationFactory.ActivatorAllocationDelegate<TEntityListResource>;
@@ -281,7 +281,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Factories
 		#region Entity hierarchy manager
 
 		public static EntityHierarchyManager BuildEntityHierarchyManager(
-			ILoggerResolver loggerResolver = null)
+			ILoggerResolver loggerResolver)
 		{
 			Func<TEntityHierarchyResource> valueAllocationDelegate =
 				() => AllocationFactory.FuncAllocationDelegate<TEntityHierarchyResource, HierarchyNode<TEntity>>(
@@ -330,7 +330,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Factories
 		#region Entity relations manager
 
 		public static EntityRelationsManager BuildEntityRelationsManager(
-			ILoggerResolver loggerResolver = null)
+			ILoggerResolver loggerResolver)
 		{
 			Func<TEntityRelationsResource> valueAllocationDelegate =
 				() => AllocationFactory.FuncAllocationDelegate<
@@ -394,7 +394,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Factories
 		#region Entity world repository
 
 		public static EntityWorldRepository BuildEntityWorldRepository(
-			ILoggerResolver loggerResolver = null)
+			ILoggerResolver loggerResolver)
 		{
 			var worldRepository = RepositoryFactory.BuildDictionaryRepository<TWorldID, TWorld>();
 

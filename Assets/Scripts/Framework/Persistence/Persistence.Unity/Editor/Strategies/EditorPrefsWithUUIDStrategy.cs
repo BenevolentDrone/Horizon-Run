@@ -32,7 +32,7 @@ namespace HereticalSolutions.Persistence
 			string keyPrefsSerializedValuesList,
 			string keyPrefsValuePrefix,
 			TUUID uuid,
-			ILogger logger = null)
+			ILogger logger)
 		{
 			this.keyPrefsValuePrefix = keyPrefsValuePrefix;
 

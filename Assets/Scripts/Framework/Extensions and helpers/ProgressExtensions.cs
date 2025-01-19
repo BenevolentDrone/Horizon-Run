@@ -10,7 +10,7 @@ namespace HereticalSolutions
 	{
 		public static IProgress<float> CreateLocalProgress(
 			this IProgress<float> progress,
-			ILogger logger = null)
+			ILogger logger)
 		{
 			if (progress == null)
 				return null;
@@ -45,7 +45,7 @@ namespace HereticalSolutions
 		public static IProgress<float> CreateLocalProgressWithCalculationDelegate(
 			this IProgress<float> progress,
 			Func<float, float> totalProgressCalculationDelegate,
-			ILogger logger = null)
+			ILogger logger)
 		{
 			if (progress == null)
 				return null;
@@ -71,7 +71,7 @@ namespace HereticalSolutions
 			this IProgress<float> progress,
 			float totalProgressStart,
 			float totalProgressFinish,
-			ILogger logger = null)
+			ILogger logger)
 		{
 			if (progress == null)
 				return null;
@@ -98,7 +98,7 @@ namespace HereticalSolutions
 			float totalProgressStart,
 			float totalProgressFinish,
 			Func<float, float> localProgressCalculationDelegate,
-			ILogger logger = null)
+			ILogger logger)
 		{
 			if (progress == null)
 				return null;
@@ -126,7 +126,7 @@ namespace HereticalSolutions
 			float totalProgressFinish,
 			int index,
 			int count,
-			ILogger logger = null)
+			ILogger logger)
 		{
 			if (progress == null)
 				return null;
@@ -155,7 +155,7 @@ namespace HereticalSolutions
 			List<float> localProgressValues,
 			int index,
 			int count,
-			ILogger logger = null)
+			ILogger logger)
 		{
 			if (progress == null)
 				return null;

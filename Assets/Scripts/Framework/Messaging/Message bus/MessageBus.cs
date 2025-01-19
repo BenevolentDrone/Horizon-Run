@@ -27,7 +27,7 @@ namespace HereticalSolutions.Messaging
             BroadcasterWithRepository broadcaster,
             IReadOnlyInstanceRepository messageRepository,
             Queue<IMessage> mailbox,
-            ILogger logger = null)
+            ILogger logger)
         {
             this.broadcaster = broadcaster;
 

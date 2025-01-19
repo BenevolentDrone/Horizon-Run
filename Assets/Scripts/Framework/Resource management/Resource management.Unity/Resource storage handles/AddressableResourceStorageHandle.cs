@@ -16,7 +16,7 @@ namespace HereticalSolutions.ResourceManagement
         public AddressableResourceStorageHandle(
             AssetReference assetReference,
             IRuntimeResourceManager runtimeResourceManager,
-            ILogger logger = null)
+            ILogger logger)
             : base(
                 runtimeResourceManager,
                 logger)

@@ -9,7 +9,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
         public static void ChainAfter(
             Entity lockEntity,
             Entity targetLockEntity,
-            ILogger logger = null)
+            ILogger logger)
         {
             ref var lockComponent = ref lockEntity.Get<LockComponent>();
             
@@ -38,7 +38,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 
         public static LockComponent Unchain(
             Entity lockEntity,
-            ILogger logger = null)
+            ILogger logger)
         {
             ref var lockComponent = ref lockEntity.Get<LockComponent>();
             

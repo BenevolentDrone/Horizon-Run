@@ -30,7 +30,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Networking
             Func<Entity, bool> filterDelegate,
             bool replicateIfOriginatedFromClient,
             bool keepProcessingAfterReplication,
-            ILogger logger = null)
+            ILogger logger)
             : base(
                 eventWorld
                     .GetEntities()

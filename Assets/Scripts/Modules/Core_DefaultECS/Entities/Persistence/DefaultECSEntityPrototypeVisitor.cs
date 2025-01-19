@@ -34,7 +34,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
 		public DefaultECSEntityPrototypeVisitor(
 			IReadOnlyRepository<Type, WriteComponentToObjectDelegate> componentWriters,
 			IEntityPrototypeRepository<TPrototypeID, TEntity> prototypeRepository,
-			ILogger logger = null)
+			ILogger logger)
 		{
 			this.componentWriters = componentWriters;
 

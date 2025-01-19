@@ -14,7 +14,7 @@ namespace HereticalSolutions.Persistence
         public string Value { get; set; }
 
         public StringStrategy(
-            ILogger logger = null)
+            ILogger logger)
         {
             this.logger = logger;
 

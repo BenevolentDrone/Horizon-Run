@@ -13,7 +13,7 @@ namespace HereticalSolutions.Persistence
 
 		public Serializer(
 			IReadOnlySerializerContext context,
-			ILogger logger = null)
+			ILogger logger)
 		{
 			this.context = context;
 

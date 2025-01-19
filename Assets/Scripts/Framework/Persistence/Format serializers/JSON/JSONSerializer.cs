@@ -24,7 +24,7 @@ namespace HereticalSolutions.Persistence
         private readonly ILogger logger;
 
         public JSONSerializer(
-            ILogger logger = null)
+            ILogger logger)
         {
             writeSerializerSettings = new JsonSerializerSettings
             {

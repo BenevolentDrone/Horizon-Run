@@ -11,7 +11,7 @@ namespace HereticalSolutions.Samples.ECSCharacterControllerSample
 
 		public SampleAnimatorViewSystem(
 			World world,
-			ILogger logger = null)
+			ILogger logger)
 			: base(
 				world
 					.GetEntities()

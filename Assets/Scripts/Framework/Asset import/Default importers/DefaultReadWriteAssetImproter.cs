@@ -17,8 +17,8 @@ namespace HereticalSolutions.AssetImport
 		private TAsset readWriteAsset;
 
 		public DefaultReadWriteAssetImporter(
-			ILoggerResolver loggerResolver = null,
-			ILogger logger = null)
+			ILoggerResolver loggerResolver,
+			ILogger logger)
 			: base(
 				loggerResolver,
 				logger)

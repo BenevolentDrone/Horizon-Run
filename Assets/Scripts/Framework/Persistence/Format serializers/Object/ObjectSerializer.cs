@@ -13,7 +13,7 @@ namespace HereticalSolutions.Persistence
 		private readonly ILogger logger;
 
 		public ObjectSerializer(
-			ILogger logger = null)
+			ILogger logger)
 		{
 			this.logger = logger;
 		}

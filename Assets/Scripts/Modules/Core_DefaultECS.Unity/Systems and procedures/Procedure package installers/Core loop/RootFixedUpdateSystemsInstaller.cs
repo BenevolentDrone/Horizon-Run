@@ -21,7 +21,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
 
 		public RootFixedUpdateSystemsInstaller(
 			ILoggerResolver loggerResolver,
-			ILogger logger = null)
+			ILogger logger)
 		{
 			this.loggerResolver = loggerResolver;
 

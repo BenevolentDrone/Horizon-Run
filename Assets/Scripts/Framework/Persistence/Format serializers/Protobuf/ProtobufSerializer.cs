@@ -19,7 +19,7 @@ namespace HereticalSolutions.Persistence
         private readonly ILogger logger;
 
         public ProtobufSerializer(
-            ILogger logger = null)
+            ILogger logger)
         {
             this.logger = logger;
         }

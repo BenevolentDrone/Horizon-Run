@@ -18,7 +18,7 @@ namespace HereticalSolutions.Repositories
 		
 		public ConcurrentBPlusTreeRepository(
 			IBPlusTreeMap<TKey, TValue> treeMap,
-			ILogger logger = null)
+			ILogger logger)
 		{
 			//TODO: good idea, ChatGPT. Now I should add this to ALL consturctors
 			this.treeMap = treeMap ?? throw new ArgumentNullException(nameof(treeMap));

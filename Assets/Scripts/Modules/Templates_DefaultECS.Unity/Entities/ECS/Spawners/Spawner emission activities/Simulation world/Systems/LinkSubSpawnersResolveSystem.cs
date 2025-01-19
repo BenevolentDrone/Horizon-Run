@@ -22,7 +22,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 		public LinkSubSpawnersResolveSystem(
 			UniversalTemplateEntityManager entityManager,
 			DefaultECSEntityHierarchyManager entityHierarchyManager,
-			ILogger logger = null)
+			ILogger logger)
 		{
 			this.entityManager = entityManager;
 

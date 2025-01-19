@@ -147,7 +147,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.DI
 			out DefaultECSEntityPrototypeVisitor worldPrototypeVisitor,
 
 			bool logErrorIfWorldNotFound = true,
-			ILogger logger = null)
+			ILogger logger)
 		{
 			if (!entityWorldRepository.TryGetEntityWorldController(
 				worldID,
@@ -208,7 +208,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.DI
 			DefaultECSEntityPrototypeVisitor simulationWorldPrototypeVisitor,
 			DefaultECSEntityPrototypeVisitor viewWorldPrototypeVisitor,
 			
-			ILogger logger = null)
+			ILogger logger)
 		{
 			logger?.Log(
 				GetType(),
@@ -282,7 +282,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.DI
 			DefaultECSEntityPrototypeVisitor registryWorldPrototypeVisitor,
 
 			out TEntity entityPrototype,
-			ILogger logger = null)
+			ILogger logger)
 		{
 			if (entityResourceData.TryGetVariant(
 				variantID,

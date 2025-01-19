@@ -19,8 +19,8 @@ namespace HereticalSolutions.AssetImport
 		protected IRuntimeResourceManager runtimeResourceManager;
 
 		public AAssetImporter(
-			ILoggerResolver loggerResolver = null,
-			ILogger logger = null)
+			ILoggerResolver loggerResolver,
+			ILogger logger)
 		{
 			this.loggerResolver = loggerResolver;
 

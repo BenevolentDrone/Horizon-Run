@@ -22,7 +22,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Networking
 			World eventWorld,
 			INetworkEventEntityManager<Entity> networkEventEntityManager,
 			bool keepProcessingAfterReplication,
-			ILogger logger = null)
+			ILogger logger)
 			: base(
 				eventWorld
 					.GetEntities()

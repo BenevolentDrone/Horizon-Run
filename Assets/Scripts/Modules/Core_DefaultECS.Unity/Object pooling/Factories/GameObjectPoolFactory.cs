@@ -24,7 +24,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Factories
 			DiContainer container,
 			GameObjectPoolSettings settings,
 			Transform parentTransform = null,
-			ILoggerResolver loggerResolver = null)
+			ILoggerResolver loggerResolver)
 		{
 			#region Builders
 

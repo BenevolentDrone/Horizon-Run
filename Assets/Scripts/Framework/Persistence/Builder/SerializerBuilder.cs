@@ -22,8 +22,8 @@ namespace HereticalSolutions.Persistence
 		private ISerializerContext serializerContext;
 
 		public SerializerBuilder(
-			ILoggerResolver loggerResolver = null,
-			ILogger logger = null)
+			ILoggerResolver loggerResolver,
+			ILogger logger)
 		{
 			this.loggerResolver = loggerResolver;
 

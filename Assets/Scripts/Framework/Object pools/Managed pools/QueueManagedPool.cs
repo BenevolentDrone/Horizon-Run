@@ -32,7 +32,7 @@ namespace HereticalSolutions.Pools
 			Queue<IPoolElementFacade<T>> pool,
 			AllocationCommand<IPoolElementFacade<T>> facadeAllocationCommand,
 			AllocationCommand<T> valueAllocationCommand,
-			ILogger logger = null)
+			ILogger logger)
 		{
 			this.pool = pool;
 

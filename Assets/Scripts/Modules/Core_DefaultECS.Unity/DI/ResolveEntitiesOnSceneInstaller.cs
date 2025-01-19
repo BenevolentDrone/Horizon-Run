@@ -88,7 +88,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.DI
 
 		private void ResolveChildren(
 			ASceneEntity parentSceneEntity,
-			ILogger logger = null)
+			ILogger logger)
 		{
 			if (parentSceneEntity.ChildEntities == null)
 				return;

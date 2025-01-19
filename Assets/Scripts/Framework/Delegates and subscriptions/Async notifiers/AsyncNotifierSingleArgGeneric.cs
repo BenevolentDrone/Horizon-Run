@@ -23,7 +23,7 @@ namespace HereticalSolutions.Delegates.Notifiers
 		public AsyncNotifierSingleArgGeneric(
 			List<NotifyRequestSingleArgGeneric<TArgument, TValue>> requests,
 			SemaphoreSlim semaphore,
-			ILogger logger = null)
+			ILogger logger)
 		{
 			this.requests = requests;
 

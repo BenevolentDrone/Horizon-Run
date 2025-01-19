@@ -21,7 +21,7 @@ namespace HereticalSolutions.ResourceManagement
 		public AConcurrentReadOnlyResourceStorageHandle(
 			SemaphoreSlim semaphore,
 			IRuntimeResourceManager runtimeResourceManager,
-			ILogger logger = null)
+			ILogger logger)
 			: base(
 				runtimeResourceManager,
 				logger)

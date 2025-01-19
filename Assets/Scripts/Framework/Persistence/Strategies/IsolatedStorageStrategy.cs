@@ -43,7 +43,7 @@ namespace HereticalSolutions.Persistence
 		public IsolatedStorageStrategy(
 			string fullPath,
 			bool flushAutomatically = true,
-			ILogger logger = null)
+			ILogger logger)
 		{
 			FullPath = fullPath;
 

@@ -16,7 +16,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
 
 		public EventEntityWorldController(
 			TWorld world,
-			ILogger logger = null)
+			ILogger logger)
 		{
 			World = world;
 

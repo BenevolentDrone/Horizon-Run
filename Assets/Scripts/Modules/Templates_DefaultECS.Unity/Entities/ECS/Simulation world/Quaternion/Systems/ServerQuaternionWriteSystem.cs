@@ -13,7 +13,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Networking
         
         public ServerQuaternionWriteSystem(
             World world,
-            ILogger logger = null)
+            ILogger logger)
         {
             serverQuaternionEntitiesSet = world
                 .GetEntities()

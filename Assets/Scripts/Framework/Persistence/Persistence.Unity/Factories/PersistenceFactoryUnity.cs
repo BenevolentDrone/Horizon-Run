@@ -8,7 +8,7 @@ namespace HereticalSolutions.Persistence.Factories
 
 		public static PlayerPrefsStrategy BuildPlayerPrefsStrategy(
 			string keyPrefs,
-			ILoggerResolver loggerResolver = null)
+			ILoggerResolver loggerResolver)
 		{
 			return new PlayerPrefsStrategy(
 				keyPrefs,

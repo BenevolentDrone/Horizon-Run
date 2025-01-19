@@ -24,7 +24,7 @@ namespace HereticalSolutions.Pools.AllocationCallbacks
 		public SetRuntimeTimerCallback(
 			string id = TimerDecoratorConsts.POOL_ELEMENT_METADATA_TIMER_ID,
 			float defaultDuration = 0f,
-			ILoggerResolver loggerResolver = null)
+			ILoggerResolver loggerResolver)
 		{
 			ID = id;
 

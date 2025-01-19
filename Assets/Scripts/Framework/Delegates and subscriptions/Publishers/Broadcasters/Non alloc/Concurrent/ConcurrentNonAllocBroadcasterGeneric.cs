@@ -29,7 +29,7 @@ namespace HereticalSolutions.Delegates
 		public ConcurrentNonAllocBroadcasterGeneric(
 			IBag<INonAllocSubscription> subscriptionsBag,
 			IPool<NonAllocBroadcasterGenericInvocationContext> contextPool,
-			ILogger logger = null)
+			ILogger logger)
 		{
 			this.subscriptionsBag = subscriptionsBag;
 

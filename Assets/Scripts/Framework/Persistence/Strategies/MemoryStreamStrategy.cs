@@ -56,7 +56,7 @@ namespace HereticalSolutions.Persistence
 			byte[] buffer = null,
 			int index = -1,
 			int count = -1,
-			ILogger logger = null)
+			ILogger logger)
 		{
 			this.buffer = buffer;
 

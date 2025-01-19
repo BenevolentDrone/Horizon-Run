@@ -20,7 +20,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
         public ErasePreviousScanResultsOnSensorScanPerformedEventSystem(
             World world,
             DefaultECSEntityListManager entityListManager,
-            ILogger logger = null)
+            ILogger logger)
             : base(
                 world
                     .GetEntities()

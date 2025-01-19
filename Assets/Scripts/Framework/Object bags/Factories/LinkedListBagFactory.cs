@@ -52,7 +52,7 @@ namespace HereticalSolutions.Bags.Factories
 		#region Non alloc linked list bag
 
 		public static NonAllocLinkedListBag<T> BuildNonAllocLinkedListBag<T>(
-			ILoggerResolver loggerResolver = null)
+			ILoggerResolver loggerResolver)
 		{
 			var linkedList = new LinkedList<T>();
 
@@ -71,6 +71,104 @@ namespace HereticalSolutions.Bags.Factories
 					new AllocationCommand<LinkedListNode<T>>
 					{
 						Descriptor = LinkedListNodePoolAdditionalAllocationDescriptor,
+
+						AllocationDelegate = allocationDelegate
+					},
+					loggerResolver));
+		}
+
+		public static NonAllocLinkedListBag<T> BuildNonAllocLinkedListBag<T>(
+			AllocationCommandDescriptor initialAllocationDescriptor,
+			AllocationCommandDescriptor additionalAllocationDescriptor,
+			ILoggerResolver loggerResolver)
+		{
+			var linkedList = new LinkedList<T>();
+
+			Func<LinkedListNode<T>> allocationDelegate = AllocationFactory
+				.ActivatorAllocationDelegate<LinkedListNode<T>>;
+
+			return new NonAllocLinkedListBag<T>(
+				linkedList,
+				StackPoolFactory.BuildStackPool<LinkedListNode<T>>(
+					new AllocationCommand<LinkedListNode<T>>
+					{
+						Descriptor = initialAllocationDescriptor,
+
+						AllocationDelegate = allocationDelegate
+					},
+					new AllocationCommand<LinkedListNode<T>>
+					{
+						Descriptor = additionalAllocationDescriptor,
+
+						AllocationDelegate = allocationDelegate
+					},
+					loggerResolver));
+		}
+
+		#endregion
+
+		#region Concurrent linked list bag
+
+		public static ConcurrentLinkedListBag<T> BuildConcurrentLinkedListBag<T>()
+		{
+			var linkedList = new LinkedList<T>();
+
+			return new ConcurrentLinkedListBag<T>(
+				linkedList);
+		}
+
+		#endregion
+
+		#region Concurrent non alloc linked list bag
+
+		public static ConcurrentNonAllocLinkedListBag<T> BuildConcurrentNonAllocLinkedListBag<T>(
+			ILoggerResolver loggerResolver)
+		{
+			var linkedList = new LinkedList<T>();
+
+			Func<LinkedListNode<T>> allocationDelegate = AllocationFactory
+				.ActivatorAllocationDelegate<LinkedListNode<T>>;
+
+			return new ConcurrentNonAllocLinkedListBag<T>(
+				linkedList,
+				StackPoolFactory.BuildStackPool<LinkedListNode<T>>(
+					new AllocationCommand<LinkedListNode<T>>
+					{
+						Descriptor = LinkedListNodePoolInitialAllocationDescriptor,
+
+						AllocationDelegate = allocationDelegate
+					},
+					new AllocationCommand<LinkedListNode<T>>
+					{
+						Descriptor = LinkedListNodePoolAdditionalAllocationDescriptor,
+
+						AllocationDelegate = allocationDelegate
+					},
+					loggerResolver));
+		}
+
+		public static ConcurrentNonAllocLinkedListBag<T> BuildConcurrentNonAllocLinkedListBag<T>(
+			AllocationCommandDescriptor initialAllocationDescriptor,
+			AllocationCommandDescriptor additionalAllocationDescriptor,
+			ILoggerResolver loggerResolver)
+		{
+			var linkedList = new LinkedList<T>();
+
+			Func<LinkedListNode<T>> allocationDelegate = AllocationFactory
+				.ActivatorAllocationDelegate<LinkedListNode<T>>;
+
+			return new ConcurrentNonAllocLinkedListBag<T>(
+				linkedList,
+				StackPoolFactory.BuildStackPool<LinkedListNode<T>>(
+					new AllocationCommand<LinkedListNode<T>>
+					{
+						Descriptor = initialAllocationDescriptor,
+
+						AllocationDelegate = allocationDelegate
+					},
+					new AllocationCommand<LinkedListNode<T>>
+					{
+						Descriptor = additionalAllocationDescriptor,
 
 						AllocationDelegate = allocationDelegate
 					},

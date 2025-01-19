@@ -12,7 +12,7 @@ namespace HereticalSolutions
 	{
 		public static AsyncExecutionContext CreateLocalProgress(
 			this AsyncExecutionContext asyncContext,
-			ILogger logger = null)
+			ILogger logger)
 		{
 			if (asyncContext == null)
 			{
@@ -53,7 +53,7 @@ namespace HereticalSolutions
 		public static AsyncExecutionContext CreateLocalProgressWithCalculationDelegate(
 			this AsyncExecutionContext asyncContext,
 			Func<float, float> totalProgressCalculationDelegate,
-			ILogger logger = null)
+			ILogger logger)
 		{
 			if (asyncContext == null)
 			{
@@ -76,7 +76,7 @@ namespace HereticalSolutions
 			this AsyncExecutionContext asyncContext,
 			float totalProgressStart,
 			float totalProgressFinish,
-			ILogger logger = null)
+			ILogger logger)
 		{
 			if (asyncContext == null)
 			{
@@ -101,7 +101,7 @@ namespace HereticalSolutions
 			float totalProgressStart,
 			float totalProgressFinish,
 			Func<float, float> localProgressCalculationDelegate,
-			ILogger logger = null)
+			ILogger logger)
 		{
 			if (asyncContext == null)
 			{
@@ -128,7 +128,7 @@ namespace HereticalSolutions
 			float totalProgressFinish,
 			int index,
 			int count,
-			ILogger logger = null)
+			ILogger logger)
 		{
 			if (asyncContext == null)
 			{
@@ -157,7 +157,7 @@ namespace HereticalSolutions
 			List<float> localProgressValues,
 			int index,
 			int count,
-			ILogger logger = null)
+			ILogger logger)
 		{
 			if (asyncContext == null)
 			{

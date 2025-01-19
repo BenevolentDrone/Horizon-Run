@@ -28,8 +28,8 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 		public SensorWithTimerInitializationSystem(
 			ITimerManager simulationTimerManager,
 			IEventEntityBuilder<Entity, Guid> eventEntityBuilder,
-			ILoggerResolver loggerResolver = null,
-			ILogger logger = null)
+			ILoggerResolver loggerResolver,
+			ILogger logger)
 		{
 			this.simulationTimerManager = simulationTimerManager;
 

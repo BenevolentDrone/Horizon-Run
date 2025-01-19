@@ -15,7 +15,7 @@ namespace HereticalSolutions.Pools.Factories
 			AllocationCommandDescriptor initialAllocation,
 			AllocationCommandDescriptor additionalAllocation,
 			object[] valueAllocationArguments = null,
-			ILoggerResolver loggerResolver = null)
+			ILoggerResolver loggerResolver)
 		{
 			#region Builders
 
@@ -68,7 +68,7 @@ namespace HereticalSolutions.Pools.Factories
 		public static IManagedPool<TAbstractValue> BuildManagedObjectPool<TAbstractValue, TConcreteValue>(
 			AllocationCommandDescriptor initialAllocation,
 			AllocationCommandDescriptor additionalAllocation,
-			ILoggerResolver loggerResolver = null,
+			ILoggerResolver loggerResolver,
 			object[] valueAllocationArguments = null)
 		{
 			#region Builders

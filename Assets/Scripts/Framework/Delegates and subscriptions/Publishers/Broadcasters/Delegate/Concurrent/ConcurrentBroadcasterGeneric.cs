@@ -27,7 +27,7 @@ namespace HereticalSolutions.Delegates
 
 		public ConcurrentBroadcasterGeneric(
 			IPool<BroadcasterGenericInvocationContext<TValue>> contextPool,
-			ILogger logger = null)
+			ILogger logger)
 		{
 			this.contextPool = contextPool;
 

@@ -22,7 +22,7 @@ namespace HereticalSolutions.Samples.ResizableGameObjectPoolSample
         public static IManagedPool<GameObject> BuildPool(
             DiContainer container,
             SamplePoolSettings settings,
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             #region Builders
 

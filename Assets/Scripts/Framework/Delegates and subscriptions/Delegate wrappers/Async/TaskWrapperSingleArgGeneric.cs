@@ -17,7 +17,7 @@ namespace HereticalSolutions.Delegates.Wrappers
 
 		public TaskWrapperSingleArgGeneric(
 			Func<TValue, AsyncExecutionContext, Task> taskFactory,
-			ILogger logger = null)
+			ILogger logger)
 		{
 			this.taskFactory = taskFactory;
 

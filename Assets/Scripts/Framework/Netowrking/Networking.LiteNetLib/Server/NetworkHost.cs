@@ -98,7 +98,7 @@ namespace HereticalSolutions.Networking.LiteNetLib
             
             ServerToClientConnectionDescriptor[] connections,
             
-            ILogger logger = null)
+            ILogger logger)
         {
             this.basicSettings = basicSettings;
 

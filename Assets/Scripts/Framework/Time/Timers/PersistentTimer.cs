@@ -47,7 +47,7 @@ namespace HereticalSolutions.Time
             
             IReadOnlyRepository<ETimerState, ITimerStrategy<IPersistentTimerContext, TimeSpan>> strategyRepository,
 
-            ILogger logger = null)
+            ILogger logger)
         {
             ID = id;
 

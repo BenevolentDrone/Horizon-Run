@@ -27,7 +27,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity.Networking
             INetworkEventEntityManager<Entity> networkEventEntityManager,
             Func<Entity, bool> filterDelegate,
             bool keepProcessingAfterReplication,
-            ILogger logger = null)
+            ILogger logger)
             : base(
                 eventWorld
                     .GetEntities()

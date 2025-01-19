@@ -24,7 +24,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
 		public RootViewWorldDeinitializationSystemsInstaller(
 			EntityWorldController viewWorldController,
 			ILoggerResolver loggerResolver,
-			ILogger logger = null)
+			ILogger logger)
 		{
 			this.viewWorldController = viewWorldController;
 

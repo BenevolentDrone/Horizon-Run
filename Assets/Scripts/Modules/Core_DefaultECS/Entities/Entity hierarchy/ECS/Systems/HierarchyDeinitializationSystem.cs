@@ -27,7 +27,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
             EntityManager entityManager,
             EntityHierarchyManager entityHierarchyManager,
             IPool<List<IReadOnlyHierarchyNode<Entity>>> bufferPool,
-            ILogger logger = null)
+            ILogger logger)
         {
             this.entityManager = entityManager;
             

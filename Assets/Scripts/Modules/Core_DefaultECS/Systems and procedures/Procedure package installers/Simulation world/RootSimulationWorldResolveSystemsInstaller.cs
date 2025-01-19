@@ -24,7 +24,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
 		public RootSimulationWorldResolveSystemsInstaller(
 			EntityWorldController simulationWorldController,
 			ILoggerResolver loggerResolver,
-			ILogger logger = null)
+			ILogger logger)
 		{
 			this.simulationWorldController = simulationWorldController;
 

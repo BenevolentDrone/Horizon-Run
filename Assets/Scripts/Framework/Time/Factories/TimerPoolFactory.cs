@@ -44,7 +44,7 @@ namespace HereticalSolutions.Time.Factories
 
 		public static IManagedPool<TimerWithSubscriptionsContainer> BuildRuntimeTimerPool(
 			ISynchronizationProvider provider,
-			ILoggerResolver loggerResolver = null)
+			ILoggerResolver loggerResolver)
 		{
 			#region Builders
 

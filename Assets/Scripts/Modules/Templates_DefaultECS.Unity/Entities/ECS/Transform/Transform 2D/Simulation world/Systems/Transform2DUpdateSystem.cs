@@ -17,7 +17,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 		public Transform2DUpdateSystem(
 			World world,
 			DefaultECSEntityHierarchyManager entityHierarchyManager,
-			ILogger logger = null)
+			ILogger logger)
 			: base(
 				world
 					.GetEntities()

@@ -33,8 +33,8 @@ namespace HereticalSolutions.Pools.Factories
         private IAllocationCallback<T>[] valueAllocationCallbacks;
 
         public ManagedPoolBuilder(
-            ILoggerResolver loggerResolver = null,
-            ILogger logger = null)
+            ILoggerResolver loggerResolver,
+            ILogger logger)
         {
             this.loggerResolver = loggerResolver;
 

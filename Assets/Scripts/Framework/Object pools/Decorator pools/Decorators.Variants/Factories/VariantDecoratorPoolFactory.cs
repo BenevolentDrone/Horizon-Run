@@ -14,7 +14,7 @@ namespace HereticalSolutions.Pools.Factories
     {
         
         public static ManagedPoolWithVariants<T> BuildPoolWithVariants<T>(
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             ILogger logger =
                 loggerResolver?.GetLogger<ManagedPoolWithVariants<T>>();
@@ -28,7 +28,7 @@ namespace HereticalSolutions.Pools.Factories
         public static ManagedPoolWithVariants<T> BuildPoolWithVariants<T>(
             IRepository<int, VariantContainer<T>> repository,
             IRandomGenerator generator,
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             ILogger logger =
                 loggerResolver?.GetLogger<ManagedPoolWithVariants<T>>();

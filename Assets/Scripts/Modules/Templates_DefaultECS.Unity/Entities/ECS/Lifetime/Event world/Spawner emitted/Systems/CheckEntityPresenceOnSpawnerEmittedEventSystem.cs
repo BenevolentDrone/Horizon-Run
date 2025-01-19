@@ -30,7 +30,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 			World world,
 			//IRepository<string, I2DPartitionedSpace<Entity>> spaceRepository,
 			//List<Entity> cachedEntitiesList,
-			ILogger logger = null)
+			ILogger logger)
 			: base(
 				world
 					.GetEntities()

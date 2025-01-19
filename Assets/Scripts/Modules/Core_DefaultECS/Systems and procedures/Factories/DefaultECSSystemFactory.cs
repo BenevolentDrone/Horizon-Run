@@ -15,7 +15,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Factories
 	public static class DefaultECSSystemFactory
 	{
 		public static DefaultECSSystemBuilder<TSystem, TProcedure> BuildDefaultECSSystemBuilder<TSystem, TProcedure>(
-			ILoggerResolver loggerResolver = null)
+			ILoggerResolver loggerResolver)
 		{
 			SystemFactory.PrepareSystemBuilderDependencies<TSystem, TProcedure>(
 				out HashSet<IProcedureNode<TProcedure>> allProcedureNodes,

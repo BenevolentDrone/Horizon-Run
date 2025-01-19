@@ -31,7 +31,7 @@ namespace HereticalSolutions.ResourceManagement
         public RuntimeResourceManager(
             IRepository<int, string> rootResourceIDHashToID,
             IRepository<int, IReadOnlyResourceData> rootResourceRepository,
-            ILogger logger = null)
+            ILogger logger)
         {
             this.rootResourceIDHashToID = rootResourceIDHashToID;
 

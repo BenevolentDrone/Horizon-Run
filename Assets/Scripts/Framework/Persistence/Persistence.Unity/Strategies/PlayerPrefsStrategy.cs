@@ -23,7 +23,7 @@ namespace HereticalSolutions.Persistence
 
 		public PlayerPrefsStrategy(
 			string keyPrefs,
-			ILogger logger = null)
+			ILogger logger)
 		{
 			this.keyPrefs = keyPrefs;
 

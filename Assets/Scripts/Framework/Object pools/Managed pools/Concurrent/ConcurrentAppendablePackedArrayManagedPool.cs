@@ -25,7 +25,7 @@ namespace HereticalSolutions.Pools
 			AllocationCommand<IPoolElementFacade<T>> appendFacadeAllocationCommand,
 			AllocationCommand<T> nullValueAllocationCommand,
 
-			ILogger logger = null)
+			ILogger logger)
 			: base (
 				packedArray,
 				facadeAllocationCommand,

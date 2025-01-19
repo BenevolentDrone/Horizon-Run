@@ -54,8 +54,8 @@ namespace HereticalSolutions.AssetImport
 			IRepository<Type, IManagedPool<AAssetImporter>> importerPoolRepository,
 			SemaphoreSlim importerPoolSemaphore,
 			SemaphoreSlim postProcessorsSemaphore,
-			ILoggerResolver loggerResolver = null,
-			ILogger logger = null)
+			ILoggerResolver loggerResolver,
+			ILogger logger)
 		{
 			this.postProcessorRepository = postProcessorRepository;
 

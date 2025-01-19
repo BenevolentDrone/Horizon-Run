@@ -19,7 +19,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
         public SensorWithTimerSystem(
             World world,
             ITimerManager simulationTimerManager,
-            ILogger logger = null)
+            ILogger logger)
             : base(
                 world
                     .GetEntities()

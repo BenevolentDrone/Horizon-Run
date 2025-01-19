@@ -17,7 +17,7 @@ namespace HereticalSolutions.Pools
 
         public ADecoratorManagedPool(
             IManagedPool<T> innerPool,
-            ILogger logger = null)
+            ILogger logger)
         {
             this.innerPool = innerPool;
 

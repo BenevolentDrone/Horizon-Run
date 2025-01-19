@@ -36,7 +36,7 @@ namespace HereticalSolutions.SpacePartitioning
             Node<TValue>[] children,
             List<ValueSpaceData<TValue>> values,
             int depth,
-            ILogger logger = null)
+            ILogger logger)
         {
             parent = null;
 

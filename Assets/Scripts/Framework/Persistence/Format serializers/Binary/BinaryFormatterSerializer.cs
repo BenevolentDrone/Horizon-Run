@@ -17,7 +17,7 @@ namespace HereticalSolutions.Persistence
 
         public BinaryFormatterSerializer(
             BinaryFormatter formatter,
-            ILogger logger = null)
+            ILogger logger)
         {
             this.formatter = formatter;
 

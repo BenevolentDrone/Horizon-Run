@@ -32,7 +32,7 @@ namespace HereticalSolutions.Delegates
 		public AsyncBroadcasterMultipleArgs(
 			IBag<INonAllocSubscription> subscriptionsBag,
 			IPool<NonAllocBroadcasterMultipleArgsInvocationContext> contextPool,
-			ILogger logger = null)
+			ILogger logger)
 		{
 			this.subscriptionsBag = subscriptionsBag;
 

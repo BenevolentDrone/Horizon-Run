@@ -21,7 +21,7 @@ namespace HereticalSolutions.Pools.AllocationCallbacks
 
         public SetDurationAndPushSubscriptionCallback(
             float duration = 0f,
-            ILoggerResolver loggerResolver = null)
+            ILoggerResolver loggerResolver)
         {
             Duration = duration;
 

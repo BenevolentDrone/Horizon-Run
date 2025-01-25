@@ -3,8 +3,6 @@ using System;
 using HereticalSolutions.Allocations;
 using HereticalSolutions.Allocations.Factories;
 
-using HereticalSolutions.Collections;
-
 using HereticalSolutions.Pools;
 using HereticalSolutions.Pools.Factories;
 
@@ -13,8 +11,6 @@ using HereticalSolutions.Bags.Factories;
 
 using HereticalSolutions.Repositories;
 using HereticalSolutions.Repositories.Factories;
-
-using HereticalSolutions.Metadata.Allocations;
 
 using HereticalSolutions.Logging;
 
@@ -68,15 +64,11 @@ namespace HereticalSolutions.Delegates.Factories
 
         #endregion
 
-        #endregion
+        public const int DEFAULT_INVOKATION_CONTEXT_SIZE = 32;
 
-        public static ManagedPoolBuilder<T> BuildManagedPoolBuilder<T>(
-            ILoggerResolver loggerResolver)
-        {
-            return new ManagedPoolBuilder<T>(
-                loggerResolver,
-                loggerResolver?.GetLogger<ManagedPoolBuilder<T>>());
-        }
+        public static int InvokationContextSize = DEFAULT_INVOKATION_CONTEXT_SIZE;
+
+        #endregion
 
         public static IPool<T> BuildContextPool<T>(
             ILoggerResolver loggerResolver)
@@ -100,12 +92,73 @@ namespace HereticalSolutions.Delegates.Factories
                 loggerResolver);
         }
 
+        #region Broadcaster generic
+
+        public static BroadcasterGeneric<T> BuildBroadcasterGeneric<T>(
+            ILoggerResolver loggerResolver)
+        {
+            var contextPool = BuildContextPool<BroadcasterInvocationContext<T>>(
+                loggerResolver);
+
+            return BuildBroadcasterGeneric<T>(
+                contextPool,
+                loggerResolver);
+        }
+
+        public static BroadcasterGeneric<T> BuildBroadcasterGeneric<T>(
+            IPool<BroadcasterInvocationContext<T>> contextPool,
+            ILoggerResolver loggerResolver)
+        {
+            ILogger logger =
+                loggerResolver?.GetLogger<BroadcasterGeneric<T>>();
+
+            return new BroadcasterGeneric<T>(
+                contextPool,
+                logger);
+        }
+
+        #endregion
+
+        #region Concurrent broadcaster generic
+
+        public static ConcurrentBroadcasterGeneric<T> BuildConcurrentBroadcasterGeneric<T>(
+            ILoggerResolver loggerResolver)
+        {
+            var contextPool = BuildContextPool<BroadcasterInvocationContext<T>>(
+                loggerResolver);
+
+            return BuildConcurrentBroadcasterGeneric<T>(
+                contextPool,
+                loggerResolver);
+        }
+
+        public static ConcurrentBroadcasterGeneric<T> BuildConcurrentBroadcasterGeneric<T>(
+            IPool<BroadcasterInvocationContext<T>> contextPool,
+            ILoggerResolver loggerResolver)
+        {
+            ILogger logger =
+                loggerResolver?.GetLogger<ConcurrentBroadcasterGeneric<T>>();
+
+            return new ConcurrentBroadcasterGeneric<T>(
+                contextPool,
+                logger);
+        }
+
+        #endregion
+
         #region Broadcaster multiple args
 
         public static BroadcasterMultipleArgs BuildBroadcasterMultipleArgs(
-            ILoggerResolver loggerResolver,
+            ILoggerResolver loggerResolver)
+        {
+            return new BroadcasterMultipleArgs(
+                BuildBroadcasterGeneric<object[]>(
+                    loggerResolver));
+        }
 
-            IPool<BroadcasterGenericInvocationContext<object[]>> contextPool = null)
+        public static BroadcasterMultipleArgs BuildBroadcasterMultipleArgs(
+            IPool<BroadcasterInvocationContext<object[]>> contextPool,
+            ILoggerResolver loggerResolver)
         {
             return new BroadcasterMultipleArgs(
                 BuildBroadcasterGeneric<object[]>(
@@ -114,7 +167,29 @@ namespace HereticalSolutions.Delegates.Factories
         }
 
         #endregion
-        
+
+        #region Concurrent broadcaster multiple args
+
+        public static ConcurrentBroadcasterMultipleArgs BuildConcurrentBroadcasterMultipleArgs(
+            ILoggerResolver loggerResolver)
+        {
+            return new ConcurrentBroadcasterMultipleArgs(
+                BuildConcurrentBroadcasterGeneric<object[]>(
+                    loggerResolver));
+        }
+
+        public static ConcurrentBroadcasterMultipleArgs BuildConcurrentBroadcasterMultipleArgs(
+            IPool<BroadcasterInvocationContext<object[]>> contextPool,
+            ILoggerResolver loggerResolver)
+        {
+            return new ConcurrentBroadcasterMultipleArgs(
+                BuildConcurrentBroadcasterGeneric<object[]>(
+                    contextPool,
+                    loggerResolver));
+        }
+
+        #endregion
+
         #region Broadcaster with repository
 
         public static BroadcasterWithRepository BuildBroadcasterWithRepository(
@@ -140,125 +215,383 @@ namespace HereticalSolutions.Delegates.Factories
         }
 
         #endregion
-        
-        #region Broadcaster generic
 
-        public static BroadcasterGeneric<T> BuildBroadcasterGeneric<T>(
-            ILoggerResolver loggerResolver,
-            
-            IPool<BroadcasterGenericInvocationContext<T>> contextPool = null)
+        #region Concurrent broadcaster with repository
+
+        public static ConcurrentBroadcasterWithRepository BuildConcurrentBroadcasterWithRepository(
+            IRepository<Type, object> broadcasterRepository,
+            ILoggerResolver loggerResolver)
         {
-            if (contextPool == null)
-                contextPool = BuildContextPool<BroadcasterGenericInvocationContext<T>>(
-                    loggerResolver);
+            return BuildConcurrentBroadcasterWithRepository(
+                RepositoryFactory.BuildDictionaryInstanceRepository(
+                    broadcasterRepository),
+                loggerResolver);
+        }
 
+        public static ConcurrentBroadcasterWithRepository BuildConcurrentBroadcasterWithRepository(
+            IReadOnlyInstanceRepository repository,
+            ILoggerResolver loggerResolver)
+        {
             ILogger logger =
-                loggerResolver?.GetLogger<BroadcasterGeneric<T>>();
+                loggerResolver?.GetLogger<ConcurrentBroadcasterWithRepository>();
 
-            return new BroadcasterGeneric<T>(
+            return new ConcurrentBroadcasterWithRepository(
+                repository,
+                logger);
+        }
+
+        #endregion
+
+        #region Non alloc broadcaster generic
+
+        public static NonAllocBroadcasterGeneric<T> BuildNonAllocBroadcasterGeneric<T>(
+            ILoggerResolver loggerResolver)
+        {
+            return BuildNonAllocBroadcasterGeneric<T>(
+                BroadcasterSubscriptionPoolInitialAllocationDescriptor,
+                BroadcasterSubscriptionPoolAdditionalAllocationDescriptor,
+                loggerResolver);
+        }
+
+        public static NonAllocBroadcasterGeneric<T> BuildNonAllocBroadcasterGeneric<T>(
+            AllocationCommandDescriptor initial,
+            AllocationCommandDescriptor additional,
+            ILoggerResolver loggerResolver)
+        {
+            Func<NonAllocBroadcasterInvocationContext> invocationContextAllocationDelegate =
+                () => new NonAllocBroadcasterInvocationContext
+                {
+                    Subscriptions = new INonAllocSubscription[InvokationContextSize]
+                };
+
+            return BuildNonAllocBroadcasterGeneric<T>(
+                LinkedListBagFactory.BuildNonAllocLinkedListBag<INonAllocSubscription>(
+                    loggerResolver),
+                StackPoolFactory.BuildStackPool<NonAllocBroadcasterInvocationContext>(
+                    new AllocationCommand<NonAllocBroadcasterInvocationContext>
+                    {
+                        Descriptor = initial,
+
+                        AllocationDelegate = invocationContextAllocationDelegate
+                    },
+                    new AllocationCommand<NonAllocBroadcasterInvocationContext>
+                    {
+                        Descriptor = additional,
+
+                        AllocationDelegate = invocationContextAllocationDelegate
+                    },
+                    loggerResolver),
+                loggerResolver);
+        }
+
+        public static NonAllocBroadcasterGeneric<T> BuildNonAllocBroadcasterGeneric<T>(
+            IBag<INonAllocSubscription> subscriptionsBag,
+            IPool<NonAllocBroadcasterInvocationContext> contextPool,
+            ILoggerResolver loggerResolver)
+        {
+            ILogger logger =
+                loggerResolver?.GetLogger<NonAllocBroadcasterGeneric<T>>();
+
+            return new NonAllocBroadcasterGeneric<T>(
+                subscriptionsBag,
                 contextPool,
                 logger);
         }
 
         #endregion
-        
-        #region Non alloc broadcaster multiple args
-        
-        public static NonAllocBroadcasterMultipleArgs BuildNonAllocBroadcasterMultipleArgs(
-            ManagedPoolBuilder<INonAllocSubscription> managedPoolBuilder,
+
+        #region Concurrent non alloc broadcaster generic
+
+        public static ConcurrentNonAllocBroadcasterGeneric<T> BuildConcurrentNonAllocBroadcasterGeneric<T>(
             ILoggerResolver loggerResolver)
         {
-            Func<INonAllocSubscription> valueAllocationDelegate =
-                AllocationFactory.NullAllocationDelegate<INonAllocSubscription>;
+            return BuildConcurrentNonAllocBroadcasterGeneric<T>(
+                BroadcasterSubscriptionPoolInitialAllocationDescriptor,
+                BroadcasterSubscriptionPoolAdditionalAllocationDescriptor,
+                loggerResolver);
+        }
 
-            if (managedPoolBuilder == null)
-                managedPoolBuilder = BuildManagedPoolBuilder<INonAllocSubscription>(
-                    loggerResolver);
-
-            managedPoolBuilder.Initialize(
-                valueAllocationDelegate,
-
-                new Func<MetadataAllocationDescriptor>[]
+        public static ConcurrentNonAllocBroadcasterGeneric<T> BuildConcurrentNonAllocBroadcasterGeneric<T>(
+            AllocationCommandDescriptor initial,
+            AllocationCommandDescriptor additional,
+            ILoggerResolver loggerResolver)
+        {
+            Func<NonAllocBroadcasterInvocationContext> invocationContextAllocationDelegate =
+                () => new NonAllocBroadcasterInvocationContext
                 {
-                    //ObjectPoolMetadataFactory.BuildIndexedMetadataDescriptor
-                },
-                
-                new AllocationCommandDescriptor
-                {
-                    Rule = EAllocationAmountRule.ADD_PREDEFINED_AMOUNT,
+                    Subscriptions = new INonAllocSubscription[InvokationContextSize]
+                };
 
-                    Amount = DEFAULT_BROADCASTER_SUBSCRIPTION_POOL_SIZE
-                },
-                new AllocationCommandDescriptor
-                {
-                    Rule = EAllocationAmountRule.DOUBLE_AMOUNT
-                },
-                
-                null,
-                null);
+            return BuildConcurrentNonAllocBroadcasterGeneric<T>(
+                LinkedListBagFactory.BuildNonAllocLinkedListBag<INonAllocSubscription>(
+                    loggerResolver),
+                StackPoolFactory.BuildStackPool<NonAllocBroadcasterInvocationContext>(
+                    new AllocationCommand<NonAllocBroadcasterInvocationContext>
+                    {
+                        Descriptor = initial,
 
-            var subscriptionsPool = managedPoolBuilder.BuildPackedArrayManagedPool();
-            
+                        AllocationDelegate = invocationContextAllocationDelegate
+                    },
+                    new AllocationCommand<NonAllocBroadcasterInvocationContext>
+                    {
+                        Descriptor = additional,
+
+                        AllocationDelegate = invocationContextAllocationDelegate
+                    },
+                    loggerResolver),
+                loggerResolver);
+        }
+
+        public static ConcurrentNonAllocBroadcasterGeneric<T> BuildConcurrentNonAllocBroadcasterGeneric<T>(
+            IBag<INonAllocSubscription> subscriptionsBag,
+            IPool<NonAllocBroadcasterInvocationContext> contextPool,
+            ILoggerResolver loggerResolver)
+        {
+            ILogger logger =
+                loggerResolver?.GetLogger<ConcurrentNonAllocBroadcasterGeneric<T>>();
+
+            return new ConcurrentNonAllocBroadcasterGeneric<T>(
+                subscriptionsBag,
+                contextPool,
+                logger);
+        }
+
+        #endregion
+
+        #region Async broadcaster generic
+
+        public static AsyncBroadcasterGeneric<T> BuildAsyncBroadcasterGeneric<T>(
+            ILoggerResolver loggerResolver)
+        {
+            return BuildAsyncBroadcasterGeneric<T>(
+                BroadcasterSubscriptionPoolInitialAllocationDescriptor,
+                BroadcasterSubscriptionPoolAdditionalAllocationDescriptor,
+                loggerResolver);
+        }
+
+        public static AsyncBroadcasterGeneric<T> BuildAsyncBroadcasterGeneric<T>(
+            AllocationCommandDescriptor initial,
+            AllocationCommandDescriptor additional,
+            ILoggerResolver loggerResolver)
+        {
+            Func<NonAllocBroadcasterInvocationContext> invocationContextAllocationDelegate =
+                () => new NonAllocBroadcasterInvocationContext
+                {
+                    Subscriptions = new INonAllocSubscription[InvokationContextSize]
+                };
+
+            return BuildAsyncBroadcasterGeneric<T>(
+                LinkedListBagFactory.BuildNonAllocLinkedListBag<INonAllocSubscription>(
+                    loggerResolver),
+                StackPoolFactory.BuildStackPool<NonAllocBroadcasterInvocationContext>(
+                    new AllocationCommand<NonAllocBroadcasterInvocationContext>
+                    {
+                        Descriptor = initial,
+
+                        AllocationDelegate = invocationContextAllocationDelegate
+                    },
+                    new AllocationCommand<NonAllocBroadcasterInvocationContext>
+                    {
+                        Descriptor = additional,
+
+                        AllocationDelegate = invocationContextAllocationDelegate
+                    },
+                    loggerResolver),
+                loggerResolver);
+        }
+
+        public static AsyncBroadcasterGeneric<T> BuildAsyncBroadcasterGeneric<T>(
+            IBag<INonAllocSubscription> subscriptionsBag,
+            IPool<NonAllocBroadcasterInvocationContext> contextPool,
+            ILoggerResolver loggerResolver)
+        {
+            ILogger logger =
+                loggerResolver?.GetLogger<AsyncBroadcasterGeneric<T>>();
+
+            return new AsyncBroadcasterGeneric<T>(
+                subscriptionsBag,
+                contextPool,
+                logger);
+        }
+
+        #endregion
+
+        #region Non alloc broadcaster multiple args
+
+        public static NonAllocBroadcasterMultipleArgs BuildNonAllocBroadcasterMultipleArgs(
+            ILoggerResolver loggerResolver)
+        {
             return BuildNonAllocBroadcasterMultipleArgs(
-                subscriptionsPool,
+                BroadcasterSubscriptionPoolInitialAllocationDescriptor,
+                BroadcasterSubscriptionPoolAdditionalAllocationDescriptor,
                 loggerResolver);
         }
 
         public static NonAllocBroadcasterMultipleArgs BuildNonAllocBroadcasterMultipleArgs(
             AllocationCommandDescriptor initial,
             AllocationCommandDescriptor additional,
-            ILoggerResolver loggerResolver,
-
-            ManagedPoolBuilder<INonAllocSubscription> managedPoolBuilder = null)
+            ILoggerResolver loggerResolver)
         {
-            Func<INonAllocSubscription> valueAllocationDelegate =
-                AllocationFactory.NullAllocationDelegate<INonAllocSubscription>;
-
-            if (managedPoolBuilder == null)
-                managedPoolBuilder = BuildManagedPoolBuilder<INonAllocSubscription>(
-                    loggerResolver);
-
-            managedPoolBuilder.Initialize(
-                valueAllocationDelegate,
-
-                new Func<MetadataAllocationDescriptor>[]
+            Func<NonAllocBroadcasterInvocationContext> invocationContextAllocationDelegate =
+                () => new NonAllocBroadcasterInvocationContext
                 {
-                    //ObjectPoolMetadataFactory.BuildIndexedMetadataDescriptor
-                },
-                
-                initial,
-                additional,
-                
-                null,
-                null);
-            
-            var subscriptionsPool = managedPoolBuilder.BuildPackedArrayManagedPool();
+                    Subscriptions = new INonAllocSubscription[InvokationContextSize]
+                };
 
             return BuildNonAllocBroadcasterMultipleArgs(
-                subscriptionsPool,
+                LinkedListBagFactory.BuildNonAllocLinkedListBag<INonAllocSubscription>(
+                    loggerResolver),
+                StackPoolFactory.BuildStackPool<NonAllocBroadcasterInvocationContext>(
+                    new AllocationCommand<NonAllocBroadcasterInvocationContext>
+                    {
+                        Descriptor = initial,
+
+                        AllocationDelegate = invocationContextAllocationDelegate
+                    },
+                    new AllocationCommand<NonAllocBroadcasterInvocationContext>
+                    {
+                        Descriptor = additional,
+
+                        AllocationDelegate = invocationContextAllocationDelegate
+                    },
+                    loggerResolver),
                 loggerResolver);
         }
-        
+
         public static NonAllocBroadcasterMultipleArgs BuildNonAllocBroadcasterMultipleArgs(
-            IBag<INonAllocSubscription> subscriptionsPool,
+            IBag<INonAllocSubscription> subscriptionsBag,
+            IPool<NonAllocBroadcasterInvocationContext> contextPool,
             ILoggerResolver loggerResolver)
         {
             ILogger logger =
                 loggerResolver?.GetLogger<NonAllocBroadcasterMultipleArgs>();
-            
-            IDynamicArray<IPoolElementFacade<INonAllocSubscription>> subscriptionsContents =
-                subscriptionsPool as IDynamicArray<IPoolElementFacade<INonAllocSubscription>>;
 
             return new NonAllocBroadcasterMultipleArgs(
-                subscriptionsPool,
-                subscriptionsContents,
+                subscriptionsBag,
+                contextPool,
                 logger);
         }
-        
+
         #endregion
-        
+
+        #region Concurrent non alloc broadcaster multiple args
+
+        public static ConcurrentNonAllocBroadcasterMultipleArgs BuildConcurrentNonAllocBroadcasterMultipleArgs(
+            ILoggerResolver loggerResolver)
+        {
+            return BuildConcurrentNonAllocBroadcasterMultipleArgs(
+                BroadcasterSubscriptionPoolInitialAllocationDescriptor,
+                BroadcasterSubscriptionPoolAdditionalAllocationDescriptor,
+                loggerResolver);
+        }
+
+        public static ConcurrentNonAllocBroadcasterMultipleArgs BuildConcurrentNonAllocBroadcasterMultipleArgs(
+            AllocationCommandDescriptor initial,
+            AllocationCommandDescriptor additional,
+            ILoggerResolver loggerResolver)
+        {
+            Func<NonAllocBroadcasterInvocationContext> invocationContextAllocationDelegate =
+                () => new NonAllocBroadcasterInvocationContext
+                {
+                    Subscriptions = new INonAllocSubscription[InvokationContextSize]
+                };
+
+            return BuildConcurrentNonAllocBroadcasterMultipleArgs(
+                LinkedListBagFactory.BuildNonAllocLinkedListBag<INonAllocSubscription>(
+                    loggerResolver),
+                StackPoolFactory.BuildStackPool<NonAllocBroadcasterInvocationContext>(
+                    new AllocationCommand<NonAllocBroadcasterInvocationContext>
+                    {
+                        Descriptor = initial,
+
+                        AllocationDelegate = invocationContextAllocationDelegate
+                    },
+                    new AllocationCommand<NonAllocBroadcasterInvocationContext>
+                    {
+                        Descriptor = additional,
+
+                        AllocationDelegate = invocationContextAllocationDelegate
+                    },
+                    loggerResolver),
+                loggerResolver);
+        }
+
+        public static ConcurrentNonAllocBroadcasterMultipleArgs BuildConcurrentNonAllocBroadcasterMultipleArgs(
+            IBag<INonAllocSubscription> subscriptionsBag,
+            IPool<NonAllocBroadcasterInvocationContext> contextPool,
+            ILoggerResolver loggerResolver)
+        {
+            ILogger logger =
+                loggerResolver?.GetLogger<ConcurrentNonAllocBroadcasterMultipleArgs>();
+
+            return new ConcurrentNonAllocBroadcasterMultipleArgs(
+                subscriptionsBag,
+                contextPool,
+                logger);
+        }
+
+        #endregion
+
+        #region Async broadcaster multiple args
+
+        public static AsyncBroadcasterMultipleArgs BuildAsyncBroadcasterMultipleArgs(
+            ILoggerResolver loggerResolver)
+        {
+            return BuildAsyncBroadcasterMultipleArgs(
+                BroadcasterSubscriptionPoolInitialAllocationDescriptor,
+                BroadcasterSubscriptionPoolAdditionalAllocationDescriptor,
+                loggerResolver);
+        }
+
+        public static AsyncBroadcasterMultipleArgs BuildAsyncBroadcasterMultipleArgs(
+            AllocationCommandDescriptor initial,
+            AllocationCommandDescriptor additional,
+            ILoggerResolver loggerResolver)
+        {
+            Func<NonAllocBroadcasterInvocationContext> invocationContextAllocationDelegate =
+                () => new NonAllocBroadcasterInvocationContext
+                {
+                    Subscriptions = new INonAllocSubscription[InvokationContextSize]
+                };
+
+            return BuildAsyncBroadcasterMultipleArgs(
+                LinkedListBagFactory.BuildNonAllocLinkedListBag<INonAllocSubscription>(
+                    loggerResolver),
+                StackPoolFactory.BuildStackPool<NonAllocBroadcasterInvocationContext>(
+                    new AllocationCommand<NonAllocBroadcasterInvocationContext>
+                    {
+                        Descriptor = initial,
+
+                        AllocationDelegate = invocationContextAllocationDelegate
+                    },
+                    new AllocationCommand<NonAllocBroadcasterInvocationContext>
+                    {
+                        Descriptor = additional,
+
+                        AllocationDelegate = invocationContextAllocationDelegate
+                    },
+                    loggerResolver),
+                loggerResolver);
+        }
+
+        public static AsyncBroadcasterMultipleArgs BuildAsyncBroadcasterMultipleArgs(
+            IBag<INonAllocSubscription> subscriptionsBag,
+            IPool<NonAllocBroadcasterInvocationContext> contextPool,
+            ILoggerResolver loggerResolver)
+        {
+            ILogger logger =
+                loggerResolver?.GetLogger<NonAllocBroadcasterMultipleArgs>();
+
+            return new AsyncBroadcasterMultipleArgs(
+                subscriptionsBag,
+                contextPool,
+                logger);
+        }
+
+        #endregion
+
         #region Non alloc broadcaster with repository
-        
+
         public static NonAllocBroadcasterWithRepository BuildNonAllocBroadcasterWithRepository(
             IRepository<Type, object> broadcasterRepository,
             ILoggerResolver loggerResolver)
@@ -280,93 +613,59 @@ namespace HereticalSolutions.Delegates.Factories
                 repository,
                 logger);
         }
-        
+
         #endregion
-        
-        #region Non alloc broadcaster generic
-        
-        public static NonAllocBroadcasterGeneric<T> BuildNonAllocBroadcasterGeneric<T>(
-            ILoggerResolver loggerResolver,
 
-            ManagedPoolBuilder<INonAllocSubscription> managedPoolBuilder = null)
+        #region Concurrent non alloc broadcaster with repository
+
+        public static ConcurrentNonAllocBroadcasterWithRepository BuildConcurrentNonAllocBroadcasterWithRepository(
+            IRepository<Type, object> broadcasterRepository,
+            ILoggerResolver loggerResolver)
         {
-            Func<INonAllocSubscription> valueAllocationDelegate =
-                AllocationFactory.NullAllocationDelegate<INonAllocSubscription>;
-
-            if (managedPoolBuilder == null)
-                managedPoolBuilder = BuildManagedPoolBuilder<INonAllocSubscription>(
-                    loggerResolver);
-
-            managedPoolBuilder.Initialize(
-                valueAllocationDelegate,
-
-                new Func<MetadataAllocationDescriptor>[]
-                {
-                    //ObjectPoolMetadataFactory.BuildIndexedMetadataDescriptor
-                },
-                BroadcasterSubscriptionPoolInitialAllocationDescriptor,
-                BroadcasterSubscriptionPoolAdditionalAllocationDescriptor,
-                
-                null,
-                null);
-
-            var subscriptionPool = managedPoolBuilder.BuildPackedArrayManagedPool();
-            
-            return BuildNonAllocBroadcasterGeneric<T>(
-                subscriptionPool,
+            return BuildConcurrentNonAllocBroadcasterWithRepository(
+                RepositoryFactory.BuildDictionaryInstanceRepository(
+                    broadcasterRepository),
                 loggerResolver);
         }
 
-        public static NonAllocBroadcasterGeneric<T> BuildNonAllocBroadcasterGeneric<T>(
-            AllocationCommandDescriptor initial,
-            AllocationCommandDescriptor additional,
-            ILoggerResolver loggerResolver,
-
-            ManagedPoolBuilder<INonAllocSubscription> managedPoolBuilder = null)
-        {
-            Func<INonAllocSubscription> valueAllocationDelegate =
-                AllocationFactory.NullAllocationDelegate<INonAllocSubscription>;
-
-            if (managedPoolBuilder == null)
-                managedPoolBuilder = BuildManagedPoolBuilder<INonAllocSubscription>(
-                    loggerResolver);
-            
-            managedPoolBuilder.Initialize(
-                valueAllocationDelegate,
-
-                new Func<MetadataAllocationDescriptor>[]
-                {
-                    //ObjectPoolMetadataFactory.BuildIndexedMetadataDescriptor
-                },
-                
-                initial,
-                additional,
-                
-                null,
-                null);
-            
-            var subscriptionsPool = managedPoolBuilder.BuildPackedArrayManagedPool();
-
-            return BuildNonAllocBroadcasterGeneric<T>(
-                subscriptionsPool,
-                loggerResolver);
-        }
-        
-        public static NonAllocBroadcasterGeneric<T> BuildNonAllocBroadcasterGeneric<T>(
-            ILoggerResolver loggerResolver,
-
-            IBag<INonAllocSubscription> subscriptionsBag = null,
-            IPool<NonAllocBroadcasterGenericInvocationContext> contextPool = null)
+        public static ConcurrentNonAllocBroadcasterWithRepository BuildConcurrentNonAllocBroadcasterWithRepository(
+            IReadOnlyInstanceRepository repository,
+            ILoggerResolver loggerResolver)
         {
             ILogger logger =
-                loggerResolver?.GetLogger<NonAllocBroadcasterGeneric<T>>();
+                loggerResolver?.GetLogger<ConcurrentNonAllocBroadcasterWithRepository>();
 
-            return new NonAllocBroadcasterGeneric<T>(
-                subscriptionsBag,
-                contextPool,
+            return new ConcurrentNonAllocBroadcasterWithRepository(
+                repository,
                 logger);
         }
-        
+
+        #endregion
+
+        #region Async broadcaster with repository
+
+        public static AsyncBroadcasterWithRepository BuildAsyncBroadcasterWithRepository(
+            IRepository<Type, object> broadcasterRepository,
+            ILoggerResolver loggerResolver)
+        {
+            return BuildAsyncBroadcasterWithRepository(
+                RepositoryFactory.BuildDictionaryInstanceRepository(
+                    broadcasterRepository),
+                loggerResolver);
+        }
+
+        public static AsyncBroadcasterWithRepository BuildAsyncBroadcasterWithRepository(
+            IReadOnlyInstanceRepository repository,
+            ILoggerResolver loggerResolver)
+        {
+            ILogger logger =
+                loggerResolver?.GetLogger<AsyncBroadcasterWithRepository>();
+
+            return new AsyncBroadcasterWithRepository(
+                repository,
+                logger);
+        }
+
         #endregion
     }
 }

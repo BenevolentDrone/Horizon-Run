@@ -2,7 +2,7 @@ using System;
 
 namespace HereticalSolutions.Delegates
 {
-	public class NonAllocBroadcasterGenericInvocationContext
+	public class NonAllocBroadcasterInvocationContext
 	{
 		public INonAllocSubscription[] Subscriptions;
 

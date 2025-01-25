@@ -17,14 +17,14 @@ namespace HereticalSolutions.Delegates
           ICleanuppable,
           IDisposable
     {
-        private readonly IPool<BroadcasterGenericInvocationContext<TValue>> contextPool;
+        private readonly IPool<BroadcasterInvocationContext<TValue>> contextPool;
 
         private readonly ILogger logger;
 
         private Action<TValue> multicastDelegate;
 
         public BroadcasterGeneric(
-            IPool<BroadcasterGenericInvocationContext<TValue>> contextPool,
+            IPool<BroadcasterInvocationContext<TValue>> contextPool,
             ILogger logger)
         {
             this.contextPool = contextPool;

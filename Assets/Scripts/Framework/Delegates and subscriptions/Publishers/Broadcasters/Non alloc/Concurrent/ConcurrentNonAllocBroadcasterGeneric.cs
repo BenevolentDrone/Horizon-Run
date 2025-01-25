@@ -20,7 +20,7 @@ namespace HereticalSolutions.Delegates
 	{
 		private readonly IBag<INonAllocSubscription> subscriptionsBag;
 
-		private readonly IPool<NonAllocBroadcasterGenericInvocationContext> contextPool;
+		private readonly IPool<NonAllocBroadcasterInvocationContext> contextPool;
 
 		private readonly object lockObject;
 
@@ -28,7 +28,7 @@ namespace HereticalSolutions.Delegates
 
 		public ConcurrentNonAllocBroadcasterGeneric(
 			IBag<INonAllocSubscription> subscriptionsBag,
-			IPool<NonAllocBroadcasterGenericInvocationContext> contextPool,
+			IPool<NonAllocBroadcasterInvocationContext> contextPool,
 			ILogger logger)
 		{
 			this.subscriptionsBag = subscriptionsBag;
@@ -195,7 +195,7 @@ namespace HereticalSolutions.Delegates
 		public void Publish(
 			TValue value)
 		{
-			NonAllocBroadcasterGenericInvocationContext context = null;
+			NonAllocBroadcasterInvocationContext context = null;
 
 			int count = -1;
 

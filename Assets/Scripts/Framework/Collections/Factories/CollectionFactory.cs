@@ -64,12 +64,12 @@ namespace HereticalSolutions.Collections.Factories
 
         public const int DEFAULT_B_PLUS_TREE_DEGREE = 32;
 
-        public static int BPlusTreeDegree => DEFAULT_B_PLUS_TREE_DEGREE;
+        public static int BPlusTreeDegree = DEFAULT_B_PLUS_TREE_DEGREE;
 
 
         public const int DEFAULT_CIRCULAR_BUFFER_CAPACITY = 1024;
 
-        public static int CircularBufferCapacity => DEFAULT_CIRCULAR_BUFFER_CAPACITY;
+        public static int CircularBufferCapacity = DEFAULT_CIRCULAR_BUFFER_CAPACITY;
 
         #endregion
 
@@ -77,8 +77,14 @@ namespace HereticalSolutions.Collections.Factories
 
         #region B+ trees
 
+        public static BPlusTree<T> BuildBPlusTree<T>()
+        {
+            return new BPlusTree<T>(
+                BPlusTreeDegree);
+        }
+
         public static BPlusTree<T> BuildBPlusTree<T>(
-            int degree = DEFAULT_B_PLUS_TREE_DEGREE)
+            int degree)
         {
             return new BPlusTree<T>(
                 degree);
@@ -87,66 +93,97 @@ namespace HereticalSolutions.Collections.Factories
         public static IPool<NonAllocBPlusTreeNode<T>> BuildNonAllocBPlusTreeNodePool<T>(
             ILoggerResolver loggerResolver)
         {
+            return BuildNonAllocBPlusTreeNodePool<T>(
+                NonAllocBPlusTreeNodePoolInitialAllocationDescriptor,
+                NonAllocBPlusTreeNodePoolAdditionalAllocationDescriptor,
+                loggerResolver);
+        }
+
+        public static IPool<NonAllocBPlusTreeNode<T>> BuildNonAllocBPlusTreeNodePool<T>(
+            AllocationCommandDescriptor initialAllocationDescriptor,
+            AllocationCommandDescriptor additionalAllocationDescriptor,
+            ILoggerResolver loggerResolver)
+        {
             Func<NonAllocBPlusTreeNode<T>> allocationDelegate = AllocationFactory.
                 ActivatorAllocationDelegate<NonAllocBPlusTreeNode<T>>;
 
             return StackPoolFactory.BuildStackPool<NonAllocBPlusTreeNode<T>>(
                 new AllocationCommand<NonAllocBPlusTreeNode<T>>
                 {
-                    Descriptor = NonAllocBPlusTreeNodePoolInitialAllocationDescriptor,
+                    Descriptor = initialAllocationDescriptor,
 
                     AllocationDelegate = allocationDelegate
                 },
                 new AllocationCommand<NonAllocBPlusTreeNode<T>>
                 {
-                    Descriptor = NonAllocBPlusTreeNodePoolAdditionalAllocationDescriptor,
-                    
+                    Descriptor = additionalAllocationDescriptor,
+
                     AllocationDelegate = allocationDelegate
                 },
                 loggerResolver);
         }
 
         public static NonAllocBPlusTree<T> BuildNonAllocBPlusTree<T>(
-            ILoggerResolver loggerResolver,
-            IPool<NonAllocBPlusTreeNode<T>> nodePool = null,
-            int degree = DEFAULT_B_PLUS_TREE_DEGREE)
+            ILoggerResolver loggerResolver)
         {
-            if (nodePool != null)
-            {
-                nodePool = BuildNonAllocBPlusTreeNodePool<T>(
-                    loggerResolver);
-            }
+            var nodePool = BuildNonAllocBPlusTreeNodePool<T>(
+                loggerResolver);
 
+            return new NonAllocBPlusTree<T>(
+                nodePool,
+                BPlusTreeDegree);
+        }
+
+        public static NonAllocBPlusTree<T> BuildNonAllocBPlusTree<T>(
+            IPool<NonAllocBPlusTreeNode<T>> nodePool,
+            int degree)
+        {
             return new NonAllocBPlusTree<T>(
                 nodePool,
                 degree);
         }
 
+        public static ConcurrentBPlusTree<T> BuildConcurrentBPlusTree<T>()
+        {
+            return new ConcurrentBPlusTree<T>(
+                BPlusTreeDegree);
+        }
+
         public static ConcurrentBPlusTree<T> BuildConcurrentBPlusTree<T>(
-            int degree = DEFAULT_B_PLUS_TREE_DEGREE)
+            int degree)
         {
             return new ConcurrentBPlusTree<T>(
                 degree);
         }
 
         public static ConcurrentNonAllocBPlusTree<T> BuildConcurrentNonAllocBPlusTree<T>(
-            ILoggerResolver loggerResolver,
-            IPool<NonAllocBPlusTreeNode<T>> nodePool = null,
-            int degree = DEFAULT_B_PLUS_TREE_DEGREE)
+            ILoggerResolver loggerResolver)
         {
-            if (nodePool != null)
-            {
-                nodePool = BuildNonAllocBPlusTreeNodePool<T>(
-                    loggerResolver);
-            }
+            var nodePool = BuildNonAllocBPlusTreeNodePool<T>(
+                loggerResolver);
 
+            return new ConcurrentNonAllocBPlusTree<T>(
+                nodePool,
+                BPlusTreeDegree);
+        }
+
+        public static ConcurrentNonAllocBPlusTree<T> BuildConcurrentNonAllocBPlusTree<T>(
+            IPool<NonAllocBPlusTreeNode<T>> nodePool,
+            int degree)
+        {
             return new ConcurrentNonAllocBPlusTree<T>(
                 nodePool,
                 degree);
         }
 
+        public static BPlusTreeMap<TKey, TValue> BuildBPlusTreeMap<TKey, TValue>()
+        {
+            return new BPlusTreeMap<TKey, TValue>(
+                BPlusTreeDegree);
+        }
+
         public static BPlusTreeMap<TKey, TValue> BuildBPlusTreeMap<TKey, TValue>(
-            int degree = DEFAULT_B_PLUS_TREE_DEGREE)
+            int degree)
         {
             return new BPlusTreeMap<TKey, TValue>(
                 degree);
@@ -155,19 +192,30 @@ namespace HereticalSolutions.Collections.Factories
         public static IPool<NonAllocBPlusTreeMapNode<TKey, TValue>> BuildNonAllocBPlusTreeMapNodePool<TKey, TValue>(
             ILoggerResolver loggerResolver)
         {
+            return BuildNonAllocBPlusTreeMapNodePool<TKey, TValue>(
+                NonAllocBPlusTreeMapNodePoolInitialAllocationDescriptor,
+                NonAllocBPlusTreeMapNodePoolAdditionalAllocationDescriptor,
+                loggerResolver);
+        }
+
+        public static IPool<NonAllocBPlusTreeMapNode<TKey, TValue>> BuildNonAllocBPlusTreeMapNodePool<TKey, TValue>(
+            AllocationCommandDescriptor initialAllocationDescriptor,
+            AllocationCommandDescriptor additionalAllocationDescriptor,
+            ILoggerResolver loggerResolver)
+        {
             Func<NonAllocBPlusTreeMapNode<TKey, TValue>> allocationDelegate = AllocationFactory.
                 ActivatorAllocationDelegate<NonAllocBPlusTreeMapNode<TKey, TValue>>;
 
             return StackPoolFactory.BuildStackPool<NonAllocBPlusTreeMapNode<TKey, TValue>>(
                 new AllocationCommand<NonAllocBPlusTreeMapNode<TKey, TValue>>
                 {
-                    Descriptor = NonAllocBPlusTreeMapNodePoolInitialAllocationDescriptor,
+                    Descriptor = initialAllocationDescriptor,
 
                     AllocationDelegate = allocationDelegate
                 },
                 new AllocationCommand<NonAllocBPlusTreeMapNode<TKey, TValue>>
                 {
-                    Descriptor = NonAllocBPlusTreeMapNodePoolAdditionalAllocationDescriptor,
+                    Descriptor = additionalAllocationDescriptor,
 
                     AllocationDelegate = allocationDelegate
                 },
@@ -175,39 +223,53 @@ namespace HereticalSolutions.Collections.Factories
         }
 
         public static NonAllocBPlusTreeMap<TKey, TValue> BuildNonAllocBPlusTreeMap<TKey, TValue>(
-            ILoggerResolver loggerResolver,
-            IPool<NonAllocBPlusTreeMapNode<TKey, TValue>> nodePool = null,
-            int degree = DEFAULT_B_PLUS_TREE_DEGREE)
+            ILoggerResolver loggerResolver)
         {
-            if (nodePool != null)
-            {
-                nodePool = BuildNonAllocBPlusTreeMapNodePool<TKey, TValue>(
+            var nodePool = BuildNonAllocBPlusTreeMapNodePool<TKey, TValue>(
                     loggerResolver);
-            }
 
+            return new NonAllocBPlusTreeMap<TKey, TValue>(
+                nodePool,
+                BPlusTreeDegree);
+        }
+
+        public static NonAllocBPlusTreeMap<TKey, TValue> BuildNonAllocBPlusTreeMap<TKey, TValue>(
+            IPool<NonAllocBPlusTreeMapNode<TKey, TValue>> nodePool,
+            int degree)
+        {
             return new NonAllocBPlusTreeMap<TKey, TValue>(
                 nodePool,
                 degree);
         }
 
+        public static ConcurrentBPlusTreeMap<TKey, TValue> BuildConcurrentBPlusTreeMap<TKey, TValue>()
+        {
+            return new ConcurrentBPlusTreeMap<TKey, TValue>(
+                BPlusTreeDegree);
+        }
+
         public static ConcurrentBPlusTreeMap<TKey, TValue> BuildConcurrentBPlusTreeMap<TKey, TValue>(
-            int degree = DEFAULT_B_PLUS_TREE_DEGREE)
+            int degree)
         {
             return new ConcurrentBPlusTreeMap<TKey, TValue>(
                 degree);
         }
 
         public static ConcurrentNonAllocBPlusTreeMap<TKey, TValue> BuildConcurrentNonAllocBPlusTreeMap<TKey, TValue>(
-            ILoggerResolver loggerResolver,
-            IPool<NonAllocBPlusTreeMapNode<TKey, TValue>> nodePool = null,
-            int degree = DEFAULT_B_PLUS_TREE_DEGREE)
+            ILoggerResolver loggerResolver)
         {
-            if (nodePool != null)
-            {
-                nodePool = BuildNonAllocBPlusTreeMapNodePool<TKey, TValue>(
+            var nodePool = BuildNonAllocBPlusTreeMapNodePool<TKey, TValue>(
                     loggerResolver);
-            }
 
+            return new ConcurrentNonAllocBPlusTreeMap<TKey, TValue>(
+                nodePool,
+                BPlusTreeDegree);
+        }
+
+        public static ConcurrentNonAllocBPlusTreeMap<TKey, TValue> BuildConcurrentNonAllocBPlusTreeMap<TKey, TValue>(
+            IPool<NonAllocBPlusTreeMapNode<TKey, TValue>> nodePool,
+            int degree)
+        {
             return new ConcurrentNonAllocBPlusTreeMap<TKey, TValue>(
                 nodePool,
                 degree);

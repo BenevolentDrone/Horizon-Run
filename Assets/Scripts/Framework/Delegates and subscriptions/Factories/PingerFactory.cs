@@ -1,18 +1,14 @@
 using System;
 
 using HereticalSolutions.Allocations;
-using HereticalSolutions.Allocations.Factories;
-
-using HereticalSolutions.Collections;
 
 using HereticalSolutions.Pools;
 using HereticalSolutions.Pools.Factories;
 
 using HereticalSolutions.Bags;
 
-using HereticalSolutions.Metadata.Allocations;
-
 using HereticalSolutions.Logging;
+using HereticalSolutions.Bags.Factories;
 
 namespace HereticalSolutions.Delegates.Factories
 {
@@ -42,10 +38,14 @@ namespace HereticalSolutions.Delegates.Factories
 
         #endregion
 
+        public const int DEFAULT_INVOKATION_CONTEXT_SIZE = 32;
+
+        public static int InvokationContextSize = DEFAULT_INVOKATION_CONTEXT_SIZE;
+
         #endregion
 
         #region Pinger
-        
+
         public static Pinger BuildPinger(
             IPool<PingerInvocationContext> contextPool)
         {
@@ -54,80 +54,57 @@ namespace HereticalSolutions.Delegates.Factories
         }
 
         #endregion
+
+        #region Concurrent pinger
+
+        public static ConcurrentPinger BuildConcurrentPinger(
+            IPool<PingerInvocationContext> contextPool)
+        {
+            return new ConcurrentPinger(
+                contextPool);
+        }
+
+        #endregion
         
         #region Non alloc pinger
         
-        public static ManagedPoolBuilder<INonAllocSubscription> BuildManagedPoolBuilder(
+        public static NonAllocPinger BuildNonAllocPinger(
             ILoggerResolver loggerResolver)
         {
-            return new ManagedPoolBuilder<INonAllocSubscription>(
-                loggerResolver,
-                loggerResolver?.GetLogger<ManagedPoolBuilder<INonAllocSubscription>>());
-        }
-
-        public static NonAllocPinger BuildNonAllocPinger(
-            ILoggerResolver loggerResolver,
-
-            ManagedPoolBuilder<INonAllocSubscription> managedPoolBuilder = null)
-        {
-            Func<INonAllocSubscription> valueAllocationDelegate =
-                AllocationFactory.NullAllocationDelegate<INonAllocSubscription>;
-
-            if (managedPoolBuilder == null)
-                managedPoolBuilder = BuildManagedPoolBuilder(
-                    loggerResolver);
-            
-            managedPoolBuilder.Initialize(
-                valueAllocationDelegate,
-
-                new Func<MetadataAllocationDescriptor>[]
-                {
-                    //ObjectPoolMetadataFactory.BuildIndexedMetadataDescriptor
-                },
+            return BuildNonAllocPinger(
                 PingerInitialAllocationDescriptor,
                 PingerAdditionalAllocationDescriptor,
-                
-                null,
-                null);
-
-            var subscriptionPool = managedPoolBuilder.BuildPackedArrayManagedPool();
-            
-            return BuildNonAllocPinger(
-                subscriptionPool,
                 loggerResolver);
         }
 
         public static NonAllocPinger BuildNonAllocPinger(
             AllocationCommandDescriptor initial,
             AllocationCommandDescriptor additional,
-            ILoggerResolver loggerResolver,
-            
-            ManagedPoolBuilder<INonAllocSubscription> managedPoolBuilder = null)
+            ILoggerResolver loggerResolver)
         {
-            Func<INonAllocSubscription> valueAllocationDelegate =
-                AllocationFactory.NullAllocationDelegate<INonAllocSubscription>;
-
-            if (managedPoolBuilder == null)
-                managedPoolBuilder = BuildManagedPoolBuilder(
-                    loggerResolver);
-            
-            managedPoolBuilder.Initialize(
-                valueAllocationDelegate,
-
-                new Func<MetadataAllocationDescriptor>[]
+            Func<NonAllocPingerInvocationContext> invocationContextAllocationDelegate =
+                () => new NonAllocPingerInvocationContext
                 {
-                    //ObjectPoolMetadataFactory.BuildIndexedMetadataDescriptor
-                },
-                initial,
-                additional,
-                
-                null,
-                null);
-            
-            var subscriptionPool = managedPoolBuilder.BuildPackedArrayManagedPool();
+                    Subscriptions = new INonAllocSubscription[InvokationContextSize]
+                };
 
             return BuildNonAllocPinger(
-                subscriptionPool,
+                LinkedListBagFactory.BuildNonAllocLinkedListBag<INonAllocSubscription>(
+                    loggerResolver),
+                StackPoolFactory.BuildStackPool<NonAllocPingerInvocationContext>(
+                    new AllocationCommand<NonAllocPingerInvocationContext>
+                    {
+                        Descriptor = initial,
+
+                        AllocationDelegate = invocationContextAllocationDelegate
+                    },
+                    new AllocationCommand<NonAllocPingerInvocationContext>
+                    {
+                        Descriptor = additional,
+
+                        AllocationDelegate = invocationContextAllocationDelegate
+                    },
+                    loggerResolver),
                 loggerResolver);
         }
 
@@ -144,7 +121,123 @@ namespace HereticalSolutions.Delegates.Factories
                 contextPool,
                 logger);
         }
-        
+
+        #endregion
+
+        #region Concurrent non alloc pinger
+
+        public static ConcurrentNonAllocPinger BuildConcurrentNonAllocPinger(
+            ILoggerResolver loggerResolver)
+        {
+            return BuildConcurrentNonAllocPinger(
+                PingerInitialAllocationDescriptor,
+                PingerAdditionalAllocationDescriptor,
+                loggerResolver);
+        }
+
+        public static ConcurrentNonAllocPinger BuildConcurrentNonAllocPinger(
+            AllocationCommandDescriptor initial,
+            AllocationCommandDescriptor additional,
+            ILoggerResolver loggerResolver)
+        {
+            Func<NonAllocPingerInvocationContext> invocationContextAllocationDelegate =
+                () => new NonAllocPingerInvocationContext
+                {
+                    Subscriptions = new INonAllocSubscription[InvokationContextSize]
+                };
+
+            return BuildConcurrentNonAllocPinger(
+                LinkedListBagFactory.BuildNonAllocLinkedListBag<INonAllocSubscription>(
+                    loggerResolver),
+                StackPoolFactory.BuildStackPool<NonAllocPingerInvocationContext>(
+                    new AllocationCommand<NonAllocPingerInvocationContext>
+                    {
+                        Descriptor = initial,
+
+                        AllocationDelegate = invocationContextAllocationDelegate
+                    },
+                    new AllocationCommand<NonAllocPingerInvocationContext>
+                    {
+                        Descriptor = additional,
+
+                        AllocationDelegate = invocationContextAllocationDelegate
+                    },
+                    loggerResolver),
+                loggerResolver);
+        }
+
+        public static ConcurrentNonAllocPinger BuildConcurrentNonAllocPinger(
+            IBag<INonAllocSubscription> subscriptionBag,
+            IPool<NonAllocPingerInvocationContext> contextPool,
+            ILoggerResolver loggerResolver)
+        {
+            ILogger logger =
+                loggerResolver?.GetLogger<ConcurrentNonAllocPinger>();
+
+            return new ConcurrentNonAllocPinger(
+                subscriptionBag,
+                contextPool,
+                logger);
+        }
+
+        #endregion
+
+        #region Async pinger
+
+        public static AsyncPinger BuildAsyncPinger(
+            ILoggerResolver loggerResolver)
+        {
+            return BuildAsyncPinger(
+                PingerInitialAllocationDescriptor,
+                PingerAdditionalAllocationDescriptor,
+                loggerResolver);
+        }
+
+        public static AsyncPinger BuildAsyncPinger(
+            AllocationCommandDescriptor initial,
+            AllocationCommandDescriptor additional,
+            ILoggerResolver loggerResolver)
+        {
+            Func<NonAllocPingerInvocationContext> invocationContextAllocationDelegate =
+                () => new NonAllocPingerInvocationContext
+                {
+                    Subscriptions = new INonAllocSubscription[InvokationContextSize]
+                };
+
+            return BuildAsyncPinger(
+                LinkedListBagFactory.BuildNonAllocLinkedListBag<INonAllocSubscription>(
+                    loggerResolver),
+                StackPoolFactory.BuildStackPool<NonAllocPingerInvocationContext>(
+                    new AllocationCommand<NonAllocPingerInvocationContext>
+                    {
+                        Descriptor = initial,
+
+                        AllocationDelegate = invocationContextAllocationDelegate
+                    },
+                    new AllocationCommand<NonAllocPingerInvocationContext>
+                    {
+                        Descriptor = additional,
+
+                        AllocationDelegate = invocationContextAllocationDelegate
+                    },
+                    loggerResolver),
+                loggerResolver);
+        }
+
+        public static AsyncPinger BuildAsyncPinger(
+            IBag<INonAllocSubscription> subscriptionBag,
+            IPool<NonAllocPingerInvocationContext> contextPool,
+            ILoggerResolver loggerResolver)
+        {
+            ILogger logger =
+                loggerResolver?.GetLogger<AsyncPinger>();
+
+            return new AsyncPinger(
+                subscriptionBag,
+                contextPool,
+                logger);
+        }
+
         #endregion
     }
 }

@@ -20,13 +20,13 @@ namespace HereticalSolutions.Delegates
     {
         private readonly IBag<INonAllocSubscription> subscriptionsBag;
 
-        private readonly IPool<NonAllocBroadcasterGenericInvocationContext> contextPool;
+        private readonly IPool<NonAllocBroadcasterInvocationContext> contextPool;
 
         private readonly ILogger logger;
 
         public NonAllocBroadcasterGeneric(
             IBag<INonAllocSubscription> subscriptionsBag,
-            IPool<NonAllocBroadcasterGenericInvocationContext> contextPool,
+            IPool<NonAllocBroadcasterInvocationContext> contextPool,
             ILogger logger)
         {
             this.subscriptionsBag = subscriptionsBag;

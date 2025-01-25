@@ -2,7 +2,7 @@ using System;
 
 namespace HereticalSolutions.Delegates
 {
-	public class BroadcasterGenericInvocationContext<TValue>
+	public class BroadcasterInvocationContext<TValue>
 	{
 		public Action<TValue> Delegate;
 	}

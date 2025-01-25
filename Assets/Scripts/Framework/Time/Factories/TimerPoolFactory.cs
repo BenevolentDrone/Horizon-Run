@@ -46,6 +46,19 @@ namespace HereticalSolutions.Time.Factories
 			ISynchronizationProvider provider,
 			ILoggerResolver loggerResolver)
 		{
+			return BuildRuntimeTimerPool(
+				provider,
+				TimerPoolInitialAllocationDescriptor,
+				TimerPoolAdditionalAllocationDescriptor,
+				loggerResolver);
+		}
+
+		public static IManagedPool<TimerWithSubscriptionsContainer> BuildRuntimeTimerPool(
+			ISynchronizationProvider provider,
+			AllocationCommandDescriptor initialAllocationDescriptor,
+			AllocationCommandDescriptor additionalAllocationDescriptor,
+			ILoggerResolver loggerResolver)
+		{
 			#region Builders
 
 			var managedPoolBuilder = new ManagedPoolBuilder<TimerWithSubscriptionsContainer>(
@@ -108,8 +121,8 @@ namespace HereticalSolutions.Time.Factories
 
 				metadataDescriptorBuilders,
 
-				TimerPoolInitialAllocationDescriptor,
-				TimerPoolAdditionalAllocationDescriptor,
+				initialAllocationDescriptor,
+				additionalAllocationDescriptor,
 
 				facadeAllocationCallbacks,
 				null);

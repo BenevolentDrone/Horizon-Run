@@ -42,6 +42,17 @@ namespace HereticalSolutions.Hierarchy.Factories
 		public static IPool<List<IReadOnlyHierarchyNode<T>>> BuildHierarchyNodeListPool<T>(
 			ILoggerResolver loggerResolver)
 		{
+			return BuildHierarchyNodeListPool<T>(
+				HierarchyNodeListPoolInitialAllocationDescriptor,
+				HierarchyNodeListPoolAdditionalAllocationDescriptor,
+				loggerResolver);
+		}
+
+		public static IPool<List<IReadOnlyHierarchyNode<T>>> BuildHierarchyNodeListPool<T>(
+			AllocationCommandDescriptor initialAllocationDescriptor,
+			AllocationCommandDescriptor additionalAllocationDescriptor,
+			ILoggerResolver loggerResolver)
+		{
 			Func<List<IReadOnlyHierarchyNode<T>>> allocationDelegate = AllocationFactory
 				.ActivatorAllocationDelegate<List<IReadOnlyHierarchyNode<T>>>;
 
@@ -49,14 +60,14 @@ namespace HereticalSolutions.Hierarchy.Factories
 				StackPoolFactory.BuildStackPool<List<IReadOnlyHierarchyNode<T>>>(
 					new AllocationCommand<List<IReadOnlyHierarchyNode<T>>>
 					{
-						Descriptor = HierarchyNodeListPoolInitialAllocationDescriptor,
+						Descriptor = initialAllocationDescriptor,
 
 						AllocationDelegate = allocationDelegate
 					},
 					new AllocationCommand<List<IReadOnlyHierarchyNode<T>>>
 					{
-						Descriptor = HierarchyNodeListPoolAdditionalAllocationDescriptor,
-						
+						Descriptor = additionalAllocationDescriptor,
+
 						AllocationDelegate = allocationDelegate
 					},
 					loggerResolver));

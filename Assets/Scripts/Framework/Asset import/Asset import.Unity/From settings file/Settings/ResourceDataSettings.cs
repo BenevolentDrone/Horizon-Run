@@ -1,3 +1,4 @@
+/*
 using System;
 
 namespace HereticalSolutions.AssetImport
@@ -19,3 +20,4 @@ namespace HereticalSolutions.AssetImport
         public ResourceVariantDataSettings[] Variants;
     }
 }
+*/

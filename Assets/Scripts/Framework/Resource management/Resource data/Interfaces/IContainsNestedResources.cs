@@ -1,3 +1,4 @@
+/*
 using System.Collections.Generic;
 
 namespace HereticalSolutions.ResourceManagement
@@ -31,3 +32,4 @@ namespace HereticalSolutions.ResourceManagement
 		IEnumerable<IReadOnlyResourceData> AllNestedResources { get; }
 	}
 }
+*/

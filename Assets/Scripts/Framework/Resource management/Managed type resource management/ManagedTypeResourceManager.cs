@@ -1,3 +1,4 @@
+/*
 using System;
 using System.Collections.Generic;
 
@@ -176,3 +177,4 @@ namespace HereticalSolutions.ResourceManagement
 		#endregion
 	}
 }
+*/

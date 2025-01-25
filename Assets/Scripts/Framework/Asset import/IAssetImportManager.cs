@@ -1,3 +1,4 @@
+/*
 using System;
 using System.Threading.Tasks;
 
@@ -26,3 +27,4 @@ namespace HereticalSolutions.AssetImport
 			where TPostProcessor : AAssetImportPostProcessor;
 	}
 }
+*/

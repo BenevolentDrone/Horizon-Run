@@ -66,8 +66,9 @@ namespace HereticalSolutions.Delegates.Factories
         }
 
         public static NonAllocPinger BuildNonAllocPinger(
-            ManagedPoolBuilder<INonAllocSubscription> managedPoolBuilder = null,
-            ILoggerResolver loggerResolver)
+            ILoggerResolver loggerResolver,
+
+            ManagedPoolBuilder<INonAllocSubscription> managedPoolBuilder = null)
         {
             Func<INonAllocSubscription> valueAllocationDelegate =
                 AllocationFactory.NullAllocationDelegate<INonAllocSubscription>;
@@ -99,8 +100,9 @@ namespace HereticalSolutions.Delegates.Factories
         public static NonAllocPinger BuildNonAllocPinger(
             AllocationCommandDescriptor initial,
             AllocationCommandDescriptor additional,
-            ManagedPoolBuilder<INonAllocSubscription> managedPoolBuilder = null,
-            ILoggerResolver loggerResolver)
+            ILoggerResolver loggerResolver,
+            
+            ManagedPoolBuilder<INonAllocSubscription> managedPoolBuilder = null)
         {
             Func<INonAllocSubscription> valueAllocationDelegate =
                 AllocationFactory.NullAllocationDelegate<INonAllocSubscription>;

@@ -24,7 +24,7 @@ namespace HereticalSolutions.Systems
 			IStageNode<TProcedure> startNode,
 			IStageNode<TProcedure> finishNode,
 
-			byte freeThreadIndex = 2,
+			byte freeThreadIndex,
 
 			ILogger logger)
 			: base(

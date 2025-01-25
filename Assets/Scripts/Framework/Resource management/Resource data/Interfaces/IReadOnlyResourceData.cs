@@ -1,3 +1,4 @@
+/*
 namespace HereticalSolutions.ResourceManagement
 {
     /// <summary>
@@ -13,3 +14,4 @@ namespace HereticalSolutions.ResourceManagement
         ResourceDescriptor Descriptor { get; }
     }
 }
+*/

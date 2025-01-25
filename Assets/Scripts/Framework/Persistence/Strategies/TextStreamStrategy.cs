@@ -51,8 +51,9 @@ namespace HereticalSolutions.Persistence
 
 		public TextStreamStrategy(
 			string fullPath,
-			bool flushAutomatically = true,
-			ILogger logger)
+			ILogger logger,
+			
+			bool flushAutomatically = true)
 		{
 			FullPath = fullPath;
 

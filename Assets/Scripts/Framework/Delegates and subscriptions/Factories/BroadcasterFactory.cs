@@ -103,8 +103,9 @@ namespace HereticalSolutions.Delegates.Factories
         #region Broadcaster multiple args
 
         public static BroadcasterMultipleArgs BuildBroadcasterMultipleArgs(
-            IPool<BroadcasterGenericInvocationContext<object[]>> contextPool = null,
-            ILoggerResolver loggerResolver)
+            ILoggerResolver loggerResolver,
+
+            IPool<BroadcasterGenericInvocationContext<object[]>> contextPool = null)
         {
             return new BroadcasterMultipleArgs(
                 BuildBroadcasterGeneric<object[]>(
@@ -143,8 +144,9 @@ namespace HereticalSolutions.Delegates.Factories
         #region Broadcaster generic
 
         public static BroadcasterGeneric<T> BuildBroadcasterGeneric<T>(
-            IPool<BroadcasterGenericInvocationContext<T>> contextPool = null,
-            ILoggerResolver loggerResolver)
+            ILoggerResolver loggerResolver,
+            
+            IPool<BroadcasterGenericInvocationContext<T>> contextPool = null)
         {
             if (contextPool == null)
                 contextPool = BuildContextPool<BroadcasterGenericInvocationContext<T>>(
@@ -205,8 +207,9 @@ namespace HereticalSolutions.Delegates.Factories
         public static NonAllocBroadcasterMultipleArgs BuildNonAllocBroadcasterMultipleArgs(
             AllocationCommandDescriptor initial,
             AllocationCommandDescriptor additional,
-            ManagedPoolBuilder<INonAllocSubscription> managedPoolBuilder = null,
-            ILoggerResolver loggerResolver)
+            ILoggerResolver loggerResolver,
+
+            ManagedPoolBuilder<INonAllocSubscription> managedPoolBuilder = null)
         {
             Func<INonAllocSubscription> valueAllocationDelegate =
                 AllocationFactory.NullAllocationDelegate<INonAllocSubscription>;
@@ -283,8 +286,9 @@ namespace HereticalSolutions.Delegates.Factories
         #region Non alloc broadcaster generic
         
         public static NonAllocBroadcasterGeneric<T> BuildNonAllocBroadcasterGeneric<T>(
-            ManagedPoolBuilder<INonAllocSubscription> managedPoolBuilder = null,
-            ILoggerResolver loggerResolver)
+            ILoggerResolver loggerResolver,
+
+            ManagedPoolBuilder<INonAllocSubscription> managedPoolBuilder = null)
         {
             Func<INonAllocSubscription> valueAllocationDelegate =
                 AllocationFactory.NullAllocationDelegate<INonAllocSubscription>;
@@ -316,8 +320,9 @@ namespace HereticalSolutions.Delegates.Factories
         public static NonAllocBroadcasterGeneric<T> BuildNonAllocBroadcasterGeneric<T>(
             AllocationCommandDescriptor initial,
             AllocationCommandDescriptor additional,
-            ManagedPoolBuilder<INonAllocSubscription> managedPoolBuilder = null,
-            ILoggerResolver loggerResolver)
+            ILoggerResolver loggerResolver,
+
+            ManagedPoolBuilder<INonAllocSubscription> managedPoolBuilder = null)
         {
             Func<INonAllocSubscription> valueAllocationDelegate =
                 AllocationFactory.NullAllocationDelegate<INonAllocSubscription>;
@@ -348,14 +353,13 @@ namespace HereticalSolutions.Delegates.Factories
         }
         
         public static NonAllocBroadcasterGeneric<T> BuildNonAllocBroadcasterGeneric<T>(
+            ILoggerResolver loggerResolver,
+
             IBag<INonAllocSubscription> subscriptionsBag = null,
-            IPool<NonAllocBroadcasterGenericInvocationContext> contextPool = null,
-            ILoggerResolver loggerResolver)
+            IPool<NonAllocBroadcasterGenericInvocationContext> contextPool = null)
         {
             ILogger logger =
                 loggerResolver?.GetLogger<NonAllocBroadcasterGeneric<T>>();
-
-            
 
             return new NonAllocBroadcasterGeneric<T>(
                 subscriptionsBag,

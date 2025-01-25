@@ -1,3 +1,4 @@
+/*
 namespace HereticalSolutions.ResourceManagement
 {
     /// <summary>
@@ -16,3 +17,4 @@ namespace HereticalSolutions.ResourceManagement
         IReadOnlyResourceData Resource { get; }
     }
 }
+*/

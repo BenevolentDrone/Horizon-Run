@@ -12,31 +12,33 @@ namespace HereticalSolutions.LifetimeManagement.Factories
     public static class LifetimeFactory
     {
         public static Lifetime BuildLifetime(
+            ILoggerResolver loggerResolver,
+
             EInitializationFlags initializationFlags = 
                 EInitializationFlags.NO_ARGS_ALLOWED,
 			
             Action setUp = null,
             Func<object[], bool> initialize = null,
             Action cleanup = null,
-            Action tearDown = null,
-			
-            ILoggerResolver loggerResolver)
+            Action tearDown = null)
         {
             ILogger logger = loggerResolver?.GetLogger<Lifetime>();
             
             return new Lifetime(
+                logger,
+
                 initializationFlags,
                 setUp,
                 initialize,
                 cleanup,
-                tearDown,
-                logger);
+                tearDown);
         }
         
         public static HierarchicalLifetime BuildHierarchicalLifetime(
             object target,
             IPool<List<IReadOnlyHierarchyNode<ILifetimeable>>> bufferPool,
-            
+            ILoggerResolver loggerResolver,
+
             ILifetimeable parentLifetime = null,
             EInitializationFlags initializationFlags = 
                 EInitializationFlags.NO_ARGS_ALLOWED
@@ -49,9 +51,7 @@ namespace HereticalSolutions.LifetimeManagement.Factories
             Action setUp = null,
             Func<object[], bool> initialize = null,
             Action cleanup = null,
-            Action tearDown = null,
-			
-            ILoggerResolver loggerResolver)
+            Action tearDown = null)
         {
             ILogger logger = loggerResolver?.GetLogger<Lifetime>();
 
@@ -64,6 +64,7 @@ namespace HereticalSolutions.LifetimeManagement.Factories
             var result = new HierarchicalLifetime(
                 target,
                 bufferPool,
+                logger,
                 
                 parentLifetime,
                 initializationFlags,
@@ -73,9 +74,7 @@ namespace HereticalSolutions.LifetimeManagement.Factories
                 setUp,
                 initialize,
                 cleanup,
-                tearDown,
-                
-                logger);
+                tearDown);
             
             if (buildHierarchyNode)
                 hierarchyNode.Contents = result;

@@ -35,7 +35,8 @@ namespace HereticalSolutions.Pools.Factories
 
             return new LinkedListPool<T>(
                 linkedList,
-                additionalAllocationCommand);
+                additionalAllocationCommand,
+                logger);
         }
 
         private static void PerformInitialAllocation<T>(
@@ -83,9 +84,10 @@ namespace HereticalSolutions.Pools.Factories
         public static LinkedListManagedPool<T> BuildLinkedListManagedPool<T>(
             AllocationCommand<T> initialAllocationCommand,
             AllocationCommand<T> additionalAllocationCommand,
+            ILoggerResolver loggerResolver,
+
             MetadataAllocationDescriptor[] metadataAllocationDescriptors = null,
-            IAllocationCallback<IPoolElementFacade<T>> facadeAllocationCallback = null,
-            ILoggerResolver loggerResolver)
+            IAllocationCallback<IPoolElementFacade<T>> facadeAllocationCallback = null)
         {
             ILogger logger =
                 loggerResolver?.GetLogger<LinkedListManagedPool<T>>();
@@ -194,9 +196,10 @@ namespace HereticalSolutions.Pools.Factories
         public static AppendableLinkedListManagedPool<T> BuildAppendableLinkedListManagedPool<T>(
             AllocationCommand<T> initialAllocationCommand,
             AllocationCommand<T> additionalAllocationCommand,
+            ILoggerResolver loggerResolver,
+
             MetadataAllocationDescriptor[] metadataAllocationDescriptors = null,
-            IAllocationCallback<IPoolElementFacade<T>> facadeAllocationCallback = null,
-            ILoggerResolver loggerResolver)
+            IAllocationCallback<IPoolElementFacade<T>> facadeAllocationCallback = null)
         {
             ILogger logger =
                 loggerResolver?.GetLogger<StackManagedPool<T>>();

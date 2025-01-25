@@ -37,8 +37,9 @@ namespace HereticalSolutions.Pools
 			IPoolElementFacade<T>[] packedArray,
 			AllocationCommand<IPoolElementFacade<T>> facadeAllocationCommand,
 			AllocationCommand<T> valueAllocationCommand,
-			bool validateValues = true,
-			ILogger logger)
+			ILogger logger,
+			
+			bool validateValues = true)
 		{
 			this.packedArray = packedArray;
 

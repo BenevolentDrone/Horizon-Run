@@ -1,3 +1,4 @@
+/*
 namespace HereticalSolutions.AssetImport
 {
 	public static partial class AssetImportConstants
@@ -7,3 +8,4 @@ namespace HereticalSolutions.AssetImport
 		public const int NORMAL_PRIORIITY = 1;
 	}
 }
+*/

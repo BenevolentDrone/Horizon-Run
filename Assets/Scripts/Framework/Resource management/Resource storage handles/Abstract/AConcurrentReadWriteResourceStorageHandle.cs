@@ -1,3 +1,4 @@
+/*
 using System;
 using System.Threading;
 
@@ -81,3 +82,4 @@ namespace HereticalSolutions.ResourceManagement
 		#endregion
 	}
 }
+*/

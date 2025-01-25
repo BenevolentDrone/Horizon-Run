@@ -272,10 +272,11 @@ namespace HereticalSolutions.Networking.LiteNetLib
             string ip,
             int port,
             string secret,
-            byte preferredPlayerSlot = byte.MaxValue,
-
+            
             //Async tail
-            AsyncExecutionContext asyncContext)
+            AsyncExecutionContext asyncContext,
+
+            byte preferredPlayerSlot = byte.MaxValue)
         {
             if (status != EClientStatus.DISCONNECTED)
             {

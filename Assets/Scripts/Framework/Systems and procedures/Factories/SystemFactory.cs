@@ -108,7 +108,9 @@ namespace HereticalSolutions.Systems.Factories
 				startNode,
 				finishNode,
 
-				logger: loggerResolver?.GetLogger<DelegateSystemBuilder>());
+				2,
+
+				loggerResolver?.GetLogger<DelegateSystemBuilder>());
 		}
 
 		public static AsyncSystemBuilder BuildAsyncSystemBuilder(
@@ -132,7 +134,9 @@ namespace HereticalSolutions.Systems.Factories
 				startNode,
 				finishNode,
 
-				logger: loggerResolver?.GetLogger<AsyncSystemBuilder>());
+				2,
+
+				loggerResolver?.GetLogger<AsyncSystemBuilder>());
 		}
 	}
 }

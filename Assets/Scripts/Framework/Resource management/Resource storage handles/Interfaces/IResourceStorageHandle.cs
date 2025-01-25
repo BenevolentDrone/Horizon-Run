@@ -1,3 +1,4 @@
+/*
 namespace HereticalSolutions.ResourceManagement
 {
 	public interface IResourceStorageHandle
@@ -8,3 +9,4 @@ namespace HereticalSolutions.ResourceManagement
 		bool SetResource<TValue>(TValue resource);
 	}
 }
+*/

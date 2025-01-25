@@ -20,14 +20,15 @@ namespace HereticalSolutions.Pools.AllocationCallbacks
         private ILogger logger;
 
         public SetDurationAndPushSubscriptionCallback(
-            float duration = 0f,
-            ILoggerResolver loggerResolver)
+            ILoggerResolver loggerResolver,
+            ILogger logger,
+            float duration = 0f)
         {
             Duration = duration;
 
             this.loggerResolver = loggerResolver;
 
-            logger = this.loggerResolver?.GetLogger<SetDurationAndPushSubscriptionCallback<T>>();
+            this.logger = logger;
         }
 
         public void OnAllocated(IPoolElementFacade<T> poolElementFacade)

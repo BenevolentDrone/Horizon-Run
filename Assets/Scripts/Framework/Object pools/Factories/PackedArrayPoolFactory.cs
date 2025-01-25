@@ -89,10 +89,11 @@ namespace HereticalSolutions.Pools.Factories
         public static PackedArrayManagedPool<T> BuildPackedArrayManagedPool<T>(
             AllocationCommand<T> initialAllocationCommand,
             AllocationCommand<T> additionalAllocationCommand,
+            ILoggerResolver loggerResolver,
+
             MetadataAllocationDescriptor[] metadataAllocationDescriptors = null,
             IAllocationCallback<IPoolElementFacade<T>> facadeAllocationCallback = null,
-            bool validateValues = true,
-            ILoggerResolver loggerResolver)
+            bool validateValues = true)
         {
             ILogger logger =
                 loggerResolver?.GetLogger<PackedArrayManagedPool<T>>();
@@ -128,8 +129,9 @@ namespace HereticalSolutions.Pools.Factories
                 contents,
                 additionalFacadeAllocationCommand,
                 additionalAllocationCommand,
-                validateValues,
-                logger);
+                logger,
+                
+                validateValues);
         }
         
         private static void PerformInitialAllocation<T>(
@@ -170,9 +172,10 @@ namespace HereticalSolutions.Pools.Factories
         public static AppendablePackedArrayManagedPool<T> BuildAppendableManagedPool<T>(
             AllocationCommand<T> initialAllocationCommand,
             AllocationCommand<T> additionalAllocationCommand,
+            ILoggerResolver loggerResolver,
+
             MetadataAllocationDescriptor[] metadataAllocationDescriptors = null,
-            IAllocationCallback<IPoolElementFacade<T>> facadeAllocationCallback = null,
-            ILoggerResolver loggerResolver)
+            IAllocationCallback<IPoolElementFacade<T>> facadeAllocationCallback = null)
         {
             ILogger logger =
                 loggerResolver?.GetLogger<AppendablePackedArrayManagedPool<T>>();

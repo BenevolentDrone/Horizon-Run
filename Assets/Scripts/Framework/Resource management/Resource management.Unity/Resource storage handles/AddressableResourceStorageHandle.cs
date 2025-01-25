@@ -1,3 +1,4 @@
+/*
 using System.Threading.Tasks;
 
 using HereticalSolutions.Asynchronous;
@@ -41,3 +42,4 @@ namespace HereticalSolutions.ResourceManagement
         }
     }
 }
+*/

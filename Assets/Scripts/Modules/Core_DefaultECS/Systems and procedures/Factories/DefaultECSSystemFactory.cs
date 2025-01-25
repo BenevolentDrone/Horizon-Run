@@ -35,7 +35,9 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Factories
 				startNode,
 				finishNode,
 
-				logger: loggerResolver?.GetLogger<DefaultECSSystemBuilder<TSystem, TProcedure>>());
+				2,
+
+				loggerResolver?.GetLogger<DefaultECSSystemBuilder<TSystem, TProcedure>>());
 		}
 	}
 }

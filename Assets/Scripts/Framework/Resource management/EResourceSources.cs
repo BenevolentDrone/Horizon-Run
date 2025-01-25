@@ -1,3 +1,4 @@
+/*
 namespace HereticalSolutions.ResourceManagement
 {
     /// <summary>
@@ -26,3 +27,4 @@ namespace HereticalSolutions.ResourceManagement
         RUNTIME_GENERATED
     }
 }
+*/

@@ -17,7 +17,8 @@ namespace HereticalSolutions.LifetimeManagement
             object target,
             ILifetimeable parentLifetime,
             IPool<List<IReadOnlyHierarchyNode<ILifetimeable>>> bufferPool,
-            
+            ILoggerResolver loggerResolver,
+
             EInitializationFlags initializationFlags = 
                 EInitializationFlags.NO_ARGS_ALLOWED
                 | EInitializationFlags.INITIALIZE_ON_PARENT_INITIALIZE
@@ -27,23 +28,20 @@ namespace HereticalSolutions.LifetimeManagement
             Action setUp = null,
             Func<object[], bool> initialize = null,
             Action cleanup = null,
-            Action tearDown = null,
-            
-            ILoggerResolver loggerResolver)
+            Action tearDown = null)
         {
             var dependencyLifetime = LifetimeFactory.BuildHierarchicalLifetime(
                 target,
                 bufferPool,
-                
+                loggerResolver,
+
                 parentLifetime,
                 initializationFlags,
                 
                 setUp: setUp,
                 initialize: initialize,
                 cleanup: cleanup,
-                tearDown: tearDown,
-                
-                loggerResolver: loggerResolver);
+                tearDown: tearDown);
             
             dependencyLifetime.SetUp();
 

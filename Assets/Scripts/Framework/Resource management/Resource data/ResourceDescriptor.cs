@@ -1,3 +1,4 @@
+/*
 namespace HereticalSolutions.ResourceManagement
 {
     /// <summary>
@@ -18,3 +19,4 @@ namespace HereticalSolutions.ResourceManagement
         public string FullPath;
     }
 }
+*/

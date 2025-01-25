@@ -35,11 +35,11 @@ namespace HereticalSolutions.Delegates.Notifiers
 		#region IAsyncNotifierSingleArgGeneric
 
 		public async Task<TValue> GetValueWhenNotified(
-			TArgument argument = default,
-			bool ignoreKey = false,
-
 			//Async tail
-			AsyncExecutionContext asyncContext)
+			AsyncExecutionContext asyncContext,
+
+			TArgument argument = default,
+			bool ignoreKey = false)
 		{
 			TaskCompletionSource<TValue> completionSource = new TaskCompletionSource<TValue>();
 
@@ -79,11 +79,11 @@ namespace HereticalSolutions.Delegates.Notifiers
 		}
 
 		public async Task<Task<TValue>> GetWaitForNotificationTask(
-			TArgument argument = default,
-			bool ignoreKey = false,
-
 			//Async tail
-			AsyncExecutionContext asyncContext)
+			AsyncExecutionContext asyncContext,
+
+			TArgument argument = default,
+			bool ignoreKey = false)
 		{
 			TaskCompletionSource<TValue> completionSource = new TaskCompletionSource<TValue>();
 

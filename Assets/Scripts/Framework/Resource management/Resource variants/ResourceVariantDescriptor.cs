@@ -1,3 +1,4 @@
+/*
 using System;
 
 namespace HereticalSolutions.ResourceManagement
@@ -35,3 +36,4 @@ namespace HereticalSolutions.ResourceManagement
         public Type ResourceType;
     }
 }
+*/

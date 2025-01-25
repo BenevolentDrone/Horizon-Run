@@ -22,13 +22,17 @@ namespace HereticalSolutions.Time.Factories
             TimeSpan defaultDurationSpan,
             ILoggerResolver loggerResolver)
         {
-            var onStart = BroadcasterFactory.BuildNonAllocBroadcasterGeneric<IPersistentTimer>(loggerResolver);
+            var onStart = BroadcasterFactory.BuildNonAllocBroadcasterGeneric<IPersistentTimer>(
+                loggerResolver);
             
-            var onStartRepeated = BroadcasterFactory.BuildNonAllocBroadcasterGeneric<IPersistentTimer>(loggerResolver);
+            var onStartRepeated = BroadcasterFactory.BuildNonAllocBroadcasterGeneric<IPersistentTimer>(
+                loggerResolver);
             
-            var onFinish = BroadcasterFactory.BuildNonAllocBroadcasterGeneric<IPersistentTimer>(loggerResolver);
+            var onFinish = BroadcasterFactory.BuildNonAllocBroadcasterGeneric<IPersistentTimer>(
+                loggerResolver);
             
-            var onFinishRepeated = BroadcasterFactory.BuildNonAllocBroadcasterGeneric<IPersistentTimer>(loggerResolver);
+            var onFinishRepeated = BroadcasterFactory.BuildNonAllocBroadcasterGeneric<IPersistentTimer>(
+                loggerResolver);
             
             ILogger logger =
                 loggerResolver?.GetLogger<PersistentTimer>();
@@ -213,9 +217,10 @@ namespace HereticalSolutions.Time.Factories
 
         public static TimerWithSubscriptionsContainer BuildRuntimeTimerWithSubscriptionsContainer(
             ISynchronizationProvider provider,
+            ILoggerResolver loggerResolver,
+            
             string id = TimerConsts.ANONYMOUS_TIMER_ID,
-            float duration = 0f,
-            ILoggerResolver loggerResolver)
+            float duration = 0f)
         {
             var logger = loggerResolver?.GetLogger<RuntimeTimer>();
             

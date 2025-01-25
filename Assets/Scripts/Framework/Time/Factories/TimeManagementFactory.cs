@@ -46,8 +46,9 @@ namespace HereticalSolutions.Time.Factories
         public static TimerManager BuildTimerManager(
             string managerID,
             ISynchronizationProvider provider,
-            bool renameTimersOnPop = true,
-            ILoggerResolver loggerResolver)
+            ILoggerResolver loggerResolver,
+            
+            bool renameTimersOnPop = true)
         {
             return new TimerManager(
                 managerID,

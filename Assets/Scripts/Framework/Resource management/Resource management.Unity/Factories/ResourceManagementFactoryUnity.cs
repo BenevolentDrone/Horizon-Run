@@ -1,3 +1,4 @@
+/*
 using HereticalSolutions.Logging;
 
 using UnityEngine.AddressableAssets;
@@ -21,3 +22,4 @@ namespace HereticalSolutions.ResourceManagement.Factories
         }
     }
 }
+*/

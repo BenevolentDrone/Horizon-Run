@@ -1,3 +1,4 @@
+/*
 using System.Collections.Generic;
 
 namespace HereticalSolutions.ResourceManagement
@@ -25,3 +26,4 @@ namespace HereticalSolutions.ResourceManagement
 		IEnumerable<IResourceVariantData> AllVariants { get; }
 	}
 }
+*/

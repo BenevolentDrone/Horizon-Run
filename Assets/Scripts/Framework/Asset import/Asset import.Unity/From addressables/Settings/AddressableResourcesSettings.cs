@@ -1,3 +1,4 @@
+/*
 using UnityEngine;
 
 namespace HereticalSolutions.AssetImport
@@ -14,3 +15,4 @@ namespace HereticalSolutions.AssetImport
         public AddressableResourceDataSettings[] Resources;
     }
 }
+*/

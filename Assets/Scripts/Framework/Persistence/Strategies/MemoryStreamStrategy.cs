@@ -53,10 +53,11 @@ namespace HereticalSolutions.Persistence
 
 
 		public MemoryStreamStrategy(
+			ILogger logger,
+			
 			byte[] buffer = null,
 			int index = -1,
-			int count = -1,
-			ILogger logger)
+			int count = -1)
 		{
 			this.buffer = buffer;
 

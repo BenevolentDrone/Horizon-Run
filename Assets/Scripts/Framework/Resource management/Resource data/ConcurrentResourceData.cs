@@ -1,3 +1,4 @@
+/*
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -1128,11 +1129,6 @@ namespace HereticalSolutions.ResourceManagement
 				$"({Descriptor.ID}) GetDefaultVariantWhenAvailable AWAITING FINISHED");
 
 			return awaitedResult;
-
-			/*
-			return await variantAddedNotifier
-				.GetValueWhenNotified(-1, true);
-			*/
 		}
 
 		public async Task<IResourceVariantData> GetVariantWhenAvailable(
@@ -1198,11 +1194,6 @@ namespace HereticalSolutions.ResourceManagement
 				$"({Descriptor.ID}) GetVariantWhenAvailable AWAITING FINISHED");
 
 			return awaitedResult;
-
-			/*
-			return await variantAddedNotifier
-				.GetValueWhenNotified(variantIDHash);
-			*/
 		}
 
 		public async Task<IResourceVariantData> GetVariantWhenAvailable(
@@ -1276,11 +1267,6 @@ namespace HereticalSolutions.ResourceManagement
 					GetType(),
 					$"({Descriptor.ID}) GetNestedResourceWhenAvailable SEMAPHORE RELEASED");
 			}
-
-			/*
-			return await nestedResourceAddedNotifier
-				.GetValueWhenNotified(nestedResourceIDHash);
-			*/
 
 			logger?.Log(
 				GetType(),
@@ -1415,3 +1401,4 @@ namespace HereticalSolutions.ResourceManagement
 		#endregion
 	}
 }
+*/

@@ -7,23 +7,30 @@ namespace HereticalSolutions.Pools.Factories
     public static class TimerDecoratorAllocationCallbacksFactory
     {
         public static SetRuntimeTimerCallback<T> BuildSetRuntimeTimerCallback<T>(
+            ILoggerResolver loggerResolver,
+
             string id = TimerDecoratorConsts.POOL_ELEMENT_METADATA_TIMER_ID,
-            float defaultDuration = 0f,
-            ILoggerResolver loggerResolver)
+            float defaultDuration = 0f)
         {
+            ILogger logger = loggerResolver?.GetLogger<SetRuntimeTimerCallback<T>>();
+
             return new SetRuntimeTimerCallback<T>(
+                loggerResolver,
+                logger,
                 id,
-                defaultDuration,
-                loggerResolver);
+                defaultDuration);
         }
 
         public static SetDurationAndPushSubscriptionCallback<T> BuildSetDurationAndPushSubscriptionCallback<T>(
-            float duration = 0f,
-            ILoggerResolver loggerResolver)
+            ILoggerResolver loggerResolver,
+            float duration = 0f)
         {
+            var logger = loggerResolver?.GetLogger<SetDurationAndPushSubscriptionCallback<T>>();
+
             return new SetDurationAndPushSubscriptionCallback<T>(
-                duration,
-                loggerResolver);
+                loggerResolver,
+                logger,
+                duration);
         }
     }
 }

@@ -13,18 +13,20 @@ namespace HereticalSolutions.Pools.AllocationCallbacks
 	public class SetRuntimeTimerCallback<T>
 		: IAllocationCallback<IPoolElementFacade<T>>
 	{
+		private readonly ILoggerResolver loggerResolver;
+
+		private readonly ILogger logger;
+
 		public string ID { get; set; }
 
 		public float DefaultDuration { get; set; }
 
-		private ILoggerResolver loggerResolver;
-
-		private ILogger logger;
-
 		public SetRuntimeTimerCallback(
+			ILoggerResolver loggerResolver,
+			ILogger logger,
+
 			string id = TimerDecoratorConsts.POOL_ELEMENT_METADATA_TIMER_ID,
-			float defaultDuration = 0f,
-			ILoggerResolver loggerResolver)
+			float defaultDuration = 0f)
 		{
 			ID = id;
 
@@ -32,10 +34,11 @@ namespace HereticalSolutions.Pools.AllocationCallbacks
 
 			this.loggerResolver = loggerResolver;
 			
-			logger = this.loggerResolver?.GetLogger<SetRuntimeTimerCallback<T>>();
+			this.logger = logger;
 		}
 
-		public void OnAllocated(IPoolElementFacade<T> poolElementFacade)
+		public void OnAllocated(
+			IPoolElementFacade<T> poolElementFacade)
 		{
 			IPoolElementFacadeWithMetadata<T> facadeWithMetadata =
 				poolElementFacade as IPoolElementFacadeWithMetadata<T>;

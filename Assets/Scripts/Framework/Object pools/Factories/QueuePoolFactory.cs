@@ -33,7 +33,8 @@ namespace HereticalSolutions.Pools.Factories
 
 			return new QueuePool<T>(
 				queue,
-				additionalAllocationCommand);
+				additionalAllocationCommand,
+				logger);
 		}
 
 		private static void PerformInitialAllocation<T>(
@@ -81,9 +82,10 @@ namespace HereticalSolutions.Pools.Factories
 		public static QueueManagedPool<T> BuildQueueManagedPool<T>(
 			AllocationCommand<T> initialAllocationCommand,
 			AllocationCommand<T> additionalAllocationCommand,
+			ILoggerResolver loggerResolver,
+
 			MetadataAllocationDescriptor[] metadataAllocationDescriptors = null,
-			IAllocationCallback<IPoolElementFacade<T>> facadeAllocationCallback = null,
-			ILoggerResolver loggerResolver)
+			IAllocationCallback<IPoolElementFacade<T>> facadeAllocationCallback = null)
 		{
 			ILogger logger =
 				loggerResolver?.GetLogger<QueueManagedPool<T>>();
@@ -178,9 +180,10 @@ namespace HereticalSolutions.Pools.Factories
 		public static AppendableQueueManagedPool<T> BuildAppendableQueueManagedPool<T>(
 			AllocationCommand<T> initialAllocationCommand,
 			AllocationCommand<T> additionalAllocationCommand,
+			ILoggerResolver loggerResolver,
+
 			MetadataAllocationDescriptor[] metadataAllocationDescriptors = null,
-			IAllocationCallback<IPoolElementFacade<T>> facadeAllocationCallback = null,
-			ILoggerResolver loggerResolver)
+			IAllocationCallback<IPoolElementFacade<T>> facadeAllocationCallback = null)
 		{
 			ILogger logger =
 				loggerResolver?.GetLogger<QueueManagedPool<T>>();

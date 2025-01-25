@@ -171,8 +171,8 @@ namespace HereticalSolutions.Persistence.Factories
         }
 
         public static TSerializationArgument BuildSerializationArgument<TSerializationArgument>(
-            object[] arguments = null,
-            ILoggerResolver loggerResolver)
+            ILoggerResolver loggerResolver,
+            object[] arguments = null)
         {
             if (Array.IndexOf(
                 serializationArgumentTypes,
@@ -258,8 +258,8 @@ namespace HereticalSolutions.Persistence.Factories
 #endif
 
         public static TFormatSerializer BuildFormatSerializer<TFormatSerializer>(
-            object[] arguments = null,
-            ILoggerResolver loggerResolver)
+            ILoggerResolver loggerResolver,
+            object[] arguments = null)
             where TFormatSerializer : IFormatSerializer
         {
             if (Array.IndexOf(
@@ -312,53 +312,58 @@ namespace HereticalSolutions.Persistence.Factories
 
         public static TextStreamStrategy BuildTextStreamStrategy(
             string fullPath,
-            bool flushAutomatically = true,
-            ILoggerResolver loggerResolver)
+            ILoggerResolver loggerResolver,
+            bool flushAutomatically = true)
         {
             return new TextStreamStrategy(
                 fullPath,
-                flushAutomatically,
-                loggerResolver?.GetLogger<TextStreamStrategy>());
+                loggerResolver?.GetLogger<TextStreamStrategy>(),
+                flushAutomatically);
         }
 
         public static FileStreamStrategy BuildFileStreamStrategy(
             string fullPath,
-            bool flushAutomatically = true,
-            ILoggerResolver loggerResolver)
+            ILoggerResolver loggerResolver,
+            bool flushAutomatically = true)
         {
             return new FileStreamStrategy(
                 fullPath,
-                flushAutomatically,
-                loggerResolver?.GetLogger<FileStreamStrategy>());
+                loggerResolver?.GetLogger<FileStreamStrategy>(),
+
+                flushAutomatically);
         }
 
         public static MemoryStreamStrategy BuildMemoryStreamStrategy(
+            ILoggerResolver loggerResolver,
+
             byte[] buffer = null,
             int index = -1,
-            int count = -1,
-            ILoggerResolver loggerResolver)
+            int count = -1)
         {
             return new MemoryStreamStrategy(
+                loggerResolver?.GetLogger<MemoryStreamStrategy>(),
+
                 buffer,
                 index,
-                count,
-                loggerResolver?.GetLogger<MemoryStreamStrategy>());
+                count);
         }
 
         public static IsolatedStorageStrategy BuildIsolatedStorageStrategy(
             string fullPath,
-            bool flushAutomatically = true,
-            ILoggerResolver loggerResolver)
+            ILoggerResolver loggerResolver,
+
+            bool flushAutomatically = true)
         {
             return new IsolatedStorageStrategy(
                 fullPath,
-                flushAutomatically,
-                loggerResolver?.GetLogger<IsolatedStorageStrategy>());
+                loggerResolver?.GetLogger<IsolatedStorageStrategy>(),
+                
+                flushAutomatically);
         }
 
         public static TSerializationStrategy BuildSerializationStrategy<TSerializationStrategy>(
-            object[] arguments = null,
-            ILoggerResolver loggerResolver)
+            ILoggerResolver loggerResolver,
+            object[] arguments = null)
             where TSerializationStrategy : ISerializationStrategy
         {
             if (Array.IndexOf(

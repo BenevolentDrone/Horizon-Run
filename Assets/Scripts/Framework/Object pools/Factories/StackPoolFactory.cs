@@ -33,7 +33,8 @@ namespace HereticalSolutions.Pools.Factories
 
             return new StackPool<T>(
                 stack,
-                additionalAllocationCommand);
+                additionalAllocationCommand,
+                logger);
         }
         
         private static void PerformInitialAllocation<T>(
@@ -81,9 +82,10 @@ namespace HereticalSolutions.Pools.Factories
         public static StackManagedPool<T> BuildStackManagedPool<T>(
             AllocationCommand<T> initialAllocationCommand,
             AllocationCommand<T> additionalAllocationCommand,
+            ILoggerResolver loggerResolver,
+
             MetadataAllocationDescriptor[] metadataAllocationDescriptors = null,
-            IAllocationCallback<IPoolElementFacade<T>> facadeAllocationCallback = null,
-            ILoggerResolver loggerResolver)
+            IAllocationCallback<IPoolElementFacade<T>> facadeAllocationCallback = null)
         {
             ILogger logger =
                 loggerResolver?.GetLogger<StackManagedPool<T>>();
@@ -178,9 +180,10 @@ namespace HereticalSolutions.Pools.Factories
         public static AppendableStackManagedPool<T> BuildAppendableStackManagedPool<T>(
             AllocationCommand<T> initialAllocationCommand,
             AllocationCommand<T> additionalAllocationCommand,
+            ILoggerResolver loggerResolver,
+
             MetadataAllocationDescriptor[] metadataAllocationDescriptors = null,
-            IAllocationCallback<IPoolElementFacade<T>> facadeAllocationCallback = null,
-            ILoggerResolver loggerResolver)
+            IAllocationCallback<IPoolElementFacade<T>> facadeAllocationCallback = null)
         {
             ILogger logger =
                 loggerResolver?.GetLogger<StackManagedPool<T>>();

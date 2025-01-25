@@ -20,7 +20,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
 			IStageNode<TProcedure> startNode,
 			IStageNode<TProcedure> finishNode,
 
-			byte freeThreadIndex = 2,
+			byte freeThreadIndex,
 
 			ILogger logger)
 			: base(

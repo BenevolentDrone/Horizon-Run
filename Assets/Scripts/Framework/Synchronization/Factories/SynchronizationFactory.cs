@@ -40,15 +40,14 @@ namespace HereticalSolutions.Synchronization.Factories
 
 		public static SynchronizationContextGeneric<TDelta> BuildSynchronizationContextGeneric<TDelta>(
 			string id,
+			ILoggerResolver loggerResolver,
 
 			bool canBeToggled = true,
 			bool active = true,
 			
 			bool canScale = false,
 			TDelta scale = default,
-			Func<TDelta, TDelta, TDelta> scaleDeltaDelegate = null,
-
-			ILoggerResolver loggerResolver)
+			Func<TDelta, TDelta, TDelta> scaleDeltaDelegate = null)
 		{
 			var descriptor = new SynchronizationDescriptor(
 				id);
@@ -81,14 +80,14 @@ namespace HereticalSolutions.Synchronization.Factories
 			TDelta fixedDelta,
 			Func<TDelta, float> deltaToFloatDelegate,
 
+			ILoggerResolver loggerResolver,
+
 			bool canBeToggled = true,
 			bool active = true,
 
 			bool canScale = false,
 			TDelta scale = default,
-			Func<TDelta, TDelta, TDelta> scaleDeltaDelegate = null,
-
-			ILoggerResolver loggerResolver)
+			Func<TDelta, TDelta, TDelta> scaleDeltaDelegate = null)
 		{
 			var descriptor = new SynchronizationDescriptor(
 				id);

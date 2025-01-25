@@ -26,15 +26,15 @@ namespace HereticalSolutions.LifetimeManagement
 		private Action tearDown;
 		
 		public Lifetime(
+			ILogger logger,
+
 			EInitializationFlags initializationFlags = 
 				EInitializationFlags.NO_ARGS_ALLOWED,
 			
 			Action setUp = null,
 			Func<object[], bool> initialize = null,
 			Action cleanup = null,
-			Action tearDown = null,
-			
-			ILogger logger)
+			Action tearDown = null)
 		{
 			this.logger = logger;
 			

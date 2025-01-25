@@ -17,9 +17,9 @@ namespace HereticalSolutions.Pools.AllocationCallbacks
         private ILogger logger;
         
         public SetAddressCallback(
+            ILogger logger,
             string fullAddress = null,
-            int[] addressHashes = null,
-            ILogger logger)
+            int[] addressHashes = null)
         {
             FullAddress = fullAddress;
             
@@ -28,7 +28,8 @@ namespace HereticalSolutions.Pools.AllocationCallbacks
             this.logger = logger;
         }
 
-        public void OnAllocated(IPoolElementFacade<T> poolElementFacade)
+        public void OnAllocated(
+            IPoolElementFacade<T> poolElementFacade)
         {
             if (FullAddress == null || AddressHashes == null)
                 return;

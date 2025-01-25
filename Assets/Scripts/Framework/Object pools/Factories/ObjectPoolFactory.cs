@@ -14,8 +14,9 @@ namespace HereticalSolutions.Pools.Factories
 		public static IManagedPool<TValue> BuildObjectPool<TValue>(
 			AllocationCommandDescriptor initialAllocation,
 			AllocationCommandDescriptor additionalAllocation,
-			object[] valueAllocationArguments = null,
-			ILoggerResolver loggerResolver)
+			ILoggerResolver loggerResolver,
+			
+			object[] valueAllocationArguments = null)
 		{
 			#region Builders
 

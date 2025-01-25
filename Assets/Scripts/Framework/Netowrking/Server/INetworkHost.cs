@@ -16,10 +16,11 @@ namespace HereticalSolutions.Networking
 
         Task Start(
             int port,
-            bool reserveSlotForSelf = false,
 
             //Async tail
-            AsyncExecutionContext asyncContext);
+            AsyncExecutionContext asyncContext,
+            
+            bool reserveSlotForSelf = false);
 
         Task Stop(
 

@@ -44,7 +44,9 @@ namespace HereticalSolutions.LifetimeManagement
 		public HierarchicalLifetime(
 			object target,
 			IPool<List<IReadOnlyHierarchyNode<ILifetimeable>>> bufferPool,
-			
+
+			ILogger logger,
+
 			ILifetimeable parentLifetime = null,
 			EInitializationFlags initializationFlags = 
 				EInitializationFlags.NO_ARGS_ALLOWED
@@ -57,9 +59,7 @@ namespace HereticalSolutions.LifetimeManagement
 			Action setUp = null,
 			Func<object[], bool> initialize = null,
 			Action cleanup = null,
-			Action tearDown = null,
-			
-			ILogger logger)
+			Action tearDown = null)
 		{
 			this.target = target;
 			

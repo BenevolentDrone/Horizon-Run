@@ -1,3 +1,4 @@
+/*
 using System;
 
 using UnityEngine.AddressableAssets;
@@ -26,3 +27,4 @@ namespace HereticalSolutions.AssetImport
         public AssetReference AssetReference;
     }
 }
+*/

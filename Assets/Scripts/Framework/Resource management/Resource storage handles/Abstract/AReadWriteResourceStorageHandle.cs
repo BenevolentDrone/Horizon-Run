@@ -1,3 +1,4 @@
+/*
 using System;
 
 using HereticalSolutions.Logging;
@@ -60,3 +61,4 @@ namespace HereticalSolutions.ResourceManagement
 		#endregion
 	}
 }
+*/

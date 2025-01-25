@@ -39,7 +39,8 @@ namespace HereticalSolutions.Persistence
 			byte[] result = null;
 
 			if (!IOHelpers.FileExists(
-				savePath))
+				savePath,
+				logger))
 			{
 				value = result.CastFromTo<byte[], TValue>();
 
@@ -65,7 +66,8 @@ namespace HereticalSolutions.Persistence
 			byte[] result = null;
 
 			if (!IOHelpers.FileExists(
-				savePath))
+				savePath,
+				logger))
 			{
 				value = result.CastFromTo<byte[], object>();
 

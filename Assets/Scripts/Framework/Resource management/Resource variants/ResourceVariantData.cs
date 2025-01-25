@@ -1,3 +1,4 @@
+/*
 using System;
 
 using HereticalSolutions.LifetimeManagement;
@@ -64,3 +65,4 @@ namespace HereticalSolutions.ResourceManagement
         #endregion
     }
 }
+*/

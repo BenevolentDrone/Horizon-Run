@@ -1,3 +1,4 @@
+/*
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -769,11 +770,6 @@ namespace HereticalSolutions.ResourceManagement
 					$"GetRootResourceWhenAvailable SEMAPHORE RELEASED");
 			}
 
-			/*
-			return await rootResourceAddedNotifier
-				.GetValueWhenNotified(resourceIDHash);
-			*/
-
 			logger?.Log(
 				GetType(),
 				$"GetRootResourceWhenAvailable AWAITING INITIATED");
@@ -1235,3 +1231,4 @@ namespace HereticalSolutions.ResourceManagement
 		}
 	}
 }
+*/

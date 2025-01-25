@@ -18,10 +18,11 @@ namespace HereticalSolutions.Networking
             string ip,
             int port,
             string secret,
-            byte preferredPlayerSlot = byte.MaxValue, //TODO: refactor
 
             //Async tail
-            AsyncExecutionContext asyncContext);
+            AsyncExecutionContext asyncContext,
+            
+            byte preferredPlayerSlot = byte.MaxValue); //TODO: refactor
 
         void Disconnect();
     }

@@ -172,10 +172,11 @@ namespace HereticalSolutions.Networking.LiteNetLib
 
         public async Task Start(
             int port,
-            bool reserveSlotForSelf = false,
 
             //Async tail
-            AsyncExecutionContext asyncContext)
+            AsyncExecutionContext asyncContext,
+
+            bool reserveSlotForSelf = false)
         {
             if (status != EHostStatus.OFFLINE)
             {
@@ -622,9 +623,10 @@ namespace HereticalSolutions.Networking.LiteNetLib
             
             Start(
                 port,
-                message.ReserveSlotForSelf,
                 
-                null);
+                null,
+
+                message.ReserveSlotForSelf);
         }
         
         private void OnServerStopMessage(

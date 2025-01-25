@@ -1,3 +1,4 @@
+/*
 using System;
 
 namespace HereticalSolutions.AssetImport
@@ -24,3 +25,4 @@ namespace HereticalSolutions.AssetImport
         public UnityEngine.Object Resource;
     }
 }
+*/

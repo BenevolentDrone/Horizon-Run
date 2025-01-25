@@ -107,9 +107,9 @@ namespace HereticalSolutions.Collections.Factories
         }
 
         public static NonAllocBPlusTree<T> BuildNonAllocBPlusTree<T>(
+            ILoggerResolver loggerResolver,
             IPool<NonAllocBPlusTreeNode<T>> nodePool = null,
-            int degree = DEFAULT_B_PLUS_TREE_DEGREE,
-            ILoggerResolver loggerResolver)
+            int degree = DEFAULT_B_PLUS_TREE_DEGREE)
         {
             if (nodePool != null)
             {
@@ -130,9 +130,9 @@ namespace HereticalSolutions.Collections.Factories
         }
 
         public static ConcurrentNonAllocBPlusTree<T> BuildConcurrentNonAllocBPlusTree<T>(
+            ILoggerResolver loggerResolver,
             IPool<NonAllocBPlusTreeNode<T>> nodePool = null,
-            int degree = DEFAULT_B_PLUS_TREE_DEGREE,
-            ILoggerResolver loggerResolver)
+            int degree = DEFAULT_B_PLUS_TREE_DEGREE)
         {
             if (nodePool != null)
             {
@@ -175,9 +175,9 @@ namespace HereticalSolutions.Collections.Factories
         }
 
         public static NonAllocBPlusTreeMap<TKey, TValue> BuildNonAllocBPlusTreeMap<TKey, TValue>(
+            ILoggerResolver loggerResolver,
             IPool<NonAllocBPlusTreeMapNode<TKey, TValue>> nodePool = null,
-            int degree = DEFAULT_B_PLUS_TREE_DEGREE,
-            ILoggerResolver loggerResolver)
+            int degree = DEFAULT_B_PLUS_TREE_DEGREE)
         {
             if (nodePool != null)
             {
@@ -198,9 +198,9 @@ namespace HereticalSolutions.Collections.Factories
         }
 
         public static ConcurrentNonAllocBPlusTreeMap<TKey, TValue> BuildConcurrentNonAllocBPlusTreeMap<TKey, TValue>(
+            ILoggerResolver loggerResolver,
             IPool<NonAllocBPlusTreeMapNode<TKey, TValue>> nodePool = null,
-            int degree = DEFAULT_B_PLUS_TREE_DEGREE,
-            ILoggerResolver loggerResolver)
+            int degree = DEFAULT_B_PLUS_TREE_DEGREE)
         {
             if (nodePool != null)
             {

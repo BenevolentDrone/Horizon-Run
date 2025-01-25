@@ -10,7 +10,8 @@
 		/// Represents a base state machine
 		/// </summary>
 		/// <typeparam name="TBaseState">The base state type.</typeparam>
-		public class BaseStateMachine<TBaseState> : IStateMachine<TBaseState>
+		public class BaseStateMachine<TBaseState>
+			: IStateMachine<TBaseState>
 			where TBaseState : IState
 		{
 			private readonly IReadOnlyRepository<Type, TBaseState> states;
@@ -241,11 +242,11 @@
 
 				OnCurrentStateChangeStarted?.Invoke(previousState, newState);
 
-				previousState.OnStateExited();
+				previousState.ExitState();
 
 				CurrentState = newState;
 
-				newState.OnStateEntered();
+				newState.EnterState();
 
 				OnCurrentStateChangeFinished?.Invoke(previousState, newState);
 

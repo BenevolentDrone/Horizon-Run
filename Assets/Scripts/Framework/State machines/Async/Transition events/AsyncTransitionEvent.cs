@@ -2,7 +2,7 @@ using HereticalSolutions.StateMachines;
 
 namespace HereticalSolutions.StateMachines
 {
-    public class TransitionEventWithRules<TBaseState>
+    public class AsyncTransitionEvent<TBaseState>
         : ITransitionEvent<TBaseState>
         where TBaseState : IState
     {
@@ -12,7 +12,7 @@ namespace HereticalSolutions.StateMachines
 
         public EAsyncTransitionRules Rules { get; protected set; }
 
-        public TransitionEventWithRules(
+        public AsyncTransitionEvent(
             TBaseState from,
             TBaseState to,
             EAsyncTransitionRules rules)

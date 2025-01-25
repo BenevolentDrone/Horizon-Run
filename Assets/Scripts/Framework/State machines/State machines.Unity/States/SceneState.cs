@@ -15,11 +15,11 @@ namespace HereticalSolutions.StateMachines
             SetAsActiveOnLoad = setAsActiveOnLoad;
         }
 
-        public virtual void OnStateEntered()
+        public virtual void EnterState()
         {
         }
 
-        public virtual void OnStateExited()
+        public virtual void ExitState()
         {            
         }
     }

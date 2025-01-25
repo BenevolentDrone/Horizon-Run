@@ -4,7 +4,7 @@ using HereticalSolutions.Asynchronous;
 
 namespace HereticalSolutions.StateMachines
 {
-    public interface ITransitionController<TBaseState>
+    public interface IAsyncTransitionController<TBaseState>
         where TBaseState : IState
     {
         Task EnterState(

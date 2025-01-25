@@ -2,8 +2,8 @@ namespace HereticalSolutions.StateMachines
 {
     public interface IState
     {
-        void OnStateEntered();
+        void EnterState();
         
-        void OnStateExited();
+        void ExitState();
     }
 }

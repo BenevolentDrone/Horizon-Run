@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace HereticalSolutions.StateMachines
 {
-    public class AnimationTransitionController<TBaseState> : ITransitionController<TBaseState>
+    public class AnimationTransitionController<TBaseState> : IAsyncTransitionController<TBaseState>
         where TBaseState : IState
     {
         public async Task EnterState(

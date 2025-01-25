@@ -10,7 +10,7 @@ using UnityEngine.SceneManagement;
 namespace HereticalSolutions.StateMachines
 {
     public class SceneTransitionController
-        : ITransitionController<SceneState>
+        : IAsyncTransitionController<SceneState>
     {
         public async Task EnterState(
             SceneState state,

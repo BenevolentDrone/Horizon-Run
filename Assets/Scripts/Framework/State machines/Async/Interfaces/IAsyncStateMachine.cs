@@ -24,7 +24,8 @@ namespace HereticalSolutions.StateMachines
 
         #region All states
 
-        TBaseState GetState<TConcreteState>();
+        TConcreteState GetState<TConcreteState>()
+            where TConcreteState : TBaseState;
         
         TBaseState GetState(
             Type stateType);
@@ -36,22 +37,15 @@ namespace HereticalSolutions.StateMachines
         #region Event handling
         
         Task Handle<TEvent>(
-            //Async tail
-            AsyncExecutionContext asyncContext,
 
-            IProgress<float> stateExitProgress = null,
-            IProgress<float> stateEnterProgress = null,
-            TransitionSupervisor supervisor = null);
+            //Async tail
+            AsyncExecutionContext asyncContext);
         
         Task Handle(
             Type eventType,
 
             //Async tail
-            AsyncExecutionContext asyncContext,
-
-            IProgress<float> stateExitProgress = null,
-            IProgress<float> stateEnterProgress = null,
-            TransitionSupervisor supervisor = null);
+            AsyncExecutionContext asyncContext);
         
         Action<ITransitionEvent<TBaseState>> OnEventFired { get; set; }
         
@@ -60,44 +54,25 @@ namespace HereticalSolutions.StateMachines
         #region Immediate transition
         
         Task TransitToImmediately<TState>(
-            //Async tail
-            AsyncExecutionContext asyncContext,
 
-            IProgress<float> stateExitProgress = null,
-            IProgress<float> stateEnterProgress = null,
-            TransitionSupervisor supervisor = null);
+            //Async tail
+            AsyncExecutionContext asyncContext)
+            where TState : TBaseState;
         
         Task TransitToImmediately(
             Type stateType,
 
             //Async tail
-            AsyncExecutionContext asyncContext,
-
-            IProgress<float> stateExitProgress = null,
-            IProgress<float> stateEnterProgress = null,
-            TransitionSupervisor supervisor = null);
+            AsyncExecutionContext asyncContext);
 
         #endregion
 
         #region Scheduled transition
 
+        IEnumerable<AsyncTransitionRequest<TBaseState>> ScheduledTransitions { get; }
+
         void ScheduleTransition<TState>(
-            //Async tail
-            AsyncExecutionContext asyncContext,
-
-            IProgress<float> stateExitProgress = null,
-            IProgress<float> stateEnterProgress = null,
-            TransitionSupervisor supervisor = null);
-
-        void ScheduleTransition(
-            Type stateType,
-
-            //Async tail
-            AsyncExecutionContext asyncContext,
-
-            IProgress<float> stateExitProgress = null,
-            IProgress<float> stateEnterProgress = null,
-            TransitionSupervisor supervisor = null);
+            AsyncTransitionRequest<TBaseState> request);
 
         #endregion
     }

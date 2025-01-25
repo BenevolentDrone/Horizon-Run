@@ -25,7 +25,7 @@ namespace HereticalSolutions.StateMachines.Factories
         public static BaseAsyncStateMachine<TBaseState> BuildBaseAsyncStateMachine<TBaseState>(
             IReadOnlyRepository<Type, TBaseState> states,
             IReadOnlyRepository<Type, ITransitionEvent<TBaseState>> events,
-            ITransitionController<TBaseState> transitionController,
+            IAsyncTransitionController<TBaseState> transitionController,
             EAsyncTransitionRules asyncTransitionRules,
             TBaseState currentState,
             ILoggerResolver loggerResolver)
@@ -37,7 +37,7 @@ namespace HereticalSolutions.StateMachines.Factories
             return new BaseAsyncStateMachine<TBaseState>(
                 states,
                 events,
-                new Queue<TransitionRequest<TBaseState>>(),
+                new Queue<AsyncTransitionRequest<TBaseState>>(),
                 transitionController,
                 asyncTransitionRules,
                 currentState,

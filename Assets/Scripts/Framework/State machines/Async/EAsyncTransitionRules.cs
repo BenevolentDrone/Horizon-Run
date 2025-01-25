@@ -2,10 +2,10 @@ namespace HereticalSolutions.StateMachines
 {
     public enum EAsyncTransitionRules
     {
-        TRANSIT_SEQUENTIALLY_UNLOAD_THEN_LOAD,
+        EXIT_THEN_ENTER,
 
-        TRANSIT_SEQUENTIALLY_LOAD_THEN_UNLOAD,
+        ENTER_THEN_EXIT,
 
-        TRANSIT_SIMULTANEOUSLY
+        PARALLEL
     }
 }

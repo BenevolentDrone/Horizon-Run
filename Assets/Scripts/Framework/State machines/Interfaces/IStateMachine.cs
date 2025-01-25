@@ -20,7 +20,8 @@ namespace HereticalSolutions.StateMachines
 
         #region All states
 
-        TBaseState GetState<TConcreteState>();
+        TConcreteState GetState<TConcreteState>()
+            where TConcreteState : TBaseState;
 
         TBaseState GetState(
             Type stateType);
@@ -31,7 +32,8 @@ namespace HereticalSolutions.StateMachines
         
         #region Event handling
         
-        void Handle<TEvent>();
+        void Handle<TEvent>()
+            where TEvent : ITransitionEvent<TBaseState>;
         
         void Handle(
             Type eventType);
@@ -42,19 +44,20 @@ namespace HereticalSolutions.StateMachines
 
         #region Immediate transition
         
-        void TransitToImmediately<TState>();
+        void TransitToImmediately<TState>()
+            where TState : TBaseState;
         
         void TransitToImmediately(
             Type stateType);
-        
+
         #endregion
 
         #region Scheduled transition
 
-        void ScheduleTransition<TState>();
+        IEnumerable<TransitionRequest<TBaseState>> ScheduledTransitions { get; }
 
-        void ScheduleTransition(
-            Type stateType);
+        void ScheduleTransition<TState>(
+            TransitionRequest<TBaseState> request);
 
         #endregion
     }

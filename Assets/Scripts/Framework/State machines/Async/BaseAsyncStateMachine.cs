@@ -17,9 +17,9 @@ namespace HereticalSolutions.StateMachines
 
         private readonly IReadOnlyRepository<Type, ITransitionEvent<TBaseState>> events;
 
-        private readonly Queue<TransitionRequest<TBaseState>> transitionRequestsQueue;
+        private readonly Queue<AsyncTransitionRequest<TBaseState>> transitionRequestsQueue;
 
-        private readonly ITransitionController<TBaseState> transitionController;
+        private readonly IAsyncTransitionController<TBaseState> transitionController;
 
         private readonly EAsyncTransitionRules defaultAsyncTransitionRules;
 
@@ -47,8 +47,8 @@ namespace HereticalSolutions.StateMachines
         public BaseAsyncStateMachine(
             IReadOnlyRepository<Type, TBaseState> states,
             IReadOnlyRepository<Type, ITransitionEvent<TBaseState>> events,
-            Queue<TransitionRequest<TBaseState>> transitionRequestsQueue,
-            ITransitionController<TBaseState> transitionController,
+            Queue<AsyncTransitionRequest<TBaseState>> transitionRequestsQueue,
+            IAsyncTransitionController<TBaseState> transitionController,
             EAsyncTransitionRules defaultAsyncTransitionRules,
             TBaseState currentState,
             ILogger logger)
@@ -607,7 +607,7 @@ namespace HereticalSolutions.StateMachines
                 transitionRequestsQueue.Count > 0
                 && !cancellationToken.IsCancellationRequested)
             {
-                TransitionRequest<TBaseState> nextRequest;
+                AsyncTransitionRequest<TBaseState> nextRequest;
 
                 lock (lockObject) 
                 {
@@ -714,8 +714,8 @@ namespace HereticalSolutions.StateMachines
 
             var rules = defaultAsyncTransitionRules;
 
-            if (@event is TransitionEventWithRules<TBaseState>)
-                rules = ((TransitionEventWithRules<TBaseState>)@event).Rules;
+            if (@event is AsyncTransitionEvent<TBaseState>)
+                rules = ((AsyncTransitionEvent<TBaseState>)@event).Rules;
 
             var task = PerformTransition(
                 previousState,
@@ -748,7 +748,7 @@ namespace HereticalSolutions.StateMachines
             {
                 switch (rules)
                 {
-                    case EAsyncTransitionRules.TRANSIT_SEQUENTIALLY_UNLOAD_THEN_LOAD:
+                    case EAsyncTransitionRules.EXIT_THEN_ENTER:
 
                         OnCurrentStateChangeStarted?.Invoke(
                             previousState,
@@ -798,7 +798,7 @@ namespace HereticalSolutions.StateMachines
 
                         break;
 
-                    case EAsyncTransitionRules.TRANSIT_SEQUENTIALLY_LOAD_THEN_UNLOAD:
+                    case EAsyncTransitionRules.ENTER_THEN_EXIT:
                         
                         OnCurrentStateChangeStarted?.Invoke(
                             previousState,
@@ -848,7 +848,7 @@ namespace HereticalSolutions.StateMachines
 
                         break;
 
-                    case EAsyncTransitionRules.TRANSIT_SIMULTANEOUSLY:
+                    case EAsyncTransitionRules.CONCURRENT:
 
                         OnCurrentStateChangeStarted?.Invoke(previousState, newState);
 
@@ -928,7 +928,7 @@ namespace HereticalSolutions.StateMachines
                 return;
             }
                         
-            previousState.OnStateExited();
+            previousState.ExitState();
 
             protocol?.OnPreviousStateExited?.Invoke(previousState);
                         
@@ -983,7 +983,7 @@ namespace HereticalSolutions.StateMachines
                 return;
             }
 
-            newState.OnStateEntered();
+            newState.EnterState();
                         
             protocol?.OnNextStateEntered?.Invoke(newState);
                         

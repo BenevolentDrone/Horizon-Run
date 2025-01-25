@@ -5,10 +5,12 @@ using System.Collections.Generic;
 
 using HereticalSolutions.Asynchronous;
 
+using HereticalSolutions.Delegates;
+
 namespace HereticalSolutions.StateMachines
 {
     public interface IAsyncStateMachine<TBaseState>
-        where TBaseState : IState
+        where TBaseState : IAsyncState
     {
         bool TransitionInProgress { get; }
         
@@ -16,9 +18,9 @@ namespace HereticalSolutions.StateMachines
 
         TBaseState CurrentState { get; }
         
-        Action<TBaseState, TBaseState> OnCurrentStateChangeStarted { get; set; }
-        
-        Action<TBaseState, TBaseState> OnCurrentStateChangeFinished { get; set; }
+        INonAllocSubscribable OnCurrentStateChangeStarted { get; }
+
+        INonAllocSubscribable OnCurrentStateChangeFinished { get; }
 
         #endregion
 
@@ -47,7 +49,7 @@ namespace HereticalSolutions.StateMachines
             //Async tail
             AsyncExecutionContext asyncContext);
         
-        Action<ITransitionEvent<TBaseState>> OnEventFired { get; set; }
+        INonAllocSubscribable OnEventFired { get; }
         
         #endregion
 
@@ -69,10 +71,10 @@ namespace HereticalSolutions.StateMachines
 
         #region Scheduled transition
 
-        IEnumerable<AsyncTransitionRequest<TBaseState>> ScheduledTransitions { get; }
+        IEnumerable<IAsyncTransitionRequest> ScheduledTransitions { get; }
 
-        void ScheduleTransition<TState>(
-            AsyncTransitionRequest<TBaseState> request);
+        void ScheduleTransition(
+            IAsyncTransitionRequest request);
 
         #endregion
     }

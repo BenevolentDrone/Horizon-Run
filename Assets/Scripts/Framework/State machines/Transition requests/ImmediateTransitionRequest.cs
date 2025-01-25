@@ -2,10 +2,15 @@ using System;
 
 namespace HereticalSolutions.StateMachines
 {
-	public class ImmediateTransitionRequest<TBaseState>
-		: TransitionRequest<TBaseState>
-		where TBaseState : IState
+	public class ImmediateTransitionRequest
+		: ATransitionRequest
 	{
-		public Type TargetStateType;
+		private Type targetStateType;
+
+		public Type TargetStateType
+		{
+			get => targetStateType;
+			set => targetStateType = value;
+		}
 	}
 }

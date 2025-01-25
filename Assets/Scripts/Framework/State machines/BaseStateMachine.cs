@@ -1,15 +1,14 @@
 	using System;
 	using System.Collections.Generic;
 
-	using HereticalSolutions.Logging;
+	using HereticalSolutions.Delegates;
+
 	using HereticalSolutions.Repositories;
 
+	using HereticalSolutions.Logging;
+	
 	namespace HereticalSolutions.StateMachines
 	{
-		/// <summary>
-		/// Represents a base state machine
-		/// </summary>
-		/// <typeparam name="TBaseState">The base state type.</typeparam>
 		public class BaseStateMachine<TBaseState>
 			: IStateMachine<TBaseState>
 			where TBaseState : IState
@@ -18,121 +17,132 @@
 
 			private readonly IReadOnlyRepository<Type, ITransitionEvent<TBaseState>> events;
 
-			private readonly Queue<ITransitionEvent<TBaseState>> transitionQueue;
+			private readonly ITransitionController<TBaseState> transitionController;
+
+			private readonly Queue<ITransitionRequest<TBaseState>> transitionQueue;
+
+
+			private readonly INonAllocSubscribable onCurrentStateChangeStarted;
+	
+			private readonly INonAllocSubscribable onCurrentStateChangeFinished;
+
 
 			private readonly ILogger logger;
 
-			/// <summary>
-			/// Initializes a new instance of the <see cref="BaseStateMachine{TBaseState}"/> class
-			/// </summary>
-			/// <param name="states">The repository of states.</param>
-			/// <param name="events">The repository of events.</param>
-			/// <param name="transitionQueue">The queue of transition events.</param>
-			/// <param name="currentState">The current state of the state machine.</param>
-			/// <param name="logger">The logger used for logging.</param>
+
+			private TBaseState currentState;
+
+			private bool transitionInProgress;
+
 			public BaseStateMachine(
 				IReadOnlyRepository<Type, TBaseState> states,
 				IReadOnlyRepository<Type, ITransitionEvent<TBaseState>> events,
 				Queue<ITransitionEvent<TBaseState>> transitionQueue,
-				TBaseState currentState,
+
+				INonAllocSubscribable onCurrentStateChangeStarted,
+				INonAllocSubscribable onCurrentStateChangeFinished,
+
+				TBaseState initialState,
+
 				ILogger logger)
 			{
 				this.states = states;
+
 				this.events = events;
+
 				this.transitionQueue = transitionQueue;
+
 				this.logger = logger;
 
-				CurrentState = currentState;
 
-				OnCurrentStateChangeStarted = null;
-				OnCurrentStateChangeFinished = null;
+				this.onCurrentStateChangeStarted = onCurrentStateChangeStarted;
+				
+				this.onCurrentStateChangeFinished = onCurrentStateChangeFinished;
+
+
+				currentState = initialState;
 			}
 
 			#region IStateMachine
 
-			/// <summary>
-			/// Gets a value indicating whether a transition is in progress
-			/// </summary>
-			public bool TransitionInProgress { get; private set; }
+			public bool TransitionInProgress => transitionInProgress;
 
 			#region Current state
 
-			/// <summary>
-			/// Gets or sets the current state of the state machine
-			/// </summary>
-			public TBaseState CurrentState { get; private set; }
+			public TBaseState CurrentState => currentState;
 
-			/// <summary>
-			/// Gets or sets the action to perform when the current state change is started
-			/// </summary>
-			public Action<TBaseState, TBaseState> OnCurrentStateChangeStarted { get; set; }
+			public INonAllocSubscribable OnCurrentStateChangeStarted => onCurrentStateChangeStarted;
 
-			/// <summary>
-			/// Gets or sets the action to perform when the current state change is finished
-			/// </summary>
-			public Action<TBaseState, TBaseState> OnCurrentStateChangeFinished { get; set; }
+			public INonAllocSubscribable OnCurrentStateChangeFinished => onCurrentStateChangeFinished;
 
+			//public Action<TBaseState, TBaseState> OnCurrentStateChangeStarted { get; set; }
+	
+			//public Action<TBaseState, TBaseState> OnCurrentStateChangeFinished { get; set; }
+	
 			#endregion
-
+	
 			#region All states
 
-			/// <summary>
-			/// Gets all the types of states in the state machine
-			/// </summary>
-			public IEnumerable<Type> AllStates
+			public TConcreteState GetState<TConcreteState>()
+				where TConcreteState : TBaseState
 			{
-				get => states.Keys;
-			}
-
-			/// <summary>
-			/// Gets the state of the specified type
-			/// </summary>
-			/// <typeparam name="TConcreteState">The concrete state type.</typeparam>
-			/// <returns>The state of the specified type.</returns>
-			public TBaseState GetState<TConcreteState>()
-			{
-				if (!states.TryGet(typeof(TConcreteState), out var result))
+				if (!states.TryGet(
+					typeof(TConcreteState),
+					out var result))
+				{
 					throw new Exception(
 						logger.TryFormatException(
 							GetType(),
 							$"STATE {nameof(TConcreteState)} NOT FOUND"));
+				}
 
-				return result;
+				return (TConcreteState)result;
 			}
 
-			/// <summary>
-			/// Gets the state of the specified type
-			/// </summary>
-			/// <param name="stateType">The type of the state.</param>
-			/// <returns>The state of the specified type.</returns>
-			public TBaseState GetState(Type stateType)
+			public TBaseState GetState(
+				Type stateType)
 			{
-				if (!states.TryGet(stateType, out var result))
+				if (!states.TryGet(
+					stateType,
+					out var result))
+				{
 					throw new Exception(
 						logger.TryFormatException(
 							GetType(),
 							$"STATE {stateType.Name} NOT FOUND"));
+				}
 
 				return result;
 			}
 
-			#endregion
-
-			#region Event handling
-
-			/// <summary>
-			/// Handles the specified event
-			/// </summary>
-			/// <typeparam name="TEvent">The type of the event.</typeparam>
-			public void Handle<TEvent>()
+			public IEnumerable<Type> AllStates
 			{
+				get => states.Keys;
+			}
+	
+			#endregion
+	
+			#region Event handling
+	
+			public bool Handle<TEvent>()
+			{
+				if (TransitionInProgress
+					|| transitionQueue.Count != 0)
+				{
+					return false;
+				}
+
 				ITransitionEvent<TBaseState> @event;
 
-				if (!events.TryGet(typeof(TEvent), out @event))
+				if (!events.TryGet(
+					typeof(TEvent),
+					out @event))
+				{
 					throw new Exception(
 						logger.TryFormatException(
 							GetType(),
 							$"EVENT {nameof(TEvent)} NOT FOUND"));
+				}
 
 				if (TransitionInProgress)
 					transitionQueue.Enqueue(@event);
@@ -140,11 +150,8 @@
 					PerformTransition(@event);
 			}
 
-			/// <summary>
-			/// Handles the specified event
-			/// </summary>
-			/// <param name="eventType">The type of the event.</param>
-			public void Handle(Type eventType)
+			public bool Handle(
+				Type eventType)
 			{
 				ITransitionEvent<TBaseState> @event;
 
@@ -160,19 +167,12 @@
 					PerformTransition(@event);
 			}
 
-			/// <summary>
-			/// Gets or sets the action to perform when an event is fired
-			/// </summary>
 			public Action<ITransitionEvent<TBaseState>> OnEventFired { get; set; }
 
 			#endregion
 
 			#region Immediate transition
 
-			/// <summary>
-			/// Transitions immediately to the specified state
-			/// </summary>
-			/// <typeparam name="TState">The type of the state.</typeparam>
 			public void TransitToImmediately<TState>()
 			{
 				if (!states.Has(typeof(TState)))
@@ -189,10 +189,6 @@
 					newState);
 			}
 
-			/// <summary>
-			/// Transitions immediately to the specified state
-			/// </summary>
-			/// <param name="stateType">The type of the state.</param>
 			public void TransitToImmediately(Type stateType)
 			{
 				if (!states.Has(stateType))
@@ -226,12 +222,16 @@
 							$"CURRENT STATE {currentStateString} IS NOT EQUAL TO TRANSITION FROM STATE {fromStateString}"));
 				}
 
-				OnEventFired?.Invoke(@event);
+				OnEventFired?.Invoke(
+					@event);
 
 				var previousState = CurrentState;
+
 				var newState = @event.To;
 
-				PerformTransition(previousState, newState);
+				PerformTransition(
+					previousState,
+					newState);
 			}
 
 			private void PerformTransition(
@@ -240,11 +240,13 @@
 			{
 				TransitionInProgress = true;
 
-				OnCurrentStateChangeStarted?.Invoke(previousState, newState);
+				OnCurrentStateChangeStarted?.Invoke(
+					previousState,
+					newState);
 
 				previousState.ExitState();
 
-				CurrentState = newState;
+				currentState = newState;
 
 				newState.EnterState();
 

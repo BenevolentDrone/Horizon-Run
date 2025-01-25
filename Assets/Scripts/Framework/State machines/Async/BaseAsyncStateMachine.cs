@@ -11,7 +11,7 @@ namespace HereticalSolutions.StateMachines
 {
     public class BaseAsyncStateMachine<TBaseState>
         : IAsyncStateMachine<TBaseState>
-        where TBaseState : IState
+        where TBaseState : IAsyncState
     {
         private readonly IReadOnlyRepository<Type, TBaseState> states;
 

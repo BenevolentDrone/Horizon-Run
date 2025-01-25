@@ -3,8 +3,8 @@ using HereticalSolutions.StateMachines;
 namespace HereticalSolutions.StateMachines
 {
     public class AsyncTransitionEvent<TBaseState>
-        : ITransitionEvent<TBaseState>
-        where TBaseState : IState
+        : IAsyncTransitionEvent<TBaseState>
+        where TBaseState : IAsyncState
     {
         public TBaseState From { get; protected set; }
 
@@ -18,7 +18,9 @@ namespace HereticalSolutions.StateMachines
             EAsyncTransitionRules rules)
         {
             From = from;
+
             To = to;
+            
             Rules = rules;
         }
 

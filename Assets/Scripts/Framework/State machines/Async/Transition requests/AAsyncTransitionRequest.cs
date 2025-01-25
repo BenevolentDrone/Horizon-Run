@@ -2,14 +2,16 @@ using System;
 
 using HereticalSolutions.Asynchronous;
 
+using HereticalSolutions.Delegates;
+
 namespace HereticalSolutions.StateMachines
 {
-    public class AsyncTransitionRequest<TBaseState>
-        where TBaseState : IState
+    public abstract class AAsyncTransitionRequest
     {
         protected readonly object lockObject = new object();
 
-        private ETransitionState transitionState = ETransitionState.UNINITIALISED;
+        protected ETransitionState transitionState = ETransitionState.UNINITIALISED;
+
         public ETransitionState TransitionState
         {
             get
@@ -28,7 +30,8 @@ namespace HereticalSolutions.StateMachines
             }
         }
 
-        private EAsyncTransitionRules rules = EAsyncTransitionRules.EXIT_THEN_ENTER;
+        protected  EAsyncTransitionRules rules = EAsyncTransitionRules.EXIT_THEN_ENTER;
+
         public EAsyncTransitionRules Rules
         {
             get
@@ -47,7 +50,8 @@ namespace HereticalSolutions.StateMachines
             }
         }
 
-        private bool commencePreviousStateExitStart = true;
+        protected  bool commencePreviousStateExitStart = true;
+
         public bool CommencePreviousStateExitStart
         {
             get
@@ -66,8 +70,9 @@ namespace HereticalSolutions.StateMachines
             }
         }
 
-        private Action<TBaseState> onPreviousStateExited;
-        public Action<TBaseState> OnPreviousStateExited
+        protected INonAllocSubscribable onPreviousStateExited;
+
+        public INonAllocSubscribable OnPreviousStateExited
         {
             get
             {
@@ -85,7 +90,8 @@ namespace HereticalSolutions.StateMachines
             }
         }
 
-        private bool commencePreviousStateExitFinish = true;
+        protected bool commencePreviousStateExitFinish = true;
+
         public bool CommencePreviousStateExitFinish
         {
             get
@@ -104,7 +110,8 @@ namespace HereticalSolutions.StateMachines
             }
         }
 
-        private bool commenceNextStateEnterStart = true;
+        protected bool commenceNextStateEnterStart = true;
+
         public bool CommenceNextStateEnterStart
         {
             get
@@ -123,8 +130,9 @@ namespace HereticalSolutions.StateMachines
             }
         }
 
-        private Action<TBaseState> onNextStateEntered;
-        public Action<TBaseState> OnNextStateEntered
+        protected INonAllocSubscribable onNextStateEntered;
+
+        public INonAllocSubscribable OnNextStateEntered
         {
             get
             {
@@ -142,7 +150,8 @@ namespace HereticalSolutions.StateMachines
             }
         }
 
-        private bool commenceNextStateEnterFinish = true;
+        protected bool commenceNextStateEnterFinish = true;
+
         public bool CommenceNextStateEnterFinish
         {
             get
@@ -161,7 +170,8 @@ namespace HereticalSolutions.StateMachines
             }
         }
 
-        private IProgress<float> previousStateExitProgress;
+        protected IProgress<float> previousStateExitProgress;
+
         public IProgress<float> PreviousStateExitProgress
         {
             get
@@ -180,7 +190,8 @@ namespace HereticalSolutions.StateMachines
             }
         }
 
-        private IProgress<float> nextStateEnterProgress;
+        protected IProgress<float> nextStateEnterProgress;
+
         public IProgress<float> NextStateEnterProgress
         {
             get
@@ -199,7 +210,8 @@ namespace HereticalSolutions.StateMachines
             }
         }
 
-        private AsyncExecutionContext asyncContext;
+        protected AsyncExecutionContext asyncContext;
+
         public AsyncExecutionContext AyncContext
         {
             get
@@ -219,44 +231,3 @@ namespace HereticalSolutions.StateMachines
         }
     }
 }
-
-/*
-using System;
-
-using HereticalSolutions.Asynchronous;
-
-namespace HereticalSolutions.StateMachines
-{
-    public class AsyncTransitionRequest<TBaseState>
-        where TBaseState : IState
-    {
-        public ETransitionState TransitionState = ETransitionState.UNINITIALISED;
-
-        public ITransitionEvent<TBaseState> Event;
-
-        public EAsyncTransitionRules Rules = EAsyncTransitionRules.EXIT_THEN_ENTER;
-
-
-        public bool CommencePreviousStateExitStart = true;
-
-        public Action<TBaseState> OnPreviousStateExited { get; set; }
-
-        public bool CommencePreviousStateExitFinish = true;
-
-
-        public bool CommenceNextStateEnterStart = true;
-
-        public Action<TBaseState> OnNextStateEntered { get; set; }
-
-        public bool CommenceNextStateEnterFinish = true;
-
-
-        public IProgress<float> PreviousStateExitProgress;
-
-        public IProgress<float> NextStateEnterProgress;
-
-
-        public AsyncExecutionContext AyncContext;
-    }
-}
-*/

@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 
+using HereticalSolutions.Delegates;
+
 namespace HereticalSolutions.StateMachines
 {
     public interface IStateMachine<TBaseState>
@@ -11,10 +13,10 @@ namespace HereticalSolutions.StateMachines
         #region Current state
 
         TBaseState CurrentState { get; }
-        
-        Action<TBaseState, TBaseState> OnCurrentStateChangeStarted { get; set; }
-        
-        Action<TBaseState, TBaseState> OnCurrentStateChangeFinished { get; set; }
+
+        INonAllocSubscribable OnCurrentStateChangeStarted { get; }
+
+        INonAllocSubscribable OnCurrentStateChangeFinished { get; }
 
         #endregion
 
@@ -32,18 +34,18 @@ namespace HereticalSolutions.StateMachines
         
         #region Event handling
         
-        void Handle<TEvent>()
+        bool Handle<TEvent>()
             where TEvent : ITransitionEvent<TBaseState>;
-        
-        void Handle(
+
+        bool Handle(
             Type eventType);
-        
-        Action<ITransitionEvent<TBaseState>> OnEventFired { get; set; }
-        
+
+        INonAllocSubscribable OnEventFired { get; }
+
         #endregion
 
         #region Immediate transition
-        
+
         void TransitToImmediately<TState>()
             where TState : TBaseState;
         
@@ -54,10 +56,10 @@ namespace HereticalSolutions.StateMachines
 
         #region Scheduled transition
 
-        IEnumerable<TransitionRequest<TBaseState>> ScheduledTransitions { get; }
+        IEnumerable<ITransitionRequest> ScheduledTransitions { get; }
 
-        void ScheduleTransition<TState>(
-            TransitionRequest<TBaseState> request);
+        void ScheduleTransition(
+            ITransitionRequest request);
 
         #endregion
     }

@@ -1,6 +1,7 @@
 namespace HereticalSolutions.StateMachines
 {
-    public class BasicTransitionEvent<TBaseState> : ITransitionEvent<TBaseState>
+    public class BasicTransitionEvent<TBaseState>
+        : ITransitionEvent<TBaseState>
         where TBaseState : IState
     {
         public TBaseState From { get; protected set; }

@@ -1,15 +1,13 @@
 using System;
 
-using HereticalSolutions.Asynchronous;
-
 namespace HereticalSolutions.StateMachines
 {
 	public class EventAsyncTransitionRequest<TBaseState>
-		: AsyncTransitionRequest<TBaseState>
-		where TBaseState : IState
+		: AAsyncTransitionRequest
+		where TBaseState : IAsyncState
 	{
-		private ITransitionEvent<TBaseState> @event;
-		public ITransitionEvent<TBaseState> Event
+		private IAsyncTransitionEvent<TBaseState> @event;
+		public IAsyncTransitionEvent<TBaseState> Event
 		{
 			get
 			{

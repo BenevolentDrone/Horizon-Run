@@ -1,12 +1,9 @@
 using System;
 
-using HereticalSolutions.Asynchronous;
-
 namespace HereticalSolutions.StateMachines
 {
-	public class ImmediateAsyncTransitionRequest<TBaseState>
-		: AsyncTransitionRequest<TBaseState>
-		where TBaseState : IState
+	public class ImmediateAsyncTransitionRequest
+		: AAsyncTransitionRequest
 	{
 		private Type targetStateType;
 		public Type TargetStateType

@@ -3,6 +3,8 @@
 using HereticalSolutions.Repositories;
 using HereticalSolutions.Repositories.Factories;
 
+using ILogger = HereticalSolutions.Logging.ILogger;
+
 using UnityEngine;
 
 namespace HereticalSolutions.Blackboard
@@ -16,6 +18,8 @@ namespace HereticalSolutions.Blackboard
 
         public Action<BlackboardBehaviour> OnModified { get; set; }
 
+        private ILogger logger;
+
         private void Awake()
         {
             if (serializedData != null)
@@ -26,7 +30,8 @@ namespace HereticalSolutions.Blackboard
                         keyValuePair.Key,
                         new BlackboardValue(
                             keyValuePair.ValueType,
-                            keyValuePair.Value));
+                            keyValuePair.Value,
+                            logger));
                 }
             }
         }

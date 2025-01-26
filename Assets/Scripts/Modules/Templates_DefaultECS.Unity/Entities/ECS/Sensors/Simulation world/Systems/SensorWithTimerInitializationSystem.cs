@@ -77,7 +77,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 
 			Entity entityClosure = entity;
 
-			INonAllocSubscription timerTickSubscription = DelegateWrapperFactory.BuildSubscriptionSingleArgGeneric<IRuntimeTimer>(
+			INonAllocSubscription timerTickSubscription = SubscriptionFactory.BuildSubscriptionSingleArgGeneric<IRuntimeTimer>(
 				(timerArg) => OnTick(entityClosure),
 				loggerResolver);
 

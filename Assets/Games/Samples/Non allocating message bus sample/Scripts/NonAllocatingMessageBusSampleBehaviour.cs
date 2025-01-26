@@ -18,7 +18,7 @@ namespace HereticalSolutions.Samples.NonAllocatingMessageBusSample
 	{
 		private INonAllocMessageSender messageBusAsSender;
 
-		private INonAllocMessageReceiver messageBusAsReceiver;
+		private INonAllocMessageSubscribable messageBusAsReceiver;
 
 
 		private INonAllocSubscription subscription;
@@ -70,13 +70,13 @@ namespace HereticalSolutions.Samples.NonAllocatingMessageBusSample
 
 			messageBusAsSender = (INonAllocMessageSender)messageBus;
 
-			messageBusAsReceiver = (INonAllocMessageReceiver)messageBus;
+			messageBusAsReceiver = (INonAllocMessageSubscribable)messageBus;
 
 			#endregion
 
 			#region Subscription
 
-			subscription = DelegateWrapperFactory.BuildSubscriptionSingleArgGeneric<SampleMessage>(Print, loggerResolver);
+			subscription = SubscriptionFactory.BuildSubscriptionSingleArgGeneric<SampleMessage>(Print, loggerResolver);
 
 			#endregion
 
@@ -135,7 +135,7 @@ namespace HereticalSolutions.Samples.NonAllocatingMessageBusSample
 					messageBusAsSender
 						.PopMessage<SampleMessage>(out var messageAllGenerics)
 						.Write<SampleMessage>(messageAllGenerics, messageArgs)
-						.Send<SampleMessage>(messageAllGenerics);
+						.PutIntoMailbox<SampleMessage>(messageAllGenerics);
 
 					logger?.Log<NonAllocatingMessageBusSampleBehaviour>(
 						"Storing a message in the mailbox");
@@ -161,7 +161,7 @@ namespace HereticalSolutions.Samples.NonAllocatingMessageBusSample
 				messageBusAsSender
 					.PopMessage(typeof(SampleMessage), out var messageTypeofs)
 					.Write(messageTypeofs, messageArgs)
-					.Send(messageTypeofs);
+					.PutIntoMailbox(messageTypeofs);
 			}
 			else
 			{

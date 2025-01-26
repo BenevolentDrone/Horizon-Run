@@ -62,7 +62,7 @@ namespace HereticalSolutions.Pools.AllocationCallbacks
                 poolElementFacade.Push();
             };
 
-            var pushSubscription = DelegateWrapperFactory.BuildSubscriptionSingleArgGeneric<IRuntimeTimer>(
+            var pushSubscription = SubscriptionFactory.BuildSubscriptionSingleArgGeneric<IRuntimeTimer>(
                 pushDelegate,
                 loggerResolver);
 

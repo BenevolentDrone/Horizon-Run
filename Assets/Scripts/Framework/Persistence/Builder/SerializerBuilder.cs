@@ -185,8 +185,8 @@ namespace HereticalSolutions.Persistence
 			where TFormatSerializer : IFormatSerializer
 		{
 			serializerContext.FormatSerializer = PersistenceFactory.BuildFormatSerializer<TFormatSerializer>(
-				arguments,
-				loggerResolver);
+				loggerResolver,
+				arguments);
 
 			return this;
 		}
@@ -256,8 +256,8 @@ namespace HereticalSolutions.Persistence
 
 			serializerContext.SerializationStrategy = PersistenceFactory.BuildTextStreamStrategy(
 				serializerContext.Arguments.Get<IPathArgument>().Path,
-				flushAutomatically,
-				loggerResolver);
+				loggerResolver,
+				flushAutomatically);
 
 			return this;
 		}
@@ -277,8 +277,8 @@ namespace HereticalSolutions.Persistence
 
 			serializerContext.SerializationStrategy = PersistenceFactory.BuildFileStreamStrategy(
 				serializerContext.Arguments.Get<IPathArgument>().Path,
-				flushAutomatically,
-				loggerResolver);
+				loggerResolver,
+				flushAutomatically);
 
 			return this;
 		}
@@ -289,10 +289,10 @@ namespace HereticalSolutions.Persistence
 			int count = -1)
 		{
 			serializerContext.SerializationStrategy = PersistenceFactory.BuildMemoryStreamStrategy(
+				loggerResolver,
 				buffer,
 				index,
-				count,
-				loggerResolver);
+				count);
 
 			return this;
 		}
@@ -312,8 +312,8 @@ namespace HereticalSolutions.Persistence
 
 			serializerContext.SerializationStrategy = PersistenceFactory.BuildIsolatedStorageStrategy(
 				serializerContext.Arguments.Get<IPathArgument>().Path,
-				flushAutomatically,
-				loggerResolver);
+				loggerResolver,
+				flushAutomatically);
 
 			return this;
 		}
@@ -323,8 +323,8 @@ namespace HereticalSolutions.Persistence
 			where TSerializationStrategy : ISerializationStrategy
 		{
 			serializerContext.SerializationStrategy = PersistenceFactory.BuildSerializationStrategy<TSerializationStrategy>(
-				arguments,
-				loggerResolver);
+				loggerResolver,
+				arguments);
 
 			return this;
 		}
@@ -384,8 +384,8 @@ namespace HereticalSolutions.Persistence
 
 			serializerContext.Arguments.TryAdd<TInterface>(
 				PersistenceFactory.BuildSerializationArgument<TArgument>(
-					arguments,
-					loggerResolver));
+					loggerResolver,
+					arguments));
 
 			return this;
 		}

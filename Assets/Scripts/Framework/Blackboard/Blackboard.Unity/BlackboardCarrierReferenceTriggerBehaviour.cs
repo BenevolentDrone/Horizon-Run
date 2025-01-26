@@ -93,7 +93,8 @@ namespace HereticalSolutions.Blackboard
                         data.Key,
                         new BlackboardValue(
                             data.ValueType,
-                            data.Value));
+                            data.Value,
+                            logger));
                 
                 lastReferencedBlackboardCarrier = blackboardCarrierReference.ReferencedCarrier;
 
@@ -106,7 +107,8 @@ namespace HereticalSolutions.Blackboard
                             data.Key,
                             new BlackboardValue(
                                 data.ValueType,
-                                data.Value));
+                                data.Value,
+                                logger));
                 }
             }
         }

@@ -196,21 +196,11 @@ namespace HereticalSolutions.Delegates.Factories
             IRepository<Type, object> broadcasterRepository,
             ILoggerResolver loggerResolver)
         {
-            return BuildBroadcasterWithRepository(
-                RepositoryFactory.BuildDictionaryInstanceRepository(
-                    broadcasterRepository),
-                loggerResolver);
-        }
-        
-        public static BroadcasterWithRepository BuildBroadcasterWithRepository(
-            IReadOnlyInstanceRepository repository,
-            ILoggerResolver loggerResolver)
-        {
             ILogger logger =
                 loggerResolver?.GetLogger<BroadcasterWithRepository>();
 
             return new BroadcasterWithRepository(
-                repository,
+                broadcasterRepository,
                 logger);
         }
 
@@ -222,21 +212,11 @@ namespace HereticalSolutions.Delegates.Factories
             IRepository<Type, object> broadcasterRepository,
             ILoggerResolver loggerResolver)
         {
-            return BuildConcurrentBroadcasterWithRepository(
-                RepositoryFactory.BuildDictionaryInstanceRepository(
-                    broadcasterRepository),
-                loggerResolver);
-        }
-
-        public static ConcurrentBroadcasterWithRepository BuildConcurrentBroadcasterWithRepository(
-            IReadOnlyInstanceRepository repository,
-            ILoggerResolver loggerResolver)
-        {
             ILogger logger =
                 loggerResolver?.GetLogger<ConcurrentBroadcasterWithRepository>();
 
             return new ConcurrentBroadcasterWithRepository(
-                repository,
+                broadcasterRepository,
                 logger);
         }
 
@@ -596,21 +576,11 @@ namespace HereticalSolutions.Delegates.Factories
             IRepository<Type, object> broadcasterRepository,
             ILoggerResolver loggerResolver)
         {
-            return BuildNonAllocBroadcasterWithRepository(
-                RepositoryFactory.BuildDictionaryInstanceRepository(
-                    broadcasterRepository),
-                loggerResolver);
-        }
-        
-        public static NonAllocBroadcasterWithRepository BuildNonAllocBroadcasterWithRepository(
-            IReadOnlyInstanceRepository repository,
-            ILoggerResolver loggerResolver)
-        {
             ILogger logger =
                 loggerResolver?.GetLogger<NonAllocBroadcasterWithRepository>();
 
             return new NonAllocBroadcasterWithRepository(
-                repository,
+                broadcasterRepository,
                 logger);
         }
 
@@ -622,21 +592,11 @@ namespace HereticalSolutions.Delegates.Factories
             IRepository<Type, object> broadcasterRepository,
             ILoggerResolver loggerResolver)
         {
-            return BuildConcurrentNonAllocBroadcasterWithRepository(
-                RepositoryFactory.BuildDictionaryInstanceRepository(
-                    broadcasterRepository),
-                loggerResolver);
-        }
-
-        public static ConcurrentNonAllocBroadcasterWithRepository BuildConcurrentNonAllocBroadcasterWithRepository(
-            IReadOnlyInstanceRepository repository,
-            ILoggerResolver loggerResolver)
-        {
             ILogger logger =
                 loggerResolver?.GetLogger<ConcurrentNonAllocBroadcasterWithRepository>();
 
             return new ConcurrentNonAllocBroadcasterWithRepository(
-                repository,
+                broadcasterRepository,
                 logger);
         }
 
@@ -648,21 +608,11 @@ namespace HereticalSolutions.Delegates.Factories
             IRepository<Type, object> broadcasterRepository,
             ILoggerResolver loggerResolver)
         {
-            return BuildAsyncBroadcasterWithRepository(
-                RepositoryFactory.BuildDictionaryInstanceRepository(
-                    broadcasterRepository),
-                loggerResolver);
-        }
-
-        public static AsyncBroadcasterWithRepository BuildAsyncBroadcasterWithRepository(
-            IReadOnlyInstanceRepository repository,
-            ILoggerResolver loggerResolver)
-        {
             ILogger logger =
                 loggerResolver?.GetLogger<AsyncBroadcasterWithRepository>();
 
             return new AsyncBroadcasterWithRepository(
-                repository,
+                broadcasterRepository,
                 logger);
         }
 

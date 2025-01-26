@@ -19,14 +19,14 @@ namespace HereticalSolutions.Delegates
 		  ICleanuppable,
 		  IDisposable
 	{
-		private readonly IReadOnlyInstanceRepository broadcasterRepository;
+		private readonly IReadOnlyRepository<Type, object> broadcasterRepository;
 
 		private readonly object lockObject;
 
 		private readonly ILogger logger;
 
 		public AsyncBroadcasterWithRepository(
-			IReadOnlyInstanceRepository broadcasterRepository,
+			IReadOnlyRepository<Type, object> broadcasterRepository,
 			ILogger logger)
 		{
 			this.broadcasterRepository = broadcasterRepository;
@@ -64,8 +64,8 @@ namespace HereticalSolutions.Delegates
 				}
 
 				if (!broadcasterRepository.TryGet(
-						valueType,
-						out object broadcasterObject))
+					valueType,
+					out object broadcasterObject))
 				{
 					logger?.LogError(
 						GetType(),
@@ -134,10 +134,8 @@ namespace HereticalSolutions.Delegates
 					// TODO: Consider yield instead
 					List<INonAllocSubscription> result = new List<INonAllocSubscription>();
 
-					foreach (var key in broadcasterRepository.Keys)
+					foreach (var broadcasterObject in broadcasterRepository.Values)
 					{
-						var broadcasterObject = broadcasterRepository.Get(key);
-
 						var broadcaster = (INonAllocSubscribable)broadcasterObject;
 
 						result.AddRange(broadcaster.AllSubscriptions);
@@ -176,12 +174,14 @@ namespace HereticalSolutions.Delegates
 				var valueType = typeof(TValue);
 
 				if (!broadcasterRepository.TryGet(
-						valueType,
-						out object broadcasterObject))
+					valueType,
+					out object broadcasterObject))
+				{
 					throw new Exception(
 						logger.TryFormatException(
 							GetType(),
 							$"INVALID VALUE TYPE: \"{valueType.Name}\""));
+				}
 
 				broadcaster = (IAsyncPublisherSingleArgGeneric<TValue>)broadcasterObject;
 			}
@@ -204,12 +204,14 @@ namespace HereticalSolutions.Delegates
 			lock (lockObject)
 			{
 				if (!broadcasterRepository.TryGet(
-						valueType,
-						out object broadcasterObject))
+					valueType,
+					out object broadcasterObject))
+				{
 					throw new Exception(
 						logger.TryFormatException(
 							GetType(),
 							$"INVALID VALUE TYPE: \"{valueType.Name}\""));
+				}
 
 				broadcaster = (IAsyncPublisherSingleArg)broadcasterObject;
 			}

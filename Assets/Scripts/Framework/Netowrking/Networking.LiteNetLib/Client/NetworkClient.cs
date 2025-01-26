@@ -32,7 +32,7 @@ namespace HereticalSolutions.Networking.LiteNetLib
 
         private readonly INonAllocMessageSender networkBusAsSender;
         
-        private readonly INonAllocMessageReceiver networkBusAsReceiver;
+        private readonly INonAllocMessageSubscribable networkBusAsReceiver;
         
         
         private readonly INonAllocMessageSender gameStateBusAsSender;
@@ -86,7 +86,7 @@ namespace HereticalSolutions.Networking.LiteNetLib
             INonAllocSubscribable pinger,
             
             INonAllocMessageSender networkBusAsSender,
-            INonAllocMessageReceiver networkBusAsReceiver,
+            INonAllocMessageSubscribable networkBusAsReceiver,
             INonAllocMessageSender gameStateBusAsSender,
             
             IPacketRepository packetRepository,
@@ -94,6 +94,7 @@ namespace HereticalSolutions.Networking.LiteNetLib
             NetDataWriter writer,
             NetPacketProcessor packetProcessor,
             
+            ILoggerResolver loggerResolver,
             ILogger logger)
         {
             this.playerSettings = playerSettings;
@@ -136,23 +137,29 @@ namespace HereticalSolutions.Networking.LiteNetLib
             packetProcessor.SubscribeReusable<GameStartedPacket>(OnGameStarted);
 
 
-            pingSubscription = DelegateWrapperFactory.BuildSubscriptionNoArgs(
-                OnPing);
+            pingSubscription = SubscriptionFactory.BuildSubscriptionNoArgs(
+                OnPing,
+                loggerResolver);
             
-            startClientSubscription = DelegateWrapperFactory.BuildSubscriptionSingleArgGeneric<ClientStartMessage>(
-                OnClientStartMessage);
+            startClientSubscription = SubscriptionFactory.BuildSubscriptionSingleArgGeneric<ClientStartMessage>(
+                OnClientStartMessage,
+                loggerResolver);
             
-            stopClientSubscription = DelegateWrapperFactory.BuildSubscriptionSingleArgGeneric<ClientStopMessage>(
-                OnClientStopMessage);
+            stopClientSubscription = SubscriptionFactory.BuildSubscriptionSingleArgGeneric<ClientStopMessage>(
+                OnClientStopMessage,
+                loggerResolver);
             
-            connectSubscription = DelegateWrapperFactory.BuildSubscriptionSingleArgGeneric<ClientConnectMessage>(
-                OnClientConnectMessage);
+            connectSubscription = SubscriptionFactory.BuildSubscriptionSingleArgGeneric<ClientConnectMessage>(
+                OnClientConnectMessage,
+                loggerResolver);
             
-            disconnectSubscription = DelegateWrapperFactory.BuildSubscriptionSingleArgGeneric<ClientDisconnectMessage>(
-                OnClientDisconnectMessage);
+            disconnectSubscription = SubscriptionFactory.BuildSubscriptionSingleArgGeneric<ClientDisconnectMessage>(
+                OnClientDisconnectMessage,
+                loggerResolver);
             
-            sendPacketSubscription = DelegateWrapperFactory.BuildSubscriptionSingleArgGeneric<ClientSendPacketMessage>(
-                OnClientSendPacketMessage);
+            sendPacketSubscription = SubscriptionFactory.BuildSubscriptionSingleArgGeneric<ClientSendPacketMessage>(
+                OnClientSendPacketMessage,
+                loggerResolver);
 
             
             networkBusAsReceiver.SubscribeTo<ClientStartMessage>(
@@ -642,9 +649,10 @@ namespace HereticalSolutions.Networking.LiteNetLib
                 message.IP,
                 message.Port,
                 message.Secret,
-                message.PreferredPlayerSlot,
                 
-                null);
+                null,
+
+                message.PreferredPlayerSlot);
         }
         
         private void OnClientDisconnectMessage(ClientDisconnectMessage message)

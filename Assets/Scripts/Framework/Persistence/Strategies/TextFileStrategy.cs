@@ -39,7 +39,8 @@ namespace HereticalSolutions.Persistence
             string result = string.Empty;
 
             if (!IOHelpers.FileExists(
-                savePath))
+                savePath,
+                logger))
             {
                 value = result.CastFromTo<string, TValue>();
 
@@ -65,7 +66,8 @@ namespace HereticalSolutions.Persistence
             string result = string.Empty;
 
             if (!IOHelpers.FileExists(
-                savePath))
+                savePath,
+                logger))
             {
                 value = result.CastFromTo<string, object>();
 

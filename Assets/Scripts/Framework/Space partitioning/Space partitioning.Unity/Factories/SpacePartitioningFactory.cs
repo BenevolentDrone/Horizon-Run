@@ -21,7 +21,8 @@ namespace HereticalSolutions.SpacePartitioning.Factories
 				RepositoryFactory.BuildDictionaryRepository<TValue, ValueSpaceData<TValue>>(),
 				NodePoolFactory.BuildNodePool<TValue>(
 					loggerResolver),
-				NodePoolFactory.BuildValueDataPool<TValue>(),
+				NodePoolFactory.BuildValueDataPool<TValue>(
+					loggerResolver),
 				new DistanceComparer2D<TValue>(),
 				new Bounds2D(
 					(min + max) / 2f,

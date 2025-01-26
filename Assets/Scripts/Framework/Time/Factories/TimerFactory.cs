@@ -141,25 +141,21 @@ namespace HereticalSolutions.Time.Factories
             var onFinishRepeated = BroadcasterFactory.BuildNonAllocBroadcasterGeneric<IRuntimeTimer>(loggerResolver);
             
             
-            INonAllocSubscription privateStartSubscription = DelegateWrapperFactory.BuildSubscriptionSingleArgGeneric<IRuntimeTimer>(
-                onStart.Publish,
-                loggerResolver);
+            INonAllocSubscription privateStartSubscription = SubscriptionFactory.
+                BuildSubscriptionSingleArgGeneric<IRuntimeTimer>(
+                    onStart.Publish,
+                    loggerResolver);
             
             onStartPrivate.Subscribe(
-                (INonAllocSubscriptionHandler<
-                    INonAllocSubscribable,
-                    IInvokableSingleArgGeneric<IRuntimeTimer>>)
                 privateStartSubscription);
             
             
-            INonAllocSubscription privateFinishSubscription = DelegateWrapperFactory.BuildSubscriptionSingleArgGeneric<IRuntimeTimer>(
-                onFinish.Publish,
-                loggerResolver);
+            INonAllocSubscription privateFinishSubscription = SubscriptionFactory.
+                BuildSubscriptionSingleArgGeneric<IRuntimeTimer>(
+                    onFinish.Publish,
+                    loggerResolver);
             
             onFinishPrivate.Subscribe(
-                (INonAllocSubscriptionHandler<
-                    INonAllocSubscribable,
-                    IInvokableSingleArgGeneric<IRuntimeTimer>>)
                 privateFinishSubscription);
 
             
@@ -232,12 +228,12 @@ namespace HereticalSolutions.Time.Factories
                 loggerResolver);
 
             // Subscribe to the runtime timer's tick event
-            var tickSubscription = DelegateWrapperFactory.BuildSubscriptionSingleArgGeneric<float>(
+            var tickSubscription = SubscriptionFactory.BuildSubscriptionSingleArgGeneric<float>(
                 timer.Tick,
                 loggerResolver);
 
 
-            var startTimerSubscription = DelegateWrapperFactory.BuildSubscriptionSingleArgGeneric<IRuntimeTimer>(
+            var startTimerSubscription = SubscriptionFactory.BuildSubscriptionSingleArgGeneric<IRuntimeTimer>(
                 (timer) =>
                 {
                     if (!tickSubscription.Active)
@@ -252,7 +248,7 @@ namespace HereticalSolutions.Time.Factories
             //timer.OnStart.Subscribe(startTimerSubscription);
 
 
-            var finishTimerSubscription = DelegateWrapperFactory.BuildSubscriptionSingleArgGeneric<IRuntimeTimer>(
+            var finishTimerSubscription = SubscriptionFactory.BuildSubscriptionSingleArgGeneric<IRuntimeTimer>(
                 (timer) =>
                 {
                     if (tickSubscription.Active)

@@ -43,7 +43,7 @@ namespace HereticalSolutions.Synchronization
 			this.deltaToFloatDelegate = deltaToFloatDelegate;
 
 
-			synchronizeFixedScubscription = DelegateWrapperFactory.BuildSubscriptionSingleArgGeneric<IRuntimeTimer>(
+			synchronizeFixedScubscription = SubscriptionFactory.BuildSubscriptionSingleArgGeneric<IRuntimeTimer>(
 				SynchronizeFixed,
 				loggerResolver);
 
@@ -60,10 +60,7 @@ namespace HereticalSolutions.Synchronization
 			fixedDeltaTimer.Start();
 
 			fixedDeltaTimer.OnFinishRepeated.Subscribe(
-				(INonAllocSubscriptionHandler<
-					INonAllocSubscribable,
-					IInvokableSingleArgGeneric<IRuntimeTimer>>)
-					synchronizeFixedScubscription);
+				synchronizeFixedScubscription);
 		}
 
 		#region IHasFixedDelta

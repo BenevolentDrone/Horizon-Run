@@ -4,8 +4,8 @@ namespace HereticalSolutions.StateMachines
     {
         EXIT_THEN_ENTER,
 
-        ENTER_THEN_EXIT,
+        ENTER_THEN_EXIT, //TODO: re-implement
 
-        PARALLEL
+        PARALLEL //TODO: re-implement
     }
 }

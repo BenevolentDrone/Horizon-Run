@@ -35,7 +35,7 @@ namespace HereticalSolutions.Networking.LiteNetLib
 
         private readonly INonAllocMessageSender networkBusAsSender;
         
-        private readonly INonAllocMessageReceiver networkBusAsReceiver;
+        private readonly INonAllocMessageSubscribable networkBusAsReceiver;
 
         #endregion
         
@@ -89,7 +89,7 @@ namespace HereticalSolutions.Networking.LiteNetLib
             INonAllocSubscribable pinger,
             
             INonAllocMessageSender networkBusAsSender,
-            INonAllocMessageReceiver networkBusAsReceiver,
+            INonAllocMessageSubscribable networkBusAsReceiver,
             
             IPacketRepository packetRepository,
             
@@ -98,6 +98,7 @@ namespace HereticalSolutions.Networking.LiteNetLib
             
             ServerToClientConnectionDescriptor[] connections,
             
+            ILoggerResolver loggerResolver,
             ILogger logger)
         {
             this.basicSettings = basicSettings;
@@ -136,17 +137,21 @@ namespace HereticalSolutions.Networking.LiteNetLib
             packetProcessor.SubscribeReusable<JoinRequestPacket, NetPeer>(OnJoinRequestReceived);
             
             
-            pingSubscription = DelegateWrapperFactory.BuildSubscriptionNoArgs(
-                OnPing);
+            pingSubscription = SubscriptionFactory.BuildSubscriptionNoArgs(
+                OnPing,
+                loggerResolver);
             
-            startServerSubscription = DelegateWrapperFactory.BuildSubscriptionSingleArgGeneric<ServerStartMessage>(
-                OnServerStartMessage);
+            startServerSubscription = SubscriptionFactory.BuildSubscriptionSingleArgGeneric<ServerStartMessage>(
+                OnServerStartMessage,
+                loggerResolver);
             
-            stopServerSubscription = DelegateWrapperFactory.BuildSubscriptionSingleArgGeneric<ServerStopMessage>(
-                OnServerStopMessage);
+            stopServerSubscription = SubscriptionFactory.BuildSubscriptionSingleArgGeneric<ServerStopMessage>(
+                OnServerStopMessage,
+                loggerResolver);
             
-            sendPacketSubscription = DelegateWrapperFactory.BuildSubscriptionSingleArgGeneric<ServerSendPacketMessage>(
-                OnServerSendPacketMessage);
+            sendPacketSubscription = SubscriptionFactory.BuildSubscriptionSingleArgGeneric<ServerSendPacketMessage>(
+                OnServerSendPacketMessage,
+                loggerResolver);
             
             
             networkBusAsReceiver.SubscribeTo<ServerStartMessage>(

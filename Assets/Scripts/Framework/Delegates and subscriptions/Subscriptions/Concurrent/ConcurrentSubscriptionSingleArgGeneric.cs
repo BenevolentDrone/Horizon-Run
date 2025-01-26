@@ -1,7 +1,5 @@
 using System;
 
-using HereticalSolutions.Delegates.Factories;
-
 using HereticalSolutions.LifetimeManagement;
 
 using HereticalSolutions.Logging;
@@ -28,11 +26,10 @@ namespace HereticalSolutions.Delegates.Subscriptions
 
 
 		public ConcurrentSubscriptionSingleArgGeneric(
-			Action<TValue> @delegate,
+			IInvokableSingleArgGeneric<TValue> @delegate,
 			ILogger logger)
 		{
-			this.@delegate = DelegateWrapperFactory.BuildDelegateWrapperSingleArgGeneric(
-				@delegate);
+			this.@delegate = @delegate;
 
 			this.logger = logger;
 

@@ -29,8 +29,12 @@ namespace HereticalSolutions.Delegates.Factories
             ILogger logger =
                 loggerResolver?.GetLogger<SubscriptionSingleArgGeneric<TValue>>();
 
-            return new SubscriptionSingleArgGeneric<TValue>(
+            IInvokableSingleArgGeneric<TValue> invokable = DelegateWrapperFactory.BuildDelegateWrapperSingleArgGeneric(
                 @delegate,
+                loggerResolver);
+
+            return new SubscriptionSingleArgGeneric<TValue>(
+                invokable,
                 logger);
         }
         
@@ -69,8 +73,12 @@ namespace HereticalSolutions.Delegates.Factories
             ILogger logger =
                 loggerResolver?.GetLogger<ConcurrentSubscriptionSingleArgGeneric<TValue>>();
 
-            return new ConcurrentSubscriptionSingleArgGeneric<TValue>(
+            IInvokableSingleArgGeneric<TValue> invokable = DelegateWrapperFactory.BuildDelegateWrapperSingleArgGeneric(
                 @delegate,
+                loggerResolver);
+
+            return new ConcurrentSubscriptionSingleArgGeneric<TValue>(
+                invokable,
                 logger);
         }
 

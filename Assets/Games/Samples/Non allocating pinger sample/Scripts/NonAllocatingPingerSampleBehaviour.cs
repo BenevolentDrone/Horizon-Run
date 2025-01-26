@@ -58,7 +58,7 @@ namespace HereticalSolutions.Samples.NonAllocatingPingerSample
 
 			#region Subscription
 
-			subscription = DelegateWrapperFactory.BuildSubscriptionNoArgs(Print, loggerResolver);
+			subscription = SubscriptionFactory.BuildSubscriptionNoArgs(Print, loggerResolver);
 
 			#endregion
 		}

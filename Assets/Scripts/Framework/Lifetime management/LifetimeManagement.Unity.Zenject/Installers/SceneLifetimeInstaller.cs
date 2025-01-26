@@ -33,8 +33,8 @@ namespace HereticalSolutions.LifetimeManagement
             var sceneLifetime = LifetimeFactory.BuildHierarchicalLifetime(
                 null,
                 bufferPool,
-                projectLifetime,
-                loggerResolver: loggerResolver);
+                loggerResolver,
+                projectLifetime);
             
             sceneLifetime.SetUp();
 

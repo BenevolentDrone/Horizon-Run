@@ -98,18 +98,12 @@ namespace HereticalSolutions.Synchronization
 		public void Subscribe(INonAllocSubscription subscription)
 		{
 			broadcasterAsSubscribable.Subscribe(
-				(INonAllocSubscriptionHandler<
-					INonAllocSubscribable,
-					IInvokableSingleArgGeneric<TDelta>>)
 				subscription);
 		}
 
 		public void Unsubscribe(INonAllocSubscription subscription)
 		{
 			broadcasterAsSubscribable.Unsubscribe(
-				(INonAllocSubscriptionHandler<
-					INonAllocSubscribable,
-					IInvokableSingleArgGeneric<TDelta>>)
 				subscription);
 		}
 

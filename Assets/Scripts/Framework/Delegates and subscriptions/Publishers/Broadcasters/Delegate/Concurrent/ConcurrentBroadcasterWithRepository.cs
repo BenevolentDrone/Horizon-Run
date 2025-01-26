@@ -15,14 +15,15 @@ namespace HereticalSolutions.Delegates
 		  ICleanuppable,
 		  IDisposable
 	{
-		private readonly IReadOnlyInstanceRepository broadcasterRepository;
+		private readonly IReadOnlyRepository<Type, object> broadcasterRepository;
 
 		private readonly object lockObject;
 
 		private readonly ILogger logger;
 
 		public ConcurrentBroadcasterWithRepository(
-			IReadOnlyInstanceRepository broadcasterRepository,
+			IReadOnlyRepository<Type, object> broadcasterRepository,
+			//IReadOnlyInstanceRepository broadcasterRepository,
 			ILogger logger)
 		{
 			this.broadcasterRepository = broadcasterRepository;
@@ -42,16 +43,20 @@ namespace HereticalSolutions.Delegates
 				var valueType = typeof(TValue);
 
 				if (!broadcasterRepository.TryGet(
-						valueType,
-						out object broadcasterObject))
+					valueType,
+					out object broadcasterObject))
+				{
 					throw new Exception(
 						logger.TryFormatException(
 							GetType(),
 							$"INVALID VALUE TYPE: \"{valueType.Name}\""));
+				}
 
-				var broadcaster = (ISubscribableSingleArgGeneric<TValue>)broadcasterObject;
+				var broadcaster = (ISubscribableSingleArgGeneric<TValue>)
+					broadcasterObject;
 
-				broadcaster.Subscribe(@delegate);
+				broadcaster.Subscribe(
+					@delegate);
 			}
 		}
 
@@ -62,16 +67,20 @@ namespace HereticalSolutions.Delegates
 			lock (lockObject)
 			{
 				if (!broadcasterRepository.TryGet(
-						valueType,
-						out object broadcasterObject))
+					valueType,
+					out object broadcasterObject))
+				{
 					throw new Exception(
 						logger.TryFormatException(
 							GetType(),
 							$"INVALID VALUE TYPE: \"{valueType.Name}\""));
+				}
 
 				var broadcaster = (ISubscribableSingleArg)broadcasterObject;
 
-				broadcaster.Subscribe(valueType, @delegate);
+				broadcaster.Subscribe(
+					valueType,
+					@delegate);
 			}
 		}
 
@@ -83,16 +92,20 @@ namespace HereticalSolutions.Delegates
 				var valueType = typeof(TValue);
 
 				if (!broadcasterRepository.TryGet(
-						valueType,
-						out object broadcasterObject))
+					valueType,
+					out object broadcasterObject))
+				{
 					throw new Exception(
 						logger.TryFormatException(
 							GetType(),
 							$"INVALID VALUE TYPE: \"{valueType.Name}\""));
+				}
 
-				var broadcaster = (ISubscribableSingleArgGeneric<TValue>)broadcasterObject;
+				var broadcaster = (ISubscribableSingleArgGeneric<TValue>)
+					broadcasterObject;
 
-				broadcaster.Unsubscribe(@delegate);
+				broadcaster.Unsubscribe(
+					@delegate);
 			}
 		}
 
@@ -103,16 +116,20 @@ namespace HereticalSolutions.Delegates
 			lock (lockObject)
 			{
 				if (!broadcasterRepository.TryGet(
-						valueType,
-						out object broadcasterObject))
+					valueType,
+					out object broadcasterObject))
+				{
 					throw new Exception(
 						logger.TryFormatException(
 							GetType(),
 							$"INVALID VALUE TYPE: \"{valueType.Name}\""));
+				}
 
 				var broadcaster = (ISubscribableSingleArg)broadcasterObject;
 
-				broadcaster.Unsubscribe(valueType, @delegate);
+				broadcaster.Unsubscribe(
+					valueType,
+					@delegate);
 			}
 		}
 
@@ -123,12 +140,14 @@ namespace HereticalSolutions.Delegates
 				var valueType = typeof(TValue);
 
 				if (!broadcasterRepository.TryGet(
-						valueType,
-						out object broadcasterObject))
+					valueType,
+					out object broadcasterObject))
+				{
 					throw new Exception(
 						logger.TryFormatException(
 							GetType(),
 							$"INVALID VALUE TYPE: \"{valueType.Name}\""));
+				}
 
 				var broadcaster = (ISubscribableSingleArgGeneric<TValue>)broadcasterObject;
 
@@ -142,12 +161,14 @@ namespace HereticalSolutions.Delegates
 			lock (lockObject)
 			{
 				if (!broadcasterRepository.TryGet(
-						valueType,
-						out object broadcasterObject))
+					valueType,
+					out object broadcasterObject))
+				{
 					throw new Exception(
 						logger.TryFormatException(
 							GetType(),
 							$"INVALID VALUE TYPE: \"{valueType.Name}\""));
+				}
 
 				var broadcaster = (ISubscribable)broadcasterObject;
 
@@ -166,7 +187,7 @@ namespace HereticalSolutions.Delegates
 					// TODO: Consider yield instead
 					List<object> result = new List<object>();
 
-					foreach (var broadcaster in broadcasterRepository.Keys)
+					foreach (var broadcaster in broadcasterRepository.Values)
 					{
 						var subscribable = (ISubscribable)broadcaster;
 
@@ -182,7 +203,7 @@ namespace HereticalSolutions.Delegates
 		{
 			lock (lockObject)
 			{
-				foreach (var broadcaster in broadcasterRepository.Keys)
+				foreach (var broadcaster in broadcasterRepository.Values)
 				{
 					var subscribable = (ISubscribable)broadcaster;
 
@@ -205,16 +226,20 @@ namespace HereticalSolutions.Delegates
 				var valueType = typeof(TValue);
 
 				if (!broadcasterRepository.TryGet(
-						valueType,
-						out object broadcasterObject))
+					valueType,
+					out object broadcasterObject))
+				{
 					throw new Exception(
 						logger.TryFormatException(
 							GetType(),
 							$"INVALID VALUE TYPE: \"{valueType.Name}\""));
+				}
 
-				var broadcaster = (IPublisherSingleArgGeneric<TValue>)broadcasterObject;
+				var broadcaster = (IPublisherSingleArgGeneric<TValue>)
+					broadcasterObject;
 
-				broadcaster.Publish(value);
+				broadcaster.Publish(
+					value);
 			}
 		}
 
@@ -225,16 +250,20 @@ namespace HereticalSolutions.Delegates
 			lock (lockObject)
 			{
 				if (!broadcasterRepository.TryGet(
-						valueType,
-						out object broadcasterObject))
+					valueType,
+					out object broadcasterObject))
+				{
 					throw new Exception(
 						logger.TryFormatException(
 							GetType(),
 							$"INVALID VALUE TYPE: \"{valueType.Name}\""));
+				}
 
 				var broadcaster = (IPublisherSingleArg)broadcasterObject;
 
-				broadcaster.Publish(valueType, value);
+				broadcaster.Publish(
+					valueType,
+					value);
 			}
 		}
 

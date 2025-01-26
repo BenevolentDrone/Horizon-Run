@@ -37,7 +37,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Factories
 			#region Callbacks
 
 			PushToManagedPoolWhenAvailableCallback<GameObject> pushCallback =
-				ObjectPoolAllocationCallbacksFactory.BuildPushToManagedPoolWhenAvailableCallback<GameObject>();
+				ObjectPoolAllocationCallbackFactory.BuildPushToManagedPoolWhenAvailableCallback<GameObject>();
 
 			#endregion
 

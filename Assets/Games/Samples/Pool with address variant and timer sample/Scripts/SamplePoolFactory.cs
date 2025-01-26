@@ -42,7 +42,7 @@ namespace HereticalSolutions.Samples.PoolWithAddressVariantAndTimerSample
 
             // Create a push to decorated pool callback
             PushToManagedPoolWhenAvailableCallback<GameObject> pushCallback =
-                ObjectPoolAllocationCallbacksFactory.BuildPushToManagedPoolWhenAvailableCallback<GameObject>();
+                ObjectPoolAllocationCallbackFactory.BuildPushToManagedPoolWhenAvailableCallback<GameObject>();
 
             #endregion
 

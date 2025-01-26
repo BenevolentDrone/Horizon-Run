@@ -39,7 +39,7 @@ namespace HereticalSolutions.Samples.ECSCharacterControllerSample.Factories
 
 			// Create a push to decorated pool callback
 			PushToManagedPoolWhenAvailableCallback<GameObject> pushCallback =
-				ObjectPoolAllocationCallbacksFactory.BuildPushToManagedPoolWhenAvailableCallback<GameObject>();
+				ObjectPoolAllocationCallbackFactory.BuildPushToManagedPoolWhenAvailableCallback<GameObject>();
 
 			#endregion
 

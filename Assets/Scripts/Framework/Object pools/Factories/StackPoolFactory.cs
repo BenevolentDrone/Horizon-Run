@@ -1,5 +1,8 @@
 using System;
+using System.Threading.Tasks;
 using System.Collections.Generic;
+
+using HereticalSolutions.Asynchronous;
 
 using HereticalSolutions.Allocations;
 using HereticalSolutions.Allocations.Factories;
@@ -74,10 +77,108 @@ namespace HereticalSolutions.Pools.Factories
                     newElement);
             }
         }
-        
+
         #endregion
 
-        #region StackManagedPool
+        #region Concurrent stack pool
+
+        public static ConcurrentStackPool<T> BuildConcurrentStackPool<T>(
+            AllocationCommand<T> initialAllocationCommand,
+            AllocationCommand<T> additionalAllocationCommand,
+            ILoggerResolver loggerResolver)
+        {
+            ILogger logger =
+                loggerResolver?.GetLogger<ConcurrentStackPool<T>>();
+
+            var stack = new Stack<T>();
+
+            PerformInitialAllocation<T>(
+                stack,
+                initialAllocationCommand,
+                logger);
+
+            return new ConcurrentStackPool<T>(
+                stack,
+                additionalAllocationCommand,
+                logger);
+        }
+
+        #endregion
+
+        #region Async stack pool
+
+        public static async Task<AsyncStackPool<T>> BuildAsyncStackPool<T>(
+            AsyncAllocationCommand<T> initialAllocationCommand,
+            AsyncAllocationCommand<T> additionalAllocationCommand,
+            ILoggerResolver loggerResolver,
+            
+            //Async tail
+            AsyncExecutionContext asyncContext)
+        {
+            ILogger logger =
+                loggerResolver?.GetLogger<AsyncStackPool<T>>();
+
+            var stack = new Stack<T>();
+
+            await PerformInitialAllocation<T>(
+                stack,
+                initialAllocationCommand,
+                logger,
+
+                asyncContext);
+
+            return new AsyncStackPool<T>(
+                stack,
+                additionalAllocationCommand,
+                logger);
+        }
+
+        private static async Task PerformInitialAllocation<T>(
+            Stack<T> stack,
+            AsyncAllocationCommand<T> initialAllocationCommand,
+            ILogger logger,
+            
+            //Async tail
+            AsyncExecutionContext asyncContext)
+        {
+            int initialAmount = -1;
+
+            switch (initialAllocationCommand.Descriptor.Rule)
+            {
+                case EAllocationAmountRule.ZERO:
+                    initialAmount = 0;
+                    break;
+
+                case EAllocationAmountRule.ADD_ONE:
+                    initialAmount = 1;
+                    break;
+
+                case EAllocationAmountRule.ADD_PREDEFINED_AMOUNT:
+                    initialAmount = initialAllocationCommand.Descriptor.Amount;
+                    break;
+
+                default:
+                    throw new Exception(
+                        logger.TryFormatException(
+                            $"[{nameof(StackPoolFactory)}] INVALID INITIAL ALLOCATION COMMAND RULE: {initialAllocationCommand.Descriptor.Rule.ToString()}"));
+            }
+
+            for (int i = 0; i < initialAmount; i++)
+            {
+                var newElement = await initialAllocationCommand.AllocationDelegate();
+
+                await initialAllocationCommand.AllocationCallback?.OnAllocated(
+                    newElement,
+                    asyncContext);
+
+                stack.Push(
+                    newElement);
+            }
+        }
+
+        #endregion
+
+        #region Stack managed pool
 
         public static StackManagedPool<T> BuildStackManagedPool<T>(
             AllocationCommand<T> initialAllocationCommand,
@@ -175,7 +276,7 @@ namespace HereticalSolutions.Pools.Factories
         
         #endregion
 
-        #region AppendableStackManagedPool
+        #region Appendable stack managed pool
         
         public static AppendableStackManagedPool<T> BuildAppendableStackManagedPool<T>(
             AllocationCommand<T> initialAllocationCommand,
@@ -288,7 +389,53 @@ namespace HereticalSolutions.Pools.Factories
 
             return currentCapacity + addedCapacity;
         }
-        
+
+        public static async Task<int> ResizeAsyncStackPool<T>(
+            Stack<T> stack,
+            int currentCapacity,
+            AsyncAllocationCommand<T> allocationCommand,
+            ILogger logger,
+            
+            //Async tail
+            AsyncExecutionContext asyncContext)
+        {
+            int addedCapacity = -1;
+
+            switch (allocationCommand.Descriptor.Rule)
+            {
+                case EAllocationAmountRule.ADD_ONE:
+                    addedCapacity = 1;
+                    break;
+
+                case EAllocationAmountRule.DOUBLE_AMOUNT:
+                    addedCapacity = currentCapacity * 2;
+                    break;
+
+                case EAllocationAmountRule.ADD_PREDEFINED_AMOUNT:
+                    addedCapacity = allocationCommand.Descriptor.Amount;
+                    break;
+
+                default:
+                    throw new Exception(
+                        logger.TryFormatException(
+                            $"[StackPoolFactory] INVALID RESIZE ALLOCATION COMMAND RULE FOR STACK: {allocationCommand.Descriptor.Rule.ToString()}"));
+            }
+
+            for (int i = 0; i < addedCapacity; i++)
+            {
+                var newElement = await allocationCommand.AllocationDelegate();
+
+                await allocationCommand.AllocationCallback?.OnAllocated(
+                    newElement,
+                    asyncContext);
+
+                stack.Push(
+                    newElement);
+            }
+
+            return currentCapacity + addedCapacity;
+        }
+
         public static int ResizeStackManagedPool<T>(
             Stack<IPoolElementFacade<T>> stack,
             int currentCapacity,

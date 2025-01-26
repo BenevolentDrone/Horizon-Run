@@ -1,5 +1,8 @@
 using System;
+using System.Threading.Tasks;
 using System.Collections.Generic;
+
+using HereticalSolutions.Asynchronous;
 
 using HereticalSolutions.Allocations;
 using HereticalSolutions.Allocations.Factories;
@@ -77,7 +80,105 @@ namespace HereticalSolutions.Pools.Factories
 
 		#endregion
 
-		#region QueueManagedPool
+		#region Concurrent queue pool
+
+		public static ConcurrentQueuePool<T> BuildConcurrentQueuePool<T>(
+			AllocationCommand<T> initialAllocationCommand,
+			AllocationCommand<T> additionalAllocationCommand,
+			ILoggerResolver loggerResolver)
+		{
+			ILogger logger =
+				loggerResolver?.GetLogger<ConcurrentQueuePool<T>>();
+
+			var queue = new Queue<T>();
+
+			PerformInitialAllocation<T>(
+				queue,
+				initialAllocationCommand,
+				logger);
+
+			return new ConcurrentQueuePool<T>(
+				queue,
+				additionalAllocationCommand,
+				logger);
+		}
+
+		#endregion
+
+		#region Async queue pool
+
+		public static async Task<AsyncQueuePool<T>> BuildAsyncQueuePool<T>(
+			AsyncAllocationCommand<T> initialAllocationCommand,
+			AsyncAllocationCommand<T> additionalAllocationCommand,
+			ILoggerResolver loggerResolver,
+
+			//Async tail
+			AsyncExecutionContext asyncContext)
+		{
+			ILogger logger =
+				loggerResolver?.GetLogger<AsyncQueuePool<T>>();
+
+			var queue = new Queue<T>();
+
+			await PerformInitialAllocation<T>(
+				queue,
+				initialAllocationCommand,
+				logger,
+				
+				asyncContext);
+
+			return new AsyncQueuePool<T>(
+				queue,
+				additionalAllocationCommand,
+				logger);
+		}
+
+		private static async Task PerformInitialAllocation<T>(
+			Queue<T> queue,
+			AsyncAllocationCommand<T> initialAllocationCommand,
+			ILogger logger,
+
+			//Async tail
+			AsyncExecutionContext asyncContext)
+		{
+			int initialAmount = -1;
+
+			switch (initialAllocationCommand.Descriptor.Rule)
+			{
+				case EAllocationAmountRule.ZERO:
+					initialAmount = 0;
+					break;
+
+				case EAllocationAmountRule.ADD_ONE:
+					initialAmount = 1;
+					break;
+
+				case EAllocationAmountRule.ADD_PREDEFINED_AMOUNT:
+					initialAmount = initialAllocationCommand.Descriptor.Amount;
+					break;
+
+				default:
+					throw new Exception(
+						logger.TryFormatException(
+							$"[QueuePoolFactory] INVALID INITIAL ALLOCATION COMMAND RULE: {initialAllocationCommand.Descriptor.Rule.ToString()}"));
+			}
+
+			for (int i = 0; i < initialAmount; i++)
+			{
+				var newElement = await initialAllocationCommand.AllocationDelegate();
+
+				await initialAllocationCommand.AllocationCallback?.OnAllocated(
+					newElement,
+					asyncContext);
+
+				queue.Enqueue(
+					newElement);
+			}
+		}
+
+		#endregion
+
+		#region Queue managed pool
 
 		public static QueueManagedPool<T> BuildQueueManagedPool<T>(
 			AllocationCommand<T> initialAllocationCommand,
@@ -175,7 +276,7 @@ namespace HereticalSolutions.Pools.Factories
 
 		#endregion
 
-		#region AppendableQueueManagedPool
+		#region Appendable queue managed pool
 
 		public static AppendableQueueManagedPool<T> BuildAppendableQueueManagedPool<T>(
 			AllocationCommand<T> initialAllocationCommand,
@@ -281,6 +382,52 @@ namespace HereticalSolutions.Pools.Factories
 				var newElement = allocationCommand.AllocationDelegate();
 
 				allocationCommand.AllocationCallback?.OnAllocated(newElement);
+
+				queue.Enqueue(
+					newElement);
+			}
+
+			return currentCapacity + addedCapacity;
+		}
+
+		public static async Task<int> ResizeAsyncQueuePool<T>(
+			Queue<T> queue,
+			int currentCapacity,
+			AsyncAllocationCommand<T> allocationCommand,
+			ILogger logger,
+
+			//Async tail
+			AsyncExecutionContext asyncContext)
+		{
+			int addedCapacity = -1;
+
+			switch (allocationCommand.Descriptor.Rule)
+			{
+				case EAllocationAmountRule.ADD_ONE:
+					addedCapacity = 1;
+					break;
+
+				case EAllocationAmountRule.DOUBLE_AMOUNT:
+					addedCapacity = currentCapacity * 2;
+					break;
+
+				case EAllocationAmountRule.ADD_PREDEFINED_AMOUNT:
+					addedCapacity = allocationCommand.Descriptor.Amount;
+					break;
+
+				default:
+					throw new Exception(
+						logger.TryFormatException(
+							$"[QueuePoolFactory] INVALID RESIZE ALLOCATION COMMAND RULE FOR STACK: {allocationCommand.Descriptor.Rule.ToString()}"));
+			}
+
+			for (int i = 0; i < addedCapacity; i++)
+			{
+				var newElement = await allocationCommand.AllocationDelegate();
+
+				await allocationCommand.AllocationCallback?.OnAllocated(
+					newElement,
+					asyncContext);
 
 				queue.Enqueue(
 					newElement);

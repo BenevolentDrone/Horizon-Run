@@ -31,6 +31,8 @@ namespace HereticalSolutions.Pools
 
 		private int capacity;
 
+		private bool isResizing;
+
 		public AsyncStackPool(
 			Stack<T> pool,
 			AsyncAllocationCommand<T> allocationCommand,
@@ -47,6 +49,8 @@ namespace HereticalSolutions.Pools
 
 
 			capacity = this.pool.Count;
+
+			isResizing = false;
 		}
 
 		#region IAsyncPool
@@ -56,29 +60,57 @@ namespace HereticalSolutions.Pools
 			//Async tail
 			AsyncExecutionContext asyncContext)
 		{
+			T result = default(T);
+
+			#region Wait for resize
+
+			bool isResizingClosure = false;
+
 			lock (lockObject)
 			{
-				T result = default(T);
+				isResizingClosure = isResizing;
+			}
 
+			while  (isResizingClosure)
+			{
+				await Task.Yield();
+
+				lock (lockObject)
+				{
+					isResizingClosure = isResizing;
+				}
+			}
+
+			#endregion
+
+			lock (lockObject)
+			{
 				if (pool.Count != 0)
 				{
 					result = pool.Pop();
-				}
-				else
-				{
-					capacity = await StackPoolFactory.ResizeAsyncStackPool(
-						pool,
-						capacity,
-						allocationCommand,
-						logger,
-						
-						asyncContext);
 
-					result = pool.Pop();
+					return result;
 				}
-
-				return result;
+				
+				isResizing = true;
 			}
+
+			capacity = await StackPoolFactory.ResizeAsyncStackPool(
+				pool,
+				capacity,
+				allocationCommand,
+				logger,
+				
+				asyncContext);
+
+			lock (lockObject)
+			{
+				result = pool.Pop();
+
+				isResizing = false;
+			}
+
+			return result;
 		}
 
 		public async Task<T> Pop(
@@ -97,6 +129,27 @@ namespace HereticalSolutions.Pools
 			//Async tail
 			AsyncExecutionContext asyncContext)
 		{
+			#region Wait for resize
+
+			bool isResizingClosure = false;
+
+			lock (lockObject)
+			{
+				isResizingClosure = isResizing;
+			}
+
+			while (isResizingClosure)
+			{
+				await Task.Yield();
+
+				lock (lockObject)
+				{
+					isResizingClosure = isResizing;
+				}
+			}
+
+			#endregion
+
 			lock (lockObject)
 			{
 				pool.Push(instance);
@@ -112,15 +165,43 @@ namespace HereticalSolutions.Pools
 			//Async tail
 			AsyncExecutionContext asyncContext)
 		{
+			#region Wait for resize
+
+			bool isResizingClosure = false;
+
 			lock (lockObject)
 			{
-				capacity = await StackPoolFactory.ResizeAsyncStackPool(
-					pool,
-					capacity,
-					allocationCommand,
-					logger,
-					
-					asyncContext);
+				isResizingClosure = isResizing;
+			}
+
+			while (isResizingClosure)
+			{
+				await Task.Yield();
+
+				lock (lockObject)
+				{
+					isResizingClosure = isResizing;
+				}
+			}
+
+			#endregion
+
+			lock (lockObject)
+			{
+				isResizing = true;
+			}
+
+			capacity = await StackPoolFactory.ResizeAsyncStackPool(
+				pool,
+				capacity,
+				allocationCommand,
+				logger,
+				
+				asyncContext);
+
+			lock (lockObject)
+			{
+				isResizing = false;
 			}
 		}
 

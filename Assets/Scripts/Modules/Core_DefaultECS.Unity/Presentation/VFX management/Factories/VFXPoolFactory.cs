@@ -67,7 +67,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Factories
 
             // Create a push to decorated pool callback
             PushToManagedPoolWhenAvailableCallback<GameObject> pushCallback =
-                ObjectPoolAllocationCallbacksFactory.BuildPushToManagedPoolWhenAvailableCallback<GameObject>();
+                ObjectPoolAllocationCallbackFactory.BuildPushToManagedPoolWhenAvailableCallback<GameObject>();
 
             #endregion
 

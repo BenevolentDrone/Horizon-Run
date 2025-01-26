@@ -71,7 +71,7 @@ namespace HereticalSolutions.Time.Factories
 
 			// Create a push to decorated pool callback
 			PushToManagedPoolWhenAvailableCallback<TimerWithSubscriptionsContainer> pushCallback =
-				ObjectPoolAllocationCallbacksFactory.BuildPushToManagedPoolWhenAvailableCallback<TimerWithSubscriptionsContainer>();
+				ObjectPoolAllocationCallbackFactory.BuildPushToManagedPoolWhenAvailableCallback<TimerWithSubscriptionsContainer>();
 
 			#endregion
 

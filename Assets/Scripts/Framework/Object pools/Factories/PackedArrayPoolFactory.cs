@@ -1,4 +1,7 @@
 using System;
+using System.Threading.Tasks;
+
+using HereticalSolutions.Asynchronous;
 
 using HereticalSolutions.Allocations;
 using HereticalSolutions.Allocations.Factories;
@@ -14,7 +17,7 @@ namespace HereticalSolutions.Pools.Factories
 
         #region Build
 
-        #region PackedArrayPool
+        #region Packed array pool
 
         public static PackedArrayPool<T> BuildPackedArrayPool<T>(
             AllocationCommand<T> initialAllocationCommand,
@@ -81,10 +84,91 @@ namespace HereticalSolutions.Pools.Factories
                 contents[i] = newElement;
             }
         }
-        
+
         #endregion
 
-        #region PackedArrayManagedPool
+        #region Concurrent packed array pool
+
+        public static ConcurrentPackedArrayPool<T> BuildConcurrentPackedArrayPool<T>(
+            AllocationCommand<T> initialAllocationCommand,
+            AllocationCommand<T> additionalAllocationCommand,
+            ILoggerResolver loggerResolver)
+        {
+            ILogger logger =
+                loggerResolver?.GetLogger<ConcurrentPackedArrayPool<T>>();
+
+            int initialAmount = CountInitialAllocationAmount(
+                initialAllocationCommand.Descriptor);
+
+            T[] contents = new T[initialAmount];
+
+            PerformInitialAllocation<T>(
+                initialAmount,
+                contents,
+                initialAllocationCommand);
+
+            return new ConcurrentPackedArrayPool<T>(
+                contents,
+                additionalAllocationCommand,
+                logger);
+        }
+
+        #endregion
+
+        #region Async packed array pool
+
+        public static async Task<AsyncPackedArrayPool<T>> BuildAsyncPackedArrayPool<T>(
+            AsyncAllocationCommand<T> initialAllocationCommand,
+            AsyncAllocationCommand<T> additionalAllocationCommand,
+            ILoggerResolver loggerResolver,
+
+            //Async tail
+            AsyncExecutionContext asyncContext)
+        {
+            ILogger logger =
+                loggerResolver?.GetLogger<AsyncPackedArrayPool<T>>();
+
+            int initialAmount = CountInitialAllocationAmount(
+                initialAllocationCommand.Descriptor);
+
+            T[] contents = new T[initialAmount];
+
+            await PerformInitialAllocation<T>(
+                initialAmount,
+                contents,
+                initialAllocationCommand,
+                
+                asyncContext);
+
+            return new AsyncPackedArrayPool<T>(
+                contents,
+                additionalAllocationCommand,
+                logger);
+        }
+
+        private static async Task PerformInitialAllocation<T>(
+            int initialAmount,
+            T[] contents,
+            AsyncAllocationCommand<T> allocationCommand,
+
+            //Async tail
+            AsyncExecutionContext asyncContext)
+        {
+            for (int i = 0; i < initialAmount; i++)
+            {
+                var newElement = await allocationCommand.AllocationDelegate();
+
+                await allocationCommand.AllocationCallback?.OnAllocated(
+                    newElement,
+                    asyncContext);
+
+                contents[i] = newElement;
+            }
+        }
+
+        #endregion
+
+        #region Packed array managed pool
 
         public static PackedArrayManagedPool<T> BuildPackedArrayManagedPool<T>(
             AllocationCommand<T> initialAllocationCommand,
@@ -167,7 +251,7 @@ namespace HereticalSolutions.Pools.Factories
         
         #endregion
 
-        #region AppendableManagedPool
+        #region Appendable packed array managed pool
         
         public static AppendablePackedArrayManagedPool<T> BuildAppendableManagedPool<T>(
             AllocationCommand<T> initialAllocationCommand,
@@ -263,9 +347,64 @@ namespace HereticalSolutions.Pools.Factories
             return newContents;
         }
 
+        public static async Task<T[]> ResizeAsyncPackedArrayPool<T>(
+            T[] packedArray,
+            AsyncAllocationCommand<T> allocationCommand,
+            ILogger logger,
+
+            //Async tail
+            AsyncExecutionContext asyncContext)
+        {
+            int newCapacity = CountResizeAllocationAmount<T>(
+                packedArray,
+                allocationCommand,
+                logger);
+
+            T[] newContents = new T[newCapacity];
+
+            await FillNewArrayWithContents<T>(
+                packedArray,
+                newContents,
+                allocationCommand,
+                
+                asyncContext);
+
+            return newContents;
+        }
+
         private static int CountResizeAllocationAmount<T>(
             T[] packedArray,
             AllocationCommand<T> allocationCommand,
+            ILogger logger)
+        {
+            int newCapacity = -1;
+
+            switch (allocationCommand.Descriptor.Rule)
+            {
+                case EAllocationAmountRule.ADD_ONE:
+                    newCapacity = packedArray.Length + 1;
+                    break;
+
+                case EAllocationAmountRule.DOUBLE_AMOUNT:
+                    newCapacity = Math.Max(packedArray.Length, 1) * 2;
+                    break;
+
+                case EAllocationAmountRule.ADD_PREDEFINED_AMOUNT:
+                    newCapacity = packedArray.Length + allocationCommand.Descriptor.Amount;
+                    break;
+
+                default:
+                    throw new Exception(
+                        logger.TryFormatException(
+                            $"[PackedArrayPoolFactory] INVALID ALLOCATION COMMAND RULE FOR PACKED ARRAY: {allocationCommand.Descriptor.Rule.ToString()}"));
+            }
+
+            return newCapacity;
+        }
+
+        private static int CountResizeAllocationAmount<T>(
+            T[] packedArray,
+            AsyncAllocationCommand<T> allocationCommand,
             ILogger logger)
         {
             int newCapacity = -1;
@@ -311,7 +450,30 @@ namespace HereticalSolutions.Pools.Factories
                 newContents[i] = newElement;
             }
         }
-        
+
+        private static async Task FillNewArrayWithContents<T>(
+            T[] oldContents,
+            T[] newContents,
+            AsyncAllocationCommand<T> allocationCommand,
+
+            //Async tail
+            AsyncExecutionContext asyncContext)
+        {
+            for (int i = 0; i < oldContents.Length; i++)
+                newContents[i] = oldContents[i];
+
+            for (int i = oldContents.Length; i < newContents.Length; i++)
+            {
+                var newElement = await allocationCommand.AllocationDelegate();
+
+                await allocationCommand.AllocationCallback?.OnAllocated(
+                    newElement,
+                    asyncContext);
+
+                newContents[i] = newElement;
+            }
+        }
+
         public static IPoolElementFacade<T>[] ResizePackedArrayManagedPool<T>(
             IPoolElementFacade<T>[] packedArray,
             AllocationCommand<IPoolElementFacade<T>> facadeAllocationCommand,

@@ -29,6 +29,8 @@ namespace HereticalSolutions.Pools
 
 		private int allocatedCount;
 
+		private bool isResizing;
+
 		public AsyncPackedArrayPool(
 			T[] packedArray,
 			AsyncAllocationCommand<T> allocationCommand,
@@ -45,6 +47,8 @@ namespace HereticalSolutions.Pools
 
 
 			allocatedCount = 0;
+
+			isResizing = false;
 		}
 
 		#region IAsyncPool
@@ -54,23 +58,58 @@ namespace HereticalSolutions.Pools
 			//Async tail
 			AsyncExecutionContext asyncContext)
 		{
+			T result = default(T);
+
+			#region Wait for resize
+
+			bool isResizingClosure = false;
+
 			lock (lockObject)
 			{
-				T result = default;
+				isResizingClosure = isResizing;
+			}
 
-				if (allocatedCount >= packedArray.Length)
+			while (isResizingClosure)
+			{
+				await Task.Yield();
+
+				lock (lockObject)
 				{
-					packedArray = await PackedArrayPoolFactory.ResizeAsyncPackedArrayPool(
-						packedArray,
-						allocationCommand,
-						logger,
-						
-						asyncContext);
+					isResizingClosure = isResizing;
+				}
+			}
+
+			#endregion
+
+			lock (lockObject)
+			{
+
+				if (allocatedCount < packedArray.Length)
+				{
+					result = packedArray[allocatedCount];
+
+					allocatedCount++;
+
+					return result;
 				}
 
+				isResizing = true;
+			}
+
+			packedArray = await PackedArrayPoolFactory.ResizeAsyncPackedArrayPool(
+				packedArray,
+				allocationCommand,
+				logger,
+				
+				asyncContext);
+
+			lock (lockObject)
+			{
 				result = packedArray[allocatedCount];
 
 				allocatedCount++;
+
+				isResizing = false;
 
 				return result;
 			}
@@ -94,6 +133,27 @@ namespace HereticalSolutions.Pools
 			//Async tail
 			AsyncExecutionContext asyncContext)
 		{
+			#region Wait for resize
+
+			bool isResizingClosure = false;
+
+			lock (lockObject)
+			{
+				isResizingClosure = isResizing;
+			}
+
+			while (isResizingClosure)
+			{
+				await Task.Yield();
+
+				lock (lockObject)
+				{
+					isResizingClosure = isResizing;
+				}
+			}
+
+			#endregion
+
 			lock (lockObject)
 			{
 				int lastAllocatedItemIndex = allocatedCount - 1;
@@ -151,14 +211,42 @@ namespace HereticalSolutions.Pools
 			//Async tail
 			AsyncExecutionContext asyncContext)
 		{
+			#region Wait for resize
+
+			bool isResizingClosure = false;
+
 			lock (lockObject)
 			{
-				packedArray = await PackedArrayPoolFactory.ResizePackedArrayPool(
-					packedArray,
-					allocationCommand,
-					logger,
-					
-					asyncContext);
+				isResizingClosure = isResizing;
+			}
+
+			while (isResizingClosure)
+			{
+				await Task.Yield();
+
+				lock (lockObject)
+				{
+					isResizingClosure = isResizing;
+				}
+			}
+
+			#endregion
+
+			lock (lockObject)
+			{
+				isResizing = true;
+			}
+
+			packedArray = await PackedArrayPoolFactory.ResizeAsyncPackedArrayPool(
+				packedArray,
+				allocationCommand,
+				logger,
+				
+				asyncContext);
+
+			lock (lockObject)
+			{
+				isResizing = false;
 			}
 		}
 

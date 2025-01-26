@@ -1,5 +1,4 @@
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 
 using System.Collections.Generic;
@@ -32,6 +31,8 @@ namespace HereticalSolutions.Pools
 
 		private int capacity;
 
+		private bool isResizing;
+
 		public AsyncQueuePool(
 			Queue<T> pool,
 			AsyncAllocationCommand<T> allocationCommand,
@@ -48,6 +49,8 @@ namespace HereticalSolutions.Pools
 
 
 			capacity = this.pool.Count;
+
+			isResizing = false;
 		}
 
 		#region IAsyncPool
@@ -57,29 +60,57 @@ namespace HereticalSolutions.Pools
 			//Async tail
 			AsyncExecutionContext asyncContext)
 		{
+			T result = default(T);
+
+			#region Wait for resize
+
+			bool isResizingClosure = false;
+
 			lock (lockObject)
 			{
-				T result = default(T);
+				isResizingClosure = isResizing;
+			}
 
+			while (isResizingClosure)
+			{
+				await Task.Yield();
+
+				lock (lockObject)
+				{
+					isResizingClosure = isResizing;
+				}
+			}
+
+			#endregion
+
+			lock (lockObject)
+			{
 				if (pool.Count != 0)
 				{
 					result = pool.Dequeue();
-				}
-				else
-				{
-					capacity = await QueuePoolFactory.ResizeAsyncQueuePool(
-						pool,
-						capacity,
-						allocationCommand,
-						logger,
-						
-						asyncContext);
 
-					result = pool.Dequeue();
+					return result;
 				}
 
-				return result;
+				isResizing = true;
 			}
+
+			capacity = await QueuePoolFactory.ResizeAsyncQueuePool(
+				pool,
+				capacity,
+				allocationCommand,
+				logger,
+
+				asyncContext);
+
+			lock (lockObject)
+			{
+				result = pool.Dequeue();
+
+				isResizing = false;
+			}
+
+			return result;
 		}
 
 		public async Task<T> Pop(
@@ -89,7 +120,6 @@ namespace HereticalSolutions.Pools
 			AsyncExecutionContext asyncContext)
 		{
 			return await Pop(
-
 				asyncContext);
 		}
 
@@ -99,6 +129,27 @@ namespace HereticalSolutions.Pools
 			//Async tail
 			AsyncExecutionContext asyncContext)
 		{
+			#region Wait for resize
+
+			bool isResizingClosure = false;
+
+			lock (lockObject)
+			{
+				isResizingClosure = isResizing;
+			}
+
+			while (isResizingClosure)
+			{
+				await Task.Yield();
+
+				lock (lockObject)
+				{
+					isResizingClosure = isResizing;
+				}
+			}
+
+			#endregion
+
 			lock (lockObject)
 			{
 				pool.Enqueue(instance);
@@ -114,15 +165,43 @@ namespace HereticalSolutions.Pools
 			//Async tail
 			AsyncExecutionContext asyncContext)
 		{
+			#region Wait for resize
+
+			bool isResizingClosure = false;
+
 			lock (lockObject)
 			{
-				capacity = await QueuePoolFactory.ResizeAsyncQueuePool(
-					pool,
-					capacity,
-					allocationCommand,
-					logger,
-					
-					asyncContext);
+				isResizingClosure = isResizing;
+			}
+
+			while (isResizingClosure)
+			{
+				await Task.Yield();
+
+				lock (lockObject)
+				{
+					isResizingClosure = isResizing;
+				}
+			}
+
+			#endregion
+
+			lock (lockObject)
+			{
+				isResizing = true;
+			}
+
+			capacity = await QueuePoolFactory.ResizeAsyncQueuePool(
+				pool,
+				capacity,
+				allocationCommand,
+				logger,
+
+				asyncContext);
+
+			lock (lockObject)
+			{
+				isResizing = false;
 			}
 		}
 

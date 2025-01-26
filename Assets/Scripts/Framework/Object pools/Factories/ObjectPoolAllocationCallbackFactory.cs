@@ -4,7 +4,7 @@ using HereticalSolutions.Pools.AllocationCallbacks;
 
 namespace HereticalSolutions.Pools.Factories
 {
-    public static class ObjectPoolAllocationCallbacksFactory
+    public static class ObjectPoolAllocationCallbackFactory
     {
         public static PushToManagedPoolCallback<T> BuildPushToPoolCallback<T>(
             IManagedPool<T> root = null)

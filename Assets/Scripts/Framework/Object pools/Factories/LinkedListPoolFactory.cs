@@ -1,5 +1,8 @@
 using System;
+using System.Threading.Tasks;
 using System.Collections.Generic;
+
+using HereticalSolutions.Asynchronous;
 
 using HereticalSolutions.Allocations;
 using HereticalSolutions.Allocations.Factories;
@@ -16,7 +19,7 @@ namespace HereticalSolutions.Pools.Factories
     {
         #region Build
 
-        #region LinkedList pool
+        #region Linked list pool
 
         public static LinkedListPool<T> BuildLinkedListPool<T>(
             AllocationCommand<T> initialAllocationCommand,
@@ -79,7 +82,105 @@ namespace HereticalSolutions.Pools.Factories
 
         #endregion
 
-        #region LinkedListManagedPool
+        #region Concurrent linkedList pool
+
+        public static ConcurrentLinkedListPool<T> BuildConcurrentLinkedListPool<T>(
+            AllocationCommand<T> initialAllocationCommand,
+            AllocationCommand<T> additionalAllocationCommand,
+            ILoggerResolver loggerResolver)
+        {
+            ILogger logger =
+                loggerResolver?.GetLogger<ConcurrentLinkedListPool<T>>();
+
+            var linkedList = new LinkedList<T>();
+
+            PerformInitialAllocation<T>(
+                linkedList,
+                initialAllocationCommand,
+                logger);
+
+            return new ConcurrentLinkedListPool<T>(
+                linkedList,
+                additionalAllocationCommand,
+                logger);
+        }
+
+        #endregion
+
+        #region Async linked list pool
+
+        public static async Task<AsyncLinkedListPool<T>> BuildAsyncLinkedListPool<T>(
+            AsyncAllocationCommand<T> initialAllocationCommand,
+            AsyncAllocationCommand<T> additionalAllocationCommand,
+            ILoggerResolver loggerResolver,
+
+            //Async tail
+            AsyncExecutionContext asyncContext)
+        {
+            ILogger logger =
+                loggerResolver?.GetLogger<AsyncLinkedListPool<T>>();
+
+            var linkedList = new LinkedList<T>();
+
+            await PerformInitialAllocation<T>(
+                linkedList,
+                initialAllocationCommand,
+                logger,
+                
+                asyncContext);
+
+            return new AsyncLinkedListPool<T>(
+                linkedList,
+                additionalAllocationCommand,
+                logger);
+        }
+
+        private static async Task PerformInitialAllocation<T>(
+            LinkedList<T> linkedList,
+            AsyncAllocationCommand<T> initialAllocationCommand,
+            ILogger logger,
+
+            //Async tail
+            AsyncExecutionContext asyncContext)
+        {
+            int initialAmount = -1;
+
+            switch (initialAllocationCommand.Descriptor.Rule)
+            {
+                case EAllocationAmountRule.ZERO:
+                    initialAmount = 0;
+                    break;
+
+                case EAllocationAmountRule.ADD_ONE:
+                    initialAmount = 1;
+                    break;
+
+                case EAllocationAmountRule.ADD_PREDEFINED_AMOUNT:
+                    initialAmount = initialAllocationCommand.Descriptor.Amount;
+                    break;
+
+                default:
+                    throw new Exception(
+                        logger.TryFormatException(
+                            $"[LinkedListPoolFactory] INVALID INITIAL ALLOCATION COMMAND RULE: {initialAllocationCommand.Descriptor.Rule.ToString()}"));
+            }
+
+            for (int i = 0; i < initialAmount; i++)
+            {
+                var newElement = await initialAllocationCommand.AllocationDelegate();
+
+                await initialAllocationCommand.AllocationCallback?.OnAllocated(
+                    newElement,
+                    asyncContext);
+
+                linkedList.AddFirst(
+                    newElement);
+            }
+        }
+
+        #endregion
+
+        #region Linked list managed pool
 
         public static LinkedListManagedPool<T> BuildLinkedListManagedPool<T>(
             AllocationCommand<T> initialAllocationCommand,
@@ -191,7 +292,7 @@ namespace HereticalSolutions.Pools.Factories
         
         #endregion
 
-        #region AppendableLinkedListManagedPool
+        #region Appendable linked list managed pool
         
         public static AppendableLinkedListManagedPool<T> BuildAppendableLinkedListManagedPool<T>(
             AllocationCommand<T> initialAllocationCommand,
@@ -296,6 +397,52 @@ namespace HereticalSolutions.Pools.Factories
                 var newElement = allocationCommand.AllocationDelegate();
 
                 allocationCommand.AllocationCallback?.OnAllocated(newElement);
+
+                linkedList.AddFirst(
+                    newElement);
+            }
+
+            return currentCapacity + addedCapacity;
+        }
+
+        public static async Task<int> ResizeAsyncLinkedListPool<T>(
+            LinkedList<T> linkedList,
+            int currentCapacity,
+            AsyncAllocationCommand<T> allocationCommand,
+            ILogger logger,
+
+            //Async tail
+            AsyncExecutionContext asyncContext)
+        {
+            int addedCapacity = -1;
+
+            switch (allocationCommand.Descriptor.Rule)
+            {
+                case EAllocationAmountRule.ADD_ONE:
+                    addedCapacity = 1;
+                    break;
+
+                case EAllocationAmountRule.DOUBLE_AMOUNT:
+                    addedCapacity = currentCapacity * 2;
+                    break;
+
+                case EAllocationAmountRule.ADD_PREDEFINED_AMOUNT:
+                    addedCapacity = allocationCommand.Descriptor.Amount;
+                    break;
+
+                default:
+                    throw new Exception(
+                        logger.TryFormatException(
+                            $"[LinkedListPoolFactory] INVALID RESIZE ALLOCATION COMMAND RULE FOR STACK: {allocationCommand.Descriptor.Rule.ToString()}"));
+            }
+
+            for (int i = 0; i < addedCapacity; i++)
+            {
+                var newElement = await allocationCommand.AllocationDelegate();
+
+                await allocationCommand.AllocationCallback?.OnAllocated(
+                    newElement,
+                    asyncContext);
 
                 linkedList.AddFirst(
                     newElement);

@@ -30,7 +30,7 @@ namespace HereticalSolutions.Messaging
 		private readonly object poolLock;
 
 		public ConcurrentNonAllocMessageBus(
-			BroadcasterWithRepository broadcaster,
+			IPublisherSingleArg broadcaster,
 			IReadOnlyRepository<Type, IManagedPool<IMessage>> messagePoolRepository,
 			Queue<IPoolElementFacade<IMessage>> mailbox,
 			ILogger logger)

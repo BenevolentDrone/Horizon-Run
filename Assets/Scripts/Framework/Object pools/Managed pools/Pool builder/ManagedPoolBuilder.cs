@@ -67,6 +67,8 @@ namespace HereticalSolutions.Pools.Factories
             this.valueAllocationCallbacks = valueAllocationCallbacks;
         }
 
+        #region Packed array
+
         public PackedArrayManagedPool<T> BuildPackedArrayManagedPool()
         {
             if (valueAllocationDelegate == null)
@@ -98,16 +100,57 @@ namespace HereticalSolutions.Pools.Factories
 
                     AllocationCallback = valueAllocationCallback
                 },
+                loggerResolver,
                 metadataDescriptors,
                 facadeAllocationCallback,
-                true,
-                loggerResolver);
+                true);
 
             Cleanup();
 
             return result;
         }
-        
+
+        public ConcurrentPackedArrayManagedPool<T> BuildConcurrentPackedArrayManagedPool()
+        {
+            if (valueAllocationDelegate == null)
+                throw new Exception(
+                    logger.TryFormatException(
+                        GetType(),
+                        "BUILDER NOT INITIALIZED"));
+
+            var metadataDescriptors = BuildMetadataDescriptors();
+
+            var facadeAllocationCallback = BuildFacadeAllocationCallback();
+
+            var valueAllocationCallback = BuildValueAllocationCallback();
+
+            var result = PackedArrayPoolFactory.BuildConcurrentPackedArrayManagedPool(
+                new AllocationCommand<T>
+                {
+                    Descriptor = initialAllocation,
+
+                    AllocationDelegate = valueAllocationDelegate,
+
+                    AllocationCallback = valueAllocationCallback
+                },
+                new AllocationCommand<T>
+                {
+                    Descriptor = additionalAllocation,
+
+                    AllocationDelegate = valueAllocationDelegate,
+
+                    AllocationCallback = valueAllocationCallback
+                },
+                loggerResolver,
+                metadataDescriptors,
+                facadeAllocationCallback,
+                true);
+
+            Cleanup();
+
+            return result;
+        }
+
         public AppendablePackedArrayManagedPool<T> BuildAppendablePackedArrayManagedPool()
         {
             if (valueAllocationDelegate == null)
@@ -139,14 +182,58 @@ namespace HereticalSolutions.Pools.Factories
 
                     AllocationCallback = valueAllocationCallback
                 },
+                loggerResolver,
                 metadataDescriptors,
-                facadeAllocationCallback,
-                loggerResolver);
+                facadeAllocationCallback);
 
             Cleanup();
 
             return result;
         }
+
+        public ConcurrentAppendablePackedArrayManagedPool<T> BuildConcurrentAppendablePackedArrayManagedPool()
+        {
+            if (valueAllocationDelegate == null)
+                throw new Exception(
+                    logger.TryFormatException(
+                        GetType(),
+                        "BUILDER NOT INITIALIZED"));
+
+            var metadataDescriptors = BuildMetadataDescriptors();
+
+            var facadeAllocationCallback = BuildFacadeAllocationCallback();
+
+            var valueAllocationCallback = BuildValueAllocationCallback();
+
+            var result = PackedArrayPoolFactory.BuildConcurrentAppendableManagedPool(
+                new AllocationCommand<T>
+                {
+                    Descriptor = initialAllocation,
+
+                    AllocationDelegate = valueAllocationDelegate,
+
+                    AllocationCallback = valueAllocationCallback
+                },
+                new AllocationCommand<T>
+                {
+                    Descriptor = additionalAllocation,
+
+                    AllocationDelegate = valueAllocationDelegate,
+
+                    AllocationCallback = valueAllocationCallback
+                },
+                loggerResolver,
+                metadataDescriptors,
+                facadeAllocationCallback);
+
+            Cleanup();
+
+            return result;
+        }
+
+        #endregion
+
+        #region Stack
 
         public StackManagedPool<T> BuildStackManagedPool()
         {
@@ -179,15 +266,55 @@ namespace HereticalSolutions.Pools.Factories
 
                     AllocationCallback = valueAllocationCallback
                 },
+                loggerResolver,
                 metadataDescriptors,
-                facadeAllocationCallback,
-                loggerResolver);
+                facadeAllocationCallback);
 
             Cleanup();
 
             return result;
         }
-        
+
+        public ConcurrentStackManagedPool<T> BuildConcurrentStackManagedPool()
+        {
+            if (valueAllocationDelegate == null)
+                throw new Exception(
+                    logger.TryFormatException(
+                        GetType(),
+                        "BUILDER NOT INITIALIZED"));
+
+            var metadataDescriptors = BuildMetadataDescriptors();
+
+            var facadeAllocationCallback = BuildFacadeAllocationCallback();
+
+            var valueAllocationCallback = BuildValueAllocationCallback();
+
+            var result = StackPoolFactory.BuildConcurrentStackManagedPool(
+                new AllocationCommand<T>
+                {
+                    Descriptor = initialAllocation,
+
+                    AllocationDelegate = valueAllocationDelegate,
+
+                    AllocationCallback = valueAllocationCallback
+                },
+                new AllocationCommand<T>
+                {
+                    Descriptor = additionalAllocation,
+
+                    AllocationDelegate = valueAllocationDelegate,
+
+                    AllocationCallback = valueAllocationCallback
+                },
+                loggerResolver,
+                metadataDescriptors,
+                facadeAllocationCallback);
+
+            Cleanup();
+
+            return result;
+        }
+
         public AppendableStackManagedPool<T> BuildAppendableStackManagedPool()
         {
             if (valueAllocationDelegate == null)
@@ -219,14 +346,58 @@ namespace HereticalSolutions.Pools.Factories
 
                     AllocationCallback = valueAllocationCallback
                 },
+                loggerResolver,
                 metadataDescriptors,
-                facadeAllocationCallback,
-                loggerResolver);
+                facadeAllocationCallback);
 
             Cleanup();
 
             return result;
         }
+
+        public ConcurrentAppendableStackManagedPool<T> BuildConcurrentAppendableStackManagedPool()
+        {
+            if (valueAllocationDelegate == null)
+                throw new Exception(
+                    logger.TryFormatException(
+                        GetType(),
+                        "BUILDER NOT INITIALIZED"));
+
+            var metadataDescriptors = BuildMetadataDescriptors();
+
+            var facadeAllocationCallback = BuildFacadeAllocationCallback();
+
+            var valueAllocationCallback = BuildValueAllocationCallback();
+
+            var result = StackPoolFactory.BuildConcurrentAppendableStackManagedPool(
+                new AllocationCommand<T>
+                {
+                    Descriptor = initialAllocation,
+
+                    AllocationDelegate = valueAllocationDelegate,
+
+                    AllocationCallback = valueAllocationCallback
+                },
+                new AllocationCommand<T>
+                {
+                    Descriptor = additionalAllocation,
+
+                    AllocationDelegate = valueAllocationDelegate,
+
+                    AllocationCallback = valueAllocationCallback
+                },
+                loggerResolver,
+                metadataDescriptors,
+                facadeAllocationCallback);
+
+            Cleanup();
+
+            return result;
+        }
+
+        #endregion
+
+        #region Queue
 
         public QueueManagedPool<T> BuildQueueManagedPool()
         {
@@ -259,9 +430,49 @@ namespace HereticalSolutions.Pools.Factories
 
                     AllocationCallback = valueAllocationCallback
                 },
+                loggerResolver,
                 metadataDescriptors,
-                facadeAllocationCallback,
-                loggerResolver);
+                facadeAllocationCallback);
+
+            Cleanup();
+
+            return result;
+        }
+
+        public ConcurrentQueueManagedPool<T> BuildConcurrentQueueManagedPool()
+        {
+            if (valueAllocationDelegate == null)
+                throw new Exception(
+                    logger.TryFormatException(
+                        GetType(),
+                        "BUILDER NOT INITIALIZED"));
+
+            var metadataDescriptors = BuildMetadataDescriptors();
+
+            var facadeAllocationCallback = BuildFacadeAllocationCallback();
+
+            var valueAllocationCallback = BuildValueAllocationCallback();
+
+            var result = QueuePoolFactory.BuildConcurrentQueueManagedPool(
+                new AllocationCommand<T>
+                {
+                    Descriptor = initialAllocation,
+
+                    AllocationDelegate = valueAllocationDelegate,
+
+                    AllocationCallback = valueAllocationCallback
+                },
+                new AllocationCommand<T>
+                {
+                    Descriptor = additionalAllocation,
+
+                    AllocationDelegate = valueAllocationDelegate,
+
+                    AllocationCallback = valueAllocationCallback
+                },
+                loggerResolver,
+                metadataDescriptors,
+                facadeAllocationCallback);
 
             Cleanup();
 
@@ -299,14 +510,58 @@ namespace HereticalSolutions.Pools.Factories
 
                     AllocationCallback = valueAllocationCallback
                 },
+                loggerResolver,
                 metadataDescriptors,
-                facadeAllocationCallback,
-                loggerResolver);
+                facadeAllocationCallback);
 
             Cleanup();
 
             return result;
         }
+
+        public ConcurrentAppendableQueueManagedPool<T> BuildConcurrentAppendableQueueManagedPool()
+        {
+            if (valueAllocationDelegate == null)
+                throw new Exception(
+                    logger.TryFormatException(
+                        GetType(),
+                        "BUILDER NOT INITIALIZED"));
+
+            var metadataDescriptors = BuildMetadataDescriptors();
+
+            var facadeAllocationCallback = BuildFacadeAllocationCallback();
+
+            var valueAllocationCallback = BuildValueAllocationCallback();
+
+            var result = QueuePoolFactory.BuildConcurrentAppendableQueueManagedPool(
+                new AllocationCommand<T>
+                {
+                    Descriptor = initialAllocation,
+
+                    AllocationDelegate = valueAllocationDelegate,
+
+                    AllocationCallback = valueAllocationCallback
+                },
+                new AllocationCommand<T>
+                {
+                    Descriptor = additionalAllocation,
+
+                    AllocationDelegate = valueAllocationDelegate,
+
+                    AllocationCallback = valueAllocationCallback
+                },
+                loggerResolver,
+                metadataDescriptors,
+                facadeAllocationCallback);
+
+            Cleanup();
+
+            return result;
+        }
+
+        #endregion
+
+        #region Linked list
 
         public LinkedListManagedPool<T> BuildLinkedListManagedPool()
         {
@@ -339,15 +594,55 @@ namespace HereticalSolutions.Pools.Factories
 
                     AllocationCallback = valueAllocationCallback
                 },
+                loggerResolver,
                 metadataDescriptors,
-                facadeAllocationCallback,
-                loggerResolver);
+                facadeAllocationCallback);
 
             Cleanup();
 
             return result;
         }
-        
+
+        public ConcurrentLinkedListManagedPool<T> BuildConcurrentLinkedListManagedPool()
+        {
+            if (valueAllocationDelegate == null)
+                throw new Exception(
+                    logger.TryFormatException(
+                        GetType(),
+                        "BUILDER NOT INITIALIZED"));
+
+            var metadataDescriptors = BuildMetadataDescriptors();
+
+            var facadeAllocationCallback = BuildFacadeAllocationCallback();
+
+            var valueAllocationCallback = BuildValueAllocationCallback();
+
+            var result = LinkedListPoolFactory.BuildConcurrentLinkedListManagedPool(
+                new AllocationCommand<T>
+                {
+                    Descriptor = initialAllocation,
+
+                    AllocationDelegate = valueAllocationDelegate,
+
+                    AllocationCallback = valueAllocationCallback
+                },
+                new AllocationCommand<T>
+                {
+                    Descriptor = additionalAllocation,
+
+                    AllocationDelegate = valueAllocationDelegate,
+
+                    AllocationCallback = valueAllocationCallback
+                },
+                loggerResolver,
+                metadataDescriptors,
+                facadeAllocationCallback);
+
+            Cleanup();
+
+            return result;
+        }
+
         public AppendableLinkedListManagedPool<T> BuildAppendableLinkedListManagedPool()
         {
             if (valueAllocationDelegate == null)
@@ -379,15 +674,57 @@ namespace HereticalSolutions.Pools.Factories
 
                     AllocationCallback = valueAllocationCallback
                 },
+                loggerResolver,
                 metadataDescriptors,
-                facadeAllocationCallback,
-                loggerResolver);
+                facadeAllocationCallback);
 
             Cleanup();
 
             return result;
         }
-        
+
+        public ConcurrentAppendableLinkedListManagedPool<T> BuildConcurrentAppendableLinkedListManagedPool()
+        {
+            if (valueAllocationDelegate == null)
+                throw new Exception(
+                    logger.TryFormatException(
+                        GetType(),
+                        "BUILDER NOT INITIALIZED"));
+
+            var metadataDescriptors = BuildMetadataDescriptors();
+
+            var facadeAllocationCallback = BuildFacadeAllocationCallback();
+
+            var valueAllocationCallback = BuildValueAllocationCallback();
+
+            var result = LinkedListPoolFactory.BuildConcurrentAppendableLinkedListManagedPool(
+                new AllocationCommand<T>
+                {
+                    Descriptor = initialAllocation,
+
+                    AllocationDelegate = valueAllocationDelegate,
+
+                    AllocationCallback = valueAllocationCallback
+                },
+                new AllocationCommand<T>
+                {
+                    Descriptor = additionalAllocation,
+
+                    AllocationDelegate = valueAllocationDelegate,
+
+                    AllocationCallback = valueAllocationCallback
+                },
+                loggerResolver,
+                metadataDescriptors,
+                facadeAllocationCallback);
+
+            Cleanup();
+
+            return result;
+        }
+
+        #endregion
+
         private MetadataAllocationDescriptor[] BuildMetadataDescriptors()
         {
             List<MetadataAllocationDescriptor> metadataDescriptorsList = new List<MetadataAllocationDescriptor>();

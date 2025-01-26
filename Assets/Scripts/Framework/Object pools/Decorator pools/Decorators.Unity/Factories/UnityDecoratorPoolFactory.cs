@@ -1,6 +1,9 @@
-using UnityEngine;
-
 using HereticalSolutions.Pools.Decorators;
+
+using HereticalSolutions.Logging;
+using ILogger = HereticalSolutions.Logging.ILogger;
+
+using UnityEngine;
 
 namespace HereticalSolutions.Pools.Factories
 {
@@ -26,20 +29,28 @@ namespace HereticalSolutions.Pools.Factories
 
 		public static GameObjectManagedPool BuildGameObjectManagedPool(
 			IManagedPool<GameObject> innerPool,
+			ILoggerResolver loggerResolver,
 			Transform parentTransform = null)
 		{
+			ILogger logger = loggerResolver?.GetLogger<GameObjectManagedPool>();
+
 			return new GameObjectManagedPool(
 				innerPool,
-				parentTransform);
+				parentTransform,
+				logger);
 		}
 
 		public static PrefabInstanceManagedPool BuildPrefabInstanceManagedPool(
 			IManagedPool<GameObject> innerPool,
-			GameObject prefab)
+			GameObject prefab,
+			ILoggerResolver loggerResolver)
 		{
+			ILogger logger = loggerResolver?.GetLogger<PrefabInstanceManagedPool>();
+
 			return new PrefabInstanceManagedPool(
 				innerPool,
-				prefab);
+				prefab,
+				logger);
 		}
 	}
 }

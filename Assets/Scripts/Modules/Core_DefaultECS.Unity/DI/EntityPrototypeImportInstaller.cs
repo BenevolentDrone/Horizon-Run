@@ -1,3 +1,4 @@
+/*
 using HereticalSolutions.AssetImport;
 
 using HereticalSolutions.ResourceManagement;
@@ -319,3 +320,4 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.DI
 		}
 	}
 }
+*/

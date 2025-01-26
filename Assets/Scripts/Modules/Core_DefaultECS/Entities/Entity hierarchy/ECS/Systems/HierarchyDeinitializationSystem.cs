@@ -1,3 +1,4 @@
+/*
 using System;
 using System.Collections.Generic;
 
@@ -103,3 +104,4 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
         }
     }
 }
+*/

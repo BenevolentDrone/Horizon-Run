@@ -173,8 +173,8 @@ namespace HereticalSolutions.Pools
                 node.PoolWithAddress = AddressDecoratorPoolFactory.BuildPoolWithAddress(
                     repository,
                     node.Level,
-                    null,
-                    loggerResolver);
+                    loggerResolver,
+                    null);
         }
     }
 }

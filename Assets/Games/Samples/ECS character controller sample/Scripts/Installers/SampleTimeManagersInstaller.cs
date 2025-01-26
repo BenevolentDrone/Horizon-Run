@@ -1,3 +1,4 @@
+/*
 using HereticalSolutions.Synchronization;
 using HereticalSolutions.Synchronization.Factories;
 
@@ -109,3 +110,4 @@ namespace HereticalSolutions.Samples.ECSCharacterControllerSample.Installers
         }
     }
 }
+*/

@@ -82,10 +82,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 				loggerResolver);
 
 			timer.OnFinish.Subscribe(
-				(INonAllocSubscriptionHandler<
-					INonAllocSubscribable,
-					IInvokableSingleArgGeneric<IRuntimeTimer>>)
-					timerTickSubscription);
+				timerTickSubscription);
 
 			timer.Start(
 				loopedTimerComponent.Timeout);

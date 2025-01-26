@@ -1,3 +1,4 @@
+/*
 using HereticalSolutions.Synchronization;
 
 using HereticalSolutions.Time;
@@ -95,3 +96,4 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.DI
         }
     }
 }
+*/

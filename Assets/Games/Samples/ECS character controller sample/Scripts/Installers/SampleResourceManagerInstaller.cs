@@ -1,3 +1,4 @@
+/*
 using HereticalSolutions.ResourceManagement;
 using HereticalSolutions.ResourceManagement.Factories;
 
@@ -23,3 +24,4 @@ namespace HereticalSolutions.Samples.ECSCharacterControllerSample.Installers
 		}
 	}
 }
+*/

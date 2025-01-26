@@ -18,9 +18,29 @@ namespace HereticalSolutions.Messaging.Factories
 {
     public class MessageBusBuilder
     {
-        private const int DEFAULT_MESSAGE_POOL_CAPACITY = 16;
+        #region Factory settings
 
-        private readonly IInstanceRepository messagePoolRepository;
+        public const int DEFAULT_MESSAGE_POOL_CAPACITY = 32;
+
+        public static AllocationCommandDescriptor MessagePoolInitialAllocationDescriptor =
+            new AllocationCommandDescriptor
+            {
+                Rule = EAllocationAmountRule.ADD_PREDEFINED_AMOUNT,
+
+                Amount = DEFAULT_MESSAGE_POOL_CAPACITY
+            };
+
+        public static AllocationCommandDescriptor MessagePoolAdditionalAllocationDescriptor =
+            new AllocationCommandDescriptor
+            {
+                Rule = EAllocationAmountRule.ADD_PREDEFINED_AMOUNT,
+
+                Amount = DEFAULT_MESSAGE_POOL_CAPACITY
+            };
+
+        #endregion
+
+        private readonly IRepository<Type, IPool<IMessage>> messagePoolRepository;
 
         private readonly BroadcasterWithRepositoryBuilder broadcasterBuilder;
 
@@ -31,7 +51,7 @@ namespace HereticalSolutions.Messaging.Factories
         {
             this.loggerResolver = loggerResolver;
 
-            messagePoolRepository = RepositoryFactory.BuildDictionaryInstanceRepository();
+            messagePoolRepository = RepositoryFactory.BuildDictionaryRepository<Type, IPool<IMessage>>();
 
             broadcasterBuilder = new BroadcasterWithRepositoryBuilder(
                 loggerResolver);
@@ -39,25 +59,20 @@ namespace HereticalSolutions.Messaging.Factories
 
         public MessageBusBuilder AddMessageType<TMessage>()
         {
-            Func<IMessage> valueAllocationDelegate = AllocationFactory.ActivatorAllocationDelegate<IMessage, TMessage>;
+            Func<IMessage> valueAllocationDelegate =
+                AllocationFactory.ActivatorAllocationDelegate<IMessage, TMessage>;
 
             var initialAllocationCommand = new AllocationCommand<IMessage>
             {
-                Descriptor = new AllocationCommandDescriptor
-                {
-                    Rule = EAllocationAmountRule.ADD_PREDEFINED_AMOUNT,
+                Descriptor = MessagePoolInitialAllocationDescriptor,
 
-                    Amount = DEFAULT_MESSAGE_POOL_CAPACITY
-                },
                 AllocationDelegate = valueAllocationDelegate
             };
             
             var additionalAllocationCommand = new AllocationCommand<IMessage>
             {
-                Descriptor = new AllocationCommandDescriptor
-                {
-                    Rule = EAllocationAmountRule.DOUBLE_AMOUNT
-                },
+                Descriptor = MessagePoolAdditionalAllocationDescriptor,
+
                 AllocationDelegate = valueAllocationDelegate
             };
             
@@ -75,14 +90,26 @@ namespace HereticalSolutions.Messaging.Factories
             return this;
         }
 
-        public MessageBus Build()
+        public MessageBus BuildMessageBus()
         {
             ILogger logger = 
                 loggerResolver?.GetLogger<MessageBus>();
 
             return new MessageBus(
-                broadcasterBuilder.Build(),
-                (IReadOnlyInstanceRepository)messagePoolRepository,
+                broadcasterBuilder.BuildBroadcasterWithRepository(),
+                messagePoolRepository,
+                new Queue<IMessage>(),
+                logger);
+        }
+
+        public ConcurrentMessageBus BuildConcurrentMessageBus()
+        {
+            ILogger logger =
+                loggerResolver?.GetLogger<ConcurrentMessageBus>();
+
+            return new ConcurrentMessageBus(
+                broadcasterBuilder.BuildBroadcasterWithRepository(),
+                messagePoolRepository,
                 new Queue<IMessage>(),
                 logger);
         }

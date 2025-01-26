@@ -1,3 +1,4 @@
+/*
 using System;
 
 using HereticalSolutions.Delegates;
@@ -170,3 +171,4 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
 		}
 	}
 }
+*/

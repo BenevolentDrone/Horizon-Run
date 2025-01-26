@@ -65,7 +65,7 @@ namespace HereticalSolutions.Samples.MessageBusSample
 
 			builder.AddMessageType<SampleMessage>();
 
-			messageBus = builder.Build();
+			messageBus = builder.BuildMessageBus();
 
 			messageBusAsSender = (IMessageSender)messageBus;
 

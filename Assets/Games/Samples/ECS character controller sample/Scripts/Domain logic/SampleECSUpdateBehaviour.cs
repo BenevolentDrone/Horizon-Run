@@ -8,6 +8,7 @@ using HereticalSolutions.Delegates.Factories;
 using UnityEngine;
 
 using DefaultEcs.System;
+using HereticalSolutions.Logging;
 
 namespace HereticalSolutions.Samples.ECSCharacterControllerSample
 {
@@ -41,7 +42,9 @@ namespace HereticalSolutions.Samples.ECSCharacterControllerSample
 			
 			ISystem<float> updateSystems,
 			ISystem<float> fixedUpdateSystems,
-			ISystem<float> lateUpdateSystems)
+			ISystem<float> lateUpdateSystems,
+			
+			ILoggerResolver loggerResolver)
 		{
 			this.updateTimeManagerAsProvider = updateTimeManagerAsProvider;
 
@@ -57,11 +60,17 @@ namespace HereticalSolutions.Samples.ECSCharacterControllerSample
 			this.lateUpdateSystems = lateUpdateSystems;
 
 
-			updateSubscription = SubscriptionFactory.BuildSubscriptionSingleArgGeneric<float>(TickUpdateSystems);
+			updateSubscription = SubscriptionFactory.BuildSubscriptionSingleArgGeneric<float>(
+				TickUpdateSystems,
+				loggerResolver);
 
-			fixedUpdateSubscription = SubscriptionFactory.BuildSubscriptionSingleArgGeneric<float>(TickFixedUpdateSystems);
+			fixedUpdateSubscription = SubscriptionFactory.BuildSubscriptionSingleArgGeneric<float>(
+				TickFixedUpdateSystems,
+				loggerResolver);
 
-			lateUpdateSubscription = SubscriptionFactory.BuildSubscriptionSingleArgGeneric<float>(TickLateUpdateSystems);
+			lateUpdateSubscription = SubscriptionFactory.BuildSubscriptionSingleArgGeneric<float>(
+				TickLateUpdateSystems,
+				loggerResolver);
 
 
 			updateTimeManagerAsProvider?.Subscribe(

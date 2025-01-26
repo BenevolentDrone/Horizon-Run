@@ -234,6 +234,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Factories
 
 		#endregion
 
+/*
 		#region Entity list manager
 
 		public static EntityListManager BuildEntityListManager(
@@ -379,6 +380,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Factories
 		}
 
 		#endregion
+*/
 
 		#region Entity prototype repository
 

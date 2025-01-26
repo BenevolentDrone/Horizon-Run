@@ -1,3 +1,4 @@
+/*
 using HereticalSolutions.Time;
 
 using HereticalSolutions.Modules.Core_DefaultECS.Factories;
@@ -40,3 +41,4 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.DI
         }
     }
 }
+*/

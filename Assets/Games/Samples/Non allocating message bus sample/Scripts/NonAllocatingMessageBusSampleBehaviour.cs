@@ -66,7 +66,7 @@ namespace HereticalSolutions.Samples.NonAllocatingMessageBusSample
 
 			builder.AddMessageType<SampleMessage>();
 
-			var messageBus = builder.Build();
+			var messageBus = builder.BuildNonAllocMessageBus();
 
 			messageBusAsSender = (INonAllocMessageSender)messageBus;
 

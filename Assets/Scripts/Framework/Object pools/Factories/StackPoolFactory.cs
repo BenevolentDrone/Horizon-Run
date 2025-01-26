@@ -273,11 +273,57 @@ namespace HereticalSolutions.Pools.Factories
                     newElementFacade);
             }
         }
-        
+
+        #endregion
+
+        #region Concurrent stack managed pool
+
+        public static ConcurrentStackManagedPool<T> BuildConcurrentStackManagedPool<T>(
+            AllocationCommand<T> initialAllocationCommand,
+            AllocationCommand<T> additionalAllocationCommand,
+            ILoggerResolver loggerResolver,
+
+            MetadataAllocationDescriptor[] metadataAllocationDescriptors = null,
+            IAllocationCallback<IPoolElementFacade<T>> facadeAllocationCallback = null)
+        {
+            ILogger logger =
+                loggerResolver?.GetLogger<ConcurrentStackManagedPool<T>>();
+
+            var stack = new Stack<IPoolElementFacade<T>>();
+
+            Func<IPoolElementFacade<T>> facadeAllocationDelegate =
+                () => ObjectPoolAllocationFactory.BuildPoolElementFacade<T>(
+                    metadataAllocationDescriptors);
+
+            AllocationCommand<IPoolElementFacade<T>> initialFacadeAllocationCommand =
+                ObjectPoolAllocationCommandFactory.BuildPoolElementFacadeAllocationCommand(
+                    initialAllocationCommand.Descriptor,
+                    facadeAllocationDelegate,
+                    facadeAllocationCallback);
+
+            AllocationCommand<IPoolElementFacade<T>> additionalFacadeAllocationCommand =
+                ObjectPoolAllocationCommandFactory.BuildPoolElementFacadeAllocationCommand(
+                    additionalAllocationCommand.Descriptor,
+                    facadeAllocationDelegate,
+                    facadeAllocationCallback);
+
+            PerformInitialAllocation<T>(
+                stack,
+                initialFacadeAllocationCommand,
+                initialAllocationCommand,
+                logger);
+
+            return new ConcurrentStackManagedPool<T>(
+                stack,
+                additionalFacadeAllocationCommand,
+                additionalAllocationCommand,
+                logger);
+        }
+
         #endregion
 
         #region Appendable stack managed pool
-        
+
         public static AppendableStackManagedPool<T> BuildAppendableStackManagedPool<T>(
             AllocationCommand<T> initialAllocationCommand,
             AllocationCommand<T> additionalAllocationCommand,
@@ -287,7 +333,7 @@ namespace HereticalSolutions.Pools.Factories
             IAllocationCallback<IPoolElementFacade<T>> facadeAllocationCallback = null)
         {
             ILogger logger =
-                loggerResolver?.GetLogger<StackManagedPool<T>>();
+                loggerResolver?.GetLogger<AppendableStackManagedPool<T>>();
             
             var stack = new Stack<IPoolElementFacade<T>>();
             
@@ -342,9 +388,78 @@ namespace HereticalSolutions.Pools.Factories
                 
                 logger);
         }
-        
+
         #endregion
-        
+
+        #region Concurrent appendable stack managed pool
+
+        public static ConcurrentAppendableStackManagedPool<T> BuildConcurrentAppendableStackManagedPool<T>(
+            AllocationCommand<T> initialAllocationCommand,
+            AllocationCommand<T> additionalAllocationCommand,
+            ILoggerResolver loggerResolver,
+
+            MetadataAllocationDescriptor[] metadataAllocationDescriptors = null,
+            IAllocationCallback<IPoolElementFacade<T>> facadeAllocationCallback = null)
+        {
+            ILogger logger =
+                loggerResolver?.GetLogger<ConcurrentAppendableStackManagedPool<T>>();
+
+            var stack = new Stack<IPoolElementFacade<T>>();
+
+            Func<IPoolElementFacade<T>> facadeAllocationDelegate =
+                () => ObjectPoolAllocationFactory.BuildPoolElementFacade<T>(
+                    metadataAllocationDescriptors);
+
+            AllocationCommand<IPoolElementFacade<T>> initialFacadeAllocationCommand =
+                ObjectPoolAllocationCommandFactory.BuildPoolElementFacadeAllocationCommand(
+                    initialAllocationCommand.Descriptor,
+                    facadeAllocationDelegate,
+                    facadeAllocationCallback);
+
+            AllocationCommand<IPoolElementFacade<T>> additionalFacadeAllocationCommand =
+                ObjectPoolAllocationCommandFactory.BuildPoolElementFacadeAllocationCommand(
+                    additionalAllocationCommand.Descriptor,
+                    facadeAllocationDelegate,
+                    facadeAllocationCallback);
+
+            AllocationCommand<T> nullValueAllocationCommand =
+                new AllocationCommand<T>
+                {
+                    Descriptor = new AllocationCommandDescriptor
+                    {
+                        Rule = EAllocationAmountRule.ADD_ONE,
+
+                        Amount = 1
+                    },
+
+                    AllocationDelegate = AllocationFactory.NullAllocationDelegate<T>
+                };
+
+            AllocationCommand<IPoolElementFacade<T>> appendFacadeAllocationCommand =
+                ObjectPoolAllocationCommandFactory.BuildPoolElementFacadeAllocationCommand(
+                    nullValueAllocationCommand.Descriptor,
+                    facadeAllocationDelegate,
+                    facadeAllocationCallback);
+
+            PerformInitialAllocation<T>(
+                stack,
+                initialFacadeAllocationCommand,
+                initialAllocationCommand,
+                logger);
+
+            return new ConcurrentAppendableStackManagedPool<T>(
+                stack,
+                additionalFacadeAllocationCommand,
+                additionalAllocationCommand,
+
+                appendFacadeAllocationCommand,
+                nullValueAllocationCommand,
+
+                logger);
+        }
+
+        #endregion
+
         #endregion
 
         #region Resize

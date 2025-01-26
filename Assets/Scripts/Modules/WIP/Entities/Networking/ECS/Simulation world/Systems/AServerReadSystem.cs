@@ -114,9 +114,6 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Networking
                 loggerResolver);
 
             timer.OnFinish.Subscribe(
-                (INonAllocSubscriptionHandler<
-                    INonAllocSubscribable,
-                    IInvokableSingleArgGeneric<IRuntimeTimer>>)
                 timerTickSubscription);
             
             timer.Start(

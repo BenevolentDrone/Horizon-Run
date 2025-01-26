@@ -30,8 +30,8 @@ namespace HereticalSolutions.Pools
 				packedArray,
 				facadeAllocationCommand,
 				valueAllocationCommand,
-				true,
-				logger)
+				logger,
+				true)
 		{
 			this.appendFacadeAllocationCommand = appendFacadeAllocationCommand;
 

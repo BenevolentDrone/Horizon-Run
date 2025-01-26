@@ -1,3 +1,5 @@
+using ILogger = HereticalSolutions.Logging.ILogger;
+
 using UnityEngine;
 
 namespace HereticalSolutions.Pools.Decorators
@@ -10,8 +12,11 @@ namespace HereticalSolutions.Pools.Decorators
 
 		public PrefabInstanceManagedPool(
 			IManagedPool<GameObject> innerPool,
-			GameObject prefab)
-			: base(innerPool)
+			GameObject prefab,
+			ILogger logger)
+			: base(
+				innerPool,
+				logger)
 		{
 			this.prefab = prefab;
 		}

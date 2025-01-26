@@ -1,3 +1,4 @@
+/*
 using System;
 
 using HereticalSolutions.AssetImport;
@@ -39,7 +40,6 @@ namespace HereticalSolutions.Samples.ECSCharacterControllerSample.Installers
 
 		public override void InstallBindings()
 		{
-			/*
 			var logger = loggerResolver.GetLogger<SampleEntityPrototypeImportInstaller>();
 
 			TaskExtensions.RunSync(
@@ -185,7 +185,7 @@ namespace HereticalSolutions.Samples.ECSCharacterControllerSample.Installers
 							}
 						}
 					));
-			*/
 		}
 	}
 }
+*/

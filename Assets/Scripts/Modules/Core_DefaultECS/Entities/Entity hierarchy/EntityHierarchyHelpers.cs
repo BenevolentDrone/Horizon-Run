@@ -1,3 +1,4 @@
+/*
 using HereticalSolutions.Hierarchy;
 
 using HereticalSolutions.Logging;
@@ -148,3 +149,4 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
         }
     }
 }
+*/

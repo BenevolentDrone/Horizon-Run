@@ -1,3 +1,4 @@
+/*
 using UnityEngine;
 
 using HereticalSolutions.Pools;
@@ -161,3 +162,4 @@ namespace HereticalSolutions.Samples.PoolWithAddressVariantAndTimerSample
 		}
 	}
 }
+*/

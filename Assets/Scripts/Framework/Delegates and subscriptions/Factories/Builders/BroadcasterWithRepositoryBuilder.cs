@@ -21,18 +21,25 @@ namespace HereticalSolutions.Delegates.Factories
             broadcasterRepository = RepositoryFactory.BuildDictionaryRepository<Type, object>();
         }
 
-        public BroadcasterWithRepositoryBuilder Add<TBroadcaster>()
+        public BroadcasterWithRepositoryBuilder Add<TValue>()
         {
             broadcasterRepository.Add(
-                typeof(TBroadcaster),
-                BroadcasterFactory.BuildBroadcasterGeneric<TBroadcaster>(loggerResolver));
+                typeof(TValue),
+                BroadcasterFactory.BuildBroadcasterGeneric<TValue>(loggerResolver));
 
             return this;
         }
 
-        public BroadcasterWithRepository Build()
+        public BroadcasterWithRepository BuildBroadcasterWithRepository()
         {
             return BroadcasterFactory.BuildBroadcasterWithRepository(
+                broadcasterRepository,
+                loggerResolver);
+        }
+
+        public ConcurrentBroadcasterWithRepository BuildConcurrentBroadcasterWithRepository()
+        {
+            return BroadcasterFactory.BuildConcurrentBroadcasterWithRepository(
                 broadcasterRepository,
                 loggerResolver);
         }

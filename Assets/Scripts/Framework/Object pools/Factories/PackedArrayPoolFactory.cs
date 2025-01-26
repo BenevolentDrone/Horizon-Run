@@ -248,11 +248,63 @@ namespace HereticalSolutions.Pools.Factories
                 contents[i] = newElement;
             }
         }
-        
+
+        #endregion
+
+        #region Concurrent packed array managed pool
+
+        public static ConcurrentPackedArrayManagedPool<T> BuildConcurrentPackedArrayManagedPool<T>(
+            AllocationCommand<T> initialAllocationCommand,
+            AllocationCommand<T> additionalAllocationCommand,
+            ILoggerResolver loggerResolver,
+
+            MetadataAllocationDescriptor[] metadataAllocationDescriptors = null,
+            IAllocationCallback<IPoolElementFacade<T>> facadeAllocationCallback = null,
+            bool validateValues = true)
+        {
+            ILogger logger =
+                loggerResolver?.GetLogger<ConcurrentPackedArrayManagedPool<T>>();
+
+            Func<IPoolElementFacade<T>> facadeAllocationDelegate =
+                () => ObjectPoolAllocationFactory.BuildPoolElementFacadeWithArrayIndex<T>(
+                    metadataAllocationDescriptors);
+
+            AllocationCommand<IPoolElementFacade<T>> initialFacadeAllocationCommand =
+                ObjectPoolAllocationCommandFactory.BuildPoolElementFacadeAllocationCommand(
+                    initialAllocationCommand.Descriptor,
+                    facadeAllocationDelegate,
+                    facadeAllocationCallback);
+
+            AllocationCommand<IPoolElementFacade<T>> additionalFacadeAllocationCommand =
+                ObjectPoolAllocationCommandFactory.BuildPoolElementFacadeAllocationCommand(
+                    additionalAllocationCommand.Descriptor,
+                    facadeAllocationDelegate,
+                    facadeAllocationCallback);
+
+            int initialAmount = CountInitialAllocationAmount(
+                initialFacadeAllocationCommand.Descriptor);
+
+            IPoolElementFacade<T>[] contents = new IPoolElementFacade<T>[initialAmount];
+
+            PerformInitialAllocation<T>(
+                initialAmount,
+                contents,
+                initialFacadeAllocationCommand,
+                initialAllocationCommand);
+
+            return new ConcurrentPackedArrayManagedPool<T>(
+                contents,
+                additionalFacadeAllocationCommand,
+                additionalAllocationCommand,
+                logger,
+
+                validateValues);
+        }
+
         #endregion
 
         #region Appendable packed array managed pool
-        
+
         public static AppendablePackedArrayManagedPool<T> BuildAppendableManagedPool<T>(
             AllocationCommand<T> initialAllocationCommand,
             AllocationCommand<T> additionalAllocationCommand,
@@ -318,6 +370,78 @@ namespace HereticalSolutions.Pools.Factories
                 appendFacadeAllocationCommand,
                 nullValueAllocationCommand,
                 
+                logger);
+        }
+
+        #endregion
+
+        #region Concurrent appendable packed array managed pool
+
+        public static ConcurrentAppendablePackedArrayManagedPool<T> BuildConcurrentAppendableManagedPool<T>(
+            AllocationCommand<T> initialAllocationCommand,
+            AllocationCommand<T> additionalAllocationCommand,
+            ILoggerResolver loggerResolver,
+
+            MetadataAllocationDescriptor[] metadataAllocationDescriptors = null,
+            IAllocationCallback<IPoolElementFacade<T>> facadeAllocationCallback = null)
+        {
+            ILogger logger =
+                loggerResolver?.GetLogger<ConcurrentAppendablePackedArrayManagedPool<T>>();
+
+            Func<IPoolElementFacade<T>> facadeAllocationDelegate =
+                () => ObjectPoolAllocationFactory.BuildPoolElementFacadeWithArrayIndex<T>(
+                    metadataAllocationDescriptors);
+
+            AllocationCommand<IPoolElementFacade<T>> initialFacadeAllocationCommand =
+                ObjectPoolAllocationCommandFactory.BuildPoolElementFacadeAllocationCommand(
+                    initialAllocationCommand.Descriptor,
+                    facadeAllocationDelegate,
+                    facadeAllocationCallback);
+
+            AllocationCommand<IPoolElementFacade<T>> additionalFacadeAllocationCommand =
+                ObjectPoolAllocationCommandFactory.BuildPoolElementFacadeAllocationCommand(
+                    additionalAllocationCommand.Descriptor,
+                    facadeAllocationDelegate,
+                    facadeAllocationCallback);
+
+            AllocationCommand<T> nullValueAllocationCommand =
+                new AllocationCommand<T>
+                {
+                    Descriptor = new AllocationCommandDescriptor
+                    {
+                        Rule = EAllocationAmountRule.ADD_ONE,
+
+                        Amount = 1
+                    },
+
+                    AllocationDelegate = AllocationFactory.NullAllocationDelegate<T>
+                };
+
+            AllocationCommand<IPoolElementFacade<T>> appendFacadeAllocationCommand =
+                ObjectPoolAllocationCommandFactory.BuildPoolElementFacadeAllocationCommand(
+                    nullValueAllocationCommand.Descriptor,
+                    facadeAllocationDelegate,
+                    facadeAllocationCallback);
+
+            int initialAmount = CountInitialAllocationAmount(
+                initialFacadeAllocationCommand.Descriptor);
+
+            IPoolElementFacade<T>[] contents = new IPoolElementFacade<T>[initialAmount];
+
+            PerformInitialAllocation<T>(
+                initialAmount,
+                contents,
+                initialFacadeAllocationCommand,
+                initialAllocationCommand);
+
+            return new ConcurrentAppendablePackedArrayManagedPool<T>(
+                contents,
+                additionalFacadeAllocationCommand,
+                additionalAllocationCommand,
+
+                appendFacadeAllocationCommand,
+                nullValueAllocationCommand,
+
                 logger);
         }
 

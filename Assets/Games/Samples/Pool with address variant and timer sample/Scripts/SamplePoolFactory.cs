@@ -1,3 +1,4 @@
+/*
 using System;
 
 using HereticalSolutions.Allocations;
@@ -26,8 +27,8 @@ namespace HereticalSolutions.Samples.PoolWithAddressVariantAndTimerSample
             DiContainer container,
             SamplePoolSettings settings,
             ITimerManager timerManager,
-            Transform parentTransform = null,
-            ILoggerResolver loggerResolver)
+            ILoggerResolver loggerResolver,
+            Transform parentTransform = null)
         {
             #region Builders
 
@@ -197,3 +198,4 @@ namespace HereticalSolutions.Samples.PoolWithAddressVariantAndTimerSample
         }
     }
 }
+*/

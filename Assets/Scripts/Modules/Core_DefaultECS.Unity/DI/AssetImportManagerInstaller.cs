@@ -1,3 +1,4 @@
+/*
 using HereticalSolutions.AssetImport;
 using HereticalSolutions.AssetImport.Factories;
 
@@ -23,3 +24,4 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.DI
 		}
 	}
 }
+*/

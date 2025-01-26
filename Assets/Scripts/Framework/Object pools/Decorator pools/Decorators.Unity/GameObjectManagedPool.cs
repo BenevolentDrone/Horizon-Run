@@ -1,3 +1,5 @@
+using ILogger = HereticalSolutions.Logging.ILogger;
+
 using UnityEngine;
 
 namespace HereticalSolutions.Pools.Decorators
@@ -9,8 +11,11 @@ namespace HereticalSolutions.Pools.Decorators
 
 		public GameObjectManagedPool(
 			IManagedPool<GameObject> innerPool,
-			Transform parentTransform)
-			: base(innerPool)
+			Transform parentTransform,
+			ILogger logger)
+			: base(
+				innerPool,
+				logger)
 		{
 			poolParentTransform = parentTransform;
 		}

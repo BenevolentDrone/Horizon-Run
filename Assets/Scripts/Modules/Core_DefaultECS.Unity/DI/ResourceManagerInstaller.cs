@@ -1,3 +1,4 @@
+/*
 using HereticalSolutions.ResourceManagement;
 using HereticalSolutions.ResourceManagement.Factories;
 
@@ -21,3 +22,4 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.DI
 		}
 	}
 }
+*/

@@ -276,6 +276,52 @@ namespace HereticalSolutions.Pools.Factories
 
 		#endregion
 
+		#region Concurrent queue managed pool
+
+		public static ConcurrentQueueManagedPool<T> BuildConcurrentQueueManagedPool<T>(
+			AllocationCommand<T> initialAllocationCommand,
+			AllocationCommand<T> additionalAllocationCommand,
+			ILoggerResolver loggerResolver,
+
+			MetadataAllocationDescriptor[] metadataAllocationDescriptors = null,
+			IAllocationCallback<IPoolElementFacade<T>> facadeAllocationCallback = null)
+		{
+			ILogger logger =
+				loggerResolver?.GetLogger<ConcurrentQueueManagedPool<T>>();
+
+			var queue = new Queue<IPoolElementFacade<T>>();
+
+			Func<IPoolElementFacade<T>> facadeAllocationDelegate =
+				() => ObjectPoolAllocationFactory.BuildPoolElementFacade<T>(
+					metadataAllocationDescriptors);
+
+			AllocationCommand<IPoolElementFacade<T>> initialFacadeAllocationCommand =
+				ObjectPoolAllocationCommandFactory.BuildPoolElementFacadeAllocationCommand(
+					initialAllocationCommand.Descriptor,
+					facadeAllocationDelegate,
+					facadeAllocationCallback);
+
+			AllocationCommand<IPoolElementFacade<T>> additionalFacadeAllocationCommand =
+				ObjectPoolAllocationCommandFactory.BuildPoolElementFacadeAllocationCommand(
+					additionalAllocationCommand.Descriptor,
+					facadeAllocationDelegate,
+					facadeAllocationCallback);
+
+			PerformInitialAllocation<T>(
+				queue,
+				initialFacadeAllocationCommand,
+				initialAllocationCommand,
+				logger);
+
+			return new ConcurrentQueueManagedPool<T>(
+				queue,
+				additionalFacadeAllocationCommand,
+				additionalAllocationCommand,
+				logger);
+		}
+
+		#endregion
+
 		#region Appendable queue managed pool
 
 		public static AppendableQueueManagedPool<T> BuildAppendableQueueManagedPool<T>(
@@ -287,7 +333,7 @@ namespace HereticalSolutions.Pools.Factories
 			IAllocationCallback<IPoolElementFacade<T>> facadeAllocationCallback = null)
 		{
 			ILogger logger =
-				loggerResolver?.GetLogger<QueueManagedPool<T>>();
+				loggerResolver?.GetLogger<AppendableQueueManagedPool<T>>();
 
 			var queue = new Queue<IPoolElementFacade<T>>();
 
@@ -333,6 +379,75 @@ namespace HereticalSolutions.Pools.Factories
 				logger);
 
 			return new AppendableQueueManagedPool<T>(
+				queue,
+				additionalFacadeAllocationCommand,
+				additionalAllocationCommand,
+
+				appendFacadeAllocationCommand,
+				nullValueAllocationCommand,
+
+				logger);
+		}
+
+		#endregion
+
+		#region Concurrent appendable queue managed pool
+
+		public static ConcurrentAppendableQueueManagedPool<T> BuildConcurrentAppendableQueueManagedPool<T>(
+			AllocationCommand<T> initialAllocationCommand,
+			AllocationCommand<T> additionalAllocationCommand,
+			ILoggerResolver loggerResolver,
+
+			MetadataAllocationDescriptor[] metadataAllocationDescriptors = null,
+			IAllocationCallback<IPoolElementFacade<T>> facadeAllocationCallback = null)
+		{
+			ILogger logger =
+				loggerResolver?.GetLogger<ConcurrentAppendableQueueManagedPool<T>>();
+
+			var queue = new Queue<IPoolElementFacade<T>>();
+
+			Func<IPoolElementFacade<T>> facadeAllocationDelegate =
+				() => ObjectPoolAllocationFactory.BuildPoolElementFacade<T>(
+					metadataAllocationDescriptors);
+
+			AllocationCommand<IPoolElementFacade<T>> initialFacadeAllocationCommand =
+				ObjectPoolAllocationCommandFactory.BuildPoolElementFacadeAllocationCommand(
+					initialAllocationCommand.Descriptor,
+					facadeAllocationDelegate,
+					facadeAllocationCallback);
+
+			AllocationCommand<IPoolElementFacade<T>> additionalFacadeAllocationCommand =
+				ObjectPoolAllocationCommandFactory.BuildPoolElementFacadeAllocationCommand(
+					additionalAllocationCommand.Descriptor,
+					facadeAllocationDelegate,
+					facadeAllocationCallback);
+
+			AllocationCommand<T> nullValueAllocationCommand =
+				new AllocationCommand<T>
+				{
+					Descriptor = new AllocationCommandDescriptor
+					{
+						Rule = EAllocationAmountRule.ADD_ONE,
+
+						Amount = 1
+					},
+
+					AllocationDelegate = AllocationFactory.NullAllocationDelegate<T>
+				};
+
+			AllocationCommand<IPoolElementFacade<T>> appendFacadeAllocationCommand =
+				ObjectPoolAllocationCommandFactory.BuildPoolElementFacadeAllocationCommand(
+					nullValueAllocationCommand.Descriptor,
+					facadeAllocationDelegate,
+					facadeAllocationCallback);
+
+			PerformInitialAllocation<T>(
+				queue,
+				initialFacadeAllocationCommand,
+				initialAllocationCommand,
+				logger);
+
+			return new ConcurrentAppendableQueueManagedPool<T>(
 				queue,
 				additionalFacadeAllocationCommand,
 				additionalAllocationCommand,

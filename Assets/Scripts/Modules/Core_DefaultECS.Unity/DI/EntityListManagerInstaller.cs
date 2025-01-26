@@ -1,3 +1,4 @@
+/*
 using HereticalSolutions.Logging;
 
 using Zenject;
@@ -24,3 +25,4 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.DI
 		}
 	}
 }
+*/

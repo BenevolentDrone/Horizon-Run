@@ -30,9 +30,23 @@ namespace HereticalSolutions.Delegates.Factories
             return this;
         }
 
-        public NonAllocBroadcasterWithRepository Build()
+        public NonAllocBroadcasterWithRepository BuildNonAllocBroadcasterWithRepository()
         {
             return BroadcasterFactory.BuildNonAllocBroadcasterWithRepository(
+                broadcasterRepository,
+                loggerResolver);
+        }
+
+        public ConcurrentNonAllocBroadcasterWithRepository BuildConcurrentNonAllocBroadcasterWithRepository()
+        {
+            return BroadcasterFactory.BuildConcurrentNonAllocBroadcasterWithRepository(
+                broadcasterRepository,
+                loggerResolver);
+        }
+
+        public AsyncBroadcasterWithRepository BuildAsyncBroadcasterWithRepository()
+        {
+            return BroadcasterFactory.BuildAsyncBroadcasterWithRepository(
                 broadcasterRepository,
                 loggerResolver);
         }

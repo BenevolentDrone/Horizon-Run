@@ -24,7 +24,7 @@ namespace HereticalSolutions.Messaging
         private readonly ILogger logger;
 
         public NonAllocMessageBus(
-            BroadcasterWithRepository broadcaster,
+            IPublisherSingleArg broadcaster,
             IReadOnlyRepository<Type, IManagedPool<IMessage>> messagePoolRepository,
             Queue<IPoolElementFacade<IMessage>> mailbox,
             ILogger logger)

@@ -1,3 +1,4 @@
+/*
 using System;
 
 using HereticalSolutions.Allocations;
@@ -176,3 +177,4 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Factories
 		}
 	}
 }
+*/

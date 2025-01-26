@@ -1,3 +1,4 @@
+/*
 using System;
 
 using HereticalSolutions.Allocations;
@@ -179,3 +180,4 @@ namespace HereticalSolutions.Samples.ECSCharacterControllerSample.Factories
 		}
 	}
 }
+*/

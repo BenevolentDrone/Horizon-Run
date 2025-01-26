@@ -1,3 +1,4 @@
+/*
 using System;
 using System.Globalization;
 
@@ -349,3 +350,4 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.DI
         }
     }
 }
+*/

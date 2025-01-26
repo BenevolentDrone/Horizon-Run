@@ -1,3 +1,4 @@
+/*
 using System;
 
 using HereticalSolutions.Relations;
@@ -172,3 +173,4 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
         }
     }
 }
+*/

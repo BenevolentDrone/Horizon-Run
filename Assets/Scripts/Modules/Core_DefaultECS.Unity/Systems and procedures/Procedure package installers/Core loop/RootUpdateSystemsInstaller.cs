@@ -96,25 +96,25 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
 				},
 				false);
 
-			systemBuilder.AddLifetimeSystemAfterStage<TSystem, TProcedure>(
-				SystemConstsDefaultECS.SIMULATION_WORLD_LIFETIME_SYSTEMS_ID,
-				SystemConstsUnity.GAME_LOGIC_SYSTEMS_ID,
-				new DespawnSystem(
-					simulationWorld),
-				false);
+			//systemBuilder.AddLifetimeSystemAfterStage<TSystem, TProcedure>(
+			//	SystemConstsDefaultECS.SIMULATION_WORLD_LIFETIME_SYSTEMS_ID,
+			//	SystemConstsUnity.GAME_LOGIC_SYSTEMS_ID,
+			//	new DespawnSystem(
+			//		simulationWorld),
+			//	false);
 
 			//Otherwise the view world would start with entities pending deletion
 			//Also I noticed NO such system in view world
 			//TODO: decide whether the view world should have one
-			if (includeViewWorld)
-			{
-				systemBuilder.AddLifetimeSystemAfterStage<TSystem, TProcedure>(
-					SystemConstsDefaultECS.VIEW_WORLD_LIFETIME_SYSTEMS_ID,
-					SystemConstsDefaultECS.SIMULATION_WORLD_LIFETIME_SYSTEMS_ID,
-					new DespawnSystem(
-						viewWorld),
-					false);
-			}
+			//if (includeViewWorld)
+			//{
+			//	systemBuilder.AddLifetimeSystemAfterStage<TSystem, TProcedure>(
+			//		SystemConstsDefaultECS.VIEW_WORLD_LIFETIME_SYSTEMS_ID,
+			//		SystemConstsDefaultECS.SIMULATION_WORLD_LIFETIME_SYSTEMS_ID,
+			//		new DespawnSystem(
+			//			viewWorld),
+			//		false);
+			//}
 		}
 
 		#endregion

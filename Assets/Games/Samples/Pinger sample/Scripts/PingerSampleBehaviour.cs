@@ -1,3 +1,4 @@
+/*
 using HereticalSolutions.Delegates;
 using HereticalSolutions.Delegates.Factories;
 
@@ -114,3 +115,4 @@ namespace HereticalSolutions.Samples.PingerSample
 		}
 	}
 }
+*/

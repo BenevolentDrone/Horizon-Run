@@ -70,19 +70,19 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
 			systemBuilder.AddStageNodesBetweenStartAndFinish(
 				SystemConstsDefaultECS.EVENT_WORLD_SYSTEMS_ID);
 
-			var despawnSystemNode = systemBuilder.AddLifetimeSystemBeforeStageFinish<TSystem, TProcedure>(
-				SystemConstsDefaultECS.EVENT_WORLD_LIFETIME_SYSTEMS_ID,
-				SystemConstsDefaultECS.EVENT_WORLD_SYSTEMS_ID,
-				new DespawnSystem(
-					eventWorld),
-				false);
-
-			systemBuilder.TryAddBeforeNode(
-				despawnSystemNode,
-				SystemFactory.BuildProcedureNode<TProcedure>(
-					new DisposeProcessedEventsSystem<float>(
-						eventWorld)),
-				false);
+			//var despawnSystemNode = systemBuilder.AddLifetimeSystemBeforeStageFinish<TSystem, TProcedure>(
+			//	SystemConstsDefaultECS.EVENT_WORLD_LIFETIME_SYSTEMS_ID,
+			//	SystemConstsDefaultECS.EVENT_WORLD_SYSTEMS_ID,
+			//	new DespawnSystem(
+			//		eventWorld),
+			//	false);
+			//
+			//systemBuilder.TryAddBeforeNode(
+			//	despawnSystemNode,
+			//	SystemFactory.BuildProcedureNode<TProcedure>(
+			//		new DisposeProcessedEventsSystem<float>(
+			//			eventWorld)),
+			//	false);
 		}
 
 		#endregion

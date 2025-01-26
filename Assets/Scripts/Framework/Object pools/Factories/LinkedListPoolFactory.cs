@@ -289,11 +289,56 @@ namespace HereticalSolutions.Pools.Factories
 
             return firstElement;
         }
-        
+
+        #endregion
+
+        #region Concurrent linked list managed pool
+
+        public static ConcurrentLinkedListManagedPool<T> BuildConcurrentLinkedListManagedPool<T>(
+            AllocationCommand<T> initialAllocationCommand,
+            AllocationCommand<T> additionalAllocationCommand,
+            ILoggerResolver loggerResolver,
+
+            MetadataAllocationDescriptor[] metadataAllocationDescriptors = null,
+            IAllocationCallback<IPoolElementFacade<T>> facadeAllocationCallback = null)
+        {
+            ILogger logger =
+                loggerResolver?.GetLogger<ConcurrentLinkedListManagedPool<T>>();
+
+            Func<IPoolElementFacade<T>> facadeAllocationDelegate =
+                () => ObjectPoolAllocationFactory.BuildPoolElementFacadeWithLinkedList<T>(
+                    metadataAllocationDescriptors);
+
+            AllocationCommand<IPoolElementFacade<T>> initialFacadeAllocationCommand =
+                ObjectPoolAllocationCommandFactory.BuildPoolElementFacadeAllocationCommand(
+                    initialAllocationCommand.Descriptor,
+                    facadeAllocationDelegate,
+                    facadeAllocationCallback);
+
+            AllocationCommand<IPoolElementFacade<T>> additionalFacadeAllocationCommand =
+                ObjectPoolAllocationCommandFactory.BuildPoolElementFacadeAllocationCommand(
+                    additionalAllocationCommand.Descriptor,
+                    facadeAllocationDelegate,
+                    facadeAllocationCallback);
+
+            var firstElement = PerformInitialAllocation<T>(
+                initialFacadeAllocationCommand,
+                initialAllocationCommand,
+                out var capacity,
+                logger);
+
+            return new ConcurrentLinkedListManagedPool<T>(
+                additionalFacadeAllocationCommand,
+                additionalAllocationCommand,
+                firstElement,
+                capacity,
+                logger);
+        }
+
         #endregion
 
         #region Appendable linked list managed pool
-        
+
         public static AppendableLinkedListManagedPool<T> BuildAppendableLinkedListManagedPool<T>(
             AllocationCommand<T> initialAllocationCommand,
             AllocationCommand<T> additionalAllocationCommand,
@@ -303,7 +348,7 @@ namespace HereticalSolutions.Pools.Factories
             IAllocationCallback<IPoolElementFacade<T>> facadeAllocationCallback = null)
         {
             ILogger logger =
-                loggerResolver?.GetLogger<StackManagedPool<T>>();
+                loggerResolver?.GetLogger<AppendableStackManagedPool<T>>();
             
             Func<IPoolElementFacade<T> > facadeAllocationDelegate = 
                 () => ObjectPoolAllocationFactory.BuildPoolElementFacadeWithLinkedList<T>(
@@ -353,6 +398,74 @@ namespace HereticalSolutions.Pools.Factories
                 appendFacadeAllocationCommand,
                 nullValueAllocationCommand,
                 
+                firstElement,
+                capacity,
+                logger);
+        }
+
+        #endregion
+
+        #region Concurrent appendable linked list managed pool
+
+        public static ConcurrentAppendableLinkedListManagedPool<T> BuildConcurrentAppendableLinkedListManagedPool<T>(
+            AllocationCommand<T> initialAllocationCommand,
+            AllocationCommand<T> additionalAllocationCommand,
+            ILoggerResolver loggerResolver,
+
+            MetadataAllocationDescriptor[] metadataAllocationDescriptors = null,
+            IAllocationCallback<IPoolElementFacade<T>> facadeAllocationCallback = null)
+        {
+            ILogger logger =
+                loggerResolver?.GetLogger<ConcurrentAppendableStackManagedPool<T>>();
+
+            Func<IPoolElementFacade<T>> facadeAllocationDelegate =
+                () => ObjectPoolAllocationFactory.BuildPoolElementFacadeWithLinkedList<T>(
+                    metadataAllocationDescriptors);
+
+            AllocationCommand<IPoolElementFacade<T>> initialFacadeAllocationCommand =
+                ObjectPoolAllocationCommandFactory.BuildPoolElementFacadeAllocationCommand(
+                    initialAllocationCommand.Descriptor,
+                    facadeAllocationDelegate,
+                    facadeAllocationCallback);
+
+            AllocationCommand<IPoolElementFacade<T>> additionalFacadeAllocationCommand =
+                ObjectPoolAllocationCommandFactory.BuildPoolElementFacadeAllocationCommand(
+                    additionalAllocationCommand.Descriptor,
+                    facadeAllocationDelegate,
+                    facadeAllocationCallback);
+
+            AllocationCommand<T> nullValueAllocationCommand =
+                new AllocationCommand<T>
+                {
+                    Descriptor = new AllocationCommandDescriptor
+                    {
+                        Rule = EAllocationAmountRule.ADD_ONE,
+
+                        Amount = 1
+                    },
+
+                    AllocationDelegate = AllocationFactory.NullAllocationDelegate<T>
+                };
+
+            AllocationCommand<IPoolElementFacade<T>> appendFacadeAllocationCommand =
+                ObjectPoolAllocationCommandFactory.BuildPoolElementFacadeAllocationCommand(
+                    nullValueAllocationCommand.Descriptor,
+                    facadeAllocationDelegate,
+                    facadeAllocationCallback);
+
+            var firstElement = PerformInitialAllocation<T>(
+                initialFacadeAllocationCommand,
+                initialAllocationCommand,
+                out var capacity,
+                logger);
+
+            return new ConcurrentAppendableLinkedListManagedPool<T>(
+                additionalFacadeAllocationCommand,
+                additionalAllocationCommand,
+
+                appendFacadeAllocationCommand,
+                nullValueAllocationCommand,
+
                 firstElement,
                 capacity,
                 logger);

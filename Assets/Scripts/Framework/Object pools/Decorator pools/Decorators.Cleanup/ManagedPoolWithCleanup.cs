@@ -1,13 +1,18 @@
 using HereticalSolutions.LifetimeManagement;
 
+using HereticalSolutions.Logging;
+
 namespace HereticalSolutions.Pools
 {
     public class ManagedPoolWithCleanup<T>
         : ADecoratorManagedPool<T>
     {
         public ManagedPoolWithCleanup(
-            IManagedPool<T> innerPool)
-            : base(innerPool)
+            IManagedPool<T> innerPool,
+            ILogger logger)
+            : base(
+                innerPool,
+                logger)
         {
         }
         

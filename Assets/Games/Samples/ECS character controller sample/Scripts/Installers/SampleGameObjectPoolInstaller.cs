@@ -1,3 +1,4 @@
+/*
 using HereticalSolutions.Pools;
 
 using HereticalSolutions.Samples.ECSCharacterControllerSample.Factories;
@@ -33,3 +34,4 @@ namespace HereticalSolutions.Samples.ECSCharacterControllerSample.Installers
 		}
 	}
 }
+*/

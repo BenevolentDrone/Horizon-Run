@@ -34,11 +34,13 @@ namespace HereticalSolutions.StateMachines
         
         #region Event handling
         
-        bool Handle<TEvent>()
+        bool Handle<TEvent>(
+            bool processQueueAfterFinish = true)
             where TEvent : ITransitionEvent<TBaseState>;
 
         bool Handle(
-            Type eventType);
+            Type eventType,
+            bool processQueueAfterFinish = true);
 
         INonAllocSubscribable OnEventFired { get; }
 
@@ -46,11 +48,13 @@ namespace HereticalSolutions.StateMachines
 
         #region Immediate transition
 
-        void TransitToImmediately<TState>()
+        bool TransitToImmediately<TState>(
+            bool processQueueAfterFinish = true)
             where TState : TBaseState;
         
-        void TransitToImmediately(
-            Type stateType);
+        bool TransitToImmediately(
+            Type stateType,
+            bool processQueueAfterFinish = true);
 
         #endregion
 
@@ -59,7 +63,10 @@ namespace HereticalSolutions.StateMachines
         IEnumerable<ITransitionRequest> ScheduledTransitions { get; }
 
         void ScheduleTransition(
-            ITransitionRequest request);
+            ITransitionRequest request,
+            bool startProcessingIfIdle = true);
+
+        void ProcessTransitionQueue();
 
         #endregion
     }

@@ -1,3 +1,4 @@
+/*
 namespace HereticalSolutions.StateMachines
 {
     public interface IStateWithAnimatedTransition : IState
@@ -7,3 +8,4 @@ namespace HereticalSolutions.StateMachines
         AnimationHandler StateExitAnimationHandler { get; }
     }
 }
+*/

@@ -1,3 +1,4 @@
+/*
 namespace HereticalSolutions.StateMachines
 {
     public class SceneState : IState
@@ -24,3 +25,4 @@ namespace HereticalSolutions.StateMachines
         }
     }
 }
+*/

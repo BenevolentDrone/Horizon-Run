@@ -38,16 +38,21 @@ namespace HereticalSolutions.StateMachines
         
         #region Event handling
         
-        Task Handle<TEvent>(
+        Task<bool> Handle<TEvent>(
 
             //Async tail
-            AsyncExecutionContext asyncContext);
-        
-        Task Handle(
+            AsyncExecutionContext asyncContext,
+
+            bool processQueueAfterFinish = true)
+            where TEvent : IAsyncTransitionEvent<TBaseState>;
+
+        Task<bool> Handle(
             Type eventType,
 
             //Async tail
-            AsyncExecutionContext asyncContext);
+            AsyncExecutionContext asyncContext,
+
+            bool processQueueAfterFinish = true);
         
         INonAllocSubscribable OnEventFired { get; }
         
@@ -55,17 +60,21 @@ namespace HereticalSolutions.StateMachines
 
         #region Immediate transition
         
-        Task TransitToImmediately<TState>(
+        Task<bool> TransitToImmediately<TState>(
 
             //Async tail
-            AsyncExecutionContext asyncContext)
+            AsyncExecutionContext asyncContext,
+
+            bool processQueueAfterFinish = true)
             where TState : TBaseState;
         
-        Task TransitToImmediately(
+        Task<bool> TransitToImmediately(
             Type stateType,
 
             //Async tail
-            AsyncExecutionContext asyncContext);
+            AsyncExecutionContext asyncContext,
+
+            bool processQueueAfterFinish = true);
 
         #endregion
 
@@ -73,8 +82,18 @@ namespace HereticalSolutions.StateMachines
 
         IEnumerable<IAsyncTransitionRequest> ScheduledTransitions { get; }
 
-        void ScheduleTransition(
-            IAsyncTransitionRequest request);
+        Task ScheduleTransition(
+            IAsyncTransitionRequest request,
+
+            //Async tail
+            AsyncExecutionContext asyncContext,
+
+            bool startProcessingIfIdle = true);
+
+        Task ProcessTransitionQueue(
+            
+            //Async tail
+            AsyncExecutionContext asyncContext);
 
         #endregion
     }

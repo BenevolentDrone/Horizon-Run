@@ -1,11 +1,14 @@
 using System;
-using System.Threading;
-using System.Threading.Tasks;
-
 using System.Collections.Generic;
 
-using HereticalSolutions.Logging;
+using HereticalSolutions.Asynchronous;
+
+using HereticalSolutions.Delegates;
+
 using HereticalSolutions.Repositories;
+
+using HereticalSolutions.Logging;
+using System.Threading.Tasks;
 
 namespace HereticalSolutions.StateMachines
 {
@@ -13,67 +16,73 @@ namespace HereticalSolutions.StateMachines
         : IAsyncStateMachine<TBaseState>
         where TBaseState : IAsyncState
     {
+        private static readonly EqualityComparer<TBaseState> comparer = EqualityComparer<TBaseState>.Default;
+
         private readonly IReadOnlyRepository<Type, TBaseState> states;
 
-        private readonly IReadOnlyRepository<Type, ITransitionEvent<TBaseState>> events;
-
-        private readonly Queue<AsyncTransitionRequest<TBaseState>> transitionRequestsQueue;
+        private readonly IReadOnlyRepository<Type, IAsyncTransitionEvent<TBaseState>> events;
 
         private readonly IAsyncTransitionController<TBaseState> transitionController;
 
-        private readonly EAsyncTransitionRules defaultAsyncTransitionRules;
+        private readonly Queue<IAsyncTransitionRequest> transitionQueue;
+
+
+        private readonly INonAllocSubscribable onCurrentStateChangeStarted;
+
+        private readonly INonAllocSubscribable onCurrentStateChangeFinished;
+
+        private readonly INonAllocSubscribable onEventFired;
+
 
         private readonly object lockObject;
+
 
         private readonly ILogger logger;
 
 
-        private Task processTransitionQueueTask;
-
-        private CancellationTokenSource processTransitionQueueCancellationTokenSource;
-
-        private CancellationTokenSource transitToImmediatelyCancellationTokenSource;
-
-
-
+        private TBaseState currentState;
 
         private bool transitionInProgress;
 
-        private TBaseState currentState;
-
-
-
-
         public BaseAsyncStateMachine(
             IReadOnlyRepository<Type, TBaseState> states,
-            IReadOnlyRepository<Type, ITransitionEvent<TBaseState>> events,
-            Queue<AsyncTransitionRequest<TBaseState>> transitionRequestsQueue,
+            IReadOnlyRepository<Type, IAsyncTransitionEvent<TBaseState>> events,
+
             IAsyncTransitionController<TBaseState> transitionController,
-            EAsyncTransitionRules defaultAsyncTransitionRules,
-            TBaseState currentState,
+            Queue<IAsyncTransitionRequest> transitionQueue,
+
+            INonAllocSubscribable onCurrentStateChangeStarted,
+            INonAllocSubscribable onCurrentStateChangeFinished,
+            INonAllocSubscribable onEventFired,
+
+            TBaseState initialState,
+
             ILogger logger)
         {
             this.states = states;
 
             this.events = events;
 
-            this.transitionRequestsQueue = transitionRequestsQueue;
 
             this.transitionController = transitionController;
 
-            this.defaultAsyncTransitionRules = defaultAsyncTransitionRules;
+            this.transitionQueue = transitionQueue;
 
-            this.logger = logger;
+
+            this.onCurrentStateChangeStarted = onCurrentStateChangeStarted;
+
+            this.onCurrentStateChangeFinished = onCurrentStateChangeFinished;
+
+            this.onEventFired = onEventFired;
 
 
             lockObject = new object();
 
 
-            CurrentState = currentState;
+            this.logger = logger;
 
-            OnCurrentStateChangeStarted = null;
 
-            OnCurrentStateChangeFinished = null;
+            currentState = initialState;
 
             transitionInProgress = false;
         }
@@ -103,901 +112,519 @@ namespace HereticalSolutions.StateMachines
                 }
             }
         }
-        //TODO: FINISH THE REST OF THE CLASS REFACTORING
 
-        public Action<TBaseState, TBaseState> OnCurrentStateChangeStarted { get; set; }
+        public INonAllocSubscribable OnCurrentStateChangeStarted => onCurrentStateChangeStarted;
 
-        public Action<TBaseState, TBaseState> OnCurrentStateChangeFinished { get; set; }
+        public INonAllocSubscribable OnCurrentStateChangeFinished => onCurrentStateChangeFinished;
 
         #endregion
 
         #region All states
 
-        public TBaseState GetState<TConcreteState>()
+        public TConcreteState GetState<TConcreteState>()
+            where TConcreteState : TBaseState
         {
-            if (!states.TryGet(typeof(TConcreteState), out var result))
+            if (!states.TryGet(
+                typeof(TConcreteState),
+                out var result))
+            {
                 throw new Exception(
                     logger.TryFormatException(
                         GetType(),
                         $"STATE {nameof(TConcreteState)} NOT FOUND"));
+            }
 
-            return result;
+            return (TConcreteState)result;
         }
 
-        /// <summary>
-        /// Gets the state of the specified type
-        /// </summary>
-        /// <param name="stateType">The type of the state.</param>
-        /// <returns>The state instance.</returns>
-        public TBaseState GetState(Type stateType)
+        public TBaseState GetState(
+            Type stateType)
         {
-            if (!states.TryGet(stateType, out var result))
+            if (!states.TryGet(
+                stateType,
+                out var result))
+            {
                 throw new Exception(
                     logger.TryFormatException(
                         GetType(),
                         $"STATE {stateType.Name} NOT FOUND"));
+            }
 
             return result;
         }
 
-        /// <summary>
-        /// Gets all the types of states in the state machine
-        /// </summary>
-        public IEnumerable<Type> AllStates => states.Keys;
+        public IEnumerable<Type> AllStates
+        {
+            get => states.Keys;
+        }
 
         #endregion
 
         #region Event handling
 
-        /// <summary>
-        /// Handles the specified event asynchronously
-        /// </summary>
-        /// <typeparam name="TEvent">The type of the event to handle.</typeparam>
-        /// <param name="stateExitProgress">The progress reporter for the state exit.</param>
-        /// <param name="stateEnterProgress">The progress reporter for the state enter.</param>
-        /// <param name="protocol">The transition protocol.</param>
-        /// <returns>A task representing the asynchronous operation.</returns>
-        public async Task Handle<TEvent>(
-            IProgress<float> stateExitProgress = null,
-            IProgress<float> stateEnterProgress = null,
-            TransitionSupervisor protocol = null)
+        public async Task<bool> Handle<TEvent>(
+
+            //Async tail
+            AsyncExecutionContext asyncContext,
+
+            bool processQueueAfterFinish = true)
+            where TEvent : IAsyncTransitionEvent<TBaseState>
         {
-            ITransitionEvent<TBaseState> @event;
-
-            if (!events.TryGet(typeof(TEvent), out @event))
-                throw new Exception(
-                    logger.TryFormatException(
-                        GetType(),
-                        $"EVENT {nameof(TEvent)} NOT FOUND"));
-
-            var request = new TransitionRequest<TBaseState>(
-                @event,
-                new CancellationTokenSource(),
-                stateExitProgress,
-                stateEnterProgress,
-                protocol);
+            IAsyncTransitionEvent<TBaseState> @event;
 
             lock (lockObject)
             {
-                transitionRequestsQueue.Enqueue(request);
-
-                if (processTransitionQueueTask == null
-                    || processTransitionQueueTask.IsCompleted)
+                if (transitionInProgress
+                    || transitionQueue.Count != 0)
                 {
-                    processTransitionQueueCancellationTokenSource?.Dispose();
+                    return false;
+                }
 
-                    processTransitionQueueCancellationTokenSource = new CancellationTokenSource();
-
-                    processTransitionQueueTask = ProcessTransitionQueueTask(processTransitionQueueCancellationTokenSource.Token);
+                if (!events.TryGet(
+                    typeof(TEvent),
+                    out @event))
+                {
+                    throw new Exception(
+                        logger.TryFormatException(
+                            GetType(),
+                            $"EVENT {nameof(TEvent)} NOT FOUND"));
                 }
             }
 
-            while (request.TransitionState != ETransitionState.ABORTED
-                   && request.TransitionState != ETransitionState.COMPLETED)
+            await PerformTransition(
+                @event,
+                null,
+                
+                asyncContext);
+
+            if (processQueueAfterFinish)
             {
-                await Task.Yield();
+                await ProcessTransitionQueue(
+                    asyncContext);
             }
+
+            return true;
         }
 
-        /// <summary>
-        /// Handles the specified event type asynchronously
-        /// </summary>
-        /// <param name="eventType">The type of the event to handle.</param>
-        /// <param name="stateExitProgress">The progress reporter for the state exit.</param>
-        /// <param name="stateEnterProgress">The progress reporter for the state enter.</param>
-        /// <param name="protocol">The transition protocol.</param>
-        /// <returns>A task representing the asynchronous operation.</returns>
-        public async Task Handle(
+        public async Task<bool> Handle(
             Type eventType,
-            IProgress<float> stateExitProgress = null,
-            IProgress<float> stateEnterProgress = null,
-            TransitionSupervisor protocol = null)
+
+            //Async tail
+            AsyncExecutionContext asyncContext,
+
+            bool processQueueAfterFinish = true)
         {
-            ITransitionEvent<TBaseState> @event;
-
-            if (!events.TryGet(eventType, out @event))
-                throw new Exception(
-                    logger.TryFormatException(
-                        GetType(),
-                        $"EVENT {eventType.Name} NOT FOUND"));
-
-            var request = new TransitionRequest<TBaseState>(
-                @event,
-                new CancellationTokenSource(),
-                stateExitProgress,
-                stateEnterProgress,
-                protocol);
+            IAsyncTransitionEvent<TBaseState> @event;
 
             lock (lockObject)
             {
-                transitionRequestsQueue.Enqueue(request);
-
-                if (processTransitionQueueTask == null
-                    || processTransitionQueueTask.IsCompleted)
+                if (transitionInProgress
+                    || transitionQueue.Count != 0)
                 {
-                    processTransitionQueueCancellationTokenSource?.Dispose();
+                    return false;
+                }
 
-                    processTransitionQueueCancellationTokenSource = new CancellationTokenSource();
-
-                    processTransitionQueueTask = ProcessTransitionQueueTask(processTransitionQueueCancellationTokenSource.Token);
+                if (!events.TryGet(
+                    eventType,
+                    out @event))
+                {
+                    throw new Exception(
+                        logger.TryFormatException(
+                            GetType(),
+                            $"EVENT {eventType.Name} NOT FOUND"));
                 }
             }
 
-            while (request.TransitionState != ETransitionState.ABORTED
-                   && request.TransitionState != ETransitionState.COMPLETED)
-            {
-                await Task.Yield();
-            }
-        }
-
-        /// <summary>
-        /// Handles the specified event asynchronously with a cancellation token
-        /// </summary>
-        /// <typeparam name="TEvent">The type of the event to handle.</typeparam>
-        /// <param name="cancellationToken">The cancellation token.</param>
-        /// <param name="stateExitProgress">The progress reporter for the state exit.</param>
-        /// <param name="stateEnterProgress">The progress reporter for the state enter.</param>
-        /// <param name="protocol">The transition protocol.</param>
-        /// <returns>A task representing the asynchronous operation.</returns>
-        public async Task Handle<TEvent>(
-            CancellationToken cancellationToken,
-            IProgress<float> stateExitProgress = null,
-            IProgress<float> stateEnterProgress = null,
-            TransitionSupervisor protocol = null)
-        {
-            ITransitionEvent<TBaseState> @event;
-
-            if (!events.TryGet(typeof(TEvent), out @event))
-                throw new Exception(
-                    logger.TryFormatException(
-                        GetType(),
-                        $"EVENT {nameof(TEvent)} NOT FOUND"));
-
-            var cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-
-            var request = new TransitionRequest<TBaseState>(
+            await PerformTransition(
                 @event,
-                cancellationTokenSource,
-                stateExitProgress,
-                stateEnterProgress,
-                protocol);
+                null,
+                
+                asyncContext);
 
-            lock (lockObject)
+            if (processQueueAfterFinish)
             {
-                transitionRequestsQueue.Enqueue(request);
-
-                if (processTransitionQueueTask == null
-                    || processTransitionQueueTask.IsCompleted)
-                {
-                    processTransitionQueueCancellationTokenSource?.Dispose();
-
-                    processTransitionQueueCancellationTokenSource = new CancellationTokenSource();
-
-                    processTransitionQueueTask = ProcessTransitionQueueTask(processTransitionQueueCancellationTokenSource.Token);
-                }
+                await ProcessTransitionQueue(
+                    asyncContext);
             }
 
-            while (request.TransitionState != ETransitionState.ABORTED
-                   && request.TransitionState != ETransitionState.COMPLETED)
-            {
-                await Task.Yield();
-            }
+            return true;
         }
 
-        /// <summary>
-        /// Handles the specified event type asynchronously with a cancellation token
-        /// </summary>
-        /// <param name="eventType">The type of the event to handle.</param>
-        /// <param name="cancellationToken">The cancellation token.</param>
-        /// <param name="stateExitProgress">The progress reporter for the state exit.</param>
-        /// <param name="stateEnterProgress">The progress reporter for the state enter.</param>
-        /// <param name="protocol">The transition protocol.</param>
-        /// <returns>A task representing the asynchronous operation.</returns>
-        public async Task Handle(
-            Type eventType,
-            CancellationToken cancellationToken,
-            IProgress<float> stateExitProgress = null,
-            IProgress<float> stateEnterProgress = null,
-            TransitionSupervisor protocol = null)
-        {
-            ITransitionEvent<TBaseState> @event;
-
-            if (!events.TryGet(eventType, out @event))
-                throw new Exception(
-                    logger.TryFormatException(
-                        GetType(),
-                        $"EVENT {eventType.Name} NOT FOUND"));
-
-            var cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-
-            var request = new TransitionRequest<TBaseState>(
-                @event,
-                cancellationTokenSource,
-                stateExitProgress,
-                stateEnterProgress,
-                protocol);
-
-            lock (lockObject)
-            {
-                transitionRequestsQueue.Enqueue(request);
-
-                if (processTransitionQueueTask == null
-                    || processTransitionQueueTask.IsCompleted)
-                {
-                    processTransitionQueueCancellationTokenSource?.Dispose();
-
-                    processTransitionQueueCancellationTokenSource = new CancellationTokenSource();
-
-                    processTransitionQueueTask = ProcessTransitionQueueTask(processTransitionQueueCancellationTokenSource.Token);
-                }
-            }
-
-            while (request.TransitionState != ETransitionState.ABORTED
-                   && request.TransitionState != ETransitionState.COMPLETED)
-            {
-                await Task.Yield();
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets the action invoked when an event is fired
-        /// </summary>
-        public Action<ITransitionEvent<TBaseState>> OnEventFired { get; set; }
+        public INonAllocSubscribable OnEventFired => onEventFired;
 
         #endregion
 
         #region Immediate transition
 
-        /// <summary>
-        /// Transitions immediately to the specified state type asynchronously
-        /// </summary>
-        /// <typeparam name="TState">The type of the state to transition to.</typeparam>
-        /// <param name="stateExitProgress">The progress reporter for the state exit.</param>
-        /// <param name="stateEnterProgress">The progress reporter for the state enter.</param>
-        /// <param name="protocol">The transition protocol.</param>
-        /// <returns>A task representing the asynchronous operation.</returns>
-        public async Task TransitToImmediately<TState>(
-            IProgress<float> stateExitProgress = null,
-            IProgress<float> stateEnterProgress = null,
-            TransitionSupervisor protocol = null)
+        public async Task<bool> TransitToImmediately<TState>(
+
+            //Async tail
+            AsyncExecutionContext asyncContext,
+
+            bool processQueueAfterFinish = true)
+            where TState : TBaseState
         {
-            if (!states.Has(typeof(TState)))
-                throw new Exception(
-                    logger.TryFormatException(
-                        GetType(),
-                        $"STATE {nameof(TState)} NOT FOUND"));
+            TBaseState previousState;
 
-            var previousState = CurrentState;
+            TBaseState newState;
 
-            var newState = states.Get(typeof(TState));
-
-            ClearTransitionQueue();
-
-            CancelImmediateTransitions();
-
-            using (transitToImmediatelyCancellationTokenSource = new CancellationTokenSource())
-            {
-                try
-                {
-                    var task = PerformTransition(
-                        previousState,
-                        newState,
-                        defaultAsyncTransitionRules,
-                        transitToImmediatelyCancellationTokenSource.Token,
-                        stateExitProgress,
-                        stateEnterProgress,
-                        protocol);
-
-                    await task;
-                        //.ConfigureAwait(false);
-
-                    await task
-                        .ThrowExceptionsIfAny(
-                            GetType(),
-                            logger);
-                }
-                catch (Exception e)
-                {
-                    return;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Transitions immediately to the specified state type asynchronously
-        /// </summary>
-        /// <param name="stateType">The type of the state to transition to.</param>
-        /// <param name="stateExitProgress">The progress reporter for the state exit.</param>
-        /// <param name="stateEnterProgress">The progress reporter for the state enter.</param>
-        /// <param name="protocol">The transition protocol.</param>
-        /// <returns>A task representing the asynchronous operation.</returns>
-        public async Task TransitToImmediately(
-            Type stateType,
-            IProgress<float> stateExitProgress = null,
-            IProgress<float> stateEnterProgress = null,
-            TransitionSupervisor protocol = null)
-        {
-            if (!states.Has(stateType))
-                throw new Exception(
-                    logger.TryFormatException(
-                        GetType(),
-                        $"STATE {stateType.Name} NOT FOUND"));
-
-            var previousState = CurrentState;
-
-            var newState = states.Get(stateType);
-
-            ClearTransitionQueue();
-
-            CancelImmediateTransitions();
-
-            using (transitToImmediatelyCancellationTokenSource = new CancellationTokenSource())
-            {
-                try
-                {
-                    var task = PerformTransition(
-                        previousState,
-                        newState,
-                        defaultAsyncTransitionRules,
-                        transitToImmediatelyCancellationTokenSource.Token,
-                        stateExitProgress,
-                        stateEnterProgress,
-                        protocol);
-
-                    await task;
-                        //.ConfigureAwait(false);
-
-                    await task
-                        .ThrowExceptionsIfAny(
-                            GetType(),
-                            logger);
-                }
-                catch (Exception e)
-                {
-                    return;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Transitions immediately to the specified state type asynchronously with a cancellation token
-        /// </summary>
-        /// <typeparam name="TState">The type of the state to transition to.</typeparam>
-        /// <param name="cancellationToken">The cancellation token.</param>
-        /// <param name="stateExitProgress">The progress reporter for the state exit.</param>
-        /// <param name="stateEnterProgress">The progress reporter for the state enter.</param>
-        /// <param name="protocol">The transition protocol.</param>
-        /// <returns>A task representing the asynchronous operation.</returns>
-        public async Task TransitToImmediately<TState>(
-            CancellationToken cancellationToken,
-            IProgress<float> stateExitProgress = null,
-            IProgress<float> stateEnterProgress = null,
-            TransitionSupervisor protocol = null)
-        {
-            if (!states.Has(typeof(TState)))
-                throw new Exception(
-                    logger.TryFormatException(
-                        GetType(),
-                        $"STATE {nameof(TState)} NOT FOUND"));
-
-            var previousState = CurrentState;
-
-            var newState = states.Get(typeof(TState));
-
-            ClearTransitionQueue();
-
-            CancelImmediateTransitions();
-
-            using (transitToImmediatelyCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken))
-            {
-                try
-                {
-                    var task = PerformTransition(
-                        previousState,
-                        newState,
-                        defaultAsyncTransitionRules,
-                        transitToImmediatelyCancellationTokenSource.Token,
-                        stateExitProgress,
-                        stateEnterProgress,
-                        protocol);
-
-                    await task;
-                        //.ConfigureAwait(false);
-
-                    await task
-                        .ThrowExceptionsIfAny(
-                            GetType(),
-                            logger);
-                }
-                catch (Exception e)
-                {
-                    return;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Transitions immediately to the specified state type asynchronously with a cancellation token
-        /// </summary>
-        /// <param name="stateType">The type of the state to transition to.</param>
-        /// <param name="cancellationToken">The cancellation token.</param>
-        /// <param name="stateExitProgress">The progress reporter for the state exit.</param>
-        /// <param name="stateEnterProgress">The progress reporter for the state enter.</param>
-        /// <param name="protocol">The transition protocol.</param>
-        /// <returns>A task representing the asynchronous operation.</returns>
-        public async Task TransitToImmediately(
-            Type stateType,
-            CancellationToken cancellationToken,
-            IProgress<float> stateExitProgress = null,
-            IProgress<float> stateEnterProgress = null,
-            TransitionSupervisor protocol = null)
-        {
-            if (!states.Has(stateType))
-                throw new Exception(
-                    logger.TryFormatException(
-                        GetType(),
-                        $"STATE {stateType.Name} NOT FOUND"));
-
-            var previousState = CurrentState;
-
-            var newState = states.Get(stateType);
-
-            ClearTransitionQueue();
-
-            CancelImmediateTransitions();
-
-            using (transitToImmediatelyCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken))
-            {
-                try
-                {
-                    var task = PerformTransition(
-                        previousState,
-                        newState,
-                        defaultAsyncTransitionRules,
-                        transitToImmediatelyCancellationTokenSource.Token,
-                        stateExitProgress,
-                        stateEnterProgress,
-                        protocol);
-
-                    await task;
-                        //.ConfigureAwait(false);
-
-                    await task
-                        .ThrowExceptionsIfAny(
-                            GetType(),
-                            logger);
-                }
-                catch (Exception e)
-                {
-                    return;
-                }
-            }
-        }
-
-        #endregion
-
-        #endregion
-
-        private async Task ProcessTransitionQueueTask(
-            CancellationToken cancellationToken)
-        {
-            transitionInProgress = true;
-
-            while (
-                transitionRequestsQueue.Count > 0
-                && !cancellationToken.IsCancellationRequested)
-            {
-                AsyncTransitionRequest<TBaseState> nextRequest;
-
-                lock (lockObject) 
-                {
-                    nextRequest = transitionRequestsQueue.Dequeue();
-                }
-
-                nextRequest.TransitionState = ETransitionState.IN_PROGRESS;
-
-                using (CancellationTokenSource combinedTokenSource =
-                       CancellationTokenSource.CreateLinkedTokenSource(
-                           nextRequest.CancellationTokenSource.Token,
-                           cancellationToken))
-                {
-                    try
-                    {
-                        var task = PerformTransition(
-                            nextRequest.Event,
-                            nextRequest.CancellationTokenSource.Token,
-                            nextRequest.StateExitProgress,
-                            nextRequest.StateEnterProgress,
-                            nextRequest.TransitionController);
-
-                        await task;
-                            //.ConfigureAwait(false);
-
-                        await task
-                            .ThrowExceptionsIfAny(
-                                GetType(),
-                                logger);
-                    }
-                    catch (Exception e)
-                    {
-                        nextRequest.TransitionState = ETransitionState.ABORTED;
-                    }
-                    finally
-                    {
-                        if (combinedTokenSource.Token.IsCancellationRequested)
-                        {
-                            nextRequest.TransitionState = ETransitionState.ABORTED;
-                        }
-                        else
-                        {
-                            nextRequest.TransitionState = ETransitionState.COMPLETED;
-                        }
-
-                        combinedTokenSource?.Dispose();
-                    }
-                }
-                
-                nextRequest.CancellationTokenSource?.Dispose();
-            }
-
-            transitionInProgress = false;
-        }
-        
-        private void ClearTransitionQueue()
-        {
-            processTransitionQueueCancellationTokenSource?.Dispose();
-            
-            processTransitionQueueCancellationTokenSource?.Cancel();
-            
             lock (lockObject)
             {
-                foreach (var request in transitionRequestsQueue)
+                if (transitionInProgress
+                    || transitionQueue.Count != 0)
                 {
-                    request.TransitionState = ETransitionState.ABORTED;
+                    return false;
                 }
 
-                transitionRequestsQueue.Clear();
-            }
-        }
+                if (!states.TryGet(
+                    typeof(TState),
+                    out newState))
+                {
+                    throw new Exception(
+                        logger.TryFormatException(
+                            GetType(),
+                            $"STATE {nameof(TState)} NOT FOUND"));
+                }
 
-        private void CancelImmediateTransitions()
-        {
-            transitToImmediatelyCancellationTokenSource?.Dispose();
+                previousState = currentState;
+            }
             
-            transitToImmediatelyCancellationTokenSource?.Cancel();
-        }
-        
-        private async Task PerformTransition(
-            ITransitionEvent<TBaseState> @event,
-            CancellationToken cancellationToken,
-            IProgress<float> stateExitProgress = null,
-            IProgress<float> stateEnterProgress = null,
-            TransitionSupervisor protocol = null)
-        {
-            if (!EqualityComparer<TBaseState>.Default.Equals(CurrentState, @event.From))
-            {
-                string currentStateString = CurrentState.GetType().Name;
-
-                string fromStateString = @event.From.GetType().Name;
-
-                throw new Exception(
-                    logger.TryFormatException(
-                        GetType(),
-                        $"CURRENT STATE {currentStateString} IS NOT EQUAL TO TRANSITION FROM STATE {fromStateString}"));
-            }
-
-            OnEventFired?.Invoke(@event);
-
-            var previousState = CurrentState;
-
-            var newState = @event.To;
-
-            var rules = defaultAsyncTransitionRules;
-
-            if (@event is AsyncTransitionEvent<TBaseState>)
-                rules = ((AsyncTransitionEvent<TBaseState>)@event).Rules;
-
-            var task = PerformTransition(
+            await PerformTransition(
                 previousState,
                 newState,
-                rules,
-                cancellationToken,
-                stateExitProgress,
-                stateEnterProgress,
-                protocol);
+                null,
+                
+                asyncContext);
 
-            await task;
-                //.ConfigureAwait(false);
+            if (processQueueAfterFinish)
+            {
+                await ProcessTransitionQueue(
+                    asyncContext);
+            }
 
-            await task
-                .ThrowExceptionsIfAny(
-                    GetType(),
-                    logger);
+            return true;
+        }
+
+        public async Task<bool> TransitToImmediately(
+            Type stateType,
+
+            //Async tail
+            AsyncExecutionContext asyncContext,
+
+            bool processQueueAfterFinish = true)
+        {
+            TBaseState previousState;
+
+            TBaseState newState;
+
+            lock (lockObject)
+            {
+                if (transitionInProgress
+                    || transitionQueue.Count != 0)
+                {
+                    return false;
+                }
+
+                if (!states.TryGet(
+                    stateType,
+                    out newState))
+                    throw new Exception(
+                        logger.TryFormatException(
+                            GetType(),
+                            $"STATE {stateType.Name} NOT FOUND"));
+
+                previousState = currentState;
+            }
+
+            await PerformTransition(
+                previousState,
+                newState,
+                null,
+                
+                asyncContext);
+
+            if (processQueueAfterFinish)
+            {
+                await ProcessTransitionQueue(
+                    asyncContext);
+            }
+
+            return true;
+        }
+
+        #endregion
+
+        #region Scheduled transition
+
+        public IEnumerable<IAsyncTransitionRequest> ScheduledTransitions => transitionQueue;
+
+        public async Task ScheduleTransition(
+            IAsyncTransitionRequest request,
+
+            //Async tail
+            AsyncExecutionContext asyncContext,
+
+            bool startProcessingIfIdle = true)
+        {
+            bool startProcessing;
+
+            lock (lockObject)
+            {
+                if (request.TransitionState != ETransitionState.UNINITIALISED)
+                {
+                    throw new Exception(
+                        logger.TryFormatException(
+                            GetType(),
+                            $"TRANSITION REQUEST {request.GetType().Name} ALREADY SCHEDULED"));
+                }
+
+                transitionQueue.Enqueue(request);
+
+                request.TransitionState = ETransitionState.QUEUED;
+
+                startProcessing =
+                    startProcessingIfIdle
+                    && !transitionInProgress;
+            }
+
+            if (startProcessing)
+            {
+                await ProcessTransitionQueue(
+                    asyncContext);
+            }
+        }
+
+        public async Task ProcessTransitionQueue(
+
+            //Async tail
+            AsyncExecutionContext asyncContext)
+        {
+            lock (lockObject)
+            {
+                if (transitionInProgress)
+                {
+                    return;
+                }
+
+                if (transitionQueue.Count == 0)
+                {
+                    return;
+                }
+            }
+
+            bool queueEmpty = false;
+
+            while (!queueEmpty) //(transitionQueue.Count != 0)
+            {
+                IAsyncTransitionRequest transitionRequest;
+
+                lock (lockObject)
+                {
+                    transitionRequest = transitionQueue.Dequeue();
+                }
+                
+                switch (transitionRequest)
+                {
+                    case EventTransitionRequest eventTransitionRequest:
+                    {
+                        IAsyncTransitionEvent<TBaseState> @event;
+
+                        lock (lockObject)
+                        {
+                            if (!events.TryGet(
+                                eventTransitionRequest.EventType,
+                                out @event))
+                            {
+                                throw new Exception(
+                                    logger.TryFormatException(
+                                        GetType(),
+                                        $"EVENT {eventTransitionRequest.EventType.Name} NOT FOUND"));
+                            }
+                        }
+
+                        await PerformTransition(
+                            @event,
+                            transitionRequest,
+                            
+                            asyncContext);
+
+                        break;
+                    }
+
+                    case ImmediateTransitionRequest immediateTransitionRequest:
+                    {
+                        TBaseState previousState;
+
+                        TBaseState newState;
+
+                        lock (lockObject)
+                        {
+                            if (!states.TryGet(
+                                immediateTransitionRequest.TargetStateType,
+                                out newState))
+                            {
+                                throw new Exception(
+                                    logger.TryFormatException(
+                                        GetType(),
+                                        $"STATE {immediateTransitionRequest.TargetStateType.Name} NOT FOUND"));
+                            }
+    
+                            previousState = currentState;
+                        }
+
+                        await PerformTransition(
+                            previousState,
+                            newState,
+                            transitionRequest,
+                            
+                            asyncContext);
+
+                        break;
+                    }
+                }
+
+                lock (lockObject)
+                {
+                    queueEmpty = transitionQueue.Count == 0;
+                }
+            }
+        }
+
+        #endregion
+
+        #endregion
+
+        private async Task PerformTransition(
+            IAsyncTransitionEvent<TBaseState> @event,
+            IAsyncTransitionRequest transitionRequest,
+
+            //Async tail
+            AsyncExecutionContext asyncContext)
+        {
+            TBaseState previousState;
+
+            TBaseState newState;
+
+            lock (lockObject)
+            {
+                if (!comparer.Equals(
+                    currentState,
+                    @event.From))
+                {
+                    string currentStateString = currentState.GetType().Name;
+
+                    string transitionString = @event.GetType().Name;
+
+                    string fromStateString = @event.From.GetType().Name;
+
+                    throw new Exception(
+                        logger.TryFormatException(
+                            GetType(),
+                            $"CURRENT STATE {currentStateString} IS NOT EQUAL TO TRANSITION {transitionString} PREVIOUS STATE {fromStateString}"));
+                }
+
+                var publisher = onEventFired as IPublisherSingleArgGeneric<IAsyncTransitionEvent<TBaseState>>;
+    
+                publisher?.Publish(
+                    @event);
+    
+                previousState = currentState;
+    
+                newState = @event.To;
+            }
+
+            await PerformTransition(
+                previousState,
+                newState,
+                transitionRequest,
+
+                asyncContext);
         }
 
         private async Task PerformTransition(
             TBaseState previousState,
             TBaseState newState,
-            EAsyncTransitionRules rules,
-            CancellationToken cancellationToken,
-            IProgress<float> stateExitProgress = null,
-            IProgress<float> stateEnterProgress = null,
-            TransitionSupervisor protocol = null)
+            IAsyncTransitionRequest transitionRequest,
+
+            //Async tail
+            AsyncExecutionContext asyncContext)
         {
-            try
+            object[] args;
+
+            lock (lockObject)
             {
-                switch (rules)
+                transitionInProgress = true;
+
+                if (transitionRequest != null)
                 {
-                    case EAsyncTransitionRules.EXIT_THEN_ENTER:
-
-                        OnCurrentStateChangeStarted?.Invoke(
-                            previousState,
-                            newState);
-
-                        var exitStateTask1 = ExitState(
-                            previousState,
-                            cancellationToken,
-                            stateExitProgress,
-                            protocol);
-
-                        await exitStateTask1;
-                            //.ConfigureAwait(false);
-
-                        await exitStateTask1
-                            .ThrowExceptionsIfAny(
-                                GetType(),
-                                logger);
-
-                        if (cancellationToken.IsCancellationRequested)
-                        {
-                            return;
-                        }
-
-                        CurrentState = newState;
-
-                        var enterStateTask1 = EnterState(
-                            newState,
-                            cancellationToken,
-                            stateEnterProgress,
-                            protocol);
-
-                        await enterStateTask1;
-                            //.ConfigureAwait(false);
-
-                        await enterStateTask1
-                            .ThrowExceptionsIfAny(
-                                GetType(),
-                                logger);
-
-                        if (cancellationToken.IsCancellationRequested)
-                        {
-                            return;
-                        }
-                        
-                        OnCurrentStateChangeFinished?.Invoke(previousState, newState);
-
-                        break;
-
-                    case EAsyncTransitionRules.ENTER_THEN_EXIT:
-                        
-                        OnCurrentStateChangeStarted?.Invoke(
-                            previousState,
-                            newState);
-
-                        var enterStateTask2 = EnterState(
-                            newState,
-                            cancellationToken,
-                            stateEnterProgress,
-                            protocol);
-
-                        await enterStateTask2;
-                            //.ConfigureAwait(false);
-
-                        await enterStateTask2
-                            .ThrowExceptionsIfAny(
-                                GetType(),
-                                logger);
-
-                        if (cancellationToken.IsCancellationRequested)
-                        {
-                            return;
-                        }
-                        
-                        CurrentState = newState;
-
-                        var exitStateTask2 = ExitState(
-                            previousState,
-                            cancellationToken,
-                            stateExitProgress,
-                            protocol);
-
-                        await exitStateTask2;
-                            //.ConfigureAwait(false);
-
-                        await exitStateTask2
-                            .ThrowExceptionsIfAny(
-                                GetType(),
-                                logger);
-
-                        if (cancellationToken.IsCancellationRequested)
-                        {
-                            return;
-                        }
-
-                        OnCurrentStateChangeFinished?.Invoke(previousState, newState);
-
-                        break;
-
-                    case EAsyncTransitionRules.CONCURRENT:
-
-                        OnCurrentStateChangeStarted?.Invoke(previousState, newState);
-
-                        var enterExitStateTask = Task
-                            .WhenAll(
-                                EnterState(
-                                    newState,
-                                    cancellationToken,
-                                    stateEnterProgress,
-                                    protocol),
-                                ExitState(
-                                    previousState,
-                                    cancellationToken,
-                                    stateExitProgress,
-                                    protocol));
-
-                        await enterExitStateTask;
-                            //.ConfigureAwait(false);
-
-                        await enterExitStateTask
-                            .ThrowExceptionsIfAny(
-                                GetType(),
-                                logger);
-
-                        if (cancellationToken.IsCancellationRequested)
-                        {
-                            return;
-                        }
-
-                        CurrentState = newState;
-
-                        OnCurrentStateChangeFinished?.Invoke(previousState, newState);
-
-                        break;
+                    transitionRequest.TransitionState = ETransitionState.IN_PROGRESS;
                 }
-            }
-            catch (OperationCanceledException)
-            {
-                //BOING
-            }
-        }
-
-        private async Task ExitState(
-            TBaseState previousState,
-            CancellationToken cancellationToken,
-            IProgress<float> stateExitProgress = null,
-            TransitionSupervisor protocol = null)
-        {
-            if (protocol != null)
-            {
-                while (protocol.CommencePreviousStateExitStart != true)
+    
+                #region Exit previous state
+    
+                args = new object[]
                 {
-                    await Task.Yield();
-                                
-                    if (cancellationToken.IsCancellationRequested)
-                    {
-                        return;
-                    }
-                }
+                    previousState,
+                    newState
+                };
+    
+                var stateChangeStartPublisher = onCurrentStateChangeStarted
+                    as IPublisherMultipleArgs;
+    
+                stateChangeStartPublisher?.Publish(
+                    args);
             }
 
-            var task = transitionController.ExitState(
-                previousState,
-                cancellationToken,
-                stateExitProgress);
+            if (transitionRequest != null)
+                await transitionController.ExitState(
+                    previousState,
+                    transitionRequest,
 
-            await task;
-                //.ConfigureAwait(false);
+                    asyncContext);
+            else
+                await transitionController.ExitState(
+                    previousState,
+                    
+                    asyncContext);
 
-            await task
-                .ThrowExceptionsIfAny(
-                    GetType(),
-                    logger);
+            #endregion
 
-            if (cancellationToken.IsCancellationRequested)
+            lock (lockObject)
             {
-                return;
+                currentState = newState;
             }
-                        
-            previousState.ExitState();
 
-            protocol?.OnPreviousStateExited?.Invoke(previousState);
-                        
-            if (protocol != null)
+            #region Enter new state
+
+            if (transitionRequest != null)
+                await transitionController.EnterState(
+                    previousState,
+                    transitionRequest,
+                    
+                    asyncContext);
+            else
+                await transitionController.EnterState(
+                    previousState,
+                    
+                    asyncContext);
+
+            lock (lockObject)
             {
-                while (protocol.CommencePreviousStateExitFinish != true)
+
+                var stateChangeFinishPublisher = onCurrentStateChangeFinished
+                    as IPublisherMultipleArgs;
+
+                stateChangeFinishPublisher?.Publish(
+                    args);
+    
+                #endregion
+    
+                if (transitionRequest != null)
                 {
-                    await Task.Yield();
-                                
-                    if (cancellationToken.IsCancellationRequested)
-                    {
-                        return;
-                    }
+                    transitionRequest.TransitionState = ETransitionState.COMPLETED;
                 }
-            }
-        }
-
-        private async Task EnterState(
-            TBaseState newState,
-            CancellationToken cancellationToken,
-            IProgress<float> stateEnterProgress = null,
-            TransitionSupervisor protocol = null)
-        {
-            if (protocol != null)
-            {
-                while (protocol.CommenceNextStateEnterStart != true)
-                {
-                    await Task.Yield();
-                                
-                    if (cancellationToken.IsCancellationRequested)
-                    {
-                        return;
-                    }
-                }
-            }
-                        
-            var task = transitionController.EnterState(
-                newState,
-                cancellationToken,
-                stateEnterProgress);
-
-            await task;
-                //.ConfigureAwait(false);
-
-            await task
-                .ThrowExceptionsIfAny(
-                    GetType(),
-                    logger);
-
-            if (cancellationToken.IsCancellationRequested)
-            {
-                return;
-            }
-
-            newState.EnterState();
-                        
-            protocol?.OnNextStateEntered?.Invoke(newState);
-                        
-            if (protocol != null)
-            {
-                while (protocol.CommenceNextStateEnterFinish != true)
-                {
-                    await Task.Yield();
-                                
-                    if (cancellationToken.IsCancellationRequested)
-                    {
-                        return;
-                    }
-                }
+            
+                transitionInProgress = false;
             }
         }
     }

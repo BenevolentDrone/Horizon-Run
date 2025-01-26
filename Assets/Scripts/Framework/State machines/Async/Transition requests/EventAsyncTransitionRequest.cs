@@ -2,25 +2,24 @@ using System;
 
 namespace HereticalSolutions.StateMachines
 {
-	public class EventAsyncTransitionRequest<TBaseState>
+	public class EventAsyncTransitionRequest
 		: AAsyncTransitionRequest
-		where TBaseState : IAsyncState
 	{
-		private IAsyncTransitionEvent<TBaseState> @event;
-		public IAsyncTransitionEvent<TBaseState> Event
+		private Type targetStateType;
+		public Type TargetStateType
 		{
 			get
 			{
 				lock (lockObject)
 				{
-					return @event;
+					return targetStateType;
 				}
 			}
 			set
 			{
 				lock (lockObject)
 				{
-					@event = value;
+					targetStateType = value;
 				}
 			}
 		}

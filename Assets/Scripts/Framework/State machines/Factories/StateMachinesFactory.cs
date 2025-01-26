@@ -1,62 +1,23 @@
 using System;
 using System.Collections.Generic;
 
-using HereticalSolutions.Logging;
 using HereticalSolutions.Repositories;
+
+using HereticalSolutions.Logging;
+using HereticalSolutions.Delegates.Factories;
 
 namespace HereticalSolutions.StateMachines.Factories
 {
-    /// <summary>
-    /// Provides methods for building state machines
-    /// </summary>
     public static class StateMachinesFactory
     {
-        /// <summary>
-        /// Builds a new instance of the BaseAsyncStateMachine class
-        /// </summary>
-        /// <typeparam name="TBaseState">The base state type.</typeparam>
-        /// <param name="states">The repository of states.</param>
-        /// <param name="events">The repository of transition events.</param>
-        /// <param name="transitionController">The transition controller.</param>
-        /// <param name="asyncTransitionRules">The async transition rules.</param>
-        /// <param name="currentState">The current state.</param>
-        /// <param name="logger">The logger.</param>
-        /// <returns>A new instance of the BaseAsyncStateMachine class.</returns>
-        public static BaseAsyncStateMachine<TBaseState> BuildBaseAsyncStateMachine<TBaseState>(
-            IReadOnlyRepository<Type, TBaseState> states,
-            IReadOnlyRepository<Type, ITransitionEvent<TBaseState>> events,
-            IAsyncTransitionController<TBaseState> transitionController,
-            EAsyncTransitionRules asyncTransitionRules,
-            TBaseState currentState,
-            ILoggerResolver loggerResolver)
-            where TBaseState : IState
-        {
-            ILogger logger =
-                loggerResolver?.GetLogger<BaseAsyncStateMachine<TBaseState>>();
-
-            return new BaseAsyncStateMachine<TBaseState>(
-                states,
-                events,
-                new Queue<AsyncTransitionRequest<TBaseState>>(),
-                transitionController,
-                asyncTransitionRules,
-                currentState,
-                logger);
-        }
-        
-        /// <summary>
-        /// Builds a new instance of the BaseStateMachine class
-        /// </summary>
-        /// <typeparam name="TBaseState">The base state type.</typeparam>
-        /// <param name="states">The repository of states.</param>
-        /// <param name="events">The repository of transition events.</param>
-        /// <param name="currentState">The current state.</param>
-        /// <param name="logger">The logger.</param>
-        /// <returns>A new instance of the BaseStateMachine class.</returns>
         public static BaseStateMachine<TBaseState> BuildBaseStateMachine<TBaseState>(
             IReadOnlyRepository<Type, TBaseState> states,
             IReadOnlyRepository<Type, ITransitionEvent<TBaseState>> events,
-            TBaseState currentState,
+
+            ITransitionController<TBaseState> transitionController,
+
+            TBaseState initialState,
+
             ILoggerResolver loggerResolver)
             where TBaseState : IState
         {
@@ -66,18 +27,88 @@ namespace HereticalSolutions.StateMachines.Factories
             return new BaseStateMachine<TBaseState>(
                 states,
                 events,
-                new Queue<ITransitionEvent<TBaseState>>(),
-                currentState,
+
+                transitionController,
+                new Queue<ITransitionRequest>(),
+
+                BroadcasterFactory.BuildNonAllocBroadcasterMultipleArgs(
+                    loggerResolver),
+                BroadcasterFactory.BuildNonAllocBroadcasterMultipleArgs(
+                    loggerResolver),
+                BroadcasterFactory.BuildNonAllocBroadcasterGeneric<ITransitionEvent<TBaseState>>(
+                    loggerResolver),
+
+                initialState,
+
                 logger);
         }
 
-        /// <summary>
-        /// Adds a new state to the repository of states
-        /// </summary>
-        /// <typeparam name="TBaseState">The base state type.</typeparam>
-        /// <typeparam name="T">The state type.</typeparam>
-        /// <param name="states">The repository of states.</param>
-        /// <returns>The newly added state.</returns>
+        public static ConcurrentBaseStateMachine<TBaseState> BuildConcurrentBaseStateMachine<TBaseState>(
+            IReadOnlyRepository<Type, TBaseState> states,
+            IReadOnlyRepository<Type, ITransitionEvent<TBaseState>> events,
+
+            ITransitionController<TBaseState> transitionController,
+
+            TBaseState initialState,
+            ILoggerResolver loggerResolver)
+            where TBaseState : IState
+        {
+            ILogger logger =
+                loggerResolver?.GetLogger<ConcurrentBaseStateMachine<TBaseState>>();
+
+            return new ConcurrentBaseStateMachine<TBaseState>(
+                states,
+                events,
+
+                transitionController,
+                new Queue<ITransitionRequest>(),
+
+                BroadcasterFactory.BuildConcurrentNonAllocBroadcasterMultipleArgs(
+                    loggerResolver),
+                BroadcasterFactory.BuildConcurrentNonAllocBroadcasterMultipleArgs(
+                    loggerResolver),
+                BroadcasterFactory.BuildConcurrentNonAllocBroadcasterGeneric<ITransitionEvent<TBaseState>>(
+                    loggerResolver),
+
+                initialState,
+
+                logger);
+        }
+
+        public static BaseAsyncStateMachine<TBaseState> BuildBaseAsyncStateMachine<TBaseState>(
+            IReadOnlyRepository<Type, TBaseState> states,
+            IReadOnlyRepository<Type, IAsyncTransitionEvent<TBaseState>> events,
+
+            IAsyncTransitionController<TBaseState> transitionController,
+
+            EAsyncTransitionRules asyncTransitionRules,
+
+            TBaseState initialState,
+            ILoggerResolver loggerResolver)
+            where TBaseState : IAsyncState
+        {
+            ILogger logger =
+                loggerResolver?.GetLogger<BaseAsyncStateMachine<TBaseState>>();
+
+            return new BaseAsyncStateMachine<TBaseState>(
+                states,
+                events,
+
+                transitionController,
+                new Queue<IAsyncTransitionRequest>(),
+
+                BroadcasterFactory.BuildConcurrentNonAllocBroadcasterMultipleArgs(
+                    loggerResolver),
+                BroadcasterFactory.BuildConcurrentNonAllocBroadcasterMultipleArgs(
+                    loggerResolver),
+                BroadcasterFactory.BuildConcurrentNonAllocBroadcasterGeneric<IAsyncTransitionEvent<TBaseState>>(
+                    loggerResolver),
+
+                initialState,
+
+                logger);
+        }
+
         public static T AddState<TBaseState, T>(
             IRepository<Type, TBaseState> states)
             where TBaseState : IState
@@ -90,15 +121,7 @@ namespace HereticalSolutions.StateMachines.Factories
 
             return state;
         }
-        
-        /// <summary>
-        /// Adds a new state with arguments to the repository of states
-        /// </summary>
-        /// <typeparam name="TBaseState">The base state type.</typeparam>
-        /// <typeparam name="T">The state type.</typeparam>
-        /// <param name="states">The repository of states.</param>
-        /// <param name="arguments">The arguments to pass to the state constructor.</param>
-        /// <returns>The newly added state.</returns>
+
         public static T AddStateWithArguments<TBaseState, T>(
             IRepository<Type, TBaseState> states,
             object[] arguments)
@@ -113,17 +136,7 @@ namespace HereticalSolutions.StateMachines.Factories
 
             return state;
         }
-        
-        /// <summary>
-        /// Adds a new transition event to the repository of transition events
-        /// </summary>
-        /// <typeparam name="TBaseState">The base state type.</typeparam>
-        /// <typeparam name="TEvent">The transition event type.</typeparam>
-        /// <typeparam name="TFrom">The source state type.</typeparam>
-        /// <typeparam name="TTo">The target state type.</typeparam>
-        /// <param name="states">The repository of states.</param>
-        /// <param name="transitionEvents">The repository of transition events.</param>
-        /// <returns>The newly added transition event.</returns>
+
         public static TEvent AddTransitionEvent<TBaseState, TEvent, TFrom, TTo>(
             IRepository<Type, TBaseState> states,
             IRepository<Type, ITransitionEvent<TBaseState>> transitionEvents)

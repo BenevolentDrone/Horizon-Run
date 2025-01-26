@@ -1,263 +1,476 @@
-	using System;
-	using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
 
-	using HereticalSolutions.Delegates;
+using HereticalSolutions.Delegates;
 
-	using HereticalSolutions.Repositories;
+using HereticalSolutions.Repositories;
 
-	using HereticalSolutions.Logging;
-	
-	namespace HereticalSolutions.StateMachines
+using HereticalSolutions.Logging;
+
+namespace HereticalSolutions.StateMachines
+{
+	public class BaseStateMachine<TBaseState>
+		: IStateMachine<TBaseState>
+		where TBaseState : IState
 	{
-		public class BaseStateMachine<TBaseState>
-			: IStateMachine<TBaseState>
-			where TBaseState : IState
+		private static readonly EqualityComparer<TBaseState> comparer = EqualityComparer<TBaseState>.Default;
+
+		private readonly IReadOnlyRepository<Type, TBaseState> states;
+
+		private readonly IReadOnlyRepository<Type, ITransitionEvent<TBaseState>> events;
+
+		private readonly ITransitionController<TBaseState> transitionController;
+
+		private readonly Queue<ITransitionRequest> transitionQueue;
+
+
+		private readonly INonAllocSubscribable onCurrentStateChangeStarted;
+
+		private readonly INonAllocSubscribable onCurrentStateChangeFinished;
+
+		private readonly INonAllocSubscribable onEventFired;
+
+
+		private readonly ILogger logger;
+
+
+		private TBaseState currentState;
+
+		private bool transitionInProgress;
+
+		public BaseStateMachine(
+			IReadOnlyRepository<Type, TBaseState> states,
+			IReadOnlyRepository<Type, ITransitionEvent<TBaseState>> events,
+
+			ITransitionController<TBaseState> transitionController,
+			Queue<ITransitionRequest> transitionQueue,
+
+			INonAllocSubscribable onCurrentStateChangeStarted,
+			INonAllocSubscribable onCurrentStateChangeFinished,
+			INonAllocSubscribable onEventFired,
+
+			TBaseState initialState,
+
+			ILogger logger)
 		{
-			private readonly IReadOnlyRepository<Type, TBaseState> states;
+			this.states = states;
 
-			private readonly IReadOnlyRepository<Type, ITransitionEvent<TBaseState>> events;
-
-			private readonly ITransitionController<TBaseState> transitionController;
-
-			private readonly Queue<ITransitionRequest<TBaseState>> transitionQueue;
+			this.events = events;
 
 
-			private readonly INonAllocSubscribable onCurrentStateChangeStarted;
-	
-			private readonly INonAllocSubscribable onCurrentStateChangeFinished;
+			this.transitionController = transitionController;
+
+			this.transitionQueue = transitionQueue;
 
 
-			private readonly ILogger logger;
+			this.onCurrentStateChangeStarted = onCurrentStateChangeStarted;
+			
+			this.onCurrentStateChangeFinished = onCurrentStateChangeFinished;
+
+			this.onEventFired = onEventFired;
 
 
-			private TBaseState currentState;
+			this.logger = logger;
 
-			private bool transitionInProgress;
 
-			public BaseStateMachine(
-				IReadOnlyRepository<Type, TBaseState> states,
-				IReadOnlyRepository<Type, ITransitionEvent<TBaseState>> events,
-				Queue<ITransitionEvent<TBaseState>> transitionQueue,
+			currentState = initialState;
 
-				INonAllocSubscribable onCurrentStateChangeStarted,
-				INonAllocSubscribable onCurrentStateChangeFinished,
+			transitionInProgress = false;
+		}
 
-				TBaseState initialState,
+		#region IStateMachine
 
-				ILogger logger)
+		public bool TransitionInProgress => transitionInProgress;
+
+		#region Current state
+
+		public TBaseState CurrentState => currentState;
+
+		public INonAllocSubscribable OnCurrentStateChangeStarted => onCurrentStateChangeStarted;
+
+		public INonAllocSubscribable OnCurrentStateChangeFinished => onCurrentStateChangeFinished;
+
+		#endregion
+
+		#region All states
+
+		public TConcreteState GetState<TConcreteState>()
+			where TConcreteState : TBaseState
+		{
+			if (!states.TryGet(
+				typeof(TConcreteState),
+				out var result))
 			{
-				this.states = states;
-
-				this.events = events;
-
-				this.transitionQueue = transitionQueue;
-
-				this.logger = logger;
-
-
-				this.onCurrentStateChangeStarted = onCurrentStateChangeStarted;
-				
-				this.onCurrentStateChangeFinished = onCurrentStateChangeFinished;
-
-
-				currentState = initialState;
+				throw new Exception(
+					logger.TryFormatException(
+						GetType(),
+						$"STATE {nameof(TConcreteState)} NOT FOUND"));
 			}
 
-			#region IStateMachine
+			return (TConcreteState)result;
+		}
 
-			public bool TransitionInProgress => transitionInProgress;
-
-			#region Current state
-
-			public TBaseState CurrentState => currentState;
-
-			public INonAllocSubscribable OnCurrentStateChangeStarted => onCurrentStateChangeStarted;
-
-			public INonAllocSubscribable OnCurrentStateChangeFinished => onCurrentStateChangeFinished;
-
-			//public Action<TBaseState, TBaseState> OnCurrentStateChangeStarted { get; set; }
-	
-			//public Action<TBaseState, TBaseState> OnCurrentStateChangeFinished { get; set; }
-	
-			#endregion
-	
-			#region All states
-
-			public TConcreteState GetState<TConcreteState>()
-				where TConcreteState : TBaseState
+		public TBaseState GetState(
+			Type stateType)
+		{
+			if (!states.TryGet(
+				stateType,
+				out var result))
 			{
-				if (!states.TryGet(
-					typeof(TConcreteState),
-					out var result))
+				throw new Exception(
+					logger.TryFormatException(
+						GetType(),
+						$"STATE {stateType.Name} NOT FOUND"));
+			}
+
+			return result;
+		}
+
+		public IEnumerable<Type> AllStates
+		{
+			get => states.Keys;
+		}
+
+		#endregion
+
+		#region Event handling
+
+		public bool Handle<TEvent>(
+			bool processQueueAfterFinish = true)
+			where TEvent : ITransitionEvent<TBaseState>
+		{
+			if (transitionInProgress
+				|| transitionQueue.Count != 0)
+			{
+				return false;
+			}
+
+			ITransitionEvent<TBaseState> @event;
+
+			if (!events.TryGet(
+				typeof(TEvent),
+				out @event))
+			{
+				throw new Exception(
+					logger.TryFormatException(
+						GetType(),
+						$"EVENT {nameof(TEvent)} NOT FOUND"));
+			}
+
+			PerformTransition(
+				@event,
+				null);
+
+			if (processQueueAfterFinish)
+			{
+				ProcessTransitionQueue();
+			}
+
+			return true;
+		}
+
+		public bool Handle(
+			Type eventType,
+			bool processQueueAfterFinish = true)
+		{
+			if (transitionInProgress
+				|| transitionQueue.Count != 0)
+			{
+				return false;
+			}
+
+			ITransitionEvent<TBaseState> @event;
+
+			if (!events.TryGet(
+				eventType,
+				out @event))
+			{
+				throw new Exception(
+					logger.TryFormatException(
+						GetType(),
+						$"EVENT {eventType.Name} NOT FOUND"));
+			}
+
+			PerformTransition(
+				@event,
+				null);
+
+			if (processQueueAfterFinish)
+			{
+				ProcessTransitionQueue();
+			}
+
+			return true;
+		}
+
+		public INonAllocSubscribable OnEventFired => onEventFired;
+
+		#endregion
+
+		#region Immediate transition
+
+		public bool TransitToImmediately<TState>(
+			bool processQueueAfterFinish = true)
+			where TState : TBaseState
+		{
+			if (transitionInProgress
+				|| transitionQueue.Count != 0)
+			{
+				return false;
+			}
+
+			if (!states.TryGet(
+				typeof(TState),
+				out var newState))
+			{
+				throw new Exception(
+					logger.TryFormatException(
+						GetType(),
+						$"STATE {nameof(TState)} NOT FOUND"));
+			}
+
+			var previousState = currentState;
+
+			PerformTransition(
+				previousState,
+				newState,
+				null);
+
+			if (processQueueAfterFinish)
+			{
+				ProcessTransitionQueue();
+			}
+
+			return true;
+		}
+
+		public bool TransitToImmediately(
+			Type stateType,
+			bool processQueueAfterFinish = true)
+		{
+			if (transitionInProgress
+				|| transitionQueue.Count != 0)
+			{
+				return false;
+			}
+
+			if (!states.TryGet(
+				stateType,
+				out var newState))
+				throw new Exception(
+					logger.TryFormatException(
+						GetType(),
+						$"STATE {stateType.Name} NOT FOUND"));
+
+			var previousState = currentState;
+
+			PerformTransition(
+				previousState,
+				newState,
+				null);
+
+			if (processQueueAfterFinish)
+			{
+				ProcessTransitionQueue();
+			}
+
+			return true;
+		}
+
+		#endregion
+	
+		#region Scheduled transition
+	
+		public IEnumerable<ITransitionRequest> ScheduledTransitions => transitionQueue;
+	
+		public void ScheduleTransition(
+			ITransitionRequest request,
+			bool startProcessingIfIdle = true)
+		{
+			if (request.TransitionState != ETransitionState.UNINITIALISED)
+			{
+				throw new Exception(
+					logger.TryFormatException(
+						GetType(),
+						$"TRANSITION REQUEST {request.GetType().Name} ALREADY SCHEDULED"));
+			}
+
+			transitionQueue.Enqueue(request);
+
+			request.TransitionState = ETransitionState.QUEUED;
+
+			if (startProcessingIfIdle
+				&& !transitionInProgress)
+			{
+				ProcessTransitionQueue();
+			}
+		}
+
+		public void ProcessTransitionQueue()
+		{
+			if (transitionInProgress)
+			{
+				return;
+			}
+
+			if (transitionQueue.Count == 0)
+			{
+				return;
+			}
+
+			while (transitionQueue.Count != 0)
+			{
+				var transitionRequest = transitionQueue.Dequeue();
+
+				switch (transitionRequest)
 				{
-					throw new Exception(
-						logger.TryFormatException(
-							GetType(),
-							$"STATE {nameof(TConcreteState)} NOT FOUND"));
-				}
+					case EventTransitionRequest eventTransitionRequest:
+					{
+						ITransitionEvent<TBaseState> @event;
 
-				return (TConcreteState)result;
-			}
+						if (!events.TryGet(
+							eventTransitionRequest.EventType,
+							out @event))
+						{
+							throw new Exception(
+								logger.TryFormatException(
+									GetType(),
+									$"EVENT {eventTransitionRequest.EventType.Name} NOT FOUND"));
+						}
 
-			public TBaseState GetState(
-				Type stateType)
-			{
-				if (!states.TryGet(
-					stateType,
-					out var result))
-				{
-					throw new Exception(
-						logger.TryFormatException(
-							GetType(),
-							$"STATE {stateType.Name} NOT FOUND"));
-				}
+						PerformTransition(
+							@event,
+							transitionRequest);
 
-				return result;
-			}
+						break;
+					}
 
-			public IEnumerable<Type> AllStates
-			{
-				get => states.Keys;
-			}
-	
-			#endregion
-	
-			#region Event handling
-	
-			public bool Handle<TEvent>()
-			{
-				if (TransitionInProgress
-					|| transitionQueue.Count != 0)
-				{
-					return false;
-				}
+					case ImmediateTransitionRequest immediateTransitionRequest:
+					{
+						if (!states.TryGet(
+							immediateTransitionRequest.TargetStateType,
+							out var newState))
+						{
+							throw new Exception(
+								logger.TryFormatException(
+									GetType(),
+									$"STATE {immediateTransitionRequest.TargetStateType.Name} NOT FOUND"));
+						}
 
-				ITransitionEvent<TBaseState> @event;
+						var previousState = currentState;
 
-				if (!events.TryGet(
-					typeof(TEvent),
-					out @event))
-				{
-					throw new Exception(
-						logger.TryFormatException(
-							GetType(),
-							$"EVENT {nameof(TEvent)} NOT FOUND"));
-				}
+						PerformTransition(
+							previousState,
+							newState,
+							transitionRequest);
 
-				if (TransitionInProgress)
-					transitionQueue.Enqueue(@event);
-				else
-					PerformTransition(@event);
-			}
-
-			public bool Handle(
-				Type eventType)
-			{
-				ITransitionEvent<TBaseState> @event;
-
-				if (!events.TryGet(eventType, out @event))
-					throw new Exception(
-						logger.TryFormatException(
-							GetType(),
-							$"EVENT {eventType.Name} NOT FOUND"));
-
-				if (TransitionInProgress)
-					transitionQueue.Enqueue(@event);
-				else
-					PerformTransition(@event);
-			}
-
-			public Action<ITransitionEvent<TBaseState>> OnEventFired { get; set; }
-
-			#endregion
-
-			#region Immediate transition
-
-			public void TransitToImmediately<TState>()
-			{
-				if (!states.Has(typeof(TState)))
-					throw new Exception(
-						logger.TryFormatException(
-							GetType(),
-							$"STATE {nameof(TState)} NOT FOUND"));
-
-				var previousState = CurrentState;
-				var newState = states.Get(typeof(TState));
-
-				PerformTransition(
-					previousState,
-					newState);
-			}
-
-			public void TransitToImmediately(Type stateType)
-			{
-				if (!states.Has(stateType))
-					throw new Exception(
-						logger.TryFormatException(
-							GetType(),
-							$"STATE {stateType.Name} NOT FOUND"));
-
-				var previousState = CurrentState;
-				var newState = states.Get(stateType);
-
-				PerformTransition(
-					previousState,
-					newState);
-			}
-
-			#endregion
-
-			#endregion
-
-			private void PerformTransition(ITransitionEvent<TBaseState> @event)
-			{
-				if (!EqualityComparer<TBaseState>.Default.Equals(CurrentState, @event.From))
-				{
-					string currentStateString = CurrentState.GetType().Name;
-					string fromStateString = @event.From.GetType().Name;
-
-					throw new Exception(
-						logger.TryFormatException(
-							GetType(),
-							$"CURRENT STATE {currentStateString} IS NOT EQUAL TO TRANSITION FROM STATE {fromStateString}"));
-				}
-
-				OnEventFired?.Invoke(
-					@event);
-
-				var previousState = CurrentState;
-
-				var newState = @event.To;
-
-				PerformTransition(
-					previousState,
-					newState);
-			}
-
-			private void PerformTransition(
-				TBaseState previousState,
-				TBaseState newState)
-			{
-				TransitionInProgress = true;
-
-				OnCurrentStateChangeStarted?.Invoke(
-					previousState,
-					newState);
-
-				previousState.ExitState();
-
-				currentState = newState;
-
-				newState.EnterState();
-
-				OnCurrentStateChangeFinished?.Invoke(previousState, newState);
-
-				TransitionInProgress = false;
-
-				if (transitionQueue.Count != 0)
-				{
-					PerformTransition(transitionQueue.Dequeue());
+						break;
+					}
 				}
 			}
 		}
+
+		#endregion
+
+		#endregion
+
+		private void PerformTransition(
+			ITransitionEvent<TBaseState> @event,
+			ITransitionRequest transitionRequest)
+		{
+			if (!comparer.Equals(
+				currentState,
+				@event.From))
+			{
+				string currentStateString = currentState.GetType().Name;
+
+				string transitionString = @event.GetType().Name;
+
+				string fromStateString = @event.From.GetType().Name;
+
+				throw new Exception(
+					logger.TryFormatException(
+						GetType(),
+						$"CURRENT STATE {currentStateString} IS NOT EQUAL TO TRANSITION {transitionString} PREVIOUS STATE {fromStateString}"));
+			}
+
+			var publisher = onEventFired as IPublisherSingleArgGeneric<ITransitionEvent<TBaseState>>;
+
+			publisher?.Publish(
+				@event);
+
+			var previousState = currentState;
+
+			var newState = @event.To;
+
+			PerformTransition(
+				previousState,
+				newState,
+				transitionRequest);
+		}
+
+		private void PerformTransition(
+			TBaseState previousState,
+			TBaseState newState,
+			ITransitionRequest transitionRequest)
+		{
+			transitionInProgress = true;
+
+			if (transitionRequest != null)
+			{
+				transitionRequest.TransitionState = ETransitionState.IN_PROGRESS;
+			}
+
+			#region Exit previous state
+
+			object[] args = new object[]
+			{
+				previousState,
+				newState
+			};
+
+			var stateChangeStartPublisher = onCurrentStateChangeStarted
+				as IPublisherMultipleArgs;
+
+			stateChangeStartPublisher?.Publish(
+				args);
+
+			if (transitionRequest != null)
+				transitionController.ExitState(
+					previousState,
+					transitionRequest);
+			else
+				transitionController.ExitState(
+					previousState);
+
+			#endregion
+
+			currentState = newState;
+
+			#region Enter new state
+
+			if (transitionRequest != null)
+				transitionController.EnterState(
+					previousState,
+					transitionRequest);
+			else
+				transitionController.EnterState(
+					previousState);
+
+			var stateChangeFinishPublisher = onCurrentStateChangeFinished
+				as IPublisherMultipleArgs;
+
+			stateChangeFinishPublisher?.Publish(
+				args);
+
+			#endregion
+
+			if (transitionRequest != null)
+			{
+				transitionRequest.TransitionState = ETransitionState.COMPLETED;
+			}
+
+			transitionInProgress = false;
+		}
 	}
+}

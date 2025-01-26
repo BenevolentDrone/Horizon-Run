@@ -1,15 +1,16 @@
+using System;
+
 namespace HereticalSolutions.StateMachines
 {
-	public class EventTransitionRequest<TBaseState>
+	public class EventTransitionRequest
 		: ATransitionRequest
-		where TBaseState : IState
 	{
-		private ITransitionEvent<TBaseState> @event;
+		private Type eventType;
 
-		public ITransitionEvent<TBaseState> Event
+		public Type EventType
 		{
-			get => @event;
-			set => @event = value;
+			get => eventType;
+			set => eventType = value;
 		}
 	}
 }

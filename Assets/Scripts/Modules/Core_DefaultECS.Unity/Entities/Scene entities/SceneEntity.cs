@@ -1,6 +1,6 @@
 using System;
 
-using HereticalSolutions.Allocations.Factories;
+using HereticalSolutions.Allocations;
 
 namespace HereticalSolutions.Modules.Core_DefaultECS
 {
@@ -12,7 +12,8 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
 #if UNITY_EDITOR
         protected override Guid AllocateID()
         {
-            return IDAllocationFactory.BuildGUID();
+            //return IDAllocationFactory.BuildGUID();
+            return GUIDAllocationController.AllocateGUIDStatic();
         }
 #endif
     }

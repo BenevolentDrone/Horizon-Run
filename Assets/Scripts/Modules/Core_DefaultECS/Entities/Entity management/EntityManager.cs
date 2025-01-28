@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 
+using HereticalSolutions.Allocations;
+
 using HereticalSolutions.Allocations.Factories;
 
 using HereticalSolutions.Repositories;
@@ -30,6 +32,8 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
 			TEntityID,
 			TEntity>
 	{
+		private readonly IIDAllocationController<TEntityID> idAllocationController;
+
 		private readonly IRepository<TEntityID, TEntity> registryEntityRepository;
 
 		private readonly IReadOnlyEntityWorldRepository<TWorldID, TWorld, TEntity> entityWorldRepository;
@@ -39,11 +43,14 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
 		private readonly ILogger logger;
 
 		public EntityManager(
+			IIDAllocationController<TEntityID> idAllocationController,
 			IRepository<TEntityID, TEntity> registryEntityRepository,
 			IReadOnlyEntityWorldRepository<TWorldID, TWorld, TEntity> entityWorldRepository,
 			TWorldID[] worldsToSpawnEntitiesIn,
 			ILogger logger)
 		{
+			this.idAllocationController = idAllocationController;
+
 			this.registryEntityRepository = registryEntityRepository;
 
 			this.entityWorldRepository = entityWorldRepository;
@@ -154,7 +161,8 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
 			TPrototypeID prototypeID,
 			EEntityAuthoringPresets authoringPreset = EEntityAuthoringPresets.DEFAULT)
 		{
-			entityID = AllocateID();
+			idAllocationController.AllocateID(
+				out entityID);
 
 			if (!SpawnEntityInAllRelevantWorlds(
 					entityID,
@@ -196,7 +204,8 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
 			TPrototypeID prototypeID,
 			EEntityAuthoringPresets authoringPreset = EEntityAuthoringPresets.DEFAULT)
 		{
-			entityID = AllocateID();
+			idAllocationController.AllocateID(
+				out entityID);
 
 			if (!SpawnAndResolveEntityInAllRelevantWorlds(
 				entityID,
@@ -325,7 +334,8 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
 			WorldOverrideDescriptor<TWorldID, TEntity>[] overrides,
 			EEntityAuthoringPresets authoringPreset = EEntityAuthoringPresets.DEFAULT)
 		{
-			entityID = AllocateID();
+			idAllocationController.AllocateID(
+				out entityID);
 
 			if (!SpawnEntityInAllRelevantWorlds(
 				entityID,
@@ -457,7 +467,8 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
 			WorldOverrideDescriptor<TWorldID, TEntity>[] overrides,
 			EEntityAuthoringPresets authoringPreset = EEntityAuthoringPresets.DEFAULT)
 		{
-			entityID = AllocateID();
+			idAllocationController.AllocateID(
+				out entityID);
 
 			if (!SpawnAndResolveEntityInAllRelevantWorlds(
 				entityID,
@@ -640,19 +651,6 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
 		#endregion
 
 		#endregion
-
-		private TEntityID AllocateID()
-		{
-            TEntityID newID;
-
-            do
-            {
-                newID = IDAllocationFactory.BuildGUID();
-            }
-            while (registryEntityRepository.Has(newID));
-
-            return newID;
-		}
 
 		private bool SpawnEntityInAllRelevantWorlds(
 			TEntityID entityID,

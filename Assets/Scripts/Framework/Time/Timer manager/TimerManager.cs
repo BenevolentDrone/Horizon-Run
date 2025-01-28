@@ -8,6 +8,7 @@ using HereticalSolutions.Repositories;
 using HereticalSolutions.Pools;
 
 using HereticalSolutions.LifetimeManagement;
+using HereticalSolutions.Allocations;
 
 namespace HereticalSolutions.Time
 {
@@ -19,6 +20,8 @@ namespace HereticalSolutions.Time
 		private readonly string timerManagerID;
 
 
+		private readonly UShortIDAllocationController idAllocationController;
+
 		private readonly IRepository<int, IPoolElementFacade<TimerWithSubscriptionsContainer>> timerContainerRepository;
 
 		private readonly IRepository<string, List<DurationHandlePair>> sharedTimerHandleRepository;
@@ -29,12 +32,15 @@ namespace HereticalSolutions.Time
 		
 		public TimerManager(
 			string timerManagerID,
+			UShortIDAllocationController idAllocationController,
 			IRepository<int, IPoolElementFacade<TimerWithSubscriptionsContainer>> timerContainerRepository,
 			IRepository<string, List<DurationHandlePair>> sharedTimerHandleRepository,
 			IManagedPool<TimerWithSubscriptionsContainer> timerContainersPool,
 			bool renameTimersOnPop = true)
 		{
 			this.timerManagerID = timerManagerID;
+
+			this.idAllocationController = idAllocationController;
 
 			this.timerContainerRepository = timerContainerRepository;
 			
@@ -53,14 +59,8 @@ namespace HereticalSolutions.Time
 			out ushort timerHandle,
 			out IRuntimeTimer timer)
 		{
-			timerHandle = 0;
-
-			do
-			{
-				timerHandle = IDAllocationFactory.BuildUshort();
-			}
-			while (timerHandle == 0
-				|| timerContainerRepository.Has(timerHandle));
+			idAllocationController.AllocateID(
+				out timerHandle);
 
 
 			var pooledTimerContainer = timerContainersPool.Pop();
@@ -259,6 +259,9 @@ namespace HereticalSolutions.Time
 			pooledTimerContainer.Push();
 
 			timerContainerRepository.TryRemove(timerHandle);
+
+			idAllocationController.FreeID(
+				timerHandle);
 			
 			
 			return true;

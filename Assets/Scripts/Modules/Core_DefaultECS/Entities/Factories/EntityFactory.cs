@@ -70,6 +70,8 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Factories
 				|| authoringPreset == EEntityAuthoringPresets.NETWORKING_CLIENT;
 
 
+			var idAllocationController = IDAllocationFactory.BuildGUIDAllocationController();
+
 			var registryEntityRepository = RepositoryFactory.BuildDictionaryRepository<TEntityID, TEntity>();
 
 			var entityWorldRepository = BuildEntityWorldRepository(loggerResolver);
@@ -167,6 +169,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Factories
 				loggerResolver?.GetLogger<EntityManager>();
 
 			return new EntityManager(
+				idAllocationController,
 				registryEntityRepository,
 				entityWorldRepository,
 				worldsToSpawnEntitiesIn.ToArray(),

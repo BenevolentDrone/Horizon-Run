@@ -1,20 +1,22 @@
 using System;
 
-using HereticalSolutions.Allocations.Factories;
-
 using HereticalSolutions.Entities;
 
 using DefaultEcs;
 using DefaultEcs.System;
+using HereticalSolutions.Allocations;
 
 namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 {
 	public class SpawnEntitiesOnSpawnerEmittedEventSystem : AEntitySetSystem<float>
 	{
+		private readonly IIDAllocationController<Guid> iDAllocationController;
+
 		private readonly IEventEntityBuilder<Entity, Guid> eventEntityBuilder;
 
 		public SpawnEntitiesOnSpawnerEmittedEventSystem(
 			World world,
+			IIDAllocationController<Guid> iDAllocationController,
 			IEventEntityBuilder<Entity, Guid> eventEntityBuilder)
 			: base(
 				world
@@ -24,6 +26,8 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 					.Without<EventProcessedComponent>()
 					.AsSet())
 		{
+			this.iDAllocationController = iDAllocationController;
+
 			this.eventEntityBuilder = eventEntityBuilder;
 		}
 
@@ -56,6 +60,9 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 
 			for (int i = 0; i < spawnEntitiesComponent.Amount; i++)
 			{
+				iDAllocationController.AllocateID(
+					out var newID);
+
 				eventEntityBuilder
 					.NewEvent(out var eventEntity)
 					.CausedByWorldLocalEntity(
@@ -65,7 +72,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 						eventEntity,
 						new EntitySpawnedEventComponent
 						{
-							GUID = IDAllocationFactory.BuildGUID(),
+							GUID = newID,
 
 							PrototypeID = spawnEntitiesComponent.PrototypeID,
 

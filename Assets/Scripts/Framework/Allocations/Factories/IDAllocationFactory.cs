@@ -1,43 +1,36 @@
 using System;
+using System.Collections.Generic;
+
+using HereticalSolutions.Logging;
 
 namespace HereticalSolutions.Allocations.Factories
 {
     public static class IDAllocationFactory
     {
-        public static TValue BuildID<TValue>()
+        public static ByteIDAllocationController BuildByteIDAllocationController(
+            ILoggerResolver loggerResolver)
         {
-            //I'd be more happy with pattern matching but thanks anyway, copilot
-            
-            if (typeof(TValue) == typeof(Guid))
-            {
-                return (TValue)(object)BuildGUID();
-            }
-            else if (typeof(TValue) == typeof(int))
-            {
-                return (TValue)(object)BuildInt();
-            }
-            else
-            {
-                throw new ArgumentException("The type of ID is not supported.");
-            }
+            ILogger logger = loggerResolver?.GetLogger<ByteIDAllocationController>();
+
+            return new ByteIDAllocationController(
+                new Queue<byte>(),
+                logger);
         }
 
-        public static Guid BuildGUID()
+        public static UShortIDAllocationController BuildUShortIDAllocationController(
+            ILoggerResolver loggerResolver)
         {
-            return Guid.NewGuid();
+            ILogger logger = loggerResolver?.GetLogger<ByteIDAllocationController>();
+
+            return new UShortIDAllocationController(
+                new Queue<ushort>(),
+                logger);
         }
 
-        public static int BuildInt()
+        public static GUIDAllocationController BuildGUIDAllocationController()
         {
-            return new Random().Next();
-        }
-
-        public static ushort BuildUshort()
-        {
-            return Convert.ToUInt16(
-                new Random().Next(
-                    ushort.MinValue,
-                    ushort.MaxValue));
+            return new GUIDAllocationController(
+                new HashSet<Guid>());
         }
     }
 }

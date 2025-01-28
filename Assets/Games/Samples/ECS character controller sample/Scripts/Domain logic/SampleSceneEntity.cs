@@ -1,8 +1,8 @@
 using System;
 
-using HereticalSolutions.Modules.Core_DefaultECS;
+using HereticalSolutions.Allocations;
 
-using HereticalSolutions.Allocations.Factories;
+using HereticalSolutions.Modules.Core_DefaultECS;
 
 namespace HereticalSolutions.Samples.ECSCharacterControllerSample
 {
@@ -14,7 +14,8 @@ namespace HereticalSolutions.Samples.ECSCharacterControllerSample
 #if UNITY_EDITOR
 		protected override Guid AllocateID()
 		{
-			return IDAllocationFactory.BuildGUID();
+			//return IDAllocationFactory.BuildGUID();
+			return GUIDAllocationController.AllocateGUIDStatic();
 		}
 #endif
 	}

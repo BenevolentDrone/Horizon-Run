@@ -21,7 +21,6 @@ using HereticalSolutions.Repositories;
 using HereticalSolutions.Repositories.Factories;
 
 using HereticalSolutions.Logging;
-using System.Linq;
 
 namespace HereticalSolutions.Persistence.Factories
 {

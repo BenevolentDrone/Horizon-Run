@@ -75,7 +75,7 @@ namespace HereticalSolutions
 
 		public static async Task LogExceptionsIfAny(
 			this Task task,
-			Type logSource,
+			Type logSourceType,
 			ILogger logger)
 		{
 			await task;
@@ -83,13 +83,13 @@ namespace HereticalSolutions
 			LookForExceptions(
 				task,
 				exception => logger?.LogError(
-					logSource,
+					logSourceType,
 					exception));
 		}
 
 		public static async Task ThrowExceptionsIfAny(
 			this Task task,
-			Type logSource,
+			Type logSourceType,
 			ILogger logger)
 		{
 			await task;
@@ -98,7 +98,7 @@ namespace HereticalSolutions
 				task,
 				exception => throw new Exception(
 					logger.TryFormatException(
-						logSource,
+						logSourceType,
 						exception)));
 		}
 
@@ -106,79 +106,91 @@ namespace HereticalSolutions
 
 		#region Task<T>
 
-		public static async Task LogExceptionsIfAny<T>(
+		public static async Task<T> LogExceptionsIfAny<T>(
 			this Task<T> task)
 		{
-			await task;
+			var result = await task;
 
 			LookForExceptions(
 				task,
 				Console.WriteLine);
+
+			return result;
 		}
 
-		public static async Task ThrowExceptionsIfAny<T>(
+		public static async Task<T> ThrowExceptionsIfAny<T>(
 			this Task<T> task)
 		{
-			await task;
+			var result = await task;
 
 			LookForExceptions(
 				task,
 				exception => throw new Exception(
 					exception));
+
+			return result;
 		}
 
-		public static async Task LogExceptionsIfAny<T, TSource>(
+		public static async Task<T> LogExceptionsIfAny<T, TSource>(
 			this Task<T> task,
 			ILogger logger)
 		{
-			await task;
+			var result = await task;
 
 			LookForExceptions(
 				task,
 				exception => logger?.LogError<TSource>(
 					exception));
+
+			return result;
 		}
 
-		public static async Task ThrowExceptionsIfAny<T, TSource>(
+		public static async Task<T> ThrowExceptionsIfAny<T, TSource>(
 			this Task<T> task,
 			ILogger logger)
 		{
-			await task;
+			var result = await task;
 
 			LookForExceptions(
 				task,
 				exception => throw new Exception(
 					logger.TryFormatException<TSource>(
 						exception)));
+			
+			return result;
 		}
 
-		public static async Task LogExceptionsIfAny<T>(
+		public static async Task<T> LogExceptionsIfAny<T>(
 			this Task<T> task,
-			Type logSource,
+			Type logSourceType,
 			ILogger logger)
 		{
-			await task;
+			var result = await task;
 
 			LookForExceptions(
 				task,
 				exception => logger?.LogError(
-					logSource,
+					logSourceType,
 					exception));
+
+			return result;
 		}
 
-		public static async Task ThrowExceptionsIfAny<T>(
+		public static async Task<T> ThrowExceptionsIfAny<T>(
 			this Task<T> task,
-			Type logSource,
+			Type logSourceType,
 			ILogger logger)
 		{
-			await task;
+			var result = await task;
 
 			LookForExceptions(
 				task,
 				exception => throw new Exception(
 					logger.TryFormatException(
-						logSource,
+						logSourceType,
 						exception)));
+
+			return result;
 		}
 
 		#endregion

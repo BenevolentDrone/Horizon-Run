@@ -66,7 +66,7 @@ namespace HereticalSolutions.Allocations
 
 			if (lastAllocatedID == byte.MaxValue)
 			{
-				logger.LogError(
+				logger?.LogError(
 					GetType(),
 					"NO FREE HANDLES");
 

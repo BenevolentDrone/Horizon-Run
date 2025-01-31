@@ -38,7 +38,7 @@ namespace HereticalSolutions.Logging
         {
             semaphore.Wait();
             
-            innerLogger.Log(value);
+            innerLogger?.Log(value);
 
             semaphore.Release();
         }
@@ -48,7 +48,7 @@ namespace HereticalSolutions.Logging
         {
             semaphore.Wait();
 
-            innerLogger.Log<TSource>(value);
+            innerLogger?.Log<TSource>(value);
             
             semaphore.Release();
         }
@@ -59,7 +59,7 @@ namespace HereticalSolutions.Logging
         {
             semaphore.Wait();
 
-            innerLogger.Log(
+            innerLogger?.Log(
                 logSource,
                 value);
             
@@ -72,7 +72,7 @@ namespace HereticalSolutions.Logging
         {
             semaphore.Wait();
             
-            innerLogger.Log(
+            innerLogger?.Log(
                 value,
                 arguments);
             
@@ -85,7 +85,7 @@ namespace HereticalSolutions.Logging
         {
             semaphore.Wait();
 
-            innerLogger.Log<TSource>(
+            innerLogger?.Log<TSource>(
                 value,
                 arguments);
             
@@ -99,7 +99,7 @@ namespace HereticalSolutions.Logging
         {
             semaphore.Wait();
 
-            innerLogger.Log(
+            innerLogger?.Log(
                 logSource,
                 value,
                 arguments);
@@ -116,7 +116,7 @@ namespace HereticalSolutions.Logging
         {
             semaphore.Wait();
             
-            innerLogger.LogWarning(
+            innerLogger?.LogWarning(
                 value);
             
             semaphore.Release();
@@ -127,7 +127,7 @@ namespace HereticalSolutions.Logging
         {
             semaphore.Wait();
 
-            innerLogger.LogWarning<TSource>(value);
+            innerLogger?.LogWarning<TSource>(value);
             
             semaphore.Release();
         }
@@ -138,7 +138,7 @@ namespace HereticalSolutions.Logging
         {
             semaphore.Wait();
 
-            innerLogger.LogWarning(
+            innerLogger?.LogWarning(
                 logSource,
                 value);
             
@@ -151,7 +151,7 @@ namespace HereticalSolutions.Logging
         {
             semaphore.Wait();
             
-            innerLogger.LogWarning(
+            innerLogger?.LogWarning(
                 value,
                 arguments);
             
@@ -164,7 +164,7 @@ namespace HereticalSolutions.Logging
         {
             semaphore.Wait();
 
-            innerLogger.LogWarning<TSource>(
+            innerLogger?.LogWarning<TSource>(
                 value,
                 arguments);
             
@@ -178,7 +178,7 @@ namespace HereticalSolutions.Logging
         {
             semaphore.Wait();
 
-            innerLogger.LogWarning(
+            innerLogger?.LogWarning(
                 logSource,
                 value,
                 arguments);
@@ -195,7 +195,7 @@ namespace HereticalSolutions.Logging
         {
             semaphore.Wait();
             
-            innerLogger.LogError(
+            innerLogger?.LogError(
                 value);
             
             semaphore.Release();
@@ -206,7 +206,7 @@ namespace HereticalSolutions.Logging
         {
             semaphore.Wait();
 
-            innerLogger.LogError<TSource>(value);
+            innerLogger?.LogError<TSource>(value);
             
             semaphore.Release();
         }
@@ -217,7 +217,7 @@ namespace HereticalSolutions.Logging
         {
             semaphore.Wait();
 
-            innerLogger.LogError(
+            innerLogger?.LogError(
                 logSource,
                 value);
             
@@ -230,7 +230,7 @@ namespace HereticalSolutions.Logging
         {
             semaphore.Wait();
             
-            innerLogger.LogError(
+            innerLogger?.LogError(
                 value,
                 arguments);
             
@@ -243,7 +243,7 @@ namespace HereticalSolutions.Logging
         {
             semaphore.Wait();
 
-            innerLogger.LogError<TSource>(
+            innerLogger?.LogError<TSource>(
                 value,
                 arguments);
             
@@ -257,7 +257,7 @@ namespace HereticalSolutions.Logging
         {
             semaphore.Wait();
 
-            innerLogger.LogError(
+            innerLogger?.LogError(
                 logSource,
                 value,
                 arguments);

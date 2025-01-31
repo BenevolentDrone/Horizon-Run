@@ -30,14 +30,14 @@ namespace HereticalSolutions.Logging
 		public void Log(
 			string value)
 		{
-			innerLogger.Log(
+			innerLogger?.Log(
 				value);
 		}
 
 		public void Log<TSource>(
 			string value)
 		{
-			innerLogger.Log<TSource>(
+			innerLogger?.Log<TSource>(
 				value);
 		}
 
@@ -45,7 +45,7 @@ namespace HereticalSolutions.Logging
 			Type logSource,
 			string value)
 		{
-			innerLogger.Log(
+			innerLogger?.Log(
 				logSource,
 				value);
 		}
@@ -54,7 +54,7 @@ namespace HereticalSolutions.Logging
 			string value,
 			object[] arguments)
 		{
-			innerLogger.Log(
+			innerLogger?.Log(
 				value,
 				arguments);
 		}
@@ -63,7 +63,7 @@ namespace HereticalSolutions.Logging
 			string value,
 			object[] arguments)
 		{
-			innerLogger.Log<TSource>(
+			innerLogger?.Log<TSource>(
 				value,
 				arguments);
 		}
@@ -73,7 +73,7 @@ namespace HereticalSolutions.Logging
 			string value,
 			object[] arguments)
 		{
-			innerLogger.Log(
+			innerLogger?.Log(
 				logSource,
 				value,
 				arguments);
@@ -86,14 +86,14 @@ namespace HereticalSolutions.Logging
 		public void LogWarning(
 			string value)
 		{
-			innerLogger.LogWarning(
+			innerLogger?.LogWarning(
 				value);
 		}
 
 		public void LogWarning<TSource>(
 			string value)
 		{
-			innerLogger.LogWarning<TSource>(
+			innerLogger?.LogWarning<TSource>(
 				value);
 		}
 
@@ -101,7 +101,7 @@ namespace HereticalSolutions.Logging
 			Type logSource,
 			string value)
 		{
-			innerLogger.LogWarning(
+			innerLogger?.LogWarning(
 				logSource,
 				value);
 		}
@@ -110,7 +110,7 @@ namespace HereticalSolutions.Logging
 			string value,
 			object[] arguments)
 		{
-			innerLogger.LogWarning(
+			innerLogger?.LogWarning(
 				value,
 				arguments);
 		}
@@ -119,7 +119,7 @@ namespace HereticalSolutions.Logging
 			string value,
 			object[] arguments)
 		{
-			innerLogger.LogWarning<TSource>(
+			innerLogger?.LogWarning<TSource>(
 				value,
 				arguments);
 		}
@@ -129,7 +129,7 @@ namespace HereticalSolutions.Logging
 			string value,
 			object[] arguments)
 		{
-			innerLogger.LogWarning(
+			innerLogger?.LogWarning(
 				logSource,
 				value,
 				arguments);
@@ -141,21 +141,21 @@ namespace HereticalSolutions.Logging
 		public void LogError(
 			string value)
 		{
-			innerLogger.LogError(
+			innerLogger?.LogError(
 				value);
 		}
 
 		public void LogError<TSource>(
 			string value)
 		{
-			innerLogger.LogError<TSource>(value);
+			innerLogger?.LogError<TSource>(value);
 		}
 
 		public void LogError(
 			Type logSource,
 			string value)
 		{
-			innerLogger.LogError(
+			innerLogger?.LogError(
 				logSource,
 				value);
 		}
@@ -164,7 +164,7 @@ namespace HereticalSolutions.Logging
 			string value,
 			object[] arguments)
 		{
-			innerLogger.LogError(
+			innerLogger?.LogError(
 				value,
 				arguments);
 		}
@@ -173,7 +173,7 @@ namespace HereticalSolutions.Logging
 			string value,
 			object[] arguments)
 		{
-			innerLogger.LogError<TSource>(
+			innerLogger?.LogError<TSource>(
 				value,
 				arguments);
 		}
@@ -183,7 +183,7 @@ namespace HereticalSolutions.Logging
 			string value,
 			object[] arguments)
 		{
-			innerLogger.LogError(
+			innerLogger?.LogError(
 				logSource,
 				value,
 				arguments);

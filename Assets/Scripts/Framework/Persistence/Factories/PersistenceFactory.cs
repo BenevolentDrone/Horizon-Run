@@ -1,17 +1,3 @@
-#define CSV_SUPPORT
-#define YAML_SUPPORT
-#define PROTOBUF_SUPPORT
-
-#if YAML_SUPPORT
-using YamlDotNet.Serialization;
-
-using YamlSerializerBuilder = YamlDotNet.Serialization.SerializerBuilder;
-using YamlDeserializerBuilder = YamlDotNet.Serialization.DeserializerBuilder;
-
-using YamlDotNetSerializer = YamlDotNet.Serialization.ISerializer;
-using YamlDotNetDeserializer = YamlDotNet.Serialization.IDeserializer;
-#endif
-
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -210,51 +196,6 @@ namespace HereticalSolutions.Persistence.Factories
                 new BinaryFormatter(),
                 loggerResolver?.GetLogger<BinaryFormatterSerializer>());
         }
-
-        public static JSONSerializer BuildJSONSerializer(
-            ILoggerResolver loggerResolver)
-        {
-            return new JSONSerializer(
-                loggerResolver?.GetLogger<JSONSerializer>());
-        }
-
-        public static XMLSerializer BuildXMLSerializer(
-            ILoggerResolver loggerResolver)
-        {
-            return new XMLSerializer(
-                loggerResolver?.GetLogger<XMLSerializer>());
-        }
-
-#if CSV_SUPPORT
-        public static CSVSerializer BuildCSVSerializer(
-            bool includeHeader,
-            ILoggerResolver loggerResolver)
-        {
-            return new CSVSerializer(
-                includeHeader,
-                loggerResolver?.GetLogger<CSVSerializer>());
-        }
-#endif
-
-#if YAML_SUPPORT
-        public static YAMLSerializer BuildYAMLSerializer(
-            ILoggerResolver loggerResolver)
-        {
-            return new YAMLSerializer(
-                new YamlSerializerBuilder().Build(),
-                new YamlDeserializerBuilder().Build(),
-                loggerResolver?.GetLogger<YAMLSerializer>());
-        }
-#endif
-
-#if PROTOBUF_SUPPORT
-        public static ProtobufSerializer BuildProtobufSerializer(
-            ILoggerResolver loggerResolver)
-        {
-            return new ProtobufSerializer(
-                loggerResolver?.GetLogger<ProtobufSerializer>());
-        }
-#endif
 
         public static TFormatSerializer BuildFormatSerializer<TFormatSerializer>(
             ILoggerResolver loggerResolver,

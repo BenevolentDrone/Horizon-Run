@@ -1,12 +1,14 @@
 using System;
-using System.Linq;
+using System.Linq; //TODO: get rid of linq
 
 using HereticalSolutions.Logging;
 using ILogger = HereticalSolutions.Logging.ILogger;
 
 using UnityEditor;
 
+#if JSON_SUPPORT
 using Newtonsoft.Json;
+#endif
 
 namespace HereticalSolutions.Persistence
 {
@@ -228,7 +230,9 @@ namespace HereticalSolutions.Persistence
 
 			try
 			{
+#if JSON_SUPPORT
 				result = JsonConvert.DeserializeObject<string[]>(serializedValuesListJson);
+#endif
 			}
 			catch (Exception e)
 			{
@@ -266,7 +270,9 @@ namespace HereticalSolutions.Persistence
 
 			try
 			{
+#if JSON_SUPPORT
 				valuesListJson = JsonConvert.SerializeObject(newSerializedValuesList);
+#endif
 			}
 			catch (Exception e)
 			{
@@ -313,7 +319,9 @@ namespace HereticalSolutions.Persistence
 
 				try
 				{
+#if JSON_SUPPORT
 					valuesListJson = JsonConvert.SerializeObject(newSerializedValuesList);
+#endif
 				}
 				catch (Exception e)
 				{

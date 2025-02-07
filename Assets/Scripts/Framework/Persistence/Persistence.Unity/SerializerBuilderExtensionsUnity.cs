@@ -2,7 +2,7 @@ using HereticalSolutions.Persistence.Factories;
 
 namespace HereticalSolutions.Persistence
 {
-	public static class PersistenceHelpersUnity
+	public static class SerializerBuilderExtensionsUnity
 	{
 		public static ISerializerBuilder FromApplicationDataPath(
 			this ISerializerBuilder builder,

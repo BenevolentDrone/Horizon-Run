@@ -1,6 +1,5 @@
-#define CSV_SUPPORT
-
 #if CSV_SUPPORT
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -563,4 +562,5 @@ namespace HereticalSolutions.Persistence
         }
     }
 }
+
 #endif

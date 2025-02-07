@@ -105,7 +105,8 @@ namespace HereticalSolutions.Logging.Factories
             ILoggerResolver loggerResolver)
         {
             var serializerBuilder = PersistenceFactory.BuildSerializerBuilder(
-                loggerResolver);
+                null);
+                //loggerResolver); //THIS ONE IS COMMENTED OUT ON PURPOSE. CHECK Serializer.cs FOR MORE INFO
 
             var serializer = serializerBuilder
                 .NewSerializer()

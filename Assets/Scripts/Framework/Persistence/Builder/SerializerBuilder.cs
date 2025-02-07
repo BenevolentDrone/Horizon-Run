@@ -1,7 +1,3 @@
-#define CSV_SUPPORT
-#define YAML_SUPPORT
-#define PROTOBUF_SUPPORT
-
 using System;
 
 using HereticalSolutions.Metadata.Factories;
@@ -131,54 +127,6 @@ namespace HereticalSolutions.Persistence
 
 			return this;
 		}
-
-		public ISerializerBuilder ToJSON()
-		{
-			serializerContext.FormatSerializer = PersistenceFactory.BuildJSONSerializer(
-				loggerResolver);
-
-			return this;
-		}
-
-		public ISerializerBuilder ToXML()
-		{
-			serializerContext.FormatSerializer = PersistenceFactory.BuildXMLSerializer(
-				loggerResolver);
-
-			return this;
-		}
-
-#if CSV_SUPPORT
-		public ISerializerBuilder ToCSV(
-			bool includeHeader = true)
-		{
-			serializerContext.FormatSerializer = PersistenceFactory.BuildCSVSerializer(
-				includeHeader,
-				loggerResolver);
-
-			return this;
-		}
-#endif
-
-#if YAML_SUPPORT
-		public ISerializerBuilder ToYAML()
-		{
-			serializerContext.FormatSerializer = PersistenceFactory.BuildYAMLSerializer(
-				loggerResolver);
-
-			return this;
-		}
-#endif
-
-#if PROTOBUF_SUPPORT
-		public ISerializerBuilder ToProtobuf()
-		{
-			serializerContext.FormatSerializer = PersistenceFactory.BuildProtobufSerializer(
-				loggerResolver);
-
-			return this;
-		}
-#endif
 
 		public ISerializerBuilder To<TFormatSerializer>(
 			object[] arguments)

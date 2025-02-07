@@ -1,8 +1,4 @@
-#define JSON_OPT_IN_SUPPORT
-#define CSV_SUPPORT
-#define PROTOBUF_SUPPORT
-
-#if JSON_OPT_IN_SUPPORT
+#if (JSON_SUPPORT && JSON_OPT_IN_SUPPORT)
 using Newtonsoft.Json;
 #endif
 
@@ -18,8 +14,9 @@ using System;
 
 namespace HereticalSolutions.Time
 {
+#region Serialization attributes        
     [Serializable]
-#if JSON_OPT_IN_SUPPORT
+#if (JSON_SUPPORT && JSON_OPT_IN_SUPPORT)
     [JsonObject(MemberSerialization.OptIn)]
 #endif
 #if CSV_SUPPORT
@@ -28,12 +25,11 @@ namespace HereticalSolutions.Time
 #if PROTOBUF_SUPPORT
     [ProtoContract]
 #endif
-    /// <summary>
-    /// Represents a persistent timer data transfer object (DTO)
-    /// </summary>
+#endregion
     public class PersistentTimerDTO
     {
-#if JSON_OPT_IN_SUPPORT
+#region Serialization attributes     
+#if (JSON_SUPPORT && JSON_OPT_IN_SUPPORT)
         [JsonProperty]
 #endif
 #if CSV_SUPPORT
@@ -42,12 +38,11 @@ namespace HereticalSolutions.Time
 #if PROTOBUF_SUPPORT
         [ProtoMember(1)]
 #endif
-        /// <summary>
-        /// Gets or sets the ID of the persistent timer
-        /// </summary>
+#endregion
         public string ID { get; set; }
 
-#if JSON_OPT_IN_SUPPORT
+#region Serialization attributes
+#if (JSON_SUPPORT && JSON_OPT_IN_SUPPORT)
         [JsonProperty]
 #endif
 #if CSV_SUPPORT
@@ -56,12 +51,11 @@ namespace HereticalSolutions.Time
 #if PROTOBUF_SUPPORT
         [ProtoMember(2)]
 #endif
-        /// <summary>
-        /// Gets or sets the state of the persistent timer
-        /// </summary>
+#endregion
         public ETimerState State { get; set; }
 
-#if JSON_OPT_IN_SUPPORT
+#region Serialization attributes
+#if (JSON_SUPPORT && JSON_OPT_IN_SUPPORT)
         [JsonProperty]
 #endif
 #if CSV_SUPPORT
@@ -70,12 +64,11 @@ namespace HereticalSolutions.Time
 #if PROTOBUF_SUPPORT
         [ProtoMember(3)]
 #endif
-        /// <summary>
-        /// Gets or sets the start time of the persistent timer
-        /// </summary>
+#endregion
         public DateTime StartTime { get; set; }
 
-#if JSON_OPT_IN_SUPPORT
+#region Serialization attributes
+#if (JSON_SUPPORT && JSON_OPT_IN_SUPPORT)
         [JsonProperty]
 #endif
 #if CSV_SUPPORT
@@ -84,12 +77,11 @@ namespace HereticalSolutions.Time
 #if PROTOBUF_SUPPORT
         [ProtoMember(4)]
 #endif
-        /// <summary>
-        /// Gets or sets the estimated finish time of the persistent timer
-        /// </summary>
+#endregion
         public DateTime EstimatedFinishTime { get; set; }
 
-#if JSON_OPT_IN_SUPPORT
+#region Serialization attributes
+#if (JSON_SUPPORT && JSON_OPT_IN_SUPPORT)
         [JsonProperty]
 #endif
 #if CSV_SUPPORT
@@ -98,12 +90,11 @@ namespace HereticalSolutions.Time
 #if PROTOBUF_SUPPORT
         [ProtoMember(5)]
 #endif
-        /// <summary>
-        /// Gets or sets the saved progress of the persistent timer
-        /// </summary>
+#endregion
         public TimeSpan SavedProgress { get; set; }
 
-#if JSON_OPT_IN_SUPPORT
+#region Serialization attributes
+#if (JSON_SUPPORT && JSON_OPT_IN_SUPPORT)
         [JsonProperty]
 #endif
 #if CSV_SUPPORT
@@ -112,12 +103,11 @@ namespace HereticalSolutions.Time
 #if PROTOBUF_SUPPORT
         [ProtoMember(6)]
 #endif
-        /// <summary>
-        /// Gets or sets a value indicating whether the persistent timer should accumulate elapsed time or not
-        /// </summary>
+#endregion
         public bool Accumulate { get; set; }
 
-#if JSON_OPT_IN_SUPPORT
+#region Serialization attributes
+#if (JSON_SUPPORT && JSON_OPT_IN_SUPPORT)
         [JsonProperty]
 #endif
 #if CSV_SUPPORT
@@ -126,12 +116,11 @@ namespace HereticalSolutions.Time
 #if PROTOBUF_SUPPORT
         [ProtoMember(7)]
 #endif
-        /// <summary>
-        /// Gets or sets a value indicating whether the persistent timer should repeat after reaching the finish time or not
-        /// </summary>
+#endregion
         public bool Repeat { get; set; }
 
-#if JSON_OPT_IN_SUPPORT
+#region Serialization attributes
+#if (JSON_SUPPORT && JSON_OPT_IN_SUPPORT)
         [JsonProperty]
 #endif
 #if CSV_SUPPORT
@@ -140,9 +129,11 @@ namespace HereticalSolutions.Time
 #if PROTOBUF_SUPPORT
         [ProtoMember(8)]
 #endif
+#endregion
         public bool FlushTimeElapsedOnRepeat { get; set; }
 
-#if JSON_OPT_IN_SUPPORT
+#region Serialization attributes
+#if (JSON_SUPPORT && JSON_OPT_IN_SUPPORT)
         [JsonProperty]
 #endif
 #if CSV_SUPPORT
@@ -151,9 +142,11 @@ namespace HereticalSolutions.Time
 #if PROTOBUF_SUPPORT
         [ProtoMember(9)]
 #endif
+#endregion
         public bool FireRepeatCallbackOnFinish { get; set; }
 
-#if JSON_OPT_IN_SUPPORT
+#region Serialization attributes
+#if (JSON_SUPPORT && JSON_OPT_IN_SUPPORT)
         [JsonProperty]
 #endif
 #if CSV_SUPPORT
@@ -162,12 +155,11 @@ namespace HereticalSolutions.Time
 #if PROTOBUF_SUPPORT
         [ProtoMember(10)]
 #endif
-        /// <summary>
-        /// Gets or sets the current duration of the persistent timer
-        /// </summary>
+#endregion
         public TimeSpan CurrentDurationSpan { get; set; }
 
-#if JSON_OPT_IN_SUPPORT
+#region Serialization attributes
+#if (JSON_SUPPORT && JSON_OPT_IN_SUPPORT)
         [JsonProperty]
 #endif
 #if CSV_SUPPORT
@@ -176,9 +168,7 @@ namespace HereticalSolutions.Time
 #if PROTOBUF_SUPPORT
         [ProtoMember(11)]
 #endif
-        /// <summary>
-        /// Gets or sets the default duration of the persistent timer
-        /// </summary>
+#endregion
         public TimeSpan DefaultDurationSpan { get; set; }
     }
 }

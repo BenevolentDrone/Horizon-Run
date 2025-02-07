@@ -21,12 +21,25 @@ namespace HereticalSolutions
 
             foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
-                foreach (Type type in assembly.GetTypes())
+                //ReflectionTypeLoadException: Exception of type 'System.Reflection.ReflectionTypeLoadException' was thrown.
+                try
                 {
-                    if (type.GetCustomAttribute<TAttribute>(false) != null)
+                    foreach (Type type in assembly.GetTypes())
                     {
-                        resultList.Add(type);
+                        if (type.GetCustomAttribute<TAttribute>(false) != null)
+                        {
+                            resultList.Add(type);
+                        }
                     }
+                }
+                catch (ReflectionTypeLoadException e)
+                {
+                    foreach (Exception ex in e.LoaderExceptions)
+                    {
+                        Console.WriteLine(ex.Message);
+                    }
+
+                    continue;
                 }
             }
 

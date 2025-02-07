@@ -1,7 +1,3 @@
-#define CSV_SUPPORT
-#define YAML_SUPPORT
-#define PROTOBUF_SUPPORT
-
 namespace HereticalSolutions.Persistence
 {
 	public interface ISerializerBuilder
@@ -30,23 +26,6 @@ namespace HereticalSolutions.Persistence
 		ISerializerBuilder ToObject();
 
 		ISerializerBuilder ToBinary();
-
-		ISerializerBuilder ToJSON();
-
-		ISerializerBuilder ToXML();
-
-#if CSV_SUPPORT
-		ISerializerBuilder ToCSV(
-			bool includeHeader = true);
-#endif
-
-#if YAML_SUPPORT
-		ISerializerBuilder ToYAML();
-#endif
-
-#if PROTOBUF_SUPPORT
-		ISerializerBuilder ToProtobuf();
-#endif
 
 		ISerializerBuilder To<TFormatSerializer>(
 			object[] arguments)

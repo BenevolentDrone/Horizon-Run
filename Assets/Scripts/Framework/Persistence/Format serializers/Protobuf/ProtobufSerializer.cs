@@ -1,5 +1,3 @@
-#define PROTOBUF_SUPPORT
-
 #if PROTOBUF_SUPPORT
 using System;
 

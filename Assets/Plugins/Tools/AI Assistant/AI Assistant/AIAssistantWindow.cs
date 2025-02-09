@@ -246,7 +246,7 @@ namespace AIAssistant
                     {
                         if (forceTimeout && runInParallel)
                         {
-                            logger.LogError(
+                            logger?.LogError(
                                 GetType(),
                                 "CANNOT RUN IN PARALLEL WITH FORCE TIMEOUT");
 
@@ -260,7 +260,7 @@ namespace AIAssistant
 
                         if (string.IsNullOrEmpty(path))
                         {
-                            logger.LogError(
+                            logger?.LogError(
                                 GetType(),
                                 "OPERATION CANCELLED");
 
@@ -297,7 +297,7 @@ namespace AIAssistant
                     {
                         if (forceTimeout && runInParallel)
                         {
-                            logger.LogError(
+                            logger?.LogError(
                                 GetType(),
                                 "CANNOT RUN IN PARALLEL WITH FORCE TIMEOUT");
 
@@ -311,7 +311,7 @@ namespace AIAssistant
 
                         if (string.IsNullOrEmpty(path))
                         {
-                            logger.LogError(
+                            logger?.LogError(
                                 GetType(),
                                 "OPERATION CANCELLED");
 
@@ -361,7 +361,7 @@ namespace AIAssistant
         {
             #region Initialize
             
-            logger.Log(
+            logger?.Log(
                 GetType(),
                 $"INITIALIZING FINDING SOURCE FILES AT DIRECTORY {path}");
 
@@ -387,7 +387,7 @@ namespace AIAssistant
                 return;
             }
 
-            logger.Log(
+            logger?.Log(
                 GetType(),
                 $"LIST OF SCRIPTS TO PROCESS RETRIEVED. AMOUNT: {promptCommands.Count.ToString()}");
 
@@ -399,7 +399,7 @@ namespace AIAssistant
             
             writeCommands.Clear();
             
-            logger.Log(
+            logger?.Log(
                 GetType(),
                 "FINISHED");
 
@@ -420,7 +420,7 @@ namespace AIAssistant
         {
             #region Initialize
             
-            logger.Log(
+            logger?.Log(
                 GetType(),
                 $"INITIALIZING COVERING SOURCE FILES AT DIRECTORY {path} WITH XML COMMENTS");
 
@@ -450,7 +450,7 @@ namespace AIAssistant
                 return;
             }
 
-            logger.Log(
+            logger?.Log(
                 GetType(),
                 $"LIST OF SCRIPTS TO PROCESS RETRIEVED. AMOUNT: {promptCommands.Count.ToString()}");
 
@@ -478,7 +478,7 @@ namespace AIAssistant
 
             #region Process write commands
             
-            logger.Log(
+            logger?.Log(
                 GetType(),
                 $"INVOKING WRITER DELEGATES");
 
@@ -501,7 +501,7 @@ namespace AIAssistant
             
             writeCommands.Clear();
 
-            logger.Log(
+            logger?.Log(
                 GetType(),
                 "FINISHED");
 
@@ -530,7 +530,7 @@ namespace AIAssistant
             List<SourceFileContext> sourceFiles,
             CancellationToken cancellationToken)
         {
-            logger.Log(
+            logger?.Log(
                 GetType(),
                 $"PROCESSING FOLDER: {path}");
 
@@ -582,7 +582,7 @@ namespace AIAssistant
         {
             #region Initialize
             
-            logger.Log(
+            logger?.Log(
                 GetType(),
                 $"INITIALIZING REGENERATING XML COMMENTS FOR FILE AT DIRECTORY {sourceFileContext.FilePath}");
 
@@ -629,7 +629,7 @@ namespace AIAssistant
 
             #region Process write commands
             
-            logger.Log(
+            logger?.Log(
                 GetType(),
                 $"INVOKING WRITER DELEGATES");
 
@@ -652,7 +652,7 @@ namespace AIAssistant
             
             writeCommands.Clear();
 
-            logger.Log(
+            logger?.Log(
                 GetType(),
                 "FINISHED");
 
@@ -758,7 +758,7 @@ namespace AIAssistant
                     {
                         lastProcessedCount = promptCommandsProcessed;
 
-                        logger.Log(
+                        logger?.Log(
                             GetType(),
                             $"PROCESSED {promptCommandsProcessed} / {promptCommands.Count} PROMPT REQUESTS");
                     }
@@ -773,7 +773,7 @@ namespace AIAssistant
             PromptCommand promptCommand,
             CancellationToken cancellationToken)
         {
-            logger.Log(
+            logger?.Log(
                 GetType(),
                 "AWAITING FOR SEMAPHORE");
 
@@ -781,7 +781,7 @@ namespace AIAssistant
 
             try
             {
-                logger.Log(
+                logger?.Log(
                     GetType(),
                     "SEMAPHORE SPINNED, PROCESSING FILE");
 
@@ -791,7 +791,7 @@ namespace AIAssistant
             }
             finally
             {
-                logger.Log(
+                logger?.Log(
                     GetType(),
                     "FINISHED, RELEASING SEMAPHORE");
 
@@ -805,7 +805,7 @@ namespace AIAssistant
         {
             string filePath = promptCommand.Context.FilePath;
 
-            logger.Log(
+            logger?.Log(
                 GetType(),
                 $"PROMPTING SOURCE FILE: {filePath}");
 
@@ -906,7 +906,7 @@ namespace AIAssistant
                         TimeSpan waitDuration =
                             TimeSpan.FromSeconds(timeout - timeSinceLastRequest.TotalSeconds + FAILSAFE);
 
-                        logger.Log(
+                        logger?.Log(
                             GetType(),
                             $"FORCE TIMEOUT. LAST REQUEST TIME: {lastRequestTime.ToString()} TIMEOUT: {waitDuration.ToString()}");
 
@@ -923,7 +923,7 @@ namespace AIAssistant
                     }
                 }
 
-                logger.Log(
+                logger?.Log(
                     GetType(),
                     $"SENDING REQUEST");
 
@@ -947,7 +947,7 @@ namespace AIAssistant
                     return;
                 }
 
-                logger.Log(
+                logger?.Log(
                     GetType(),
                     "AWAITING RESPONSE");
 
@@ -975,7 +975,7 @@ namespace AIAssistant
                 // Response extraction
                 var json = responseText;
 
-                logger.Log(
+                logger?.Log(
                     GetType(),
                     $"RESPONSE RECEIVED:\n{json}");
 
@@ -983,7 +983,7 @@ namespace AIAssistant
 
                 if (responseData.Equals(default(OpenAI.Response)))
                 {
-                    logger.LogError(
+                    logger?.LogError(
                         GetType(),
                         "RESPONSE STRUCT IS EMPTY");
 
@@ -1042,7 +1042,7 @@ namespace AIAssistant
                                 "TOKEN LENGTH EXCEEDED"));
 
                         /*
-                        logger.LogError(
+                        logger?.LogError(
                             GetType(),
                             "TOKEN LENGTH EXCEEDED, REQUESTING TO RESEND PROMPT RESPONSE");
 

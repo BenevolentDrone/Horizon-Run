@@ -10,7 +10,7 @@ namespace HereticalSolutions.Persistence
 	[SerializationStrategy]
 	public class EditorPrefsStrategy
 		: ISerializationStrategy,
-		  IStrategyWithIODestination
+		  IHasIODestination
 	{
 		private static readonly Type[] allowedValueTypes = new Type[]
 		{
@@ -127,22 +127,22 @@ namespace HereticalSolutions.Persistence
 
 		#region IStrategyWithIODestination
 
-		public void EnsureIOTargetDestinationExists()
+		public void EnsureIODestinationExists()
 		{
 			//Do nothing
 		}
 
-		public bool IOTargetExists()
+		public bool IODestinationExists()
 		{
 			return EditorPrefs.HasKey(keyPrefs);
 		}
 
-		public void CreateIOTarget()
+		public void CreateIODestination()
 		{
 			//Do nothing
 		}
 
-		public void EraseIOTarget()
+		public void EraseIODestination()
 		{
 			EditorPrefs.DeleteKey(keyPrefs);
 		}

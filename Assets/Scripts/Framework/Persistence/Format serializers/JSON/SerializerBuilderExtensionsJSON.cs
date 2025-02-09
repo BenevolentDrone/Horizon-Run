@@ -1,6 +1,10 @@
 #if JSON_SUPPORT
 
+using System;
+
 using HereticalSolutions.Persistence.Factories;
+
+using HereticalSolutions.Logging;
 
 namespace HereticalSolutions.Persistence
 {
@@ -11,9 +15,28 @@ namespace HereticalSolutions.Persistence
 		{
 			var builderCasted = builder as ISerializerBuilderInternal;
 
-			builderCasted.SerializerContext.FormatSerializer =
-				JSONPersistenceFactory.BuildJSONSerializer(
-					builderCasted.LoggerResolver);
+			if (builderCasted.DeferredBuildFormatSerializerDelegate != null)
+			{
+				throw new Exception(
+					builderCasted.Logger.TryFormatException(
+						builderCasted.GetType(),
+						$"FORMAT SERIALIZER IS ALREADY PRESENT. PLEASE REMOVE IT BEFORE ADDING A NEW ONE"));
+			}
+
+			builderCasted.DeferredBuildFormatSerializerDelegate = () =>
+			{
+				if (builderCasted.SerializerContext.FormatSerializer != null)
+				{
+					throw new Exception(
+						builderCasted.Logger.TryFormatException(
+							builderCasted.GetType(),
+							$"FORNMAT SERIALIZER IS ALREADY PRESENT. PLEASE REMOVE IT BEFORE ADDING A NEW ONE"));
+				}
+
+				builderCasted.SerializerContext.FormatSerializer =
+					JSONPersistenceFactory.BuildJSONSerializer(
+						builderCasted.LoggerResolver);
+			};
 
 			return builder;
 		}

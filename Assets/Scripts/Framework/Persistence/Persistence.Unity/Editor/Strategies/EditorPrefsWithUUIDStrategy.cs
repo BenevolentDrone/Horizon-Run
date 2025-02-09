@@ -15,7 +15,7 @@ namespace HereticalSolutions.Persistence
 	[SerializationStrategy]
 	public class EditorPrefsWithUUIDStrategy<TUUID>
 		: ISerializationStrategy,
-		  IStrategyWithIODestination
+		  IHasIODestination
 	{
 		private static readonly Type[] allowedValueTypes = new Type[]
 		{
@@ -176,12 +176,12 @@ namespace HereticalSolutions.Persistence
 
 		#region IStrategyWithIODestination
 
-		public void EnsureIOTargetDestinationExists()
+		public void EnsureIODestinationExists()
 		{
 			//Do nothing
 		}
 
-		public bool IOTargetExists()
+		public bool IODestinationExists()
 		{
 			var serializedValuesList = GetSerializedValuesListFromEditorPrefs(
 				keyPrefsSerializedValuesList);
@@ -193,12 +193,12 @@ namespace HereticalSolutions.Persistence
 			return serializedValuesList.Contains(key) && EditorPrefs.HasKey(key);
 		}
 
-		public void CreateIOTarget()
+		public void CreateIODestination()
 		{
 			//Do nothing
 		}
 
-		public void EraseIOTarget()
+		public void EraseIODestination()
 		{
 			EraseAllSerializedValuesFromEditorPrefs(
 				keyPrefsSerializedValuesList);

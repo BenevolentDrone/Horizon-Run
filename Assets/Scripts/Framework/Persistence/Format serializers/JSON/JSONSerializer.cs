@@ -1,3 +1,5 @@
+#if JSON_SUPPORT
+
 using System;
 using System.Text;
 using System.Collections.Generic;
@@ -240,3 +242,5 @@ namespace HereticalSolutions.Persistence
         #endregion
     }
 }
+
+#endif

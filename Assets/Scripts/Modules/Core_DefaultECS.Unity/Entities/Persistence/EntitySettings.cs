@@ -37,7 +37,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
 					.NewSerializer()
 					.ToJSON()
 					.AsString()
-					.Build();
+					.BuildSerializer();
 			}
 
 			var stringStrategy = serializer.Context.SerializationStrategy as StringStrategy;

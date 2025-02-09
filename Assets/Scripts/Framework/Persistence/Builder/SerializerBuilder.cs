@@ -1,6 +1,7 @@
 using System;
 
 using HereticalSolutions.Metadata.Factories;
+
 using HereticalSolutions.Persistence.Factories;
 
 using HereticalSolutions.Logging;
@@ -15,7 +16,15 @@ namespace HereticalSolutions.Persistence
 
 		private readonly ILogger logger;
 
+
 		private ISerializerContext serializerContext;
+
+
+		private Action deferredBuildFormatSerializerDelegate;
+
+		private Action deferredBuildDataConverterDelegate;
+
+		private Action deferredBuildSerializationStrategyDelegate;
 
 		public SerializerBuilder(
 			ILoggerResolver loggerResolver,
@@ -25,7 +34,15 @@ namespace HereticalSolutions.Persistence
 
 			this.logger = logger;
 
+
 			serializerContext = null;
+
+
+			deferredBuildFormatSerializerDelegate = null;
+
+			deferredBuildDataConverterDelegate = null;
+
+			deferredBuildSerializationStrategyDelegate = null;
 		}
 
 		#region ISerializerBuilderInternal
@@ -36,12 +53,33 @@ namespace HereticalSolutions.Persistence
 			set => serializerContext = value;
 		}
 
+		public Action DeferredBuildFormatSerializerDelegate
+		{
+			get => deferredBuildFormatSerializerDelegate;
+			set => deferredBuildFormatSerializerDelegate = value;
+		}
+
+		public Action DeferredBuildDataConverterDelegate
+		{
+			get => deferredBuildDataConverterDelegate;
+			set => deferredBuildDataConverterDelegate = value;
+		}
+
+		public Action DeferredBuildSerializationStrategyDelegate
+		{
+			get => deferredBuildSerializationStrategyDelegate;
+			set => deferredBuildSerializationStrategyDelegate = value;
+		}
+
 		public ILoggerResolver LoggerResolver => loggerResolver;
+
+		public ILogger Logger => logger;
 
 		public void EnsureArgumentsExist()
 		{
 			if (serializerContext.Arguments == null)
-				serializerContext.Arguments = MetadataFactory.BuildStronglyTypedMetadata();
+				serializerContext.Arguments =
+					MetadataFactory.BuildStronglyTypedMetadata();
 		}
 
 		#endregion
@@ -55,6 +93,14 @@ namespace HereticalSolutions.Persistence
 			return this;
 		}
 
+		public ISerializerBuilder RecycleSerializer(
+			ISerializer serializer)
+		{
+			serializerContext = serializer.Context as ISerializerContext;
+
+			return this;
+		}
+
 		#region Settings
 
 		public ISerializerBuilder FromAbsolutePath(
@@ -62,9 +108,15 @@ namespace HereticalSolutions.Persistence
 		{
 			EnsureArgumentsExist();
 
-			serializerContext.Arguments.TryAdd<IPathArgument>(
+			if (!serializerContext.Arguments.TryAdd<IPathArgument>(
 				PersistenceFactory.BuildPathArgument(
-					filePathSettings.FullPath));
+					filePathSettings.FullPath)))
+			{
+				throw new Exception(
+					logger.TryFormatException(
+						GetType(),
+						$"PATH ARGUMENT IS ALREADY PRESENT: {serializerContext.Arguments.Get<IPathArgument>().Path}. PLEASE REMOVE IT BEFORE ADDING A NEW ONE"));
+			}
 
 			return this;
 		}
@@ -74,9 +126,15 @@ namespace HereticalSolutions.Persistence
 		{
 			EnsureArgumentsExist();
 
-			serializerContext.Arguments.TryAdd<IPathArgument>(
+			if (!serializerContext.Arguments.TryAdd<IPathArgument>(
 				PersistenceFactory.BuildPathArgument(
-					filePathSettings.FullPath));
+					filePathSettings.FullPath)))
+			{
+				throw new Exception(
+					logger.TryFormatException(
+						GetType(),
+						$"PATH ARGUMENT IS ALREADY PRESENT: {serializerContext.Arguments.Get<IPathArgument>().Path}. PLEASE REMOVE IT BEFORE ADDING A NEW ONE"));
+			}
 
 			return this;
 		}
@@ -86,9 +144,15 @@ namespace HereticalSolutions.Persistence
 		{
 			EnsureArgumentsExist();
 
-			serializerContext.Arguments.TryAdd<IPathArgument>(
+			if (!serializerContext.Arguments.TryAdd<IPathArgument>(
 				PersistenceFactory.BuildPathArgument(
-					filePathSettings.FullPath));
+					filePathSettings.FullPath)))
+			{
+				throw new Exception(
+					logger.TryFormatException(
+						GetType(),
+						$"PATH ARGUMENT IS ALREADY PRESENT: {serializerContext.Arguments.Get<IPathArgument>().Path}. PLEASE REMOVE IT BEFORE ADDING A NEW ONE"));
+			}
 
 			return this;
 		}
@@ -101,9 +165,24 @@ namespace HereticalSolutions.Persistence
 
 			var pathSettingsCasted = pathSettings as IPathSettings;
 
-			serializerContext.Arguments.TryAdd<IPathArgument>(
+			if (!serializerContext.Arguments.TryAdd<IPathArgument>(
 				PersistenceFactory.BuildPathArgument(
-					pathSettingsCasted.FullPath));
+					pathSettingsCasted.FullPath)))
+			{
+				throw new Exception(
+					logger.TryFormatException(
+						GetType(),
+						$"PATH ARGUMENT IS ALREADY PRESENT: {serializerContext.Arguments.Get<IPathArgument>().Path}. PLEASE REMOVE IT BEFORE ADDING A NEW ONE"));
+			}
+
+			return this;
+		}
+
+		public ISerializerBuilder ErasePath()
+		{
+			EnsureArgumentsExist();
+
+			serializerContext.Arguments.TryRemove<IPathArgument>();
 
 			return this;
 		}
@@ -114,16 +193,56 @@ namespace HereticalSolutions.Persistence
 
 		public ISerializerBuilder ToObject()
 		{
-			serializerContext.FormatSerializer = PersistenceFactory.BuildObjectSerializer(
-				loggerResolver);
+			if (deferredBuildFormatSerializerDelegate != null)
+			{
+				throw new Exception(
+					logger.TryFormatException(
+						GetType(),
+						$"FORMAT SERIALIZER IS ALREADY PRESENT. PLEASE REMOVE IT BEFORE ADDING A NEW ONE"));
+			}
+
+			deferredBuildFormatSerializerDelegate = () =>
+			{
+				if (serializerContext.FormatSerializer != null)
+				{
+					throw new Exception(
+						logger.TryFormatException(
+							GetType(),
+							$"FORNMAT SERIALIZER IS ALREADY PRESENT. PLEASE REMOVE IT BEFORE ADDING A NEW ONE"));
+				}
+
+				serializerContext.FormatSerializer =
+					PersistenceFactory.BuildObjectSerializer(
+						loggerResolver);
+			};
 
 			return this;
 		}
 
 		public ISerializerBuilder ToBinary()
 		{
-			serializerContext.FormatSerializer = PersistenceFactory.BuildBinaryFormatterSerializer(
-				loggerResolver);
+			if (deferredBuildFormatSerializerDelegate != null)
+			{
+				throw new Exception(
+					logger.TryFormatException(
+						GetType(),
+						$"FORMAT SERIALIZER IS ALREADY PRESENT. PLEASE REMOVE IT BEFORE ADDING A NEW ONE"));
+			}
+
+			deferredBuildFormatSerializerDelegate = () =>
+			{
+				if (serializerContext.FormatSerializer != null)
+				{
+					throw new Exception(
+						logger.TryFormatException(
+							GetType(),
+							$"FORNMAT SERIALIZER IS ALREADY PRESENT. PLEASE REMOVE IT BEFORE ADDING A NEW ONE"));
+				}
+
+				serializerContext.FormatSerializer =
+					PersistenceFactory.BuildBinaryFormatterSerializer(
+						loggerResolver);
+			};
 
 			return this;
 		}
@@ -132,9 +251,99 @@ namespace HereticalSolutions.Persistence
 			object[] arguments)
 			where TFormatSerializer : IFormatSerializer
 		{
-			serializerContext.FormatSerializer = PersistenceFactory.BuildFormatSerializer<TFormatSerializer>(
-				loggerResolver,
-				arguments);
+			if (deferredBuildFormatSerializerDelegate != null)
+			{
+				throw new Exception(
+					logger.TryFormatException(
+						GetType(),
+						$"FORMAT SERIALIZER IS ALREADY PRESENT. PLEASE REMOVE IT BEFORE ADDING A NEW ONE"));
+			}
+
+			deferredBuildFormatSerializerDelegate = () =>
+			{
+				if (serializerContext.FormatSerializer != null)
+				{
+					throw new Exception(
+						logger.TryFormatException(
+							GetType(),
+							$"FORNMAT SERIALIZER IS ALREADY PRESENT. PLEASE REMOVE IT BEFORE ADDING A NEW ONE"));
+				}
+
+				serializerContext.FormatSerializer =
+					PersistenceFactory.BuildFormatSerializer<TFormatSerializer>(
+						loggerResolver,
+						arguments);
+			};
+
+			return this;
+		}
+
+		public ISerializerBuilder EraseFormatSerializer()
+		{
+			serializerContext.FormatSerializer = null;
+
+			return this;
+		}
+
+		#endregion
+
+		#region Data converters
+
+		public ISerializerBuilder WithLZ4Compression()
+		{
+			throw new NotImplementedException();
+		}
+
+		public ISerializerBuilder WithByteArrayFallback()
+		{
+			deferredBuildDataConverterDelegate += () =>
+			{
+				if (serializerContext.DataConverter == null)
+				{
+					throw new Exception(
+						logger.TryFormatException(
+							GetType(),
+							$"DATA CONVERTER IS NULL"));
+				}
+
+				serializerContext.DataConverter =
+					PersistenceFactory.BuildByteArrayFallbackConverter(
+						serializerContext.DataConverter,
+						null,
+						null,
+						loggerResolver);
+			};
+
+			return this;
+		}
+
+		public ISerializerBuilder WithDataConverter<TDataConverter>(
+			object[] arguments)
+			where TDataConverter : IDataConverter
+		{
+			deferredBuildDataConverterDelegate += () =>
+			{
+				if (serializerContext.DataConverter == null)
+				{
+					throw new Exception(
+						logger.TryFormatException(
+							GetType(),
+							$"DATA CONVERTER IS NULL"));
+				}
+
+				serializerContext.DataConverter =
+					PersistenceFactory.BuildDataConverter<TDataConverter>(
+						serializerContext.DataConverter,
+						loggerResolver,
+						arguments);
+			};
+
+			return this;
+		}
+
+		public ISerializerBuilder EraseDataConverters()
+		{
+			serializerContext.DataConverter = null;
 
 			return this;
 		}
@@ -143,48 +352,108 @@ namespace HereticalSolutions.Persistence
 
 		#region Serialization strategies
 
-		public ISerializerBuilder AsString()
+		public ISerializerBuilder AsString(
+			Func<string> valueGetter,
+			Action<string> valueSetter)
 		{
-			serializerContext.SerializationStrategy = PersistenceFactory.BuildStringStrategy(
-				loggerResolver);
+			if (deferredBuildSerializationStrategyDelegate != null)
+			{
+				throw new Exception(
+					logger.TryFormatException(
+						GetType(),
+						$"SERIALIZATION STRATEGY IS ALREADY PRESENT. PLEASE REMOVE IT BEFORE ADDING A NEW ONE"));
+			}
+
+			deferredBuildSerializationStrategyDelegate = () =>
+			{
+				if (serializerContext.SerializationStrategy != null)
+				{
+					throw new Exception(
+						logger.TryFormatException(
+							GetType(),
+							$"SERIALIZATION STRATEGY IS ALREADY PRESENT. PLEASE REMOVE IT BEFORE ADDING A NEW ONE"));
+				}
+
+				serializerContext.SerializationStrategy =
+					PersistenceFactory.BuildStringStrategy(
+						valueGetter,
+						valueSetter,
+						loggerResolver);
+			};
 
 			return this;
 		}
 
 		public ISerializerBuilder AsTextFile()
 		{
-			EnsureArgumentsExist();
-
-			if (!serializerContext.Arguments.Has<IPathArgument>())
+			if (deferredBuildSerializationStrategyDelegate != null)
 			{
 				throw new Exception(
 					logger.TryFormatException(
 						GetType(),
-						"PATH ARGUMENT MISSING. IF IT IS CHAINED LATER, PLEASE MOVE IT UP THE CHAIN BEFORE THE 'AS' CALL"));
+						$"SERIALIZATION STRATEGY IS ALREADY PRESENT. PLEASE REMOVE IT BEFORE ADDING A NEW ONE"));
 			}
 
-			serializerContext.SerializationStrategy = PersistenceFactory.BuildTextFileStrategy(
-				serializerContext.Arguments.Get<IPathArgument>().Path,
-				loggerResolver);
+			deferredBuildSerializationStrategyDelegate = () =>
+			{
+				if (serializerContext.SerializationStrategy != null)
+				{
+					throw new Exception(
+						logger.TryFormatException(
+							GetType(),
+							$"SERIALIZATION STRATEGY IS ALREADY PRESENT. PLEASE REMOVE IT BEFORE ADDING A NEW ONE"));
+				}
+
+				if (!serializerContext.Arguments.Has<IPathArgument>())
+				{
+					throw new Exception(
+						logger.TryFormatException(
+							GetType(),
+							"PATH ARGUMENT MISSING"));
+				}
+	
+				serializerContext.SerializationStrategy =
+					PersistenceFactory.BuildTextFileStrategy(
+						serializerContext.Arguments.Get<IPathArgument>().Path,
+						loggerResolver);
+			};
 
 			return this;
 		}
 
 		public ISerializerBuilder AsBinaryFile()
 		{
-			EnsureArgumentsExist();
-
-			if (!serializerContext.Arguments.Has<IPathArgument>())
+			if (deferredBuildSerializationStrategyDelegate != null)
 			{
 				throw new Exception(
 					logger.TryFormatException(
 						GetType(),
-						"PATH ARGUMENT MISSING. IF IT IS CHAINED LATER, PLEASE MOVE IT UP THE CHAIN BEFORE THE 'AS' CALL"));
+						$"SERIALIZATION STRATEGY IS ALREADY PRESENT. PLEASE REMOVE IT BEFORE ADDING A NEW ONE"));
 			}
 
-			serializerContext.SerializationStrategy = PersistenceFactory.BuildBinaryFileStrategy(
-				serializerContext.Arguments.Get<IPathArgument>().Path,
-				loggerResolver);
+			deferredBuildSerializationStrategyDelegate = () =>
+			{
+				if (serializerContext.SerializationStrategy != null)
+				{
+					throw new Exception(
+						logger.TryFormatException(
+							GetType(),
+							$"SERIALIZATION STRATEGY IS ALREADY PRESENT. PLEASE REMOVE IT BEFORE ADDING A NEW ONE"));
+				}
+
+				if (!serializerContext.Arguments.Has<IPathArgument>())
+				{
+					throw new Exception(
+						logger.TryFormatException(
+							GetType(),
+							"PATH ARGUMENT MISSING"));
+				}
+	
+				serializerContext.SerializationStrategy =
+					PersistenceFactory.BuildBinaryFileStrategy(
+						serializerContext.Arguments.Get<IPathArgument>().Path,
+						loggerResolver);
+			};
 
 			return this;
 		}
@@ -192,20 +461,38 @@ namespace HereticalSolutions.Persistence
 		public ISerializerBuilder AsTextStream(
 			bool flushAutomatically = true)
 		{
-			EnsureArgumentsExist();
-
-			if (!serializerContext.Arguments.Has<IPathArgument>())
+			if (deferredBuildSerializationStrategyDelegate != null)
 			{
 				throw new Exception(
 					logger.TryFormatException(
 						GetType(),
-						"PATH ARGUMENT MISSING. IF IT IS CHAINED LATER, PLEASE MOVE IT UP THE CHAIN BEFORE THE 'AS' CALL"));
+						$"SERIALIZATION STRATEGY IS ALREADY PRESENT. PLEASE REMOVE IT BEFORE ADDING A NEW ONE"));
 			}
 
-			serializerContext.SerializationStrategy = PersistenceFactory.BuildTextStreamStrategy(
-				serializerContext.Arguments.Get<IPathArgument>().Path,
-				loggerResolver,
-				flushAutomatically);
+			deferredBuildSerializationStrategyDelegate = () =>
+			{
+				if (serializerContext.SerializationStrategy != null)
+				{
+					throw new Exception(
+						logger.TryFormatException(
+							GetType(),
+							$"SERIALIZATION STRATEGY IS ALREADY PRESENT. PLEASE REMOVE IT BEFORE ADDING A NEW ONE"));
+				}
+
+				if (!serializerContext.Arguments.Has<IPathArgument>())
+				{
+					throw new Exception(
+						logger.TryFormatException(
+							GetType(),
+							"PATH ARGUMENT MISSING"));
+				}
+	
+				serializerContext.SerializationStrategy =
+					PersistenceFactory.BuildTextStreamStrategy(
+						serializerContext.Arguments.Get<IPathArgument>().Path,
+						loggerResolver,
+						flushAutomatically);
+			};
 
 			return this;
 		}
@@ -213,20 +500,38 @@ namespace HereticalSolutions.Persistence
 		public ISerializerBuilder AsFileStream(
 			bool flushAutomatically = true)
 		{
-			EnsureArgumentsExist();
-
-			if (!serializerContext.Arguments.Has<IPathArgument>())
+			if (deferredBuildSerializationStrategyDelegate != null)
 			{
 				throw new Exception(
 					logger.TryFormatException(
 						GetType(),
-						"PATH ARGUMENT MISSING. IF IT IS CHAINED LATER, PLEASE MOVE IT UP THE CHAIN BEFORE THE 'AS' CALL"));
+						$"SERIALIZATION STRATEGY IS ALREADY PRESENT. PLEASE REMOVE IT BEFORE ADDING A NEW ONE"));
 			}
 
-			serializerContext.SerializationStrategy = PersistenceFactory.BuildFileStreamStrategy(
-				serializerContext.Arguments.Get<IPathArgument>().Path,
-				loggerResolver,
-				flushAutomatically);
+			deferredBuildSerializationStrategyDelegate = () =>
+			{
+				if (serializerContext.SerializationStrategy != null)
+				{
+					throw new Exception(
+						logger.TryFormatException(
+							GetType(),
+							$"SERIALIZATION STRATEGY IS ALREADY PRESENT. PLEASE REMOVE IT BEFORE ADDING A NEW ONE"));
+				}
+
+				if (!serializerContext.Arguments.Has<IPathArgument>())
+				{
+					throw new Exception(
+						logger.TryFormatException(
+							GetType(),
+							"PATH ARGUMENT MISSING"));
+				}
+	
+				serializerContext.SerializationStrategy =
+					PersistenceFactory.BuildFileStreamStrategy(
+						serializerContext.Arguments.Get<IPathArgument>().Path,
+						loggerResolver,
+						flushAutomatically);
+			};
 
 			return this;
 		}
@@ -236,11 +541,31 @@ namespace HereticalSolutions.Persistence
 			int index = -1,
 			int count = -1)
 		{
-			serializerContext.SerializationStrategy = PersistenceFactory.BuildMemoryStreamStrategy(
-				loggerResolver,
-				buffer,
-				index,
-				count);
+			if (deferredBuildSerializationStrategyDelegate != null)
+			{
+				throw new Exception(
+					logger.TryFormatException(
+						GetType(),
+						$"SERIALIZATION STRATEGY IS ALREADY PRESENT. PLEASE REMOVE IT BEFORE ADDING A NEW ONE"));
+			}
+
+			deferredBuildSerializationStrategyDelegate = () =>
+			{
+				if (serializerContext.SerializationStrategy != null)
+				{
+					throw new Exception(
+						logger.TryFormatException(
+							GetType(),
+							$"SERIALIZATION STRATEGY IS ALREADY PRESENT. PLEASE REMOVE IT BEFORE ADDING A NEW ONE"));
+				}
+
+				serializerContext.SerializationStrategy =
+					PersistenceFactory.BuildMemoryStreamStrategy(
+						loggerResolver,
+						buffer,
+						index,
+						count);
+			};
 
 			return this;
 		}
@@ -248,20 +573,38 @@ namespace HereticalSolutions.Persistence
 		public ISerializerBuilder AsIsolatedStorageFileStream(
 			bool flushAutomatically = true)
 		{
-			EnsureArgumentsExist();
-
-			if (!serializerContext.Arguments.Has<IPathArgument>())
+			if (deferredBuildSerializationStrategyDelegate != null)
 			{
 				throw new Exception(
 					logger.TryFormatException(
 						GetType(),
-						"PATH ARGUMENT MISSING. IF IT IS CHAINED LATER, PLEASE MOVE IT UP THE CHAIN BEFORE THE 'AS' CALL"));
+						$"SERIALIZATION STRATEGY IS ALREADY PRESENT. PLEASE REMOVE IT BEFORE ADDING A NEW ONE"));
 			}
 
-			serializerContext.SerializationStrategy = PersistenceFactory.BuildIsolatedStorageStrategy(
-				serializerContext.Arguments.Get<IPathArgument>().Path,
-				loggerResolver,
-				flushAutomatically);
+			deferredBuildSerializationStrategyDelegate = () =>
+			{
+				if (serializerContext.SerializationStrategy != null)
+				{
+					throw new Exception(
+						logger.TryFormatException(
+							GetType(),
+							$"SERIALIZATION STRATEGY IS ALREADY PRESENT. PLEASE REMOVE IT BEFORE ADDING A NEW ONE"));
+				}
+
+				if (!serializerContext.Arguments.Has<IPathArgument>())
+				{
+					throw new Exception(
+						logger.TryFormatException(
+							GetType(),
+							"PATH ARGUMENT MISSING"));
+				}
+	
+				serializerContext.SerializationStrategy =
+					PersistenceFactory.BuildIsolatedStorageStrategy(
+						serializerContext.Arguments.Get<IPathArgument>().Path,
+						loggerResolver,
+						flushAutomatically);
+			};
 
 			return this;
 		}
@@ -270,9 +613,36 @@ namespace HereticalSolutions.Persistence
 			object[] arguments)
 			where TSerializationStrategy : ISerializationStrategy
 		{
-			serializerContext.SerializationStrategy = PersistenceFactory.BuildSerializationStrategy<TSerializationStrategy>(
-				loggerResolver,
-				arguments);
+			if (deferredBuildSerializationStrategyDelegate != null)
+			{
+				throw new Exception(
+					logger.TryFormatException(
+						GetType(),
+						$"SERIALIZATION STRATEGY IS ALREADY PRESENT. PLEASE REMOVE IT BEFORE ADDING A NEW ONE"));
+			}
+
+			deferredBuildSerializationStrategyDelegate = () =>
+			{
+				if (serializerContext.SerializationStrategy != null)
+				{
+					throw new Exception(
+						logger.TryFormatException(
+							GetType(),
+							$"SERIALIZATION STRATEGY IS ALREADY PRESENT. PLEASE REMOVE IT BEFORE ADDING A NEW ONE"));
+				}
+
+				serializerContext.SerializationStrategy =
+					PersistenceFactory.BuildSerializationStrategy<TSerializationStrategy>(
+						loggerResolver,
+						arguments);
+			};
+
+			return this;
+		}
+
+		public ISerializerBuilder EraseStrategy()
+		{
+			serializerContext.SerializationStrategy = null;
 
 			return this;
 		}
@@ -286,9 +656,15 @@ namespace HereticalSolutions.Persistence
 		{
 			EnsureArgumentsExist();
 
-			serializerContext.Arguments.TryAdd<IPathArgument>(
+			if (!serializerContext.Arguments.TryAdd<IPathArgument>(
 				PersistenceFactory.BuildPathArgument(
-					path));
+					path)))
+			{
+				throw new Exception(
+					logger.TryFormatException(
+						GetType(),
+						$"PATH ARGUMENT IS ALREADY PRESENT: {serializerContext.Arguments.Get<IPathArgument>().Path}. PLEASE REMOVE IT BEFORE ADDING A NEW ONE"));
+			}
 
 			return this;
 		}
@@ -297,8 +673,14 @@ namespace HereticalSolutions.Persistence
 		{
 			EnsureArgumentsExist();
 
-			serializerContext.Arguments.TryAdd<IAppendArgument>(
-				PersistenceFactory.BuildAppendArgument());
+			if (!serializerContext.Arguments.TryAdd<IAppendArgument>(
+				PersistenceFactory.BuildAppendArgument()))
+			{
+				throw new Exception(
+					logger.TryFormatException(
+						GetType(),
+						$"APPEND ARGUMENT IS ALREADY PRESENT. PLEASE REMOVE IT BEFORE ADDING A NEW ONE"));
+			}
 
 			return this;
 		}
@@ -307,8 +689,14 @@ namespace HereticalSolutions.Persistence
 		{
 			EnsureArgumentsExist();
 
-			serializerContext.Arguments.TryAdd<IReadAndWriteAccessArgument>(
-				PersistenceFactory.BuildReadAndWriteAccessArgument());
+			if (!serializerContext.Arguments.TryAdd<IReadAndWriteAccessArgument>(
+				PersistenceFactory.BuildReadAndWriteAccessArgument()))
+			{
+				throw new Exception(
+					logger.TryFormatException(
+						GetType(),
+						$"READ WRITE ACCESS ARGUMENT IS ALREADY PRESENT. PLEASE REMOVE IT BEFORE ADDING A NEW ONE"));
+			}
 
 			return this;
 		}
@@ -318,8 +706,15 @@ namespace HereticalSolutions.Persistence
 		{
 			EnsureArgumentsExist();
 
-			serializerContext.Arguments.TryAdd<IBlockSerializationArgument>(
-				PersistenceFactory.BuildBlockSerializationArgument());
+			if (!serializerContext.Arguments.TryAdd<IBlockSerializationArgument>(
+				PersistenceFactory.BuildBlockSerializationArgument(
+					blockSize)))
+			{
+				throw new Exception(
+					logger.TryFormatException(
+						GetType(),
+						$"BLOCK SERIALIZATION IS ALREADY PRESENT. PLEASE REMOVE IT BEFORE ADDING A NEW ONE"));
+			}
 
 			return this;
 		}
@@ -330,10 +725,34 @@ namespace HereticalSolutions.Persistence
 		{
 			EnsureArgumentsExist();
 
-			serializerContext.Arguments.TryAdd<TInterface>(
+			if (!serializerContext.Arguments.TryAdd<TInterface>(
 				PersistenceFactory.BuildSerializationArgument<TArgument>(
 					loggerResolver,
-					arguments));
+					arguments)))
+			{
+				throw new Exception(
+					logger.TryFormatException(
+						GetType(),
+						$"{nameof(TInterface)} ARGUMENT IS ALREADY PRESENT. PLEASE REMOVE IT BEFORE ADDING A NEW ONE"));
+			}
+
+			return this;
+		}
+
+		public ISerializerBuilder Without<TInterface>()
+		{
+			EnsureArgumentsExist();
+
+			serializerContext.Arguments.TryRemove<TInterface>();
+
+			return this;
+		}
+
+		public ISerializerBuilder EraseArguments()
+		{
+			EnsureArgumentsExist();
+
+			serializerContext.Arguments.Clear();
 
 			return this;
 		}
@@ -345,14 +764,70 @@ namespace HereticalSolutions.Persistence
 		public ISerializerBuilder WithVisitor(
 			IVisitor visitor)
 		{
+			if (serializerContext.Visitor != null)
+			{
+				throw new Exception(
+					logger.TryFormatException(
+						GetType(),
+						$"VISITOR IS ALREADY PRESENT. PLEASE REMOVE IT BEFORE ADDING A NEW ONE"));
+			}
+
 			serializerContext.Visitor = visitor;
+
+			return this;
+		}
+
+		public ISerializerBuilder EraseVisitor()
+		{
+			serializerContext.Visitor = null;
 
 			return this;
 		}
 
 		#endregion
 
-		public ISerializer Build()
+		#region Build
+
+		public ISerializer BuildSerializer()
+		{
+			AssembleContext();
+			
+			return new Serializer(
+				serializerContext,
+				loggerResolver?.GetLogger<Serializer>());
+		}
+
+		public IBlockSerializer BuildBlockSerializer()
+		{
+			AssembleContext();
+
+			throw new NotImplementedException();
+		}
+
+		public IAsyncSerializer BuildAsyncSerializer()
+		{
+			AssembleContext();
+
+			throw new NotImplementedException();
+		}
+
+		public IAsyncBlockSerializer BuildAsyncBlockSerializer()
+		{
+			AssembleContext();
+
+			throw new NotImplementedException();
+		}
+
+		#endregion
+
+		public void Refurbish()
+		{
+			AssembleContext();
+		}
+
+		#endregion
+
+		private void AssembleContext()
 		{
 			if (serializerContext == null)
 			{
@@ -364,10 +839,54 @@ namespace HereticalSolutions.Persistence
 
 			EnsureArgumentsExist();
 
+			if (deferredBuildFormatSerializerDelegate != null)
+			{
+				deferredBuildFormatSerializerDelegate();
+
+				deferredBuildFormatSerializerDelegate = null;
+			}
+
 			if (serializerContext.FormatSerializer == null)
 			{
-				serializerContext.FormatSerializer = PersistenceFactory.BuildObjectSerializer(
-					loggerResolver);
+				serializerContext.FormatSerializer =
+					PersistenceFactory.BuildObjectSerializer(
+						loggerResolver);
+			}
+
+			if (deferredBuildDataConverterDelegate != null)
+			{
+				serializerContext.DataConverter =
+					PersistenceFactory.BuildInvokeStrategyConverter(
+						loggerResolver);
+
+				deferredBuildDataConverterDelegate();
+
+				deferredBuildDataConverterDelegate = null;
+
+				if (serializerContext.DataConverter.GetType()
+					!= typeof(ByteArrayFallbackConverter))
+				{
+					serializerContext.DataConverter =
+						PersistenceFactory.BuildByteArrayFallbackConverter(
+							serializerContext.DataConverter,
+							null,
+							null,
+							loggerResolver);
+				}
+			}
+
+			if (serializerContext.DataConverter == null)
+			{
+				serializerContext.DataConverter =
+					PersistenceFactory.BuildInvokeStrategyConverter(
+						loggerResolver);
+
+				serializerContext.DataConverter =
+					PersistenceFactory.BuildByteArrayFallbackConverter(
+						serializerContext.DataConverter,
+						null,
+						null,
+						loggerResolver);
 			}
 
 			if (serializerContext.SerializationStrategy == null)
@@ -383,12 +902,6 @@ namespace HereticalSolutions.Persistence
 				serializerContext.Visitor = PersistenceFactory.BuildDispatchVisitor(
 					loggerResolver);
 			}
-
-			return new Serializer(
-				serializerContext,
-				loggerResolver?.GetLogger<Serializer>());
 		}
-
-		#endregion
 	}
 }

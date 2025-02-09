@@ -143,7 +143,7 @@ namespace HereticalSolutions.Tools.AnimationRetargettingToolbox
 						KEY_PREFS_SAVED_EDITOR_STATES,
 						KEY_PREFS_EDITOR_STATE_SAVE_PREFIX,
 						this.GetInstanceID())
-					.Build();
+					.BuildSerializer();
 			}
 		}
 

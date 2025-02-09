@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -223,12 +224,100 @@ namespace HereticalSolutions.Persistence.Factories
 
         #endregion
 
+        #region Data converters
+
+        public static InvokeStrategyConverter BuildInvokeStrategyConverter(
+            ILoggerResolver loggerResolver)
+        {
+            ILogger logger = loggerResolver?.GetLogger<InvokeStrategyConverter>();
+
+            return new InvokeStrategyConverter(
+                logger);
+        }
+
+        public static ByteArrayFallbackConverter BuildByteArrayFallbackConverter(
+            IDataConverter innerConverter,
+            TypeDelegatePair[] convertFromBytesDelegates,
+            TypeDelegatePair[] convertToBytesDelegates,
+            ILoggerResolver loggerResolver)
+        {
+            ILogger logger = loggerResolver?.GetLogger<ByteArrayFallbackConverter>();
+
+            IRepository<Type, Delegate> convertFromBytesDelegateRepository =
+                RepositoryFactory.BuildDictionaryRepository<Type, Delegate>();
+
+            IRepository< Type, Delegate > convertToBytesDelegateRepository =
+                RepositoryFactory.BuildDictionaryRepository<Type, Delegate>();
+
+            AddDefaultDelegates(
+                convertFromBytesDelegateRepository,
+                convertToBytesDelegateRepository);
+
+            if (convertFromBytesDelegates != null)
+                foreach (TypeDelegatePair pair in convertFromBytesDelegates)
+                {
+                    convertFromBytesDelegateRepository.Add(
+                        pair.Type,
+                        pair.Delegate);
+                }
+
+            if (convertToBytesDelegates != null)
+                foreach (TypeDelegatePair pair in convertToBytesDelegates)
+                {
+                    convertToBytesDelegateRepository.Add(
+                        pair.Type,
+                        pair.Delegate);
+                }
+
+            return new ByteArrayFallbackConverter(
+                convertFromBytesDelegateRepository,
+                convertToBytesDelegateRepository,
+                innerConverter,
+                logger);
+        }
+
+        public static TDataConverter BuildDataConverter<TDataConverter>(
+            IDataConverter innerConverter,
+            ILoggerResolver loggerResolver,
+            object[] arguments = null)
+            where TDataConverter : IDataConverter
+        {
+            if (Array.IndexOf(
+                formatSerializerTypes,
+                typeof(TDataConverter))
+                == -1) // to avoid using linq's Contains
+            {
+                throw new Exception(
+                    $"TYPE {nameof(TDataConverter)} IS NOT A VALID DATA CONVERTER TYPE");
+            }
+
+            arguments = TryAppendLogger(
+                typeof(TDataConverter),
+                arguments,
+                loggerResolver);
+
+            arguments = TryAppendDataConverter(
+                typeof(TDataConverter),
+                arguments,
+                innerConverter);
+
+            return (TDataConverter)Activator.CreateInstance(
+                typeof(TDataConverter),
+                 arguments);
+        }
+
+        #endregion
+
         #region Serialization strategies
 
         public static StringStrategy BuildStringStrategy(
+            Func<string> valueGetter,
+            Action<string> valueSetter,
             ILoggerResolver loggerResolver)
         {
             return new StringStrategy(
+                valueGetter,
+                valueSetter,
                 loggerResolver?.GetLogger<StringStrategy>());
         }
 
@@ -371,6 +460,55 @@ namespace HereticalSolutions.Persistence.Factories
                 loggerResolver.GetLogger(type));
 
             return argumentList.ToArray();
+        }
+
+        private static object[] TryAppendDataConverter(
+            Type type,
+            object[] arguments,
+            IDataConverter innerDataConverter)
+        {
+            if (innerDataConverter == null)
+            {
+                return arguments;
+            }
+
+            var constructor = type.GetConstructors()[0];
+
+            var parameters = constructor.GetParameters();
+
+            if (parameters.Length == 0)
+            {
+                return arguments;
+            }
+
+            bool canReceiveInnerConverter =
+                parameters[parameters.Length - 2].ParameterType.IsAssignableFrom(typeof( IDataConverter));
+
+            if (!canReceiveInnerConverter)
+            {
+                return arguments;
+            }
+
+            List<object> argumentList = new List<object>(arguments);
+
+            argumentList.Insert(
+                argumentList.Count - 1,
+                innerDataConverter);
+
+            return argumentList.ToArray();
+        }
+
+        private static void AddDefaultDelegates(
+            IRepository<Type, Delegate> convertFromBytesDelegateRepository,
+            IRepository<Type, Delegate> convertToBytesDelegateRepository)
+        {
+            convertFromBytesDelegateRepository.Add(
+                typeof(string),
+                (Func<byte[],string>)Encoding.UTF8.GetString);
+
+            convertToBytesDelegateRepository.Add(
+                typeof(string),
+                (Func<string,byte[]>)Encoding.UTF8.GetBytes);
         }
     }
 }

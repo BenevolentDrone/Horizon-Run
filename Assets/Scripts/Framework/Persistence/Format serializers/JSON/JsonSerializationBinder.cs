@@ -1,3 +1,5 @@
+#if JSON_SUPPORT
+
 using System;
 
 using Newtonsoft.Json.Serialization;
@@ -35,3 +37,5 @@ namespace HereticalSolutions.Persistence
 		}
 	}
 }
+
+#endif

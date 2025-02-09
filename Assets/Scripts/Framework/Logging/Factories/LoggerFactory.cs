@@ -115,7 +115,7 @@ namespace HereticalSolutions.Logging.Factories
                 .ToObject()
                 .AsTextStream()
                 .WithAppend()
-                .Build();
+                .BuildSerializer();
                 
             var result = new FileSink(
                 serializer);

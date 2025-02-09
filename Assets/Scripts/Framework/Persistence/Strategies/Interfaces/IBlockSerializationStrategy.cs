@@ -6,12 +6,12 @@ namespace HereticalSolutions.Persistence
 	{
 		#region Read
 
-		bool BlockRead<TValue>(
+		bool ReadBlock<TValue>(
 			int blockOffset,
 			int blockSize,
 			out TValue value);
 
-		bool BlockRead(
+		bool ReadBlock(
 			Type valueType,
 			int blockOffset,
 			int blockSize,
@@ -21,12 +21,12 @@ namespace HereticalSolutions.Persistence
 
 		#region Write
 
-		bool BlockWrite<TValue>(
+		bool WriteBlock<TValue>(
 			TValue value,
 			int blockOffset,
 			int blockSize);
 
-		bool BlockWrite(
+		bool WriteBlock(
 			Type valueType,
 			object value,
 			int blockOffset,

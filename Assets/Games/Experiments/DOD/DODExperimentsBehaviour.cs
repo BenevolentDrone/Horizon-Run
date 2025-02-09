@@ -303,35 +303,35 @@ public class DODExperimentsBehaviour : MonoBehaviour
         {
             case LogType.Log:
                     
-                logger.Log(
+                logger?.Log(
                     log);
                     
                 break;
                 
             case LogType.Warning:
                     
-                logger.LogWarning(
+                logger?.LogWarning(
                     log);
                     
                 break;
                 
             case LogType.Error:
                     
-                logger.LogError(
+                logger?.LogError(
                     log);
                     
                 break;
                 
             case LogType.Assert:
                     
-                logger.Log(
+                logger?.Log(
                     log);
                     
                 break;
                 
             case LogType.Exception:
                     
-                logger.LogError(
+                logger?.LogError(
                     log);
                     
                 break;
@@ -354,11 +354,11 @@ public class DODExperimentsBehaviour : MonoBehaviour
     {
         experimentPositionSize = Marshal.SizeOf(typeof(ExperimentPosition));
         
-        logger.Log($"ExperimentPosition SIZE: {experimentPositionSize}");
+        logger?.Log($"ExperimentPosition SIZE: {experimentPositionSize}");
         
         experimentVelocitySize = Marshal.SizeOf(typeof(ExperimentVelocity));
         
-        logger.Log($"ExperimentVelocity SIZE: {experimentVelocitySize}");
+        logger?.Log($"ExperimentVelocity SIZE: {experimentVelocitySize}");
         
         InitializePositions();
         
@@ -393,7 +393,7 @@ public class DODExperimentsBehaviour : MonoBehaviour
 
             if (useAsserts)
             {
-                logger.Log($"Initialized position {i} with value [{Positions[i].Position.x}; {Positions[i].Position.y}; {Positions[i].Position.z}]");
+                logger?.Log($"Initialized position {i} with value [{Positions[i].Position.x}; {Positions[i].Position.y}; {Positions[i].Position.z}]");
             }
         }
     }
@@ -414,7 +414,7 @@ public class DODExperimentsBehaviour : MonoBehaviour
             
             if (useAsserts)
             {
-                logger.Log($"Initialized velocity {i} with value [{Velocities[i].Velocity.x}; {Velocities[i].Velocity.y}; {Velocities[i].Velocity.z}]");
+                logger?.Log($"Initialized velocity {i} with value [{Velocities[i].Velocity.x}; {Velocities[i].Velocity.y}; {Velocities[i].Velocity.z}]");
             }
         }
     }
@@ -460,7 +460,7 @@ public class DODExperimentsBehaviour : MonoBehaviour
             
             if (useAsserts)
             {
-                logger.Log($"Initialized unsafe position {i} with value [{currentPosition.Position.x}; {currentPosition.Position.y}; {currentPosition.Position.z}]");
+                logger?.Log($"Initialized unsafe position {i} with value [{currentPosition.Position.x}; {currentPosition.Position.y}; {currentPosition.Position.z}]");
             }
         }
     }
@@ -505,7 +505,7 @@ public class DODExperimentsBehaviour : MonoBehaviour
             
             if (useAsserts)
             {
-                logger.Log($"Initialized unsafe velocity {i} with value [{currentVelocity.Velocity.x}; {currentVelocity.Velocity.y}; {currentVelocity.Velocity.z}]");
+                logger?.Log($"Initialized unsafe velocity {i} with value [{currentVelocity.Velocity.x}; {currentVelocity.Velocity.y}; {currentVelocity.Velocity.z}]");
             }
         }
     }
@@ -541,7 +541,7 @@ public class DODExperimentsBehaviour : MonoBehaviour
     {
         int componentsPerCacheLine = cacheLineSize / experimentPositionSize;
         
-        logger.Log($"COMPONENTS PER CACHE LINE: {componentsPerCacheLine}");
+        logger?.Log($"COMPONENTS PER CACHE LINE: {componentsPerCacheLine}");
         
         scrambledWithinCacheLineIndexes = new int[entityCount];
 
@@ -574,7 +574,7 @@ public class DODExperimentsBehaviour : MonoBehaviour
     {
         int componentsPerL1Cache = l1CacheSize / experimentPositionSize;
         
-        logger.Log($"COMPONENTS PER L1 CACHE: {componentsPerL1Cache}");
+        logger?.Log($"COMPONENTS PER L1 CACHE: {componentsPerL1Cache}");
         
         scrambledWithinL1CacheIndexes = new int[entityCount];
 
@@ -754,7 +754,7 @@ public class DODExperimentsBehaviour : MonoBehaviour
 
                 Positions[i].Position += Velocities[i].Velocity;
 
-                logger.Log(
+                logger?.Log(
                     $"{i}: [{previousPosition.x}; {previousPosition.y}; {previousPosition.z}] + [{Velocities[i].Velocity.x}; {Velocities[i].Velocity.y}; {Velocities[i].Velocity.z}] = [{Positions[i].Position.x}; {Positions[i].Position.y}; {Positions[i].Position.z}]");
             }
         }
@@ -781,7 +781,7 @@ public class DODExperimentsBehaviour : MonoBehaviour
 
                 Positions[index].Position += Velocities[index].Velocity;
 
-                logger.Log(
+                logger?.Log(
                     $"{index}: [{previousPosition.x}; {previousPosition.y}; {previousPosition.z}] + [{Velocities[index].Velocity.x}; {Velocities[index].Velocity.y}; {Velocities[index].Velocity.z}] = [{Positions[index].Position.x}; {Positions[index].Position.y}; {Positions[index].Position.z}]");
             }
         }
@@ -808,7 +808,7 @@ public class DODExperimentsBehaviour : MonoBehaviour
 
                 Positions[index].Position += Velocities[index].Velocity;
 
-                logger.Log(
+                logger?.Log(
                     $"{index}: [{previousPosition.x}; {previousPosition.y}; {previousPosition.z}] + [{Velocities[index].Velocity.x}; {Velocities[index].Velocity.y}; {Velocities[index].Velocity.z}] = [{Positions[index].Position.x}; {Positions[index].Position.y}; {Positions[index].Position.z}]");
             }
         }
@@ -835,7 +835,7 @@ public class DODExperimentsBehaviour : MonoBehaviour
 
                 Positions[index].Position += Velocities[index].Velocity;
 
-                logger.Log(
+                logger?.Log(
                     $"{index}: [{previousPosition.x}; {previousPosition.y}; {previousPosition.z}] + [{Velocities[index].Velocity.x}; {Velocities[index].Velocity.y}; {Velocities[index].Velocity.z}] = [{Positions[index].Position.x}; {Positions[index].Position.y}; {Positions[index].Position.z}]");
             }
         }
@@ -862,7 +862,7 @@ public class DODExperimentsBehaviour : MonoBehaviour
 
                 Positions[index].Position += Velocities[index].Velocity;
 
-                logger.Log(
+                logger?.Log(
                     $"{index}: [{previousPosition.x}; {previousPosition.y}; {previousPosition.z}] + [{Velocities[index].Velocity.x}; {Velocities[index].Velocity.y}; {Velocities[index].Velocity.z}] = [{Positions[index].Position.x}; {Positions[index].Position.y}; {Positions[index].Position.z}]");
             }
         }
@@ -911,7 +911,7 @@ public class DODExperimentsBehaviour : MonoBehaviour
 
                 currentPosition.Position += currentVelocity.Velocity;
 
-                logger.Log(
+                logger?.Log(
                     $"{i}: [{previousPosition.x}; {previousPosition.y}; {previousPosition.z}] + [{currentVelocity.Velocity.x}; {currentVelocity.Velocity.y}; {currentVelocity.Velocity.z}] = [{currentPosition.Position.x}; {currentPosition.Position.y}; {currentPosition.Position.z}]");
             }
         }
@@ -943,7 +943,7 @@ public class DODExperimentsBehaviour : MonoBehaviour
 
                 currentPosition->Position += currentVelocity->Velocity;
 
-                logger.Log(
+                logger?.Log(
                     $"{i}: [{previousPosition.x}; {previousPosition.y}; {previousPosition.z}] + [{currentVelocity->Velocity.x}; {currentVelocity->Velocity.y}; {currentVelocity->Velocity.z}] = [{currentPosition->Position.x}; {currentPosition->Position.y}; {currentPosition->Position.z}]");
 
                 currentPosition++;
@@ -986,7 +986,7 @@ public class DODExperimentsBehaviour : MonoBehaviour
 
                 currentPosition.Position += currentVelocity.Velocity;
 
-                logger.Log(
+                logger?.Log(
                     $"{index}: [{previousPosition.x}; {previousPosition.y}; {previousPosition.z}] + [{currentVelocity.Velocity.x}; {currentVelocity.Velocity.y}; {currentVelocity.Velocity.z}] = [{currentPosition.Position.x}; {currentPosition.Position.y}; {currentPosition.Position.z}]");
             }
         }
@@ -1025,7 +1025,7 @@ public class DODExperimentsBehaviour : MonoBehaviour
 
                 currentPosition.Position += currentVelocity.Velocity;
 
-                logger.Log(
+                logger?.Log(
                     $"{index}: [{previousPosition.x}; {previousPosition.y}; {previousPosition.z}] + [{currentVelocity.Velocity.x}; {currentVelocity.Velocity.y}; {currentVelocity.Velocity.z}] = [{currentPosition.Position.x}; {currentPosition.Position.y}; {currentPosition.Position.z}]");
             }
         }
@@ -1051,14 +1051,14 @@ public class DODExperimentsBehaviour : MonoBehaviour
 
         if (positionsHandle.IsAllocated)
         {
-            logger.Log("Freeing positions pointer");
+            logger?.Log("Freeing positions pointer");
 
             positionsHandle.Free();
         }
         
         if (velocitiesHandle.IsAllocated)
         {
-            logger.Log("Freeing velocities pointer");
+            logger?.Log("Freeing velocities pointer");
 
             velocitiesHandle.Free();
         }
@@ -1068,7 +1068,7 @@ public class DODExperimentsBehaviour : MonoBehaviour
             ref Unsafe.AsRef<byte>(
                 positionsPtr)))
         {
-            logger.Log("Freeing positions pointer");
+            logger?.Log("Freeing positions pointer");
             
             Marshal.FreeHGlobal(new IntPtr(positionsPtr));
         }
@@ -1077,7 +1077,7 @@ public class DODExperimentsBehaviour : MonoBehaviour
             ref Unsafe.AsRef<byte>(
                 velocitiesPtr)))
         {
-            logger.Log("Freeing velocities pointer");
+            logger?.Log("Freeing velocities pointer");
             
             Marshal.FreeHGlobal(new IntPtr(velocitiesPtr));
         }
@@ -1087,7 +1087,7 @@ public class DODExperimentsBehaviour : MonoBehaviour
             ref Unsafe.AsRef<byte>(
                 positionsPtr)))
         {
-            logger.Log("Freeing positions pointer");
+            logger?.Log("Freeing positions pointer");
 
             NativeMemory.Free(positionsPtr);
         }
@@ -1096,7 +1096,7 @@ public class DODExperimentsBehaviour : MonoBehaviour
             ref Unsafe.AsRef<byte>(
                 velocitiesPtr)))
         {
-            logger.Log("Freeing velocities pointer");
+            logger?.Log("Freeing velocities pointer");
 
             NativeMemory.Free(velocitiesPtr);
         }

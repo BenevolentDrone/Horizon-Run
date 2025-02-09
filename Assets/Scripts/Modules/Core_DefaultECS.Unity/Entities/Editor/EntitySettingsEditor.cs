@@ -91,7 +91,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Editor
 					.NewSerializer()
 					.ToJSON()
 					.AsString()
-					.Build();
+					.BuildSerializer();
 			}
 
 			if (structNameLabelStyle == null)

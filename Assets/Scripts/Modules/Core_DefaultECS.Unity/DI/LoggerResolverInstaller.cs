@@ -300,7 +300,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.DI
 
                 case LogType.Error:
 
-                    rootLogger.LogError<Application>(
+                    rootLogger?.LogError<Application>(
                         log);
 
                     break;
@@ -314,7 +314,7 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.DI
 
                 case LogType.Exception:
 
-                    rootLogger.LogError<Application>(
+                    rootLogger?.LogError<Application>(
                         log);
 
                     break;

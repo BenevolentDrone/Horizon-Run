@@ -1,3 +1,5 @@
+#if XML_SUPPORT
+
 using System;
 using System.Text;
 using System.IO;
@@ -386,3 +388,5 @@ namespace HereticalSolutions.Persistence
         }
     }
 }
+
+#endif

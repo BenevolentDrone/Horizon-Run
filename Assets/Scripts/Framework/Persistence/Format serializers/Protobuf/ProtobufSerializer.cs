@@ -1,4 +1,5 @@
 #if PROTOBUF_SUPPORT
+
 using System;
 
 using HereticalSolutions.Metadata;
@@ -184,4 +185,5 @@ namespace HereticalSolutions.Persistence
         #endregion
     }
 }
+
 #endif

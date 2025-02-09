@@ -8,9 +8,9 @@ namespace HereticalSolutions.Persistence
 {
 	public interface IStrategyWithStream
 		: IAsyncSerializationStrategy,
-		  IStrategyWithState,
 		  IBlockSerializationStrategy,
-		  IAsyncBlockSerializationStrategy
+		  IAsyncBlockSerializationStrategy,
+		  IHasReadWriteControl
 	{
 		EStreamMode CurrentMode { get; }
 

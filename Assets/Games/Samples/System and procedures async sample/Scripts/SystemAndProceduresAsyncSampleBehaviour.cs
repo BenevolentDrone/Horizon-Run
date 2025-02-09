@@ -211,7 +211,7 @@ namespace HereticalSolutions.Samples.SystemAndProceduresAsyncSample
 					CommonProcedures.CreateTaskFactoryFromAction(
 						() =>
 						{
-							logger.Log(
+							logger?.Log(
 								GetType(),
 								"MAIN THREAD PROCEDURE 1 DELEGATE INVOKED");
 						})));
@@ -222,7 +222,7 @@ namespace HereticalSolutions.Samples.SystemAndProceduresAsyncSample
 					CommonProcedures.CreateTaskFactoryFromAction(
 						() =>
 						{
-							logger.Log(
+							logger?.Log(
 								GetType(),
 								"MAIN THREAD PROCEDURE 2 DELEGATE INVOKED");
 						})));
@@ -232,7 +232,7 @@ namespace HereticalSolutions.Samples.SystemAndProceduresAsyncSample
 				CommonProcedures.CreateTaskFactoryFromAction(
 					() =>
 					{
-						logger.Log(
+						logger?.Log(
 							GetType(),
 							"THREAD 1 PROCEDURE 1 DELEGATE INVOKED");
 					}));
@@ -245,7 +245,7 @@ namespace HereticalSolutions.Samples.SystemAndProceduresAsyncSample
 				CommonProcedures.CreateTaskFactoryFromAction(
 					() =>
 					{
-						logger.Log(
+						logger?.Log(
 							GetType(),
 							"THREAD 1 PROCEDURE 2 DELEGATE INVOKED");
 					}));
@@ -258,7 +258,7 @@ namespace HereticalSolutions.Samples.SystemAndProceduresAsyncSample
 				CommonProcedures.CreateTaskFactoryFromAction(
 					() =>
 					{
-						logger.Log(
+						logger?.Log(
 							GetType(),
 							"THREAD 1 PROCEDURE 3 DELEGATE INVOKED");
 					}));
@@ -271,7 +271,7 @@ namespace HereticalSolutions.Samples.SystemAndProceduresAsyncSample
 				CommonProcedures.CreateTaskFactoryFromAction(
 					() =>
 					{
-						logger.Log(
+						logger?.Log(
 							GetType(),
 							"THREAD 1 PROCEDURE 4 DELEGATE INVOKED");
 					}));
@@ -284,7 +284,7 @@ namespace HereticalSolutions.Samples.SystemAndProceduresAsyncSample
 				CommonProcedures.CreateTaskFactoryFromAction(
 					() =>
 					{
-						logger.Log(
+						logger?.Log(
 							GetType(),
 							"THREAD 1 PROCEDURE 5 DELEGATE INVOKED");
 					}));
@@ -299,7 +299,7 @@ namespace HereticalSolutions.Samples.SystemAndProceduresAsyncSample
 				CommonProcedures.CreateTaskFactoryFromAction(
 					() =>
 					{
-						logger.Log(
+						logger?.Log(
 							GetType(),
 							"THREAD 2 PROCEDURE 1 DELEGATE INVOKED");
 					}));
@@ -312,7 +312,7 @@ namespace HereticalSolutions.Samples.SystemAndProceduresAsyncSample
 				CommonProcedures.CreateTaskFactoryFromAction(
 					() =>
 					{
-						logger.Log(
+						logger?.Log(
 							GetType(),
 							"THREAD 2 PROCEDURE 2 DELEGATE INVOKED");
 					}));
@@ -338,7 +338,7 @@ namespace HereticalSolutions.Samples.SystemAndProceduresAsyncSample
 			//Validate the system
 			if (!asyncSystemBuilder.ValidateSystem())
 			{
-				logger.LogError(
+				logger?.LogError(
 					GetType(),
 					"Failed to validate the system");
 
@@ -349,7 +349,7 @@ namespace HereticalSolutions.Samples.SystemAndProceduresAsyncSample
 			if (!asyncSystemBuilder.BuildSystem(
 				out delegateSystem))
 			{
-				logger.LogError(
+				logger?.LogError(
 					GetType(),
 					"Failed to build the system");
 
@@ -362,14 +362,14 @@ namespace HereticalSolutions.Samples.SystemAndProceduresAsyncSample
 		[ContextMenu("Perform")]
 		private void Perform()
 		{
-			logger.Log(
+			logger?.Log(
 				"START");
 
 			//Run the system
 			CommonProcedures.WaitForSync(
 				delegateSystem?.Invoke());
 
-			logger.Log(
+			logger?.Log(
 				"FINISH");
 		}
 

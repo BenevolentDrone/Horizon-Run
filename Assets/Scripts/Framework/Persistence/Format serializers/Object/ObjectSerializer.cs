@@ -1,7 +1,5 @@
 using System;
 
-using HereticalSolutions.Metadata;
-
 using HereticalSolutions.Logging;
 
 namespace HereticalSolutions.Persistence
@@ -21,8 +19,7 @@ namespace HereticalSolutions.Persistence
 		#region IFormatSerializer
 
 		public bool Serialize<TValue>(
-			ISerializationStrategy strategy,
-			IStronglyTypedMetadata arguments,
+			ISerializationCommandContext context,
 			TValue value)
 		{
 			PersistenceHelpers.EnsureStrategyInitializedForWriteOrAppend(
@@ -36,9 +33,8 @@ namespace HereticalSolutions.Persistence
 		}
 
 		public bool Serialize(
-			ISerializationStrategy strategy,
-			IStronglyTypedMetadata arguments,
 			Type valueType,
+			ISerializationCommandContext context,
 			object valueObject)
 		{
 			PersistenceHelpers.EnsureStrategyInitializedForWriteOrAppend(
@@ -53,8 +49,7 @@ namespace HereticalSolutions.Persistence
 		}
 
 		public bool Deserialize<TValue>(
-			ISerializationStrategy strategy,
-			IStronglyTypedMetadata arguments,
+			ISerializationCommandContext context,
 			out TValue value)
 		{
 			PersistenceHelpers.EnsureStrategyInitializedForRead(
@@ -76,9 +71,8 @@ namespace HereticalSolutions.Persistence
 
 		//TODO: fix deserialize as <GENERIC> is NOT working at all - the value does NOT get populated properly
 		public bool Deserialize(
-			ISerializationStrategy strategy,
-			IStronglyTypedMetadata arguments,
 			Type valueType,
+			ISerializationCommandContext context,
 			out object valueObject)
 		{
 			PersistenceHelpers.EnsureStrategyInitializedForRead(
@@ -100,8 +94,7 @@ namespace HereticalSolutions.Persistence
 		}
 
 		public bool Populate<TValue>(
-			ISerializationStrategy strategy,
-			IStronglyTypedMetadata arguments,
+			ISerializationCommandContext context,
 			ref TValue value)
 		{
 			PersistenceHelpers.EnsureStrategyInitializedForRead(
@@ -122,9 +115,8 @@ namespace HereticalSolutions.Persistence
 		}
 
 		public bool Populate(
-			ISerializationStrategy strategy,
-			IStronglyTypedMetadata arguments,
 			Type valueType,
+			ISerializationCommandContext context,
 			ref object valueObject)
 		{
 			PersistenceHelpers.EnsureStrategyInitializedForRead(

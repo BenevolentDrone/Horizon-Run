@@ -51,21 +51,24 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 			if (pooledViewElement.Value == null)
 			{
 				throw new Exception(
-					logger.TryFormatException<AttachToHUDCanvasInitializationSystem>(
+					logger.TryFormatException(
+						GetType(),
 						$"POOLED ELEMENT'S VALUE IS NULL"));
 			}
 
 			if (pooledViewElement.Status != EPoolElementStatus.POPPED)
 			{
 				throw new Exception(
-					logger.TryFormatException<AttachToHUDCanvasInitializationSystem>(
+					logger.TryFormatException(
+						GetType(),
 						$"POOLED ELEMENT'S STATUS IS INVALID"));
 			}
 
 			if (!pooledViewElement.Value.activeInHierarchy)
 			{
 				throw new Exception(
-					logger.TryFormatException<AttachToHUDCanvasInitializationSystem>(
+					logger.TryFormatException(
+						GetType(),
 						$"POOLED GAME OBJECT IS DISABLED"));
 			}
 

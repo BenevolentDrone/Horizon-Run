@@ -10,13 +10,11 @@ namespace HereticalSolutions.Persistence
 	{
 		public static void EnsureDirectoryExists(
 			string path,
-			ILogger logger,
-			Type callerType = null)
+			ILogger logger)
 		{
 			if (string.IsNullOrEmpty(path))
 				throw new Exception(
 					logger.TryFormatException(
-						callerType,
 						"INVALID PATH"));
 
 			string directoryPath = Path.GetDirectoryName(path);
@@ -24,7 +22,6 @@ namespace HereticalSolutions.Persistence
 			if (string.IsNullOrEmpty(directoryPath))
 				throw new Exception(
 					logger.TryFormatException(
-						callerType,
 						$"INVALID DIRECTORY PATH: {directoryPath}"));
 
 			if (!Directory.Exists(directoryPath))
@@ -35,13 +32,11 @@ namespace HereticalSolutions.Persistence
 
 		public static bool FileExists(
 			string path,
-			ILogger logger,
-			Type callerType = null)
+			ILogger logger)
 		{
 			if (string.IsNullOrEmpty(path))
 				throw new Exception(
 					logger.TryFormatException(
-						callerType,
 						"INVALID PATH"));
 
 			string directoryPath = Path.GetDirectoryName(path);
@@ -49,7 +44,6 @@ namespace HereticalSolutions.Persistence
 			if (string.IsNullOrEmpty(directoryPath))
 				throw new Exception(
 					logger.TryFormatException(
-						callerType,
 						"INVALID DIRECTORY PATH"));
 
 			if (!Directory.Exists(directoryPath))
@@ -63,13 +57,11 @@ namespace HereticalSolutions.Persistence
 		public static void EnsureDirectoryInIsolatedStorageExists(
 			string path,
 			IsolatedStorageFile isolatedStorageFile,
-			ILogger logger,
-			Type callerType = null)
+			ILogger logger)
 		{
 			if (string.IsNullOrEmpty(path))
 				throw new Exception(
 					logger.TryFormatException(
-						callerType,
 						"INVALID PATH"));
 
 			string directoryPath = Path.GetDirectoryName(path);
@@ -77,7 +69,6 @@ namespace HereticalSolutions.Persistence
 			if (string.IsNullOrEmpty(directoryPath))
 				throw new Exception(
 					logger.TryFormatException(
-						callerType,
 						$"INVALID DIRECTORY PATH: {directoryPath}"));
 
 			bool directoryExists = isolatedStorageFile.DirectoryExists(directoryPath);
@@ -91,13 +82,11 @@ namespace HereticalSolutions.Persistence
 		public static bool FileInIsolatedStorageExists(
 			string path,
 			IsolatedStorageFile isolatedStorageFile,
-			ILogger logger,
-			Type callerType = null)
+			ILogger logger)
 		{
 			if (string.IsNullOrEmpty(path))
 				throw new Exception(
 					logger.TryFormatException(
-						callerType,
 						"INVALID PATH"));
 
 			return isolatedStorageFile.FileExists(path);

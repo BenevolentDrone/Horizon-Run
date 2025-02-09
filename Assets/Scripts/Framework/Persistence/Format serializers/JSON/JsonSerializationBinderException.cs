@@ -1,3 +1,5 @@
+#if JSON_SUPPORT
+
 using System;
 using System.Runtime.Serialization;
 
@@ -17,3 +19,5 @@ namespace HereticalSolutions.Persistence
 		public JsonSerializationBinderException(SerializationInfo info, StreamingContext context) : base(info, context) { }
 	}
 }
+
+#endif

@@ -93,21 +93,24 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 			if (pooledPhysicsBodyElement.Value == null)
 			{
 				throw new Exception(
-					logger.TryFormatException<UnityPhysicsManager>(
+					logger.TryFormatException(
+						GetType(),
 						$"POOLED ELEMENT'S VALUE IS NULL"));
 			}
 
 			if (pooledPhysicsBodyElement.Status != EPoolElementStatus.POPPED)
 			{
 				throw new Exception(
-					logger.TryFormatException<UnityPhysicsManager>(
+					logger.TryFormatException(
+						GetType(),
 						$"POOLED ELEMENT'S STATUS IS INVALID ({pooledPhysicsBodyElement.Value.name})"));
 			}
 
 			if (!pooledPhysicsBodyElement.Value.activeInHierarchy)
 			{
 				throw new Exception(
-					logger.TryFormatException<UnityPhysicsManager>(
+					logger.TryFormatException(
+						GetType(),
 						$"POOLED GAME OBJECT IS SPAWNED DISABLED ({pooledPhysicsBodyElement.Value.name})"));
 			}
 
@@ -118,7 +121,8 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 			if (physicsBody == null)
 			{
 				throw new Exception(
-					logger.TryFormatException<UnityPhysicsManager>(
+					logger.TryFormatException(
+						GetType(),
 						$"PHYSICS BODY DESCRIPTOR IS NULL"));
 			}
 
@@ -140,7 +144,8 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 		{
 			if (physicsBodyHandle == 0)
 				throw new Exception(
-					logger.TryFormatException<UnityPhysicsManager>(
+					logger.TryFormatException(
+						GetType(),
 						$"INVALID PHYSICS BODY HANDLE {physicsBodyHandle}"));
 
 			var result = physicsBodyRepository.TryGet(
@@ -168,7 +173,8 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 			if (poolElement == null)
 			{
 				throw new Exception(
-					logger.TryFormatException<UnityPhysicsManager>(
+					logger.TryFormatException(
+						GetType(),
 						$"POOL ELEMENT IS NULL"));
 			}
 

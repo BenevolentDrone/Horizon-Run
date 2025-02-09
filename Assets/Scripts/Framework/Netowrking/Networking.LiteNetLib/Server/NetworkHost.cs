@@ -383,7 +383,8 @@ namespace HereticalSolutions.Networking.LiteNetLib
                 out Type packetType))
             {
                 throw new Exception(
-                    logger.TryFormatException<NetworkHost>(
+                    logger.TryFormatException(
+                        GetType(),
                         $"COULD NOT FIND PACKET TYPE FOR ID: {packetID}"));
             }
 
@@ -685,7 +686,8 @@ namespace HereticalSolutions.Networking.LiteNetLib
                 out byte packetID))
             {
                 throw new Exception(
-                    logger.TryFormatException<NetworkHost>(
+                    logger.TryFormatException(
+                        GetType(),
                         $"COULD NOT FIND PACKET ID FOR TYPE: {nameof(T)}"));
             }
 
@@ -706,7 +708,8 @@ namespace HereticalSolutions.Networking.LiteNetLib
                 out byte packetID))
             {
                 throw new Exception(
-                    logger.TryFormatException<NetworkHost>(
+                    logger.TryFormatException(
+                        GetType(),
                         $"COULD NOT FIND PACKET ID FOR TYPE: {nameof(T)}"));
             }
 
@@ -745,7 +748,8 @@ namespace HereticalSolutions.Networking.LiteNetLib
                 out byte packetID))
             {
                 throw new Exception(
-                    logger.TryFormatException<NetworkHost>(
+                    logger.TryFormatException(
+                        GetType(),
                         $"COULD NOT FIND PACKET ID FOR TYPE: {nameof(T)}"));
             }
 
@@ -799,7 +803,8 @@ namespace HereticalSolutions.Networking.LiteNetLib
                 out byte packetID))
             {
                 throw new Exception(
-                    logger.TryFormatException<NetworkHost>(
+                    logger.TryFormatException(
+                        GetType(),
                         $"COULD NOT FIND PACKET ID FOR TYPE: {packetType.Name}"));
             }
 
@@ -853,7 +858,8 @@ namespace HereticalSolutions.Networking.LiteNetLib
                 out byte packetID))
             {
                 throw new Exception(
-                    logger.TryFormatException<NetworkHost>(
+                    logger.TryFormatException(
+                        GetType(),
                         $"COULD NOT FIND PACKET ID FOR TYPE: {nameof(T)}"));
             }
 
@@ -906,7 +912,8 @@ namespace HereticalSolutions.Networking.LiteNetLib
                 out byte packetID))
             {
                 throw new Exception(
-                    logger.TryFormatException<NetworkHost>(
+                    logger.TryFormatException(
+                        GetType(),
                         $"COULD NOT FIND PACKET ID FOR TYPE: {packetType.Name}"));
             }
 
@@ -960,7 +967,8 @@ namespace HereticalSolutions.Networking.LiteNetLib
                 out byte packetID))
             {
                 throw new Exception(
-                    logger.TryFormatException<NetworkHost>(
+                    logger.TryFormatException(
+                        GetType(),
                         $"COULD NOT FIND PACKET ID FOR TYPE: {packetType.Name}"));
             }
 

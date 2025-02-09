@@ -10,7 +10,8 @@ namespace HereticalSolutions.Persistence
 	[SerializationStrategy]
 	public class PlayerPrefsStrategy
 		: ISerializationStrategy,
-		  IStrategyWithIODestination
+		  IStrategyWithFilter,
+		  IHasIODestination
 	{
 		private static readonly Type[] allowedValueTypes = new Type[]
 		{
@@ -125,24 +126,39 @@ namespace HereticalSolutions.Persistence
 
 		#endregion
 
+		#region IStrategyWithFilter
+
+		public bool AllowsType<TValue>()
+		{
+			return typeof(TValue) == typeof(string);
+		}
+
+		public bool AllowsType(
+			Type valueType)
+		{
+			return valueType == typeof(string);
+		}
+
+		#endregion
+
 		#region IStrategyWithIODestination
 
-		public void EnsureIOTargetDestinationExists()
+		public void EnsureIODestinationExists()
 		{
 			//Do nothing
 		}
 
-		public bool IOTargetExists()
+		public bool IODestinationExists()
 		{
 			return PlayerPrefs.HasKey(keyPrefs);
 		}
 
-		public void CreateIOTarget()
+		public void CreateIODestination()
 		{
 			//Do nothing
 		}
 
-		public void EraseIOTarget()
+		public void EraseIODestination()
 		{
 			PlayerPrefs.DeleteKey(keyPrefs);
 		}

@@ -9,16 +9,22 @@ namespace HereticalSolutions.Persistence
         : ISerializationStrategy,
           IStrategyWithFilter
     {
+        private readonly Func<string> valueGetter;
+
+        private readonly Action<string> valueSetter;
+
         private readonly ILogger logger;
 
-        public string Value { get; set; }
-
         public StringStrategy(
+            Func<string> valueGetter,
+            Action<string> valueSetter,
             ILogger logger)
         {
-            this.logger = logger;
+            this.valueGetter = valueGetter;
 
-            Value = string.Empty;
+            this.valueSetter = valueSetter;
+
+            this.logger = logger;
         }
 
         #region ISerializationStrategy
@@ -31,7 +37,7 @@ namespace HereticalSolutions.Persistence
             AssertStrategyIsValid(
                typeof(TValue));
 
-            value = Value.CastFromTo<string, TValue>();
+            value = valueGetter().CastFromTo<string, TValue>();
 
             return true;
         }
@@ -43,7 +49,7 @@ namespace HereticalSolutions.Persistence
             AssertStrategyIsValid(
                valueType);
 
-            value = Value.CastFromTo<string, object>();
+            value = valueGetter().CastFromTo<string, object>();
 
             return true;
         }
@@ -58,7 +64,7 @@ namespace HereticalSolutions.Persistence
             AssertStrategyIsValid(
                typeof(TValue));
 
-            Value = value.CastFromTo<TValue, string>();
+            valueSetter(value.CastFromTo<TValue, string>());
 
             return true;
         }
@@ -70,7 +76,7 @@ namespace HereticalSolutions.Persistence
             AssertStrategyIsValid(
                valueType);
 
-            Value = value.CastFromTo<object, string>();
+            valueSetter(value.CastFromTo<object, string>());
 
             return true;
         }
@@ -85,7 +91,11 @@ namespace HereticalSolutions.Persistence
             AssertStrategyIsValid(
                 typeof(TValue));
 
-            Value += value.CastFromTo<TValue, string>();
+            var result = valueGetter();
+
+            result += value.CastFromTo<TValue, string>();
+
+            valueSetter(result);
 
             return true;
         }
@@ -97,7 +107,11 @@ namespace HereticalSolutions.Persistence
             AssertStrategyIsValid(
                 valueType);
 
-            Value += value.CastFromTo<object, string>();
+            var result = valueGetter();
+
+            result += value.CastFromTo<object, string>();
+
+            valueSetter(result);
 
             return true;
         }

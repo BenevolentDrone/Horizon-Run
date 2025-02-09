@@ -12,7 +12,7 @@ namespace HereticalSolutions.Persistence
 		{
 			IStrategyWithStream strategyWithStream = strategy as IStrategyWithStream;
 
-			IStrategyWithState strategyWithState = strategy as IStrategyWithState;
+			IHasReadWriteControl strategyWithState = strategy as IHasReadWriteControl;
 
 
 			if (strategyWithState != null)
@@ -44,7 +44,7 @@ namespace HereticalSolutions.Persistence
 		{
 			IStrategyWithStream strategyWithStream = strategy as IStrategyWithStream;
 
-			IStrategyWithState strategyWithState = strategy as IStrategyWithState;
+			IHasReadWriteControl strategyWithState = strategy as IHasReadWriteControl;
 
 
 			if (strategyWithState != null)
@@ -85,16 +85,16 @@ namespace HereticalSolutions.Persistence
 			ISerializationStrategy strategy,
 			IStronglyTypedMetadata arguments)
 		{
-			IStrategyWithIODestination strategyWithIODestination = strategy as IStrategyWithIODestination;
+			IHasIODestination strategyWithIODestination = strategy as IHasIODestination;
 
 			IStrategyWithStream strategyWithStream = strategy as IStrategyWithStream;
 
-			IStrategyWithState strategyWithState = strategy as IStrategyWithState;
+			IHasReadWriteControl strategyWithState = strategy as IHasReadWriteControl;
 
 			if (strategyWithStream == null || !strategyWithStream.StreamOpen)
 			{
 				//Ensure that if there is no folder, then create it
-				strategyWithIODestination.EnsureIOTargetDestinationExists();
+				strategyWithIODestination.EnsureIODestinationExists();
 			}
 
 
@@ -125,11 +125,11 @@ namespace HereticalSolutions.Persistence
 			ISerializationStrategy strategy,
 			IStronglyTypedMetadata arguments)
 		{
-			IStrategyWithIODestination strategyWithIODestination = strategy as IStrategyWithIODestination;
+			IHasIODestination strategyWithIODestination = strategy as IHasIODestination;
 
 			IStrategyWithStream strategyWithStream = strategy as IStrategyWithStream;
 
-			IStrategyWithState strategyWithState = strategy as IStrategyWithState;
+			IHasReadWriteControl strategyWithState = strategy as IHasReadWriteControl;
 
 
 			//If the strategy writes to a file, then
@@ -138,13 +138,13 @@ namespace HereticalSolutions.Persistence
 				if (strategyWithStream == null || !strategyWithStream.StreamOpen)
 				{
 					//Ensure the file with the same path does not exist
-					if (strategyWithIODestination.IOTargetExists())
+					if (strategyWithIODestination.IODestinationExists())
 					{
-						strategyWithIODestination.EraseIOTarget();
+						strategyWithIODestination.EraseIODestination();
 					}
 
 					//Ensure that if there is no folder, then create it
-					strategyWithIODestination.EnsureIOTargetDestinationExists();
+					strategyWithIODestination.EnsureIODestinationExists();
 				}
 			}
 
@@ -195,7 +195,7 @@ namespace HereticalSolutions.Persistence
 		{
 			IStrategyWithStream strategyWithStream = strategy as IStrategyWithStream;
 
-			IStrategyWithState strategyWithState = strategy as IStrategyWithState;
+			IHasReadWriteControl strategyWithState = strategy as IHasReadWriteControl;
 
 
 			if (strategyWithState != null)
@@ -218,11 +218,11 @@ namespace HereticalSolutions.Persistence
 			ISerializationStrategy strategy,
 			IStronglyTypedMetadata arguments)
 		{
-			IStrategyWithIODestination strategyWithIODestination = strategy as IStrategyWithIODestination;
+			IHasIODestination strategyWithIODestination = strategy as IHasIODestination;
 
 			IStrategyWithStream strategyWithStream = strategy as IStrategyWithStream;
 
-			IStrategyWithState strategyWithState = strategy as IStrategyWithState;
+			IHasReadWriteControl strategyWithState = strategy as IHasReadWriteControl;
 
 
 			if (strategyWithState != null)
@@ -332,7 +332,7 @@ namespace HereticalSolutions.Persistence
 
 				IBlockSerializationStrategy blockSerializationStrategy = strategy as IBlockSerializationStrategy;
 
-				return blockSerializationStrategy.BlockRead<TValue>(
+				return blockSerializationStrategy.ReadBlock<TValue>(
 					0,
 					blockArgument.BlockSize,
 					out value);
@@ -354,7 +354,7 @@ namespace HereticalSolutions.Persistence
 
 				IBlockSerializationStrategy blockSerializationStrategy = strategy as IBlockSerializationStrategy;
 
-				return blockSerializationStrategy.BlockRead(
+				return blockSerializationStrategy.ReadBlock(
 					valueType,
 					0,
 					blockArgument.BlockSize,
@@ -441,7 +441,7 @@ namespace HereticalSolutions.Persistence
 
 				IBlockSerializationStrategy blockSerializationStrategy = strategy as IBlockSerializationStrategy;
 
-				return blockSerializationStrategy.BlockWrite<TValue>(
+				return blockSerializationStrategy.WriteBlock<TValue>(
 					value,
 					0,
 					blockArgument.BlockSize);
@@ -470,7 +470,7 @@ namespace HereticalSolutions.Persistence
 
 				IBlockSerializationStrategy blockSerializationStrategy = strategy as IBlockSerializationStrategy;
 
-				return blockSerializationStrategy.BlockWrite(
+				return blockSerializationStrategy.WriteBlock(
 					valueType,
 					valueObject,
 					0,

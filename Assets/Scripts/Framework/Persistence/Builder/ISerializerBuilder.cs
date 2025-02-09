@@ -1,8 +1,13 @@
+using System;
+
 namespace HereticalSolutions.Persistence
 {
 	public interface ISerializerBuilder
 	{
 		ISerializerBuilder NewSerializer();
+
+		ISerializerBuilder RecycleSerializer(
+			ISerializer serializer);
 
 		#region Settings
 
@@ -19,6 +24,22 @@ namespace HereticalSolutions.Persistence
 			TPathSettings pathSettings)
 			where TPathSettings : IPathSettings;
 
+		ISerializerBuilder ErasePath();
+
+		#endregion
+
+		#region Data converters
+
+		ISerializerBuilder WithLZ4Compression();
+
+		ISerializerBuilder WithByteArrayFallback();
+
+		ISerializerBuilder WithDataConverter<TDataConverter>(
+			object[] arguments)
+			where TDataConverter : IDataConverter;
+
+		ISerializerBuilder EraseDataConverters();
+
 		#endregion
 
 		#region Format serializer
@@ -31,11 +52,15 @@ namespace HereticalSolutions.Persistence
 			object[] arguments)
 			where TFormatSerializer : IFormatSerializer;
 
-#endregion
+		ISerializerBuilder EraseFormatSerializer();
+
+		#endregion
 
 		#region Serialization strategies
 
-		ISerializerBuilder AsString();
+		ISerializerBuilder AsString(
+			Func<string> valueGetter,
+			Action<string> valueSetter);
 
 		ISerializerBuilder AsTextFile();
 
@@ -59,6 +84,8 @@ namespace HereticalSolutions.Persistence
 			object[] arguments)
 			where TSerializationStrategy : ISerializationStrategy;
 
+		ISerializerBuilder EraseStrategy();
+
 		#endregion
 
 		#region Arguments
@@ -77,6 +104,10 @@ namespace HereticalSolutions.Persistence
 			object[] arguments)
 			where TArgument : TInterface;
 
+		ISerializerBuilder Without<TInterface>();
+
+		ISerializerBuilder EraseArguments();
+
 		#endregion
 
 		#region Visitor
@@ -84,8 +115,22 @@ namespace HereticalSolutions.Persistence
 		ISerializerBuilder WithVisitor(
 			IVisitor visitor);
 
+		ISerializerBuilder EraseVisitor();
+
 		#endregion
 
-		ISerializer Build();
+		#region Build
+
+		ISerializer BuildSerializer();
+
+		IBlockSerializer BuildBlockSerializer();
+
+		IAsyncSerializer BuildAsyncSerializer();
+
+		IAsyncBlockSerializer BuildAsyncBlockSerializer();
+
+		#endregion
+
+		void Refurbish();
 	}
 }

@@ -63,7 +63,8 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Unity
 				out var timer))
 			{
 				throw new Exception(
-					logger.TryFormatException<SensorWithTimerInitializationSystem>(
+					logger.TryFormatException(
+						GetType(),
 						$"ERROR CREATING TIMER FROM TIME MANAGER {simulationTimerManager.ID}"));
 			}
 

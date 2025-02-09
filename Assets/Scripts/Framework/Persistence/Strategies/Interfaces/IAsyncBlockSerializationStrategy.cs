@@ -9,14 +9,14 @@ namespace HereticalSolutions.Persistence
 	{
 		#region Read
 
-		Task<(bool, TValue)> BlockReadAsync<TValue>(
+		Task<(bool, TValue)> ReadBlockAsync<TValue>(
 			int blockOffset,
 			int blockSize,
 
 			//Async tail
 			AsyncExecutionContext asyncContext);
 
-		Task<(bool, object)> BlockReadAsync(
+		Task<(bool, object)> ReadBlockAsync(
 			Type valueType,
 			int blockOffset,
 			int blockSize,
@@ -28,7 +28,7 @@ namespace HereticalSolutions.Persistence
 
 		#region Write
 
-		Task<bool> BlockWriteAsync<TValue>(
+		Task<bool> WriteBlockAsync<TValue>(
 			TValue value,
 			int blockOffset,
 			int blockSize,
@@ -36,7 +36,7 @@ namespace HereticalSolutions.Persistence
 			//Async tail
 			AsyncExecutionContext asyncContext);
 
-		Task<bool> BlockWriteAsync(
+		Task<bool> WriteBlockAsync(
 			Type valueType,
 			object value,
 			int blockOffset,

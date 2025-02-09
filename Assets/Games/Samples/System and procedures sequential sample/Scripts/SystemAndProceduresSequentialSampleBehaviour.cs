@@ -208,7 +208,7 @@ namespace HereticalSolutions.Samples.SystemAndProceduresSequentialSample
 				SystemFactory.BuildProcedureNode<Action>(
 					() =>
 					{
-						logger.Log(
+						logger?.Log(
 							GetType(),
 							"MAIN THREAD PROCEDURE 1 DELEGATE INVOKED");
 					}));
@@ -218,7 +218,7 @@ namespace HereticalSolutions.Samples.SystemAndProceduresSequentialSample
 				SystemFactory.BuildProcedureNode<Action>(
 					() =>
 					{
-						logger.Log(
+						logger?.Log(
 							GetType(),
 							"MAIN THREAD PROCEDURE 2 DELEGATE INVOKED");
 					}));
@@ -227,7 +227,7 @@ namespace HereticalSolutions.Samples.SystemAndProceduresSequentialSample
 			var thread1Procedure1 = SystemFactory.BuildProcedureNode<Action>(
 				() =>
 				{
-					logger.Log(
+					logger?.Log(
 						GetType(),
 						"THREAD 1 PROCEDURE 1 DELEGATE INVOKED");
 				});
@@ -239,7 +239,7 @@ namespace HereticalSolutions.Samples.SystemAndProceduresSequentialSample
 			var thread1Procedure2 = SystemFactory.BuildProcedureNode<Action>(
 				() =>
 				{
-					logger.Log(
+					logger?.Log(
 						GetType(),
 						"THREAD 1 PROCEDURE 2 DELEGATE INVOKED");
 				});
@@ -251,7 +251,7 @@ namespace HereticalSolutions.Samples.SystemAndProceduresSequentialSample
 			var thread1Procedure3 = SystemFactory.BuildProcedureNode<Action>(
 				() =>
 				{
-					logger.Log(
+					logger?.Log(
 						GetType(),
 						"THREAD 1 PROCEDURE 3 DELEGATE INVOKED");
 				});
@@ -263,7 +263,7 @@ namespace HereticalSolutions.Samples.SystemAndProceduresSequentialSample
 			var thread1Procedure4 = SystemFactory.BuildProcedureNode<Action>(
 				() =>
 				{
-					logger.Log(
+					logger?.Log(
 						GetType(),
 						"THREAD 1 PROCEDURE 4 DELEGATE INVOKED");
 				});
@@ -275,7 +275,7 @@ namespace HereticalSolutions.Samples.SystemAndProceduresSequentialSample
 			var thread1Procedure5 = SystemFactory.BuildProcedureNode<Action>(
 				() =>
 				{
-					logger.Log(
+					logger?.Log(
 						GetType(),
 						"THREAD 1 PROCEDURE5 DELEGATE INVOKED");
 				});
@@ -289,7 +289,7 @@ namespace HereticalSolutions.Samples.SystemAndProceduresSequentialSample
 			var thread2Procedure1 = SystemFactory.BuildProcedureNode<Action>(
 				() =>
 				{
-					logger.Log(
+					logger?.Log(
 						GetType(),
 						"THREAD 2 PROCEDURE 1 DELEGATE INVOKED");
 				});
@@ -301,7 +301,7 @@ namespace HereticalSolutions.Samples.SystemAndProceduresSequentialSample
 			var thread2Procedure2 = SystemFactory.BuildProcedureNode<Action>(
 				() =>
 				{
-					logger.Log(
+					logger?.Log(
 						GetType(),
 						"THREAD 2 PROCEDURE 2 DELEGATE INVOKED");
 				});
@@ -327,7 +327,7 @@ namespace HereticalSolutions.Samples.SystemAndProceduresSequentialSample
 			//Validate the system
 			if (!delegateSystemBuilder.ValidateSystem())
 			{
-				logger.LogError(
+				logger?.LogError(
 					GetType(),
 					"Failed to validate the system");
 
@@ -338,7 +338,7 @@ namespace HereticalSolutions.Samples.SystemAndProceduresSequentialSample
 			if (!delegateSystemBuilder.BuildSystem(
 				out var delegateSystem))
 			{
-				logger.LogError(
+				logger?.LogError(
 					GetType(),
 					"Failed to build the system");
 
@@ -351,13 +351,13 @@ namespace HereticalSolutions.Samples.SystemAndProceduresSequentialSample
 		[ContextMenu("Perform")]
 		private void Perform()
 		{
-			logger.Log(
+			logger?.Log(
 				"START");
 
 			//Run the system
 			delegateSystem?.Invoke();
 
-			logger.Log(
+			logger?.Log(
 				"FINISH");
 		}
 

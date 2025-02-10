@@ -2,6 +2,6 @@ namespace HereticalSolutions.Persistence
 {
     public interface IBlockSerializationArgument
 	{
-		int BlockSize { get; }
+		//int BlockSize { get; }
     }
 }

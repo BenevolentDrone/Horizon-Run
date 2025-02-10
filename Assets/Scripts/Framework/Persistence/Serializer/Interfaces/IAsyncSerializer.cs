@@ -42,12 +42,12 @@ namespace HereticalSolutions.Persistence
 
 		#region Populate
 
-		Task<bool> PopulateAsync<TValue>(
-			ref TValue value);
+		Task<(bool, TValue)> PopulateAsync<TValue>(
+			TValue value);
 
-		Task<bool> PopulateAsync(
+		Task<(bool, object)> PopulateAsync(
 			Type valueType,
-			ref object valueObject);
+			object valueObject);
 
 		#endregion
 	}

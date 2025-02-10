@@ -1,4 +1,7 @@
 using System;
+using System.Threading.Tasks;
+
+using HereticalSolutions.Asynchronous;
 
 using HereticalSolutions.Logging;
 
@@ -46,136 +49,229 @@ namespace HereticalSolutions.Persistence
 
 		#endregion
 
-		protected void EnsureStrategyInitializedForRead(
-			ISerializationStrategy strategy,
-			IStronglyTypedMetadata arguments)
+		#region Ensure strategy initialized / finalized
+
+		protected void EnsureStrategyInitializedForDeserialization(
+			ISerializationCommandContext context)
 		{
-			IStrategyWithStream strategyWithStream = strategy as IStrategyWithStream;
+			var strategyWithReadWriteControl = context.SerializationStrategy
+				as IHasReadWriteControl;
 
-			IHasReadWriteControl strategyWithState = strategy as IHasReadWriteControl;
-
-
-			if (strategyWithState != null)
+			//If the strategy has no read/write control, then we can't do anything
+			if (strategyWithReadWriteControl == null)
 			{
-				//If it's a stream strategy and the stream is not open, then open the write stream
-				if (strategyWithStream != null && !strategyWithStream.StreamOpen)
-				{
-					if (arguments.Has<IReadAndWriteAccessArgument>())
-					{
-						if (!strategyWithState.SupportsSimultaneousReadAndWrite)
-						{
-							throw new InvalidOperationException(
-								$"THE STRATEGY {strategy.GetType().Name} DOES NOT SUPPORT SIMULTANEOUS READ AND WRITE");
-						}
+				return;
+			}
 
-						strategyWithState.InitializeReadAndWrite();
-					}
-					else
+			IHasIODestination strategyWithIODestination = context.SerializationStrategy
+				as IHasIODestination;
+
+			IStrategyWithStream strategyWithStream = context.SerializationStrategy
+				as IStrategyWithStream;
+
+			//Before reading we need to ensure that
+			//1. There IS something to read from
+			//2. Nothing is actively reading from or writing to it right now
+			//(for instance, a stream)
+			if (strategyWithIODestination != null
+				&& (strategyWithStream == null
+					|| !strategyWithStream.StreamOpen))
+			{
+				if (!strategyWithIODestination.IODestinationExists())
+				{
+					throw new InvalidOperationException(
+						logger.FormatException(
+							GetType(),
+							$"THE DESTINATION FOR READ DOES NOT EXIST"));
+				}
+			}
+
+			//If it's a stream strategy and the stream is not open, then open the write stream
+			if (strategyWithStream != null
+				&& !strategyWithStream.StreamOpen)
+			{
+				if (context.Arguments.Has<IReadAndWriteAccessArgument>())
+				{
+					if (!strategyWithReadWriteControl.SupportsSimultaneousReadAndWrite)
 					{
-						strategyWithState.InitializeRead();
+						throw new InvalidOperationException(
+							logger.FormatException(
+								GetType(),
+								$"THE STRATEGY {context.SerializationStrategy.GetType().Name} DOES NOT SUPPORT SIMULTANEOUS READ AND WRITE"));
 					}
+
+					strategyWithReadWriteControl.InitializeReadAndWrite();
+				}
+				else
+				{
+					strategyWithReadWriteControl.InitializeRead();
 				}
 			}
 		}
 
-		protected void EnsureStrategyFinalizedForRead(
-			ISerializationStrategy strategy,
-			IStronglyTypedMetadata arguments)
+		protected void EnsureStrategyFinalizedForDeserialization(
+			ISerializationCommandContext context)
 		{
-			IStrategyWithStream strategyWithStream = strategy as IStrategyWithStream;
+			IHasReadWriteControl strategyWithReadWriteControl = context.SerializationStrategy
+				as IHasReadWriteControl;
 
-			IHasReadWriteControl strategyWithState = strategy as IHasReadWriteControl;
-
-
-			if (strategyWithState != null)
+			//If the strategy has no read/write control, then we can't do anything
+			if (strategyWithReadWriteControl == null)
 			{
-				if (strategyWithStream != null && strategyWithStream.StreamOpen)
+				return;
+			}
+
+			IStrategyWithStream strategyWithStream = context.SerializationStrategy
+				as IStrategyWithStream;
+
+			//If it's a stream strategy and the stream is open, then close the write stream
+			if (strategyWithStream != null
+				&& strategyWithStream.StreamOpen)
+			{
+				if (strategyWithStream.CurrentMode == EStreamMode.READ_AND_WRITE)
 				{
-					if (strategyWithStream.CurrentMode == EStreamMode.READ_AND_WRITE)
-					{
-						strategyWithState.FinalizeReadAndWrite();
-					}
-					else if (strategyWithStream.CurrentMode == EStreamMode.READ)
-					{
-						strategyWithState.FinalizeRead();
-					}
+					strategyWithReadWriteControl.FinalizeReadAndWrite();
+				}
+				else if (strategyWithStream.CurrentMode == EStreamMode.READ)
+				{
+					strategyWithReadWriteControl.FinalizeRead();
+				}
+				else
+				{
+					throw new InvalidOperationException(
+						logger.FormatException(
+							GetType(),
+							$"THE STRATEGY IS IN AN INVALID MODE: {strategyWithStream.CurrentMode}"));
 				}
 			}
 		}
 
-		protected void EnsureStrategyInitializedForWriteOrAppend(
-			ISerializationStrategy strategy,
-			IStronglyTypedMetadata arguments)
+		protected void EnsureStrategyInitializedForSerialization(
+			ISerializationCommandContext context)
 		{
-			if (arguments.Has<IAppendArgument>())
+			if (context.Arguments.Has<IReadAndWriteAccessArgument>())
+			{
+				EnsureStrategyInitializedForReadWrite(
+					context);
+			}
+			else if (context.Arguments.Has<IAppendArgument>())
 			{
 				EnsureStrategyInitializedForAppend(
-					strategy,
-					arguments);
+					context);
 			}
 			else
 			{
 				EnsureStrategyInitializedForWrite(
-					strategy,
-					arguments);
+					context);
+			}
+		}
+
+		protected void EnsureStrategyInitializedForReadWrite(
+			ISerializationCommandContext context)
+		{
+			IHasReadWriteControl strategyWithReadWriteControl = context.SerializationStrategy
+				as IHasReadWriteControl;
+
+			//If the strategy has no read/write control, then we can't do anything
+			if (strategyWithReadWriteControl == null)
+				return;
+
+			IHasIODestination strategyWithIODestination = context.SerializationStrategy
+				as IHasIODestination;
+
+			IStrategyWithStream strategyWithStream = context.SerializationStrategy
+				as IStrategyWithStream;
+
+			//Before read/writing we need to ensure that
+			//1. There IS something to read from / write to
+			//2. Nothing is actively reading from or writing to it right now
+			//(for instance, a stream)
+			if (strategyWithIODestination != null
+				&& (strategyWithStream == null
+					|| !strategyWithStream.StreamOpen))
+			{
+				//Ensure that if there is no destination, then create it
+				strategyWithIODestination.EnsureIODestinationExists();
+			}
+
+			//If it's a stream strategy and the stream is not open, then open the write stream
+			if (strategyWithStream != null
+				&& !strategyWithStream.StreamOpen)
+			{
+				if (!strategyWithReadWriteControl.SupportsSimultaneousReadAndWrite)
+				{
+					throw new InvalidOperationException(
+						logger.FormatException(
+							GetType(),
+							$"THE STRATEGY {context.SerializationStrategy.GetType().Name} DOES NOT SUPPORT SIMULTANEOUS READ AND WRITE"));
+				}
+
+				strategyWithReadWriteControl.InitializeReadAndWrite();
 			}
 		}
 
 		protected void EnsureStrategyInitializedForAppend(
-			ISerializationStrategy strategy,
-			IStronglyTypedMetadata arguments)
+			ISerializationCommandContext context)
 		{
-			IHasIODestination strategyWithIODestination = strategy as IHasIODestination;
+			IHasReadWriteControl strategyWithReadWriteControl = context.SerializationStrategy
+				as IHasReadWriteControl;
 
-			IStrategyWithStream strategyWithStream = strategy as IStrategyWithStream;
+			//If the strategy has no read/write control, then we can't do anything
+			if (strategyWithReadWriteControl == null)
+				return;
 
-			IHasReadWriteControl strategyWithState = strategy as IHasReadWriteControl;
+			IHasIODestination strategyWithIODestination = context.SerializationStrategy
+				as IHasIODestination;
 
-			if (strategyWithStream == null || !strategyWithStream.StreamOpen)
+			IStrategyWithStream strategyWithStream = context.SerializationStrategy
+				as IStrategyWithStream;
+
+			//Before appending we need to ensure that
+			//1. There IS something to append to
+			//2. Nothing is actively reading from or writing to it right now
+			//(for instance, a stream)
+			if (strategyWithIODestination != null
+				&& (strategyWithStream == null
+					|| !strategyWithStream.StreamOpen))
 			{
 				//Ensure that if there is no folder, then create it
 				strategyWithIODestination.EnsureIODestinationExists();
 			}
 
-
-			if (strategyWithState != null)
+			//If it's a stream strategy and the stream is not open, then open the write stream
+			if (strategyWithStream != null
+				&& !strategyWithStream.StreamOpen)
 			{
-				//If it's a stream strategy and the stream is not open, then open the write stream
-				if (strategyWithStream != null && !strategyWithStream.StreamOpen)
-				{
-					if (arguments.Has<IReadAndWriteAccessArgument>())
-					{
-						if (!strategyWithState.SupportsSimultaneousReadAndWrite)
-						{
-							throw new InvalidOperationException(
-								$"THE STRATEGY {strategy.GetType().Name} DOES NOT SUPPORT SIMULTANEOUS READ AND WRITE");
-						}
-
-						strategyWithState.InitializeReadAndWrite();
-					}
-					else
-					{
-						strategyWithState.InitializeAppend();
-					}
-				}
+				strategyWithReadWriteControl.InitializeAppend();
 			}
 		}
 
 		protected void EnsureStrategyInitializedForWrite(
-			ISerializationStrategy strategy,
-			IStronglyTypedMetadata arguments)
+			ISerializationCommandContext context)
 		{
-			IHasIODestination strategyWithIODestination = strategy as IHasIODestination;
+			IHasReadWriteControl strategyWithReadWriteControl = context.SerializationStrategy
+				as IHasReadWriteControl;
 
-			IStrategyWithStream strategyWithStream = strategy as IStrategyWithStream;
+			//If the strategy has no read/write control, then we can't do anything
+			if (strategyWithReadWriteControl == null)
+				return;
 
-			IHasReadWriteControl strategyWithState = strategy as IHasReadWriteControl;
+			IHasIODestination strategyWithIODestination = context.SerializationStrategy
+				as IHasIODestination;
+
+			IStrategyWithStream strategyWithStream = context.SerializationStrategy
+				as IStrategyWithStream;
 
 
-			//If the strategy writes to a file, then
+			//Before writing we need to ensure that
+			//1. Whatever may be at the destination, it is erased
+			//2. There IS something to write to
+			//3. Nothing is actively reading from or writing to it right now
+			//(for instance, a stream)
 			if (strategyWithIODestination != null)
 			{
-				if (strategyWithStream == null || !strategyWithStream.StreamOpen)
+				if (strategyWithStream == null
+					|| !strategyWithStream.StreamOpen)
 				{
 					//Ensure the file with the same path does not exist
 					if (strategyWithIODestination.IODestinationExists())
@@ -188,338 +284,647 @@ namespace HereticalSolutions.Persistence
 				}
 			}
 
-			if (strategyWithState != null)
+			//If it's a stream strategy and the stream is not open, then open the write stream
+			if (strategyWithStream != null
+				&& !strategyWithStream.StreamOpen)
 			{
-				//If it's a stream strategy and the stream is not open, then open the write stream
-				if (strategyWithStream != null && !strategyWithStream.StreamOpen)
-				{
-					if (arguments.Has<IReadAndWriteAccessArgument>())
-					{
-						if (!strategyWithState.SupportsSimultaneousReadAndWrite)
-						{
-							throw new InvalidOperationException(
-								$"THE STRATEGY {strategy.GetType().Name} DOES NOT SUPPORT SIMULTANEOUS READ AND WRITE");
-						}
-
-						strategyWithState.InitializeReadAndWrite();
-					}
-					else
-					{
-						strategyWithState.InitializeWrite();
-					}
-				}
+				strategyWithReadWriteControl.InitializeWrite();
 			}
 		}
 
-		protected void EnsureStrategyFinalizedForWriteOrAppend(
-			ISerializationStrategy strategy,
-			IStronglyTypedMetadata arguments)
+		protected void EnsureStrategyFinalizedForSerialization(
+			ISerializationCommandContext context)
 		{
-			if (arguments.Has<IAppendArgument>())
+			if (context.Arguments.Has<IReadAndWriteAccessArgument>())
+			{
+				EnsureStrategyFinalizedForReadWrite(
+					context);
+			}
+			else if (context.Arguments.Has<IAppendArgument>())
 			{
 				EnsureStrategyFinalizedForAppend(
-					strategy,
-					arguments);
+					context);
 			}
 			else
 			{
 				EnsureStrategyFinalizedForWrite(
-					strategy,
-					arguments);
+					context);
+			}
+		}
+
+		protected void EnsureStrategyFinalizedForReadWrite(
+			ISerializationCommandContext context)
+		{
+			IHasReadWriteControl strategyWithReadWriteControl = context.SerializationStrategy 
+				as IHasReadWriteControl;
+
+			if (strategyWithReadWriteControl != null)
+				return;
+
+			IStrategyWithStream strategyWithStream = context.SerializationStrategy
+				as IStrategyWithStream;
+
+			if (strategyWithStream != null
+				&& strategyWithStream.StreamOpen)
+			{
+				if (strategyWithStream.CurrentMode == EStreamMode.READ_AND_WRITE)
+				{
+					strategyWithReadWriteControl.FinalizeReadAndWrite();
+				}
+				else
+				{
+					throw new InvalidOperationException(
+						logger.FormatException(
+							GetType(),
+							$"THE STRATEGY IS IN AN INVALID MODE: {strategyWithStream.CurrentMode}"));
+				}
 			}
 		}
 
 		protected void EnsureStrategyFinalizedForAppend(
-			ISerializationStrategy strategy,
-			IStronglyTypedMetadata arguments)
+			ISerializationCommandContext context)
 		{
-			IStrategyWithStream strategyWithStream = strategy as IStrategyWithStream;
+			IHasReadWriteControl strategyWithReadWriteControl = context.SerializationStrategy
+				as IHasReadWriteControl;
 
-			IHasReadWriteControl strategyWithState = strategy as IHasReadWriteControl;
+			if (strategyWithReadWriteControl != null)
+				return;
 
+			IStrategyWithStream strategyWithStream = context.SerializationStrategy
+				as IStrategyWithStream;
 
-			if (strategyWithState != null)
+			if (strategyWithStream != null
+				&& strategyWithStream.StreamOpen)
 			{
-				if (strategyWithStream != null && strategyWithStream.StreamOpen)
+				if (strategyWithStream.CurrentMode == EStreamMode.APPEND)
 				{
-					if (strategyWithStream.CurrentMode == EStreamMode.READ_AND_WRITE)
-					{
-						strategyWithState.FinalizeReadAndWrite();
-					}
-					else if (strategyWithStream.CurrentMode == EStreamMode.APPEND)
-					{
-						strategyWithState.FinalizeAppend();
-					}
+					strategyWithReadWriteControl.FinalizeAppend();
+				}
+				else
+				{
+					throw new InvalidOperationException(
+						logger.FormatException(
+							GetType(),
+							$"THE STRATEGY IS IN AN INVALID MODE: {strategyWithStream.CurrentMode}"));
 				}
 			}
 		}
 
 		protected void EnsureStrategyFinalizedForWrite(
-			ISerializationStrategy strategy,
-			IStronglyTypedMetadata arguments)
+			ISerializationCommandContext context)
 		{
-			IHasIODestination strategyWithIODestination = strategy as IHasIODestination;
+			IHasReadWriteControl strategyWithReadWriteControl = context.SerializationStrategy
+				as IHasReadWriteControl;
 
-			IStrategyWithStream strategyWithStream = strategy as IStrategyWithStream;
+			if (strategyWithReadWriteControl != null)
+				return;
 
-			IHasReadWriteControl strategyWithState = strategy as IHasReadWriteControl;
+			IStrategyWithStream strategyWithStream = context.SerializationStrategy
+				as IStrategyWithStream;
 
-
-			if (strategyWithState != null)
+			if (strategyWithStream != null
+				&& strategyWithStream.StreamOpen)
 			{
-				if (strategyWithStream != null && strategyWithStream.StreamOpen)
+				if (strategyWithStream.CurrentMode == EStreamMode.WRITE)
 				{
-					if (strategyWithStream.CurrentMode == EStreamMode.READ_AND_WRITE)
-					{
-						strategyWithState.FinalizeReadAndWrite();
-					}
-					else if (strategyWithStream.CurrentMode == EStreamMode.WRITE)
-					{
-						strategyWithState.FinalizeWrite();
-					}
+					strategyWithReadWriteControl.FinalizeWrite();
+				}
+				else
+				{
+					throw new InvalidOperationException(
+						logger.FormatException(
+							GetType(),
+							$"THE STRATEGY IS IN AN INVALID MODE: {strategyWithStream.CurrentMode}"));
 				}
 			}
 		}
 
-		protected bool TryReadPersistently<TValue>(
-			ISerializationStrategy strategy,
-			IStronglyTypedMetadata arguments,
-			Func<byte[], TValue> convertFromBytesDelegate,
+		#endregion
+
+		#region Try deserialize / serialize
+
+		protected bool TryDeserialize<TValue>(
+			ISerializationCommandContext context,
 			out TValue value)
 		{
-			IStrategyWithFilter strategyWithFilter = strategy as IStrategyWithFilter;
-
-			if (strategyWithFilter == null
-				|| strategyWithFilter.AllowsType<TValue>())
+			if (context.Arguments.Has<IBlockSerializationArgument>())
 			{
-				return TryRead<TValue>(
-					strategy,
-					arguments,
-					out value);
-			}
-
-			if (strategyWithFilter.AllowsType<byte[]>()) //almost anything can be converted to a byte array
-			{
-				value = default;
-
-				var result = TryRead<byte[]>(
-					strategy,
-					arguments,
-					out var byteArray);
-
-				if (result)
-				{
-					value = convertFromBytesDelegate.Invoke(byteArray);
-				}
-
-				return result;
-			}
-
-			value = default;
-
-			return false;
-		}
-
-		protected bool TryReadPersistently(
-			ISerializationStrategy strategy,
-			IStronglyTypedMetadata arguments,
-			Func<byte[], object> convertFromBytesDelegate,
-			Type valueType,
-			out object value)
-		{
-			IStrategyWithFilter strategyWithFilter = strategy as IStrategyWithFilter;
-
-			if (strategyWithFilter == null
-				|| strategyWithFilter.AllowsType(valueType))
-			{
-				return TryRead(
-					strategy,
-					arguments,
-					valueType,
-					out value);
-			}
-
-			if (strategyWithFilter.AllowsType<byte[]>()) //almost anything can be converted to a byte array
-			{
-				value = default;
-
-				var result = TryRead<byte[]>(
-					strategy,
-					arguments,
-					out var byteArray);
-
-				if (result)
-				{
-					value = convertFromBytesDelegate.Invoke(byteArray);
-				}
-
-				return result;
-			}
-
-			value = default;
-
-			return false;
-		}
-
-		protected bool TryRead<TValue>(
-			ISerializationStrategy strategy,
-			IStronglyTypedMetadata arguments,
-			out TValue value)
-		{
-			if (arguments.Has<IBlockSerializationArgument>())
-			{
-				var blockArgument = arguments.Get<IBlockSerializationArgument>();
-
-				IBlockSerializationStrategy blockSerializationStrategy = strategy as IBlockSerializationStrategy;
-
-				return blockSerializationStrategy.ReadBlock<TValue>(
+				return TryDeserializeBlock(
+					context,
 					0,
-					blockArgument.BlockSize,
+					-1,
 					out value);
 			}
 
-			return strategy.Read<TValue>(
+			return context.DataConverter.ReadAndConvert<TValue>(
+				context,
 				out value);
 		}
 
-		protected bool TryRead(
-			ISerializationStrategy strategy,
-			IStronglyTypedMetadata arguments,
+		protected bool TryDeserialize(
 			Type valueType,
+			ISerializationCommandContext context,
 			out object value)
 		{
-			if (arguments.Has<IBlockSerializationArgument>())
+			if (context.Arguments.Has<IBlockSerializationArgument>())
 			{
-				var blockArgument = arguments.Get<IBlockSerializationArgument>();
-
-				IBlockSerializationStrategy blockSerializationStrategy = strategy as IBlockSerializationStrategy;
-
-				return blockSerializationStrategy.ReadBlock(
+				return TryDeserializeBlock(
 					valueType,
+					context,
 					0,
-					blockArgument.BlockSize,
+					-1,
 					out value);
 			}
 
-			return strategy.Read(
+			return context.DataConverter.ReadAndConvert(
 				valueType,
+				context,
 				out value);
 		}
 
-		protected bool TryWriteOrAppendPersistently<TValue>(
-			ISerializationStrategy strategy,
-			IStronglyTypedMetadata arguments,
-			Func<TValue, byte[]> convertToBytesDelegate,
+		protected bool TrySerialize<TValue>(
+			ISerializationCommandContext context,
 			TValue value)
 		{
-			IStrategyWithFilter strategyWithFilter = strategy as IStrategyWithFilter;
-
-			if (strategyWithFilter == null
-				|| strategyWithFilter.AllowsType<TValue>())
+			if (context.Arguments.Has<IBlockSerializationArgument>())
 			{
-				return TryWriteOrAppend<TValue>(
-					strategy,
-					arguments,
-					value);
-			}
-
-			if (strategyWithFilter.AllowsType<byte[]>()) //almost anything can be converted to a byte array
-			{
-				return TryWriteOrAppend<byte[]>(
-					strategy,
-					arguments,
-					convertToBytesDelegate?.Invoke(value));
-			}
-
-			return false;
-		}
-
-		protected bool TryWriteOrAppendPersistently(
-			ISerializationStrategy strategy,
-			IStronglyTypedMetadata arguments,
-			Func<object, byte[]> convertToBytesDelegate,
-			Type valueType,
-			object valueObject)
-		{
-			IStrategyWithFilter strategyWithFilter = strategy as IStrategyWithFilter;
-
-			if (strategyWithFilter == null
-				|| strategyWithFilter.AllowsType(valueType))
-			{
-				return TryWriteOrAppend(
-					strategy,
-					arguments,
-					valueType,
-					valueObject);
-			}
-
-			if (strategyWithFilter.AllowsType<byte[]>()) //almost anything can be converted to a byte array
-			{
-				return TryWriteOrAppend<byte[]>(
-					strategy,
-					arguments,
-					convertToBytesDelegate?.Invoke(valueObject));
-			}
-
-			return false;
-		}
-
-		protected bool TryWriteOrAppend<TValue>(
-			ISerializationStrategy strategy,
-			IStronglyTypedMetadata arguments,
-			TValue value)
-		{
-			if (arguments.Has<IAppendArgument>())
-			{
-				return strategy.Append<TValue>(
-					value);
-			}
-
-			if (arguments.Has<IBlockSerializationArgument>())
-			{
-				var blockArgument = arguments.Get<IBlockSerializationArgument>();
-
-				IBlockSerializationStrategy blockSerializationStrategy = strategy as IBlockSerializationStrategy;
-
-				return blockSerializationStrategy.WriteBlock<TValue>(
+				return TrySerializeBlock(
+					context,
 					value,
 					0,
-					blockArgument.BlockSize);
+					-1);
 			}
 
-			return strategy.Write<TValue>(
+			if (context.Arguments.Has<IAppendArgument>())
+			{
+				return context.DataConverter.ConvertAndAppend<TValue>(
+					context,
+					value);
+			}
+
+			return context.DataConverter.ConvertAndWrite<TValue>(
+				context,
 				value);
 		}
 
-		protected bool TryWriteOrAppend(
-			ISerializationStrategy strategy,
-			IStronglyTypedMetadata arguments,
+		protected bool TrySerialize(
 			Type valueType,
+			ISerializationCommandContext context,
 			object valueObject)
 		{
-			if (arguments.Has<IAppendArgument>())
+			if (context.Arguments.Has<IBlockSerializationArgument>())
 			{
-				return strategy.Append(
+				return TrySerializeBlock(
 					valueType,
+					context,
+					valueObject,
+					0,
+					-1);
+			}
+
+			if (context.Arguments.Has<IAppendArgument>())
+			{
+				return context.DataConverter.ConvertAndAppend(
+					valueType,
+					context,
 					valueObject);
 			}
 
-			if (arguments.Has<IBlockSerializationArgument>())
-			{
-				var blockArgument = arguments.Get<IBlockSerializationArgument>();
-
-				IBlockSerializationStrategy blockSerializationStrategy = strategy as IBlockSerializationStrategy;
-
-				return blockSerializationStrategy.WriteBlock(
-					valueType,
-					valueObject,
-					0,
-					blockArgument.BlockSize);
-			}
-
-			return strategy.Write(
+			return context.DataConverter.ConvertAndWrite(
 				valueType,
+				context,
 				valueObject);
 		}
+
+		#endregion
+
+		#region Try deserialize / serialize block
+
+		protected bool TryDeserializeBlock<TValue>(
+			ISerializationCommandContext context,
+			int blockOffset,
+			int blockSize,
+			out TValue value)
+		{
+			var blockDataConverter = context.DataConverter
+				as IBlockDataConverter;
+
+			if (blockDataConverter == null)
+			{
+				throw new InvalidOperationException(
+					logger.FormatException(
+						GetType(),
+						$"THE DATA CONVERTER IS NOT A BLOCK DATA CONVERTER"));
+			}
+
+			return blockDataConverter.ReadBlockAndConvert<TValue>(
+				context,
+				blockOffset,
+				blockSize,
+				out value);
+		}
+
+		protected bool TryDeserializeBlock(
+			Type valueType,
+			ISerializationCommandContext context,
+			int blockOffset,
+			int blockSize,
+			out object value)
+		{
+			var blockDataConverter = context.DataConverter
+				as IBlockDataConverter;
+
+			if (blockDataConverter == null)
+			{
+				throw new InvalidOperationException(
+					logger.FormatException(
+						GetType(),
+						$"THE DATA CONVERTER IS NOT A BLOCK DATA CONVERTER"));
+			}
+
+			return blockDataConverter.ReadBlockAndConvert(
+				valueType,
+				context,
+				blockOffset,
+				blockSize,
+				out value);
+		}
+
+		protected bool TrySerializeBlock<TValue>(
+			ISerializationCommandContext context,
+			TValue value,
+			int blockOffset,
+			int blockSize)
+		{
+			var blockDataConverter = context.DataConverter
+				as IBlockDataConverter;
+
+			if (blockDataConverter == null)
+			{
+				throw new InvalidOperationException(
+					logger.FormatException(
+						GetType(),
+						$"THE DATA CONVERTER IS NOT A BLOCK DATA CONVERTER"));
+			}
+
+			return blockDataConverter.ConvertAndWriteBlock<TValue>(
+				context,
+				value,
+				blockOffset,
+				blockSize);
+		}
+
+		protected bool TrySerializeBlock(
+			Type valueType,
+			ISerializationCommandContext context,
+			object valueObject,
+			int blockOffset,
+			int blockSize)
+		{
+			var blockDataConverter = context.DataConverter
+				as IBlockDataConverter;
+
+			if (blockDataConverter == null)
+			{
+				throw new InvalidOperationException(
+					logger.FormatException(
+						GetType(),
+						$"THE DATA CONVERTER IS NOT A BLOCK DATA CONVERTER"));
+			}
+
+			return blockDataConverter.ConvertAndWriteBlock(
+				valueType,
+				context,
+				valueObject,
+				blockOffset,
+				blockSize);
+		}
+
+		#endregion
+
+		#region Try deserialize / serialize async
+
+		protected async Task<(bool, TValue)> TryDeserializeAsync<TValue>(
+			ISerializationCommandContext context,
+			
+			//Async tail
+			AsyncExecutionContext asyncContext)
+		{
+			if (context.Arguments.Has<IBlockSerializationArgument>())
+			{
+				return await TryDeserializeBlockAsync<TValue>(
+					context,
+					0,
+					-1,
+					asyncContext);
+			}
+
+			var asyncDataConverter = context.DataConverter
+				as IAsyncDataConverter;
+
+			if (asyncDataConverter == null)
+			{
+				//throw new InvalidOperationException(
+				//	logger.FormatException(
+				//		GetType(),
+				//		$"THE DATA CONVERTER IS NOT AN ASYNC DATA CONVERTER"));
+
+				var result = TryDeserialize<TValue>(
+					context,
+					out var value);
+
+				return (result, value);
+			}
+
+			return await asyncDataConverter.ReadAsyncAndConvert<TValue>(
+				context,
+				asyncContext);
+		}
+
+		protected async Task<(bool, object)> TryDeserializeAsync(
+			Type valueType,
+			ISerializationCommandContext context,
+
+			//Async tail
+			AsyncExecutionContext asyncContext)
+		{
+			if (context.Arguments.Has<IBlockSerializationArgument>())
+			{
+				return await TryDeserializeBlockAsync(
+					valueType,
+					context,
+					0,
+					-1,
+					asyncContext);
+			}
+
+			var asyncDataConverter = context.DataConverter
+				as IAsyncDataConverter;
+
+			if (asyncDataConverter == null)
+			{
+				//throw new InvalidOperationException(
+				//	logger.FormatException(
+				//		GetType(),
+				//		$"THE DATA CONVERTER IS NOT AN ASYNC DATA CONVERTER"));
+
+				var result = TryDeserialize(
+					valueType,
+					context,
+					out var value);
+
+				return (result, value);
+			}
+
+			return await asyncDataConverter.ReadAsyncAndConvert(
+				valueType,
+				context,
+				asyncContext);
+		}
+
+		protected async Task<bool> TrySerializeAsync<TValue>(
+			ISerializationCommandContext context,
+			TValue value,
+
+			//Async tail
+			AsyncExecutionContext asyncContext)
+		{
+			if (context.Arguments.Has<IBlockSerializationArgument>())
+			{
+				return await TrySerializeBlockAsync(
+					context,
+					value,
+					0,
+					-1,
+					asyncContext);
+			}
+
+			var asyncDataConverter = context.DataConverter
+				as IAsyncDataConverter;
+
+			if (asyncDataConverter == null)
+			{
+				//throw new InvalidOperationException(
+				//	logger.FormatException(
+				//		GetType(),
+				//		$"THE DATA CONVERTER IS NOT AN ASYNC DATA CONVERTER"));
+
+				return TrySerialize<TValue>(
+					context,
+					value);
+			}
+
+			if (context.Arguments.Has<IAppendArgument>())
+			{
+				return  await asyncDataConverter.ConvertAndAppendAsync<TValue>(
+					context,
+					value,
+					asyncContext);
+			}
+
+			return await asyncDataConverter.ConvertAndWriteAsync<TValue>(
+				context,
+				value,
+				asyncContext);
+		}
+
+		protected async Task<bool> TrySerializeAsync(
+			Type valueType,
+			ISerializationCommandContext context,
+			object valueObject,
+
+			//Async tail
+			AsyncExecutionContext asyncContext)
+		{
+			if (context.Arguments.Has<IBlockSerializationArgument>())
+			{
+				return await TrySerializeBlockAsync(
+					valueType,
+					context,
+					valueObject,
+					0,
+					-1,
+					asyncContext);
+			}
+
+			var asyncDataConverter = context.DataConverter
+				as IAsyncDataConverter;
+
+			if (asyncDataConverter == null)
+			{
+				//throw new InvalidOperationException(
+				//	logger.FormatException(
+				//		GetType(),
+				//		$"THE DATA CONVERTER IS NOT AN ASYNC DATA CONVERTER"));
+
+				return TrySerialize(
+					valueType,
+					context,
+					valueObject);
+			}
+
+			if (context.Arguments.Has<IAppendArgument>())
+			{
+				return await asyncDataConverter.ConvertAndAppendAsync(
+					valueType,
+					context,
+					valueObject,
+					asyncContext);
+			}
+
+			return await asyncDataConverter.ConvertAndWriteAsync(
+				valueType,
+				context,
+				valueObject,
+				asyncContext);
+		}
+
+		#endregion
+
+		#region Try deserialize / serialize block async
+
+		protected async Task<(bool, TValue)> TryDeserializeBlockAsync<TValue>(
+			ISerializationCommandContext context,
+			int blockOffset,
+			int blockSize,
+
+			//Async tail
+			AsyncExecutionContext asyncContext)
+		{
+			var asyncBlockDataConverter = context.DataConverter
+				as IAsyncBlockDataConverter;
+
+			if (asyncBlockDataConverter == null)
+			{
+				//throw new InvalidOperationException(
+				//	logger.FormatException(
+				//		GetType(),
+				//		$"THE DATA CONVERTER IS NOT AN ASYNC BLOCK DATA CONVERTER"));
+
+				var result = TryDeserializeBlock<TValue>(
+					context,
+					blockOffset,
+					blockSize,
+					out var value);
+
+				return (result, value);
+			}
+
+			return await asyncBlockDataConverter.ReadBlockAsyncAndConvert<TValue>(
+				context,
+				blockOffset,
+				blockSize,
+				asyncContext);
+		}
+
+		protected async Task<(bool, object)> TryDeserializeBlockAsync(
+			Type valueType,
+			ISerializationCommandContext context,
+			int blockOffset,
+			int blockSize,
+
+			//Async tail
+			AsyncExecutionContext asyncContext)
+		{
+			var asyncBlockDataConverter = context.DataConverter
+				as IAsyncBlockDataConverter;
+
+			if (asyncBlockDataConverter == null)
+			{
+				//throw new InvalidOperationException(
+				//	logger.FormatException(
+				//		GetType(),
+				//		$"THE DATA CONVERTER IS NOT AN ASYNC BLOCK DATA CONVERTER"));
+
+				var result = TryDeserializeBlock(
+					valueType,
+					context,
+					blockOffset,
+					blockSize,
+					out var value);
+
+				return (result, value);
+			}
+
+			return await asyncBlockDataConverter.ReadBlockAsyncAndConvert(
+				valueType,
+				context,
+				blockOffset,
+				blockSize,
+				asyncContext);
+		}
+
+		protected async Task<bool> TrySerializeBlockAsync<TValue>(
+			ISerializationCommandContext context,
+			TValue value,
+			int blockOffset,
+			int blockSize,
+
+			//Async tail
+			AsyncExecutionContext asyncContext)
+		{
+			var asyncBlockDataConverter = context.DataConverter
+				as IAsyncBlockDataConverter;
+
+			if (asyncBlockDataConverter == null)
+			{
+				//throw new InvalidOperationException(
+				//	logger.FormatException(
+				//		GetType(),
+				//		$"THE DATA CONVERTER IS NOT AN ASYNC BLOCK DATA CONVERTER"));
+
+				return TrySerializeBlock(
+					context,
+					value,
+					blockOffset,
+					blockSize);
+			}
+
+			return await asyncBlockDataConverter.ConvertAndWriteBlockAsync<TValue>(
+				context,
+				value,
+				blockOffset,
+				blockSize,
+				asyncContext);
+		}
+
+		protected async Task<bool> TrySerializeBlockAsync(
+			Type valueType,
+			ISerializationCommandContext context,
+			object valueObject,
+			int blockOffset,
+			int blockSize,
+
+			//Async tail
+			AsyncExecutionContext asyncContext)
+		{
+			var asyncBlockDataConverter = context.DataConverter
+				as IAsyncBlockDataConverter;
+
+			if (asyncBlockDataConverter == null)
+			{
+				//throw new InvalidOperationException(
+				//	logger.FormatException(
+				//		GetType(),
+				//		$"THE DATA CONVERTER IS NOT AN ASYNC BLOCK DATA CONVERTER"));
+
+				return TrySerializeBlock(
+					valueType,
+					context,
+					valueObject,
+					blockOffset,
+					blockSize);
+			}
+
+			return await asyncBlockDataConverter.ConvertAndWriteBlockAsync(
+				valueType,
+				context,
+				valueObject,
+				blockOffset,
+				blockSize,
+				asyncContext);
+		}
+
+		#endregion
 	}
 }

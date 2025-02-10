@@ -1,4 +1,7 @@
 using System;
+using System.Threading.Tasks;
+
+using HereticalSolutions.Asynchronous;
 
 using HereticalSolutions.Logging;
 
@@ -6,59 +9,208 @@ namespace HereticalSolutions.Persistence
 {
 	[FormatSerializer]
 	public class ObjectSerializer
-		: IFormatSerializer
+		: AFormatSerializer,
+		  IBlockFormatSerializer,
+		  IAsyncFormatSerializer,
+		  IAsyncBlockFormatSerializer
 	{
-		private readonly ILogger logger;
-
 		public ObjectSerializer(
 			ILogger logger)
+			: base (
+				logger)
 		{
-			this.logger = logger;
 		}
 
 		#region IFormatSerializer
 
-		public bool Serialize<TValue>(
+		public override bool Serialize<TValue>(
 			ISerializationCommandContext context,
 			TValue value)
 		{
-			PersistenceHelpers.EnsureStrategyInitializedForWriteOrAppend(
-				strategy,
-				arguments);
+			EnsureStrategyInitializedForSerialization(
+				context);
 
-			return PersistenceHelpers.TryWriteOrAppend<TValue>(
-				strategy,
-				arguments,
+			var result = TrySerialize<TValue>(
+				context,
 				value);
+
+			EnsureStrategyFinalizedForSerialization(
+				context);
+
+			return result;
 		}
 
-		public bool Serialize(
+		public override bool Serialize(
 			Type valueType,
 			ISerializationCommandContext context,
 			object valueObject)
 		{
-			PersistenceHelpers.EnsureStrategyInitializedForWriteOrAppend(
-				strategy,
-				arguments);
+			EnsureStrategyInitializedForSerialization(
+				context);
 
-			return PersistenceHelpers.TryWriteOrAppend(
-				strategy,
-				arguments,
+			var result = TrySerialize(
 				valueType,
+				context,
 				valueObject);
+
+			EnsureStrategyFinalizedForSerialization(
+				context);
+
+			return result;
 		}
 
-		public bool Deserialize<TValue>(
+		public override bool Deserialize<TValue>(
 			ISerializationCommandContext context,
 			out TValue value)
 		{
-			PersistenceHelpers.EnsureStrategyInitializedForRead(
-				strategy,
-				arguments);
+			EnsureStrategyInitializedForDeserialization(
+				context);
 
-			if (!PersistenceHelpers.TryRead<TValue>(
-				strategy,
-				arguments,
+			if (!TryDeserialize<TValue>(
+				context,
+				out value))
+			{
+				value = default(TValue);
+
+				EnsureStrategyFinalizedForDeserialization(
+					context);
+
+				return false;
+			}
+
+			EnsureStrategyFinalizedForDeserialization(
+				context);
+
+			return true;
+		}
+
+		public override bool Deserialize(
+			Type valueType,
+			ISerializationCommandContext context,
+			out object valueObject)
+		{
+			EnsureStrategyInitializedForDeserialization(
+				context);
+
+			if (!TryDeserialize(
+				valueType,
+				context,
+				out valueObject))
+			{
+				valueObject = default(object);
+
+				EnsureStrategyFinalizedForDeserialization(
+					context);
+
+				return false;
+			}
+
+			EnsureStrategyFinalizedForDeserialization(
+				context);
+
+			return true;
+		}
+
+		public override bool Populate<TValue>(
+			ISerializationCommandContext context,
+			ref TValue value)
+		{
+			EnsureStrategyInitializedForDeserialization(
+				context);
+
+			if (!TryDeserialize<TValue>(
+				context,
+				out TValue newValue))
+			{
+				EnsureStrategyFinalizedForDeserialization(
+					context);
+
+				return false;
+			}
+
+			value = newValue;
+
+			EnsureStrategyFinalizedForDeserialization(
+				context);
+
+			return true;
+		}
+
+		public override bool Populate(
+			Type valueType,
+			ISerializationCommandContext context,
+			ref object valueObject)
+		{
+			EnsureStrategyInitializedForDeserialization(
+				context);
+
+			if (!TryDeserialize(
+				valueType,
+				context,
+				out object newValue))
+			{
+				EnsureStrategyFinalizedForDeserialization(
+					context);
+
+				return false;
+			}
+
+			valueObject = newValue;
+
+			EnsureStrategyFinalizedForDeserialization(
+				context);
+
+			return true;
+		}
+
+		#endregion
+
+		#region IBlockFormatSerializer
+
+		#region Serialize
+
+		public bool SerializeBlock<TValue>(
+			ISerializationCommandContext context,
+			TValue value,
+			int blockOffset,
+			int blockSize)
+		{
+			return TrySerializeBlock<TValue>(
+				context,
+				value,
+				blockOffset,
+				blockSize);
+		}
+
+		public bool SerializeBlock(
+			Type valueType,
+			ISerializationCommandContext context,
+			object valueObject,
+			int blockOffset,
+			int blockSize)
+		{
+			return TrySerializeBlock(
+				valueType,
+				context,
+				valueObject,
+				blockOffset,
+				blockSize);
+		}
+
+		#endregion
+
+		#region Deserialize
+
+		public bool DeserializeBlock<TValue>(
+			ISerializationCommandContext context,
+			int blockOffset,
+			int blockSize,
+			out TValue value)
+		{
+			if (!TryDeserializeBlock<TValue>(
+				context,
+				blockOffset,
+				blockSize,
 				out value))
 			{
 				value = default(TValue);
@@ -69,20 +221,18 @@ namespace HereticalSolutions.Persistence
 			return true;
 		}
 
-		//TODO: fix deserialize as <GENERIC> is NOT working at all - the value does NOT get populated properly
-		public bool Deserialize(
+		public bool DeserializeBlock(
 			Type valueType,
 			ISerializationCommandContext context,
+			int blockOffset,
+			int blockSize,
 			out object valueObject)
 		{
-			PersistenceHelpers.EnsureStrategyInitializedForRead(
-				strategy,
-				arguments);
-
-			if (!PersistenceHelpers.TryRead(
-				strategy,
-				arguments,
+			if (!TryDeserializeBlock(
 				valueType,
+				context,
+				blockOffset,
+				blockSize,
 				out valueObject))
 			{
 				valueObject = default(object);
@@ -93,17 +243,20 @@ namespace HereticalSolutions.Persistence
 			return true;
 		}
 
-		public bool Populate<TValue>(
-			ISerializationCommandContext context,
-			ref TValue value)
-		{
-			PersistenceHelpers.EnsureStrategyInitializedForRead(
-				strategy,
-				arguments);
+		#endregion
 
-			if (!PersistenceHelpers.TryRead<TValue>(
-				strategy,
-				arguments,
+		#region Populate
+
+		public bool PopulateBlock<TValue>(
+			ISerializationCommandContext context,
+			ref TValue value,
+			int blockOffset,
+			int blockSize)
+		{
+			if (!TryDeserializeBlock<TValue>(
+				context,
+				blockOffset,
+				blockSize,
 				out TValue newValue))
 			{
 				return false;
@@ -114,19 +267,18 @@ namespace HereticalSolutions.Persistence
 			return true;
 		}
 
-		public bool Populate(
+		public bool PopulateBlock(
 			Type valueType,
 			ISerializationCommandContext context,
-			ref object valueObject)
+			ref object valueObject,
+			int blockOffset,
+			int blockSize)
 		{
-			PersistenceHelpers.EnsureStrategyInitializedForRead(
-				strategy,
-				arguments);
-
-			if (!PersistenceHelpers.TryRead(
-				strategy,
-				arguments,
+			if (!TryDeserializeBlock(
 				valueType,
+				context,
+				blockOffset,
+				blockSize,
 				out object newValue))
 			{
 				return false;
@@ -136,6 +288,298 @@ namespace HereticalSolutions.Persistence
 
 			return true;
 		}
+
+		#endregion
+
+		#endregion
+
+		#region IAsyncFormatSerializer
+	
+		#region Serialize
+
+		public async Task<bool> SerializeAsync<TValue>(
+			ISerializationCommandContext context,
+			TValue value,
+
+			//Async tail
+			AsyncExecutionContext asyncContext)
+		{
+			EnsureStrategyInitializedForSerialization(
+				context);
+
+			var result = await TrySerializeAsync<TValue>(
+				context,
+				value,
+				asyncContext);
+
+			EnsureStrategyFinalizedForSerialization(
+				context);
+
+			return result;
+		}
+
+		public async Task<bool> SerializeAsync(
+			Type valueType,
+			ISerializationCommandContext context,
+			object valueObject,
+
+			//Async tail
+			AsyncExecutionContext asyncContext)
+		{
+			EnsureStrategyInitializedForSerialization(
+				context);
+
+			var result = await TrySerializeAsync(
+				valueType,
+				context,
+				valueObject,
+				asyncContext);
+
+			EnsureStrategyFinalizedForSerialization(
+				context);
+
+			return result;
+		}
+
+		#endregion
+
+		#region Deserialize
+
+		public async Task<(bool, TValue)> DeserializeAsync<TValue>(
+			ISerializationCommandContext context,
+
+			//Async tail
+			AsyncExecutionContext asyncContext)
+		{
+			EnsureStrategyInitializedForDeserialization(
+				context);
+
+			var result = await TryDeserializeAsync<TValue>(
+				context,
+				asyncContext);
+
+			EnsureStrategyFinalizedForDeserialization(
+				context);
+
+			return result;
+		}
+
+		public async Task<(bool, object)> DeserializeAsync(
+			Type valueType,
+			ISerializationCommandContext context,
+
+			//Async tail
+			AsyncExecutionContext asyncContext)
+		{
+			EnsureStrategyInitializedForDeserialization(
+				context);
+
+			var result = await TryDeserializeAsync(
+				valueType,
+				context,
+				asyncContext);
+
+			EnsureStrategyFinalizedForDeserialization(
+				context);
+
+			return result;
+		}
+
+		#endregion
+
+		#region Populate
+
+		public async Task<(bool, TValue)> PopulateAsync<TValue>(
+			ISerializationCommandContext context,
+			TValue value,
+
+			//Async tail
+			AsyncExecutionContext asyncContext)
+		{
+			EnsureStrategyInitializedForDeserialization(
+				context);
+
+			var result = await TryDeserializeAsync<TValue>(
+				context,
+				asyncContext);
+
+			if (!result.Item1)
+			{
+				EnsureStrategyFinalizedForDeserialization(
+					context);
+
+				return (false, value);
+			}
+
+			EnsureStrategyFinalizedForDeserialization(
+				context);
+
+			return result;
+		}
+
+		public async Task<(bool, object)> PopulateAsync(
+			Type valueType,
+			ISerializationCommandContext context,
+			object valueObject,
+
+			//Async tail
+			AsyncExecutionContext asyncContext)
+		{
+			EnsureStrategyInitializedForDeserialization(
+				context);
+
+			var result = await TryDeserializeAsync(
+				valueType,
+				context,
+				asyncContext);
+
+			if (!result.Item1)
+			{
+				EnsureStrategyFinalizedForDeserialization(
+					context);
+
+				return (false, valueObject);
+			}
+
+			EnsureStrategyFinalizedForDeserialization(
+				context);
+
+			return result;
+		}
+
+		#endregion
+
+		#endregion
+
+		#region IAsyncBlockFormatSerializer
+	
+		#region Serialize
+
+		public async Task<bool> SerializeBlockAsync<TValue>(
+			ISerializationCommandContext context,
+			TValue value,
+			int blockOffset,
+			int blockSize,
+
+			//Async tail
+			AsyncExecutionContext asyncContext)
+		{
+			return await TrySerializeBlockAsync<TValue>(
+				context,
+				value,
+				blockOffset,
+				blockSize,
+				asyncContext);
+		}
+
+		public async Task<bool> SerializeBlockAsync(
+			Type valueType,
+			ISerializationCommandContext context,
+			object valueObject,
+			int blockOffset,
+			int blockSize,
+
+			//Async tail
+			AsyncExecutionContext asyncContext)
+		{
+			return await TrySerializeBlockAsync(
+				valueType,
+				context,
+				valueObject,
+				blockOffset,
+				blockSize,
+				asyncContext);
+		}
+
+		#endregion
+
+		#region Deserialize
+
+		public async Task<(bool, TValue)> DeserializeBlockAsync<TValue>(
+			ISerializationCommandContext context,
+			int blockOffset,
+			int blockSize,
+
+			//Async tail
+			AsyncExecutionContext asyncContext)
+		{
+			return await TryDeserializeBlockAsync<TValue>(
+				context,
+				blockOffset,
+				blockSize,
+				asyncContext);
+		}
+
+		public async Task<(bool, object)> DeserializeBlockAsync(
+			Type valueType,
+			ISerializationCommandContext context,
+			int blockOffset,
+			int blockSize,
+
+			//Async tail
+			AsyncExecutionContext asyncContext)
+		{
+			return await TryDeserializeBlockAsync(
+				valueType,
+				context,
+				blockOffset,
+				blockSize,
+				asyncContext);
+		}
+
+		#endregion
+
+		#region Populate
+
+		public async Task<(bool, TValue)> PopulateBlockAsync<TValue>(
+			ISerializationCommandContext context,
+			TValue value,
+			int blockOffset,
+			int blockSize,
+
+			//Async tail
+			AsyncExecutionContext asyncContext)
+		{
+			var result = await TryDeserializeBlockAsync<TValue>(
+				context,
+				blockOffset,
+				blockSize,
+				asyncContext);
+
+			if (!result.Item1)
+			{
+				return (false, value);
+			}
+
+			return result;
+		}
+
+		public async Task<(bool, object)> PopulateBlockAsync(
+			Type valueType,
+			ISerializationCommandContext context,
+			object valueObject,
+			int blockOffset,
+			int blockSize,
+
+			//Async tail
+			AsyncExecutionContext asyncContext)
+		{
+			var result = await TryDeserializeBlockAsync(
+				valueType,
+				context,
+				blockOffset,
+				blockSize,
+				asyncContext);
+
+			if (!result.Item1)
+			{
+				return (false, valueObject);
+			}
+
+			return result;
+		}
+
+		#endregion
 
 		#endregion
 	}

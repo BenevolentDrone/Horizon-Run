@@ -97,8 +97,7 @@ namespace HereticalSolutions.Persistence
 
 		ISerializerBuilder WithReadWriteAccess();
 
-		ISerializerBuilder WithBlockSerialization(
-			int blockSize = 1024);
+		ISerializerBuilder WithBlockSerialization();
 
 		ISerializerBuilder With<TInterface, TArgument>(
 			object[] arguments)

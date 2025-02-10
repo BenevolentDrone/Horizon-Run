@@ -181,6 +181,14 @@ namespace HereticalSolutions.Persistence
             IOHelpers.EnsureDirectoryExists(
                 FullPath,
                 logger);
+
+            if (!IOHelpers.FileExists(
+                FullPath,
+                logger))
+            {
+                File.Create(
+                    FullPath);
+            }
         }
 
         public bool IODestinationExists()
@@ -192,30 +200,23 @@ namespace HereticalSolutions.Persistence
 
         public void CreateIODestination()
         {
-            string savePath = FullPath;
+            EraseIODestination();
 
             IOHelpers.EnsureDirectoryExists(
                 FullPath,
                 logger);
 
-            if (!IOHelpers.FileExists(
-                savePath,
-                logger))
-            {
-                File.Create(
-                    FullPath);
-            }
+            File.Create(
+                FullPath);
         }
 
         public void EraseIODestination()
         {
-            string savePath = FullPath;
-
             if (IOHelpers.FileExists(
-                savePath,
+                FullPath,
                 logger))
             {
-                File.Delete(savePath);
+                File.Delete(FullPath);
             }
         }
 

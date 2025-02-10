@@ -45,17 +45,17 @@ namespace HereticalSolutions.Persistence
 
 		#region Populate
 
-		Task<bool> PopulateAsync<TValue>(
+		Task<(bool, TValue)> PopulateAsync<TValue>(
 			ISerializationCommandContext context,
-			ref TValue value,
+			TValue value,
 
 			//Async tail
 			AsyncExecutionContext asyncContext);
 
-		Task<bool> PopulateAsync(
+		Task<(bool, object)> PopulateAsync(
 			Type valueType,
 			ISerializationCommandContext context,
-			ref object valueObject,
+			object valueObject,
 
 			//Async tail
 			AsyncExecutionContext asyncContext);

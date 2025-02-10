@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Text;
 using System.Collections.Generic;
 using System.Reflection;
@@ -140,13 +141,9 @@ namespace HereticalSolutions.Persistence.Factories
             };
         }
 
-        public static BlockSerializationArgument BuildBlockSerializationArgument(
-            int blockSize = 1024)
+        public static BlockSerializationArgument BuildBlockSerializationArgument()
         {
-            return new BlockSerializationArgument
-            {
-                BlockSize = blockSize
-            };
+            return new BlockSerializationArgument();
         }
 
         public static ReadAndWriteAccessArgument BuildReadAndWriteAccessArgument()
@@ -156,7 +153,22 @@ namespace HereticalSolutions.Persistence.Factories
             };
         }
 
-        public static TSerializationArgument BuildSerializationArgument<TSerializationArgument>(
+        public static SourceByteArrayArgument BuildSourceByteArrayArgument(
+            byte[] source)
+        {
+            return new SourceByteArrayArgument
+            {
+                Source = source
+            };
+        }
+
+        public static DataConversionArgument BuildDataConversionArgument()
+        {
+            return new DataConversionArgument();
+        }
+
+        public static TSerializationArgument 
+            BuildSerializationArgument<TSerializationArgument>(
             ILoggerResolver loggerResolver,
             object[] arguments = null)
         {

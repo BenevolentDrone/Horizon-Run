@@ -1,12 +1,9 @@
 #if JSON_SUPPORT
 
 using System;
-using System.Text;
 using System.Collections.Generic;
 
 using System.Linq;
-
-using HereticalSolutions.Metadata;
 
 using HereticalSolutions.Logging;
 
@@ -17,16 +14,19 @@ namespace HereticalSolutions.Persistence
 {
     [FormatSerializer]
     public class JSONSerializer
-        : IFormatSerializer
+        : AFormatSerializer,
+          IBlockFormatSerializer,
+          IAsyncFormatSerializer,
+          IAsyncBlockFormatSerializer
     {
         private readonly JsonSerializerSettings writeSerializerSettings;
 
         private readonly JsonSerializerSettings readSerializerSettings;
 
-        private readonly ILogger logger;
-
         public JSONSerializer(
             ILogger logger)
+            : base(
+                logger)
         {
             writeSerializerSettings = new JsonSerializerSettings
             {
@@ -64,71 +64,70 @@ namespace HereticalSolutions.Persistence
                     }
                 }
             };
-
-            this.logger = logger;
         }
 
         #region IFormatSerializer
 
-        public bool Serialize<TValue>(
-            ISerializationStrategy strategy,
-            IStronglyTypedMetadata arguments,
+        public override bool Serialize<TValue>(
+            ISerializationCommandContext context,
             TValue value)
         {
-            PersistenceHelpers.EnsureStrategyInitializedForWriteOrAppend(
-                strategy,
-                arguments);
+            EnsureStrategyInitializedForSerialization(
+                context);
 
             string json = JsonConvert.SerializeObject(
                 value,
                 Formatting.Indented,
                 writeSerializerSettings);
 
-            return PersistenceHelpers.TryWriteOrAppendPersistently<string>(
-                strategy,
-                arguments,
-                Encoding.UTF8.GetBytes,
+            var result = TrySerialize<string>(
+                context,
                 json);
+
+            EnsureStrategyFinalizedForSerialization(
+                context);
+
+            return result;
         }
 
-        public bool Serialize(
-            ISerializationStrategy strategy,
-            IStronglyTypedMetadata arguments,
+        public override bool Serialize(
             Type valueType,
+            ISerializationCommandContext context,
             object valueObject)
         {
-            PersistenceHelpers.EnsureStrategyInitializedForWriteOrAppend(
-                strategy,
-                arguments);
+            EnsureStrategyInitializedForSerialization(
+                context);
 
             string json = JsonConvert.SerializeObject(
                 valueObject,
                 Formatting.Indented,
                 writeSerializerSettings);
 
-            return PersistenceHelpers.TryWriteOrAppendPersistently<string>(
-                strategy,
-                arguments,
-                Encoding.UTF8.GetBytes,
+            var result = TrySerialize<string>(
+                context,
                 json);
+
+            EnsureStrategyFinalizedForSerialization(
+                context);
+
+            return result;
         }
 
-        public bool Deserialize<TValue>(
-            ISerializationStrategy strategy,
-            IStronglyTypedMetadata arguments,
+        public override bool Deserialize<TValue>(
+            ISerializationCommandContext context,
             out TValue value)
         {
-            PersistenceHelpers.EnsureStrategyInitializedForRead(
-                strategy,
-                arguments);
+            EnsureStrategyInitializedForDeserialization(
+                context);
 
-            if (!PersistenceHelpers.TryReadPersistently<string>(
-                strategy,
-                arguments,
-                Encoding.UTF8.GetString,
+            if (!TryDeserialize<string>(
+                context,
                 out string json))
             {
                 value = default(TValue);
+
+                EnsureStrategyFinalizedForDeserialization(
+                    context);
 
                 return false;
             }
@@ -137,43 +136,28 @@ namespace HereticalSolutions.Persistence
                 json,
                 readSerializerSettings);
 
-            //DTO = (TValue)Activator.CreateInstance(typeof(TValue));
-            //
-            ////TODO: fix deserialize as <GENERIC> is NOT working at all - the value does NOT get populated properly
-            ////WARNING: THIS ONE MAY NOT PROPERLY POPULATE. I HAVE NO IDEA WHY
-            //JsonConvert.PopulateObject(
-            //    json,
-            //    DTO,
-            //    readSerializerSettings);
+            EnsureStrategyFinalizedForDeserialization(
+                context);
 
             return true;
         }
 
-        //TODO: fix deserialize as <GENERIC> is NOT working at all - the value does NOT get populated properly
-        public bool Deserialize(
-            ISerializationStrategy strategy,
-            IStronglyTypedMetadata arguments,
+        public override bool Deserialize(
             Type valueType,
+            ISerializationCommandContext context,
             out object valueObject)
         {
-            //DTO = Activator.CreateInstance(DTOType);
-            //
-            //JsonConvert.PopulateObject(
-            //    json,
-            //    DTO,
-            //    readSerializerSettings);
+            EnsureStrategyInitializedForDeserialization(
+                context);
 
-            PersistenceHelpers.EnsureStrategyInitializedForRead(
-                strategy,
-                arguments);
-
-            if (!PersistenceHelpers.TryReadPersistently<string>(
-                strategy,
-                arguments,
-                Encoding.UTF8.GetString,
+            if (!TryDeserialize<string>(
+                context,
                 out string json))
             {
                 valueObject = default(object);
+
+                EnsureStrategyFinalizedForDeserialization(
+                    context);
 
                 return false;
             }
@@ -183,24 +167,26 @@ namespace HereticalSolutions.Persistence
                 valueType,
                 readSerializerSettings);
 
+            EnsureStrategyFinalizedForDeserialization(
+                context);
+
             return true;
         }
 
-        public bool Populate<TValue>(
-            ISerializationStrategy strategy,
-            IStronglyTypedMetadata arguments,
+        public override bool Populate<TValue>(
+            ISerializationCommandContext context,
             ref TValue value)
         {
-            PersistenceHelpers.EnsureStrategyInitializedForRead(
-                strategy,
-                arguments);
+            EnsureStrategyInitializedForDeserialization(
+                context);
 
-            if (!PersistenceHelpers.TryReadPersistently<string>(
-                strategy,
-                arguments,
-                Encoding.UTF8.GetString,
+            if (!TryDeserialize<string>(
+                context,
                 out string json))
             {
+                EnsureStrategyFinalizedForDeserialization(
+                    context);
+
                 return false;
             }
 
@@ -209,25 +195,27 @@ namespace HereticalSolutions.Persistence
                 value,
                 readSerializerSettings);
 
+            EnsureStrategyFinalizedForDeserialization(
+                context);
+
             return true;
         }
 
-        public bool Populate(
-            ISerializationStrategy strategy,
-            IStronglyTypedMetadata arguments,
+        public override bool Populate(
             Type valueType,
+            ISerializationCommandContext context,
             ref object valueObject)
         {
-            PersistenceHelpers.EnsureStrategyInitializedForRead(
-                strategy,
-                arguments);
+            EnsureStrategyInitializedForDeserialization(
+                context);
 
-            if (!PersistenceHelpers.TryReadPersistently<string>(
-                strategy,
-                arguments,
-                Encoding.UTF8.GetString,
+            if (!TryDeserialize<string>(
+                context,
                 out string json))
             {
+                EnsureStrategyFinalizedForDeserialization(
+                    context);
+
                 return false;
             }
 
@@ -235,6 +223,9 @@ namespace HereticalSolutions.Persistence
                 json,
                 valueObject,
                 readSerializerSettings);
+
+            EnsureStrategyFinalizedForDeserialization(
+                context);
 
             return true;
         }

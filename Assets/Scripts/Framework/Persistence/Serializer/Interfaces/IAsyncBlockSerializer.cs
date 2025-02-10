@@ -50,14 +50,14 @@ namespace HereticalSolutions.Persistence
 
 		#region Populate
 
-		Task<bool> PopulateBlockAsync<TValue>(
-			ref TValue value,
+		Task<(bool, TValue)> PopulateBlockAsync<TValue>(
+			TValue value,
 			int blockOffset,
 			int blockSize);
 
-		Task<bool> PopulateBlockAsync(
+		Task<(bool, object)> PopulateBlockAsync(
 			Type valueType,
-			ref object valueObject,
+			object valueObject,
 			int blockOffset,
 			int blockSize);
 

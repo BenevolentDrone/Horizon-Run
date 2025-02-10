@@ -321,6 +321,14 @@ namespace HereticalSolutions.Persistence
 			object[] arguments)
 			where TDataConverter : IDataConverter
 		{
+			EnsureArgumentsExist();
+
+			if (!serializerContext.Arguments.Has<IDataConversionArgument>())
+			{
+				serializerContext.Arguments.TryAdd<IDataConversionArgument>(
+					PersistenceFactory.BuildDataConversionArgument());
+			}
+
 			deferredBuildDataConverterDelegate += () =>
 			{
 				if (serializerContext.DataConverter == null)
@@ -559,6 +567,19 @@ namespace HereticalSolutions.Persistence
 							$"SERIALIZATION STRATEGY IS ALREADY PRESENT. PLEASE REMOVE IT BEFORE ADDING A NEW ONE"));
 				}
 
+				if (buffer != null)
+				{
+					if (!serializerContext.Arguments.TryAdd<ISourceByteArrayArgument>(
+						PersistenceFactory.BuildSourceByteArrayArgument(
+							buffer)))
+					{
+						throw new Exception(
+							logger.TryFormatException(
+								GetType(),
+								$"SOURCE BYTE ARRAY ARGUMENT IS ALREADY PRESENT. PLEASE REMOVE IT BEFORE ADDING A NEW ONE"));
+					}
+				}
+
 				serializerContext.SerializationStrategy =
 					PersistenceFactory.BuildMemoryStreamStrategy(
 						loggerResolver,
@@ -701,14 +722,12 @@ namespace HereticalSolutions.Persistence
 			return this;
 		}
 
-		public ISerializerBuilder WithBlockSerialization(
-			int blockSize = 1024)
+		public ISerializerBuilder WithBlockSerialization()
 		{
 			EnsureArgumentsExist();
 
 			if (!serializerContext.Arguments.TryAdd<IBlockSerializationArgument>(
-				PersistenceFactory.BuildBlockSerializationArgument(
-					blockSize)))
+				PersistenceFactory.BuildBlockSerializationArgument()))
 			{
 				throw new Exception(
 					logger.TryFormatException(

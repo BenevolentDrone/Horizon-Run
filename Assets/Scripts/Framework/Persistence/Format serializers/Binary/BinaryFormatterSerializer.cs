@@ -1,7 +1,6 @@
 using System;
+using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
-
-using HereticalSolutions.Metadata;
 
 using HereticalSolutions.Logging;
 
@@ -9,94 +8,44 @@ namespace HereticalSolutions.Persistence
 {
     [FormatSerializer]
     public class BinaryFormatterSerializer
-        : IFormatSerializer
+        : ABinarySerializer
     {
         private readonly BinaryFormatter formatter;
-
-        private readonly ILogger logger;
 
         public BinaryFormatterSerializer(
             BinaryFormatter formatter,
             ILogger logger)
+            : base(
+                logger)
         {
             this.formatter = formatter;
-
-            this.logger = logger;
         }
 
-        #region IFormatSerializer
+        protected override bool CanSerializeWithStream => true;
 
-        public bool Serialize<TValue>(
-            ISerializationStrategy strategy,
-            IStronglyTypedMetadata arguments,
+        protected override void SerializeWithStream<TValue>(
+            IStrategyWithStream strategyWithStream,
             TValue value)
         {
-            PersistenceHelpers.EnsureStrategyInitializedForWriteOrAppend(
-                strategy,
-                arguments);
-
-            if (strategy is not IStrategyWithStream strategyWithStream)
-            {
-                logger?.LogError(
-                    GetType(),
-                    $"{GetType().Name} ONLY SUPPORTS STRATEGIES WITH STREAMS");
-
-                return false;
-            }
-
             formatter.Serialize(
                 strategyWithStream.Stream,
                 value);
-
-            return true;
         }
 
-        public bool Serialize(
-            ISerializationStrategy strategy,
-            IStronglyTypedMetadata arguments,
+        protected override void SerializeWithStream(
+            IStrategyWithStream strategyWithStream,
             Type valueType,
             object valueObject)
         {
-            PersistenceHelpers.EnsureStrategyInitializedForWriteOrAppend(
-                strategy,
-                arguments);
-
-            if (strategy is not IStrategyWithStream strategyWithStream)
-            {
-                logger?.LogError(
-                    GetType(),
-                    $"{GetType().Name} ONLY SUPPORTS STRATEGIES WITH STREAMS");
-
-                return false;
-            }
-
             formatter.Serialize(
                 strategyWithStream.Stream,
                 valueObject);
-
-            return true;
         }
 
-        public bool Deserialize<TValue>(
-            ISerializationStrategy strategy,
-            IStronglyTypedMetadata arguments,
+        protected override bool DeserializeWithStream<TValue>(
+            IStrategyWithStream strategyWithStream,
             out TValue value)
         {
-            PersistenceHelpers.EnsureStrategyInitializedForRead(
-                strategy,
-                arguments);
-
-            if (strategy is not IStrategyWithStream strategyWithStream)
-            {
-                logger?.LogError(
-                    GetType(),
-                    $"{GetType().Name} ONLY SUPPORTS STRATEGIES WITH STREAMS");
-
-                value = default;
-
-                return false;
-            }
-
             var valueObject = formatter.Deserialize(
                 strategyWithStream.Stream);
 
@@ -105,84 +54,93 @@ namespace HereticalSolutions.Persistence
             return true;
         }
 
-        public bool Deserialize(
-            ISerializationStrategy strategy,
-            IStronglyTypedMetadata arguments,
+        protected override bool DeserializeWithStream(
+            IStrategyWithStream strategyWithStream,
             Type valueType,
             out object valueObject)
         {
-            PersistenceHelpers.EnsureStrategyInitializedForRead(
-                strategy,
-                arguments);
-
-            if (strategy is not IStrategyWithStream strategyWithStream)
-            {
-                logger?.LogError(
-                    GetType(),
-                    $"{GetType().Name} ONLY SUPPORTS STRATEGIES WITH STREAMS");
-
-                valueObject = default;
-
-                return false;
-            }
-
             valueObject = formatter.Deserialize(
                 strategyWithStream.Stream);
 
             return true;
         }
 
-        public bool Populate<TValue>(
-            ISerializationStrategy strategy,
-            IStronglyTypedMetadata arguments,
-            ref TValue value)
+        //Courtesy of https://stackoverflow.com/questions/1446547/how-to-convert-an-object-to-a-byte-array-in-c-sharp
+        protected override byte[] SerializeToByteArray<TValue>(
+            TValue value)
         {
-            PersistenceHelpers.EnsureStrategyInitializedForRead(
-                strategy,
-                arguments);
-
-            if (strategy is not IStrategyWithStream strategyWithStream)
+            using (var memoryStream = new MemoryStream())
             {
-                logger?.LogError(
-                    GetType(),
-                    $"{GetType().Name} ONLY SUPPORTS STRATEGIES WITH STREAMS");
+                formatter.Serialize(
+                    memoryStream,
+                    value);
 
-                return false;
+                return memoryStream.ToArray();
             }
-
-            var valueObject = formatter.Deserialize(
-                strategyWithStream.Stream);
-
-            value = valueObject.CastFromTo<object, TValue>();
-
-            return true;
         }
 
-        public bool Populate(
-            ISerializationStrategy strategy,
-            IStronglyTypedMetadata arguments,
+        //Courtesy of https://stackoverflow.com/questions/1446547/how-to-convert-an-object-to-a-byte-array-in-c-sharp
+        protected override byte[] SerializeToByteArray(
             Type valueType,
-            ref object valueObject)
+            object valueObject)
         {
-            PersistenceHelpers.EnsureStrategyInitializedForRead(
-                strategy,
-                arguments);
-
-            if (strategy is not IStrategyWithStream strategyWithStream)
+            using (var memoryStream = new MemoryStream())
             {
-                logger?.LogError(
-                    GetType(),
-                    $"{GetType().Name} ONLY SUPPORTS STRATEGIES WITH STREAMS");
+                formatter.Serialize(
+                    memoryStream,
+                    valueObject);
 
-                return false;
+                return memoryStream.ToArray();
             }
-
-            valueObject = formatter.Deserialize(
-                strategyWithStream.Stream);
-
-            return true;
         }
 
-        #endregion
+        //Courtesy of https://stackoverflow.com/questions/1446547/how-to-convert-an-object-to-a-byte-array-in-c-sharp
+        protected override bool DeserializeFromByteArray<TValue>(
+            byte[] byteArrayValue,
+            out TValue value)
+        {
+            using (var memoryStream = new MemoryStream())
+            {
+                memoryStream.Write(
+                    byteArrayValue,
+                    0,
+                    byteArrayValue.Length);
+
+                memoryStream.Seek(
+                    0,
+                    SeekOrigin.Begin);
+
+                var valueObject = formatter.Deserialize(
+                    memoryStream);
+
+                value = valueObject.CastFromTo<object, TValue>();
+
+                return true;
+            }
+        }
+
+        //Courtesy of https://stackoverflow.com/questions/1446547/how-to-convert-an-object-to-a-byte-array-in-c-sharp
+        protected override bool DeserializeFromByteArray(
+            byte[] byteArrayValue,
+            Type valueType,
+            out object valueObject)
+        {
+            using (var memoryStream = new MemoryStream())
+            {
+                memoryStream.Write(
+                    byteArrayValue,
+                    0,
+                    byteArrayValue.Length);
+
+                memoryStream.Seek(
+                    0,
+                    SeekOrigin.Begin);
+
+                valueObject = formatter.Deserialize(
+                    memoryStream);
+
+                return true;
+            }
+        }
     }
 }

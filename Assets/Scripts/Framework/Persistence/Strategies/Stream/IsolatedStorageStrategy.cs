@@ -55,6 +55,15 @@ namespace HereticalSolutions.Persistence
 				FullPath,
 				isolatedStorageFile,
 				logger);
+
+			if (!IOHelpers.FileInIsolatedStorageExists(
+				FullPath,
+				isolatedStorageFile,
+				logger))
+			{
+				isolatedStorageFile.CreateFile(
+					FullPath);
+			}
 		}
 
 		public bool IODestinationExists()
@@ -67,33 +76,26 @@ namespace HereticalSolutions.Persistence
 
 		public void CreateIODestination()
 		{
-			string savePath = FullPath;
+			EraseIODestination();
 
 			IOHelpers.EnsureDirectoryInIsolatedStorageExists(
 				FullPath,
 				isolatedStorageFile,
 				logger);
 
-			if (!IOHelpers.FileInIsolatedStorageExists(
-				savePath,
-				isolatedStorageFile,
-				logger))
-			{
-				isolatedStorageFile.CreateFile(
-					FullPath);
-			}
+			isolatedStorageFile.CreateFile(
+				FullPath);
 		}
 
 		public void EraseIODestination()
 		{
-			string savePath = FullPath;
-
 			if (IOHelpers.FileInIsolatedStorageExists(
-				savePath,
+				FullPath,
 				isolatedStorageFile,
 				logger))
 			{
-				isolatedStorageFile.DeleteFile(savePath);
+				isolatedStorageFile.DeleteFile(
+					FullPath);
 			}
 		}
 

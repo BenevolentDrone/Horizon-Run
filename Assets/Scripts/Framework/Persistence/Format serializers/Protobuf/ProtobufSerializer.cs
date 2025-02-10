@@ -1,8 +1,7 @@
 #if PROTOBUF_SUPPORT
 
 using System;
-
-using HereticalSolutions.Metadata;
+using System.IO;
 
 using HereticalSolutions.Logging;
 
@@ -13,116 +12,51 @@ namespace HereticalSolutions.Persistence
 {
     [FormatSerializer]
     public class ProtobufSerializer
-        : IFormatSerializer
+        : ABinarySerializer
     {
-        private readonly ILogger logger;
-
         public ProtobufSerializer(
             ILogger logger)
+            : base(
+                logger)
         {
-            this.logger = logger;
         }
 
-        #region IFormatSerializer
+        protected override bool CanSerializeWithStream => true;
 
-        public bool Serialize<TValue>(
-            ISerializationStrategy strategy,
-            IStronglyTypedMetadata arguments,
+        protected override void SerializeWithStream<TValue>(
+            IStrategyWithStream strategyWithStream,
             TValue value)
         {
-            PersistenceHelpers.EnsureStrategyInitializedForWriteOrAppend(
-                strategy,
-                arguments);
-
-            if (strategy is not IStrategyWithStream strategyWithStream)
-            {
-                logger?.LogError(
-                    GetType(),
-                    $"{GetType().Name} ONLY SUPPORTS STRATEGIES WITH STREAMS");
-
-                return false;
-            }
-
             ProtobufInternalSerializer.Serialize<TValue>(
                 strategyWithStream.Stream,
                 value);
-
-            return true;
         }
 
-        public bool Serialize(
-            ISerializationStrategy strategy,
-            IStronglyTypedMetadata arguments,
+        protected override void SerializeWithStream(
+            IStrategyWithStream strategyWithStream,
             Type valueType,
             object valueObject)
         {
-            PersistenceHelpers.EnsureStrategyInitializedForWriteOrAppend(
-                strategy,
-                arguments);
-
-            if (strategy is not IStrategyWithStream strategyWithStream)
-            {
-                logger?.LogError(
-                    GetType(),
-                    $"{GetType().Name} ONLY SUPPORTS STRATEGIES WITH STREAMS");
-
-                return false;
-            }
-
             ProtobufInternalSerializer.NonGeneric.Serialize(
                 strategyWithStream.Stream,
                 valueObject);
-
-            return true;
         }
 
-        public bool Deserialize<TValue>(
-            ISerializationStrategy strategy,
-            IStronglyTypedMetadata arguments,
+        protected override bool DeserializeWithStream<TValue>(
+            IStrategyWithStream strategyWithStream,
             out TValue value)
         {
-            PersistenceHelpers.EnsureStrategyInitializedForRead(
-                strategy,
-                arguments);
-
-            if (strategy is not IStrategyWithStream strategyWithStream)
-            {
-                logger?.LogError(
-                    GetType(),
-                    $"{GetType().Name} ONLY SUPPORTS STRATEGIES WITH STREAMS");
-
-                value = default;
-
-                return false;
-            }
-
             value = ProtobufInternalSerializer.Deserialize<TValue>(
                 strategyWithStream.Stream);
 
             return true;
         }
 
-        public bool Deserialize(
-            ISerializationStrategy strategy,
-            IStronglyTypedMetadata arguments,
+        protected override bool DeserializeWithStream(
+            IStrategyWithStream strategyWithStream,
             Type valueType,
             out object valueObject)
         {
-            PersistenceHelpers.EnsureStrategyInitializedForRead(
-                strategy,
-                arguments);
-
-            if (strategy is not IStrategyWithStream strategyWithStream)
-            {
-                logger?.LogError(
-                    GetType(),
-                    $"{GetType().Name} ONLY SUPPORTS STRATEGIES WITH STREAMS");
-
-                valueObject = default;
-
-                return false;
-            }
-
             valueObject = ProtobufInternalSerializer.NonGeneric.Deserialize(
                 valueType,
                 strategyWithStream.Stream);
@@ -130,59 +64,82 @@ namespace HereticalSolutions.Persistence
             return true;
         }
 
-        public bool Populate<TValue>(
-            ISerializationStrategy strategy,
-            IStronglyTypedMetadata arguments,
-            ref TValue value)
+        //Courtesy of https://stackoverflow.com/questions/1446547/how-to-convert-an-object-to-a-byte-array-in-c-sharp
+        protected override byte[] SerializeToByteArray<TValue>(
+            TValue value)
         {
-            PersistenceHelpers.EnsureStrategyInitializedForRead(
-                strategy,
-                arguments);
-
-            if (strategy is not IStrategyWithStream strategyWithStream)
+            using (var memoryStream = new MemoryStream())
             {
-                logger?.LogError(
-                    GetType(),
-                    $"{GetType().Name} ONLY SUPPORTS STRATEGIES WITH STREAMS");
+                ProtobufInternalSerializer.Serialize<TValue>(
+                    memoryStream,
+                    value);
 
-                return false;
+                return memoryStream.ToArray();
             }
-
-            value = ProtobufInternalSerializer.Deserialize<TValue>(
-                strategyWithStream.Stream,
-                value);
-
-            return true;
         }
 
-        public bool Populate(
-            ISerializationStrategy strategy,
-            IStronglyTypedMetadata arguments,
+        //Courtesy of https://stackoverflow.com/questions/1446547/how-to-convert-an-object-to-a-byte-array-in-c-sharp
+        protected override byte[] SerializeToByteArray(
             Type valueType,
-            ref object valueObject)
+            object valueObject)
         {
-            PersistenceHelpers.EnsureStrategyInitializedForRead(
-                strategy,
-                arguments);
-
-            if (strategy is not IStrategyWithStream strategyWithStream)
+            using (var memoryStream = new MemoryStream())
             {
-                logger?.LogError(
-                    GetType(),
-                    $"{GetType().Name} ONLY SUPPORTS STRATEGIES WITH STREAMS");
+                ProtobufInternalSerializer.NonGeneric.Serialize(
+                    memoryStream,
+                    valueObject);
 
-                return false;
+                return memoryStream.ToArray();
             }
-
-            valueObject = ProtobufInternalSerializer.NonGeneric.Deserialize(
-                valueType,
-                strategyWithStream.Stream,
-                valueObject);
-
-            return true;
         }
 
-        #endregion
+        //Courtesy of https://stackoverflow.com/questions/1446547/how-to-convert-an-object-to-a-byte-array-in-c-sharp
+        protected override bool DeserializeFromByteArray<TValue>(
+            byte[] byteArrayValue,
+            out TValue value)
+        {
+            using (var memoryStream = new MemoryStream())
+            {
+                memoryStream.Write(
+                    byteArrayValue,
+                    0,
+                    byteArrayValue.Length);
+
+                memoryStream.Seek(
+                    0,
+                    SeekOrigin.Begin);
+
+                value = ProtobufInternalSerializer.Deserialize<TValue>(
+                    memoryStream);
+
+                return true;
+            }
+        }
+
+        //Courtesy of https://stackoverflow.com/questions/1446547/how-to-convert-an-object-to-a-byte-array-in-c-sharp
+        protected override bool DeserializeFromByteArray(
+            byte[] byteArrayValue,
+            Type valueType,
+            out object valueObject)
+        {
+            using (var memoryStream = new MemoryStream())
+            {
+                memoryStream.Write(
+                    byteArrayValue,
+                    0,
+                    byteArrayValue.Length);
+
+                memoryStream.Seek(
+                    0,
+                    SeekOrigin.Begin);
+
+                valueObject = ProtobufInternalSerializer.NonGeneric.Deserialize(
+                    valueType,
+                    memoryStream);
+
+                return true;
+            }
+        }
     }
 }
 

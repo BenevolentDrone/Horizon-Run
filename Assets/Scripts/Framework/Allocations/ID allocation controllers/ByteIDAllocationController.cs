@@ -75,7 +75,7 @@ namespace HereticalSolutions.Allocations
 				return false;
 			}
 			
-			id = lastAllocatedID++;
+			id = (byte)(lastAllocatedID + 1);
 
 			lastAllocatedID = id;
 

@@ -1,0 +1,88 @@
+using System;
+
+using HereticalSolutions.Logging;
+
+namespace HereticalSolutions.StanleyScript
+{
+	public class ListCount
+		: AStanleyInstructionHandler
+	{
+		public ListCount(
+			ILoggerResolver loggerResolver,
+			ILogger logger)
+			: base(
+				loggerResolver,
+				logger)
+		{
+		}
+
+		#region IStanleyInstructionHandler
+
+		#region Instruction
+
+		public override string Instruction => StanleyOpcodes.OP_LIST_COUNT;
+
+		#endregion
+
+		#region Arguments
+
+		public override int ArgumentsCount => 1;
+
+		public override Type[] ArgumentTypes => new Type[]
+		{
+			typeof(StanleyList)
+		};
+
+		#endregion
+
+		#region Return values
+
+		public override int ReturnValuesCount => 1;
+
+		public override Type[] ReturnValueTypes => new Type[]
+		{
+			typeof(int)
+		};
+
+		#endregion
+
+		public override bool Handle(
+			IStanleyContextInternal context,
+			string instruction,
+			string[] instructionTokens)
+		{
+			var currentLogger = SelectLogger(
+				context);
+
+			var stack = context.StackMachine;
+
+			if (!stack.Pop(
+				out var listVariable))
+			{
+				currentLogger?.LogError(
+					GetType(),
+					"STACK VARIABLE NOT FOUND");
+
+				return false;
+			}
+
+			if (!AssertVariableType<StanleyList>(
+				listVariable,
+				currentLogger))
+				return false;
+
+			var list = listVariable.GetValue<StanleyList>();
+
+			stack.Push(
+				StanleyFactory.BuildValueVariable(
+					StanleyConsts.RVALUE_VARIABLE_NAME,
+					typeof(int),
+					list.Count,
+					loggerResolver));
+
+			return true;
+		}
+
+		#endregion
+	}
+}

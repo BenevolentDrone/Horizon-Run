@@ -82,5 +82,14 @@ namespace HereticalSolutions
 
             result = resultList.ToArray();
         }
+
+        public static bool IsSameOrInheritor(
+            this Type currentType,
+            Type targetType)
+        {
+            return
+                (currentType == targetType)
+                || targetType.IsAssignableFrom(currentType);
+        }
     }
 }

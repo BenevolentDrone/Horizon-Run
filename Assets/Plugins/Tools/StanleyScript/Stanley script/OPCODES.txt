@@ -1,0 +1,241 @@
+//Keywords like POP, PUSH, ALLOC, FREE are going FIRST
+//Otherwise the first word is related to the target, i.e. SCOPE, DELEGATE, etc
+//VAR means any kind of variable
+
+INSTRUCTION                     ARG1    ARG2    ARG3    RET
+
+// Push literals
+//THE VALUES COME FROM COMMAND STRING SEPARATED BY SPACE
+//EVERYTHING IN TEXT CAN BE EXPRESSED AS THESE
+//THE REST SHOULD CONVERT FROM STRING OR INT
+OP_PUSH_INT                                             INT
+OP_PUSH_FLOAT                                           FLOAT
+OP_PUSH_BOOL                                            BOOL
+OP_PUSH_STRING                                          STRING
+
+// Types that require conversion from other types
+OP_PUSH_TYPE                    STRING                  TYPE
+OP_PUSH_HANDLE                  INT                     HANDLE
+
+// Copying
+OP_COPY                         VAR     VAR
+
+// Casting
+//CASTS ARG1 TO ARG2 TYPE
+//YOU CAN ADD MORE DIFFERENT TYPES AND PROVIDE CASTING TO THEM BY ADDING A NEW OPERATION WITH THE INSTRUCTION OP_CAST THAT CHECKS FOR ARG1'S AND ARG2'S TYPES IN WillHandle METHOD
+OP_CAST                         VAR     TYPE            VAR
+OP_TYPE_GET                     VAR                     TYPE
+
+// Scope
+//CREATES A CHILD SCOPE TO THE CURRENT
+//RETURNS HANDLE TO ALLOW SWITCHING BRANCHING SCOPES FOR EVENTS
+OP_PUSH_SCOPE                                           HANDLE
+OP_POP_SCOPE
+OP_SCOPE_SWITCH                 HANDLE
+
+// Variables
+OP_ALLOC_VARIABLE               STRING  TYPE
+OP_FREE_VARIABLE                STRING
+OP_PUSH_VARIABLE                STRING                  VAR
+OP_PUSH_VARIABLE_GLOBAL         STRING                  VAR
+
+// Objects
+OP_PUSH_OBJECT                                          OBJECT
+OP_ALLOC_PROPERTY               OBJECT  STRING  TYPE
+OP_FREE_PROPERTY                OBJECT  STRING
+OP_PUSH_PROPERTY                OBJECT  STRING          VAR
+
+// Delegates
+//CREATES A DELEGATE THAT PERFORMS A JUMP TO A LABEL SPECIFIED BY STRING
+OP_PUSH_DELEGATE                STRING                 	DELEGATE
+OP_DELEGATE_CALL                DELEGATE
+
+// Events
+//CREATES AN EMPTY EVENT
+OP_PUSH_EVENT                   BOOL    STRING          EVENT
+OP_EVENT_RAISE                  EVENT
+OP_EVENT_RESET                  EVENT
+OP_EVENT_GET_LABEL              EVENT                   STRING
+OP_EVENT_SET_LABEL              EVENT   STRING
+
+// Programs
+//RETURNS HANDLE TO ALLOCATED SUBPROGRAM TO ALLOW RUNNING 2+ SUBPROGRAMS WITH THE SAME NAME
+OP_PUSH_SUBPROGRAM              STRING                  HANDLE
+OP_POP_SUBPROGRAM               HANDLE
+OP_SUBPROGRAM_START             HANDLE
+OP_SUBPROGRAM_PAUSE             HANDLE
+OP_SUBPROGRAM_STOP              HANDLE
+OP_SUBPROGRAM_STEP              HANDLE
+
+// Math operations
+OP_ADD                          VAR     VAR             VAR
+OP_SUBSTRACT                    VAR     VAR             VAR
+OP_MULTIPLY                     VAR     VAR             VAR
+OP_DIVIDE                       VAR     VAR             FLOAT
+OP_DIVIDE_INT                   VAR     VAR             INT
+OP_MODULO                       VAR     VAR             VAR
+OP_POWER                        VAR     VAR             VAR
+OP_NEGATIVE                     VAR                     VAR
+OP_CEILING                      VAR                     VAR
+OP_FLOOR                        VAR                     VAR
+OP_ROUND                        VAR                     VAR
+OP_INC                          INT                     INT
+OP_DEC                          INT                     INT
+
+// Boolean operations
+OP_NOT                          BOOL                    BOOL
+OP_AND                          BOOL    BOOL            BOOL
+OP_OR                           BOOL    BOOL            BOOL
+OP_XOR                          BOOL    BOOL            BOOL
+OP_EQ                           VAR     VAR             BOOL
+OP_NEQ                          VAR     VAR             BOOL
+OP_LESS                         VAR     VAR             BOOL
+OP_LEQ                          VAR     VAR             BOOL
+OP_MORE                         VAR     VAR             BOOL
+OP_MEQ                          VAR     VAR             BOOL
+
+// Collections
+//THE DEFAULT COLLECTION IS LIST<STANLEYVARIABLE>
+OP_PUSH_LIST                                            LIST
+OP_LIST_COUNT                   LIST                    INT
+OP_LIST_FIRSTVAL                LIST                    VAR
+OP_LIST_LASTVAL                 LIST                    VAR
+OP_LIST_VALATINDEX              LIST    INT             VAR
+OP_LIST_PUSH                    LIST    VAR
+OP_LIST_POP                     LIST                    VAR
+OP_LIST_INSERTAT                LIST    INT     VAR
+OP_LIST_REMOVEAT                LIST    INT
+OP_LIST_CONCAT                  LIST    LIST            LIST
+OP_LIST_ENUMERATE               LIST    DELEGATE        LIST
+OP_LIST_CLEAR                   LIST
+
+// Waiting
+OP_WAIT_MS                      INT
+OP_WAIT_EVENT                   EVENT
+
+// Stack manipulation
+//COPIES PC TO STACK
+OP_STACK_PUSH_PC                                        INT
+//COPIES LC TO STACK
+OP_STACK_PUSH_LC                                        INT
+//SETS LC VALUE
+OP_STACK_SET_LC                 INT
+//COPIES STACK COUNT TO STACK
+OP_STACK_PUSH_SIZE                                      INT
+
+//PEEKS TOP VARIABLE IN STACK AND PUSHES TO STACK
+OP_STACK_PEEK                                           VAR
+//PEEKS VARIABLE IN STACK AT POSITION STARTING FROM TOP AND PUSHES TO STACK
+OP_STACK_PEEK_FROM_TOP          INT                     VAR
+//PEEKS VARIABLE IN STACK AT POSITION STARTING FROM BOTTOM AND PUSHES TO STACK
+OP_STACK_PEEK_FROM_BOTTOM       INT                     VAR
+
+
+//DUPLICATES TOP VARIABLE IN STACK
+OP_STACK_DUPE                                           VAR
+//DUPLICATES VARIABLE IN STACK AT POSITION STARTING FROM TOP AND PUSHES TO STACK
+OP_STACK_DUPE_FROM_TOP          INT                     VAR
+//DUPLICATES VARIABLE IN STACK AT POSITION STARTING FROM BOTTOM AND PUSHES TO STACK
+OP_STACK_DUPE_FROM_BOTTOM       INT                     VAR
+
+//POPS TOP VARIABLE IN STACK
+OP_STACK_POP                    
+//POPS VALUE FROM STACK AT POSITION STARTING FROM TOP
+OP_STACK_POP_FROM_TOP           INT
+//POPS VALUE FROM STACK AT POSITION STARTING FROM BOTTOM
+OP_STACK_POP_FROM_BOTTOM        INT
+
+//PUSHES VALUE FROM STACK TOP TO STACK AT POSITION STARTING FROM TOP
+OP_STACK_PUSH_TO_TOP            INT     VAR
+//PUSHES VALUE FROM STACK TOP TO STACK AT POSITION STARTING FROM BOTTOM
+OP_STACK_PUSH_TO_BOTTOM         INT     VAR
+
+// Flow control
+OP_ALLOC_LABEL                  STRING  INT
+OP_FREE_LABEL                   STRING
+OP_JUMP                         INT
+OP_JUMP_LABEL                   STRING
+OP_JUMP_CONDITIONAL             INT     BOOL
+OP_JUMP_LABEL_CONDITIONAL       STRING  BOOL
+OP_RETURN
+//THE LABEL STRING COMES FROM COMMAND STRING SEPARATED BY SPACE
+LABEL
+
+// Logging
+OP_PRINT                        STRING
+
+// Assertions
+OP_ASSERT                       BOOL
+
+###############################################################
+
+EVENTS
+
+- Each scope caches the list of event variables inside the SCOPE object (SCOPE.EVENT_LIST)
+- After each op the program goes over each scope recursively starting at root
+- For each event variable the Poll() method is called
+- If after the poll the variable is (still) raised, then:
+
+    //JUMP HEADER
+	- The PC is pushed to stack (OP_STACK_PUSH_PC)
+	- The scope handle is pushed to stack (SCOPE.HANDLE)
+
+	//EVENT JUMP
+	//- The event variable is reset (OP_EVENT_RESET) - done by the caller instead
+	- The scope is switched (OP_SCOPE_SWITCH) to the handle stored in the SCOPE object (SCOPE.HANDLE) of the event variable's scope (provided by the method, as it's currently processing this scope)
+	- The jump is performed (OP_JUMP_LABEL) to the label stored in the event variable (OP_EVENT_GET_LABEL)
+		
+	//METHOD HEADER
+	- The new scope is pushed (OP_PUSH_SCOPE)
+	- The scope handle from stack is stored inside the SCOPE object (SCOPE.RETURN_SCOPE)
+	- The pc from stack is stored inside the SCOPE object (SCOPE.RETURN_PC)
+
+    - The code after the label performs
+
+	//METHOD FOOTER
+	- The pc stored inside the SCOPE object (SCOPE.RETURN_PC) is pushed to stack
+	- The scope handle stored inside the SCOPE object (SCOPE.RETURN_SCOPE) is pushed to stack
+	- The current scope is popped (OP_POP_SCOPE)
+	- The scope is switched to the scope handle from stack (OP_SCOPE_SWITCH)
+	- The jump is performed to the pc from stack (OP_JUMP)
+
+    - The next scope is processed
+- Otherwise:
+    - The next scope is processed
+- This way top level scope events get processed before the lower level scope events
+- This way event processing interrupts the execution of programs but also (kinda?) ensures safety by performing within their own scope
+    
+
+###############################################################
+
+//EXAMPLES
+
+###############################################################
+
+//#FOR "a = 2 + 3" WE HAVE:
+//
+//# ALLOCATE THE VARIABLE THAT WILL STORE THE SUM
+//# FIRST OPS OF ANY SCOPE ARE DEDICATED TO ALLOCATING VARIABLES IN THE SYMBOL TABLE
+//OP_PUSH_STRING "int"
+//OP_PUSH_TYPE
+//OP_PUSH_STRING "a"
+//OP_ALLOC_VARIABLE
+//
+//# LOAD VARIABLE THAT WILL STORE THE SUM
+//OP_PUSH_STRING "a"
+//OP_PUSH_VARIABLE
+//
+//# LOAD ARGS
+//OP_PUSH_INT 3
+//OP_PUSH_INT 2
+//
+//# PERFORM ADD, STORE RESULT IN STACK
+//OP_ADD
+//
+//# COPY THE SUM TO THE VARIABLE
+//OP_COPY
+//
+//# RETURN
+//OP_RETURN
+
+

@@ -41,13 +41,13 @@ namespace HereticalSolutions.Persistence
 		#region Populate
 
 		bool PopulateBlock<TValue>(
-			ref TValue value,
+			TValue value,
 			int blockOffset,
 			int blockSize);
 
 		bool PopulateBlock(
 			Type valueType,
-			ref object valueObject,
+			object valueObject,
 			int blockOffset,
 			int blockSize);
 

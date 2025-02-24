@@ -1,4 +1,5 @@
 using System;
+using System.Reflection;
 using System.Threading.Tasks;
 
 using HereticalSolutions.Asynchronous;
@@ -8,7 +9,8 @@ using HereticalSolutions.Logging;
 namespace HereticalSolutions.Persistence
 {
 	public abstract class AFormatSerializer
-		: IFormatSerializer
+		: IFormatSerializer,
+		  IAsyncFormatSerializer
 	{
 		protected readonly ILogger logger;
 
@@ -38,14 +40,143 @@ namespace HereticalSolutions.Persistence
 			ISerializationCommandContext context,
 			out object valueObject);
 
-		public abstract bool Populate<TValue>(
+		public virtual bool Populate<TValue>(
 			ISerializationCommandContext context,
-			ref TValue value);
+			TValue value)
+		{
+			if (!Deserialize<TValue>(
+				context,
+				out var newValue))
+			{
+				return false;
+			}
 
-		public abstract bool Populate(
+			PopulateWithReflection(
+				newValue,
+				value);
+
+			return true;
+		}
+
+		public virtual bool Populate(
 			Type valueType,
 			ISerializationCommandContext context,
-			ref object valueObject);
+			object valueObject)
+		{
+			if (!Deserialize(
+				valueType,
+				context,
+				out var newValue))
+			{
+				return false;
+			}
+
+			PopulateWithReflection(
+				newValue,
+				valueObject);
+
+			return true;
+		}
+
+		#endregion
+
+		#region IAsyncFormatSerializer
+
+		#region Serialize
+
+		public virtual async Task<bool> SerializeAsync<TValue>(
+			ISerializationCommandContext context,
+			TValue value,
+
+			//Async tail
+			AsyncExecutionContext asyncContext)
+		{
+			return Serialize<TValue>(
+				context,
+				value);
+		}
+
+		public virtual async Task<bool> SerializeAsync(
+			Type valueType,
+			ISerializationCommandContext context,
+			object valueObject,
+
+			//Async tail
+			AsyncExecutionContext asyncContext)
+		{
+			return Serialize(
+				valueType,
+				context,
+				valueObject);
+		}
+
+		#endregion
+
+		#region Deserialize
+
+		public virtual async Task<(bool, TValue)> DeserializeAsync<TValue>(
+			ISerializationCommandContext context,
+
+			//Async tail
+			AsyncExecutionContext asyncContext)
+		{
+			bool result = Deserialize<TValue>(
+				context,
+				out TValue value);
+			
+			return (result, value);
+		}
+
+		public virtual async Task<(bool, object)> DeserializeAsync(
+			Type valueType,
+			ISerializationCommandContext context,
+
+			//Async tail
+			AsyncExecutionContext asyncContext)
+		{
+			bool result = Deserialize(
+				valueType,
+				context,
+				out object valueObject);
+			
+			return (result, valueObject);
+		}
+
+		#endregion
+
+		#region Populate
+
+		public virtual async Task<bool> PopulateAsync<TValue>(
+			ISerializationCommandContext context,
+			TValue value,
+
+			//Async tail
+			AsyncExecutionContext asyncContext)
+		{
+			bool result = Populate<TValue>(
+				context,
+				value);
+			
+			return result;
+		}
+
+		public virtual async Task<bool> PopulateAsync(
+			Type valueType,
+			ISerializationCommandContext context,
+			object valueObject,
+
+			//Async tail
+			AsyncExecutionContext asyncContext)
+		{
+			bool result = Populate(
+				valueType,
+				context,
+				valueObject);
+			
+			return result;
+		}
+
+		#endregion
 
 		#endregion
 
@@ -923,6 +1054,57 @@ namespace HereticalSolutions.Persistence
 				blockOffset,
 				blockSize,
 				asyncContext);
+		}
+
+		#endregion
+	
+		#region Populate with reflection
+
+		protected void PopulateWithReflection(
+			object source,
+			object destination)
+		{
+			PopulateFieldsWithReflection(source, destination);
+
+			PopulatePropertiesWithReflection(source, destination);
+		}
+
+		protected void PopulateFieldsWithReflection(
+			object source,
+			object destination)
+		{
+			var fields = source
+				.GetType()
+				.GetFields(
+					BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
+
+			foreach (var field in fields)
+			{
+				var value = field.GetValue(source);
+
+				field.SetValue(destination, value);
+			}
+		}
+
+		protected void PopulatePropertiesWithReflection(
+			object source,
+			object destination)
+		{
+			PropertyInfo[] properties =
+				source
+				.GetType()
+				.GetProperties(
+					BindingFlags.Instance | BindingFlags.Public | BindingFlags.GetProperty);
+
+			foreach (var property in properties)
+			{
+				if (property != null
+					&& property.CanWrite)
+					property.SetValue(
+						destination,
+						property.GetValue(source, null),
+						null);
+			}
 		}
 
 		#endregion

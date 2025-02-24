@@ -33,11 +33,11 @@ namespace HereticalSolutions.Persistence
         #region Populate
 
         bool Populate<TValue>(
-            ref TValue value);
+            TValue value);
 
         bool Populate(
             Type valueType,
-            ref object valueObject);
+            object valueObject);
 
         #endregion
     }

@@ -44,22 +44,31 @@ namespace HereticalSolutions.Persistence
 		Task<(bool, object)> DeserializeBlockAsync(
 			Type valueType,
 			int blockOffset,
-			int blockSize);
+			int blockSize,
+
+			//Async tail
+			AsyncExecutionContext asyncContext);
 
 		#endregion
 
 		#region Populate
 
-		Task<(bool, TValue)> PopulateBlockAsync<TValue>(
+		Task<bool> PopulateBlockAsync<TValue>(
 			TValue value,
 			int blockOffset,
-			int blockSize);
+			int blockSize,
 
-		Task<(bool, object)> PopulateBlockAsync(
+			//Async tail
+			AsyncExecutionContext asyncContext);
+
+		Task<bool> PopulateBlockAsync(
 			Type valueType,
 			object valueObject,
 			int blockOffset,
-			int blockSize);
+			int blockSize,
+
+			//Async tail
+			AsyncExecutionContext asyncContext);
 
 		#endregion
 	}

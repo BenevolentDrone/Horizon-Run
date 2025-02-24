@@ -34,7 +34,9 @@ namespace HereticalSolutions.Persistence
 
         protected override bool CanSerializeWithTextWriter => true;
 
-        protected override void SerializeWithTextWriter<TValue>(
+        protected override bool CanDeserializeWithTextReader => true;
+
+        protected override bool SerializeWithTextWriter<TValue>(
             TextStreamStrategy textStreamStrategy,
             TValue value)
         {
@@ -42,9 +44,11 @@ namespace HereticalSolutions.Persistence
                 textStreamStrategy.StreamWriter,
                 value,
                 typeof(TValue));
+
+            return true;
         }
 
-        protected override void SerializeWithTextWriter(
+        protected override bool SerializeWithTextWriter(
             TextStreamStrategy textStreamStrategy,
             Type valueType,
             object valueObject)
@@ -53,6 +57,8 @@ namespace HereticalSolutions.Persistence
                 textStreamStrategy.StreamWriter,
                 valueObject,
                 valueType);
+
+            return true;
         }
 
         protected override bool DeserializeWithTextReader<TValue>(

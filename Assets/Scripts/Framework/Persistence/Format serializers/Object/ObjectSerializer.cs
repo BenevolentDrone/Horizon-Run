@@ -113,7 +113,7 @@ namespace HereticalSolutions.Persistence
 
 		public override bool Populate<TValue>(
 			ISerializationCommandContext context,
-			ref TValue value)
+			TValue value)
 		{
 			EnsureStrategyInitializedForDeserialization(
 				context);
@@ -128,7 +128,9 @@ namespace HereticalSolutions.Persistence
 				return false;
 			}
 
-			value = newValue;
+			PopulateWithReflection(
+				newValue,
+				value);
 
 			EnsureStrategyFinalizedForDeserialization(
 				context);
@@ -139,7 +141,7 @@ namespace HereticalSolutions.Persistence
 		public override bool Populate(
 			Type valueType,
 			ISerializationCommandContext context,
-			ref object valueObject)
+			object valueObject)
 		{
 			EnsureStrategyInitializedForDeserialization(
 				context);
@@ -155,7 +157,9 @@ namespace HereticalSolutions.Persistence
 				return false;
 			}
 
-			valueObject = newValue;
+			PopulateWithReflection(
+				newValue,
+				valueObject);
 
 			EnsureStrategyFinalizedForDeserialization(
 				context);
@@ -249,7 +253,7 @@ namespace HereticalSolutions.Persistence
 
 		public bool PopulateBlock<TValue>(
 			ISerializationCommandContext context,
-			ref TValue value,
+			TValue value,
 			int blockOffset,
 			int blockSize)
 		{
@@ -262,7 +266,9 @@ namespace HereticalSolutions.Persistence
 				return false;
 			}
 
-			value = newValue;
+			PopulateWithReflection(
+				newValue,
+				value);
 
 			return true;
 		}
@@ -270,7 +276,7 @@ namespace HereticalSolutions.Persistence
 		public bool PopulateBlock(
 			Type valueType,
 			ISerializationCommandContext context,
-			ref object valueObject,
+			object valueObject,
 			int blockOffset,
 			int blockSize)
 		{
@@ -284,7 +290,9 @@ namespace HereticalSolutions.Persistence
 				return false;
 			}
 
-			valueObject = newValue;
+			PopulateWithReflection(
+				newValue,
+				valueObject);
 
 			return true;
 		}
@@ -297,7 +305,7 @@ namespace HereticalSolutions.Persistence
 	
 		#region Serialize
 
-		public async Task<bool> SerializeAsync<TValue>(
+		public override async Task<bool> SerializeAsync<TValue>(
 			ISerializationCommandContext context,
 			TValue value,
 
@@ -318,7 +326,7 @@ namespace HereticalSolutions.Persistence
 			return result;
 		}
 
-		public async Task<bool> SerializeAsync(
+		public override async Task<bool> SerializeAsync(
 			Type valueType,
 			ISerializationCommandContext context,
 			object valueObject,
@@ -345,7 +353,7 @@ namespace HereticalSolutions.Persistence
 
 		#region Deserialize
 
-		public async Task<(bool, TValue)> DeserializeAsync<TValue>(
+		public override async Task<(bool, TValue)> DeserializeAsync<TValue>(
 			ISerializationCommandContext context,
 
 			//Async tail
@@ -364,7 +372,7 @@ namespace HereticalSolutions.Persistence
 			return result;
 		}
 
-		public async Task<(bool, object)> DeserializeAsync(
+		public override async Task<(bool, object)> DeserializeAsync(
 			Type valueType,
 			ISerializationCommandContext context,
 
@@ -389,7 +397,7 @@ namespace HereticalSolutions.Persistence
 
 		#region Populate
 
-		public async Task<(bool, TValue)> PopulateAsync<TValue>(
+		public override async Task<bool> PopulateAsync<TValue>(
 			ISerializationCommandContext context,
 			TValue value,
 
@@ -408,16 +416,20 @@ namespace HereticalSolutions.Persistence
 				EnsureStrategyFinalizedForDeserialization(
 					context);
 
-				return (false, value);
+				return false;
 			}
+
+			PopulateWithReflection(
+				result.Item2,
+				value);
 
 			EnsureStrategyFinalizedForDeserialization(
 				context);
 
-			return result;
+			return true;
 		}
 
-		public async Task<(bool, object)> PopulateAsync(
+		public override async Task<bool> PopulateAsync(
 			Type valueType,
 			ISerializationCommandContext context,
 			object valueObject,
@@ -438,13 +450,17 @@ namespace HereticalSolutions.Persistence
 				EnsureStrategyFinalizedForDeserialization(
 					context);
 
-				return (false, valueObject);
+				return false;
 			}
+
+			PopulateWithReflection(
+				result.Item2,
+				valueObject);
 
 			EnsureStrategyFinalizedForDeserialization(
 				context);
 
-			return result;
+			return true;
 		}
 
 		#endregion
@@ -531,7 +547,7 @@ namespace HereticalSolutions.Persistence
 
 		#region Populate
 
-		public async Task<(bool, TValue)> PopulateBlockAsync<TValue>(
+		public async Task<bool> PopulateBlockAsync<TValue>(
 			ISerializationCommandContext context,
 			TValue value,
 			int blockOffset,
@@ -548,13 +564,17 @@ namespace HereticalSolutions.Persistence
 
 			if (!result.Item1)
 			{
-				return (false, value);
+				return false;
 			}
 
-			return result;
+			PopulateWithReflection(
+				result.Item2,
+				value);
+
+			return true;
 		}
 
-		public async Task<(bool, object)> PopulateBlockAsync(
+		public async Task<bool> PopulateBlockAsync(
 			Type valueType,
 			ISerializationCommandContext context,
 			object valueObject,
@@ -573,10 +593,14 @@ namespace HereticalSolutions.Persistence
 
 			if (!result.Item1)
 			{
-				return (false, valueObject);
+				return false;
 			}
 
-			return result;
+			PopulateWithReflection(
+				result.Item2,
+				valueObject);
+
+			return true;
 		}
 
 		#endregion

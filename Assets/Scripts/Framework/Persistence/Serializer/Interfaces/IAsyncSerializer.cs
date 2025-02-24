@@ -36,18 +36,27 @@ namespace HereticalSolutions.Persistence
 			AsyncExecutionContext asyncContext);
 
 		Task<(bool, object)> DeserializeAsync(
-			Type valueType);
+			Type valueType,
+
+			//Async tail
+			AsyncExecutionContext asyncContext);
 
 		#endregion
 
 		#region Populate
 
-		Task<(bool, TValue)> PopulateAsync<TValue>(
-			TValue value);
+		Task<bool> PopulateAsync<TValue>(
+			TValue value,
 
-		Task<(bool, object)> PopulateAsync(
+			//Async tail
+			AsyncExecutionContext asyncContext);
+
+		Task<bool> PopulateAsync(
 			Type valueType,
-			object valueObject);
+			object valueObject,
+
+			//Async tail
+			AsyncExecutionContext asyncContext);
 
 		#endregion
 	}

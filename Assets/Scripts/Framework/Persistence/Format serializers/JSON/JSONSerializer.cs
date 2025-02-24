@@ -14,10 +14,7 @@ namespace HereticalSolutions.Persistence
 {
     [FormatSerializer]
     public class JSONSerializer
-        : AFormatSerializer,
-          IBlockFormatSerializer,
-          IAsyncFormatSerializer,
-          IAsyncBlockFormatSerializer
+        : AFormatSerializer
     {
         private readonly JsonSerializerSettings writeSerializerSettings;
 
@@ -175,7 +172,7 @@ namespace HereticalSolutions.Persistence
 
         public override bool Populate<TValue>(
             ISerializationCommandContext context,
-            ref TValue value)
+            TValue value)
         {
             EnsureStrategyInitializedForDeserialization(
                 context);
@@ -204,7 +201,7 @@ namespace HereticalSolutions.Persistence
         public override bool Populate(
             Type valueType,
             ISerializationCommandContext context,
-            ref object valueObject)
+            object valueObject)
         {
             EnsureStrategyInitializedForDeserialization(
                 context);

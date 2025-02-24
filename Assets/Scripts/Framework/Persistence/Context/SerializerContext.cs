@@ -1,5 +1,3 @@
-using System;
-
 using HereticalSolutions.Metadata;
 
 namespace HereticalSolutions.Persistence
@@ -10,6 +8,8 @@ namespace HereticalSolutions.Persistence
 		public IVisitor Visitor { get; set; }
 
 		public IFormatSerializer FormatSerializer { get; set; }
+
+		public  IDataConverter DataConverter { get; set; }
 
 		public ISerializationStrategy SerializationStrategy { get; set; }
 

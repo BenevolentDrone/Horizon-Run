@@ -42,14 +42,14 @@ namespace HereticalSolutions.Persistence
 
 		bool PopulateBlock<TValue>(
 			ISerializationCommandContext context,
-			ref TValue value,
+			TValue value,
 			int blockOffset,
 			int blockSize);
 
 		bool PopulateBlock(
 			Type valueType,
 			ISerializationCommandContext context,
-			ref object valueObject,
+			object valueObject,
 			int blockOffset,
 			int blockSize);
 

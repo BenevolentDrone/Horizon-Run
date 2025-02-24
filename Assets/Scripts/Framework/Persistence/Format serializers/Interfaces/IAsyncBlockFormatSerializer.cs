@@ -53,7 +53,7 @@ namespace HereticalSolutions.Persistence
 
 		#region Populate
 
-		Task<(bool, TValue)> PopulateBlockAsync<TValue>(
+		Task<bool> PopulateBlockAsync<TValue>(
 			ISerializationCommandContext context,
 			TValue value,
 			int blockOffset,
@@ -62,7 +62,7 @@ namespace HereticalSolutions.Persistence
 			//Async tail
 			AsyncExecutionContext asyncContext);
 
-		Task<(bool, object)> PopulateBlockAsync(
+		Task<bool> PopulateBlockAsync(
 			Type valueType,
 			ISerializationCommandContext context,
 			object valueObject,

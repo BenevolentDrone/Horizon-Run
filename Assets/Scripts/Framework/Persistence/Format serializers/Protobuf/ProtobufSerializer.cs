@@ -23,16 +23,20 @@ namespace HereticalSolutions.Persistence
 
         protected override bool CanSerializeWithStream => true;
 
-        protected override void SerializeWithStream<TValue>(
+        protected override bool CanDeserializeWithStream => true;
+
+        protected override bool SerializeWithStream<TValue>(
             IStrategyWithStream strategyWithStream,
             TValue value)
         {
             ProtobufInternalSerializer.Serialize<TValue>(
                 strategyWithStream.Stream,
                 value);
+
+            return true;
         }
 
-        protected override void SerializeWithStream(
+        protected override bool SerializeWithStream(
             IStrategyWithStream strategyWithStream,
             Type valueType,
             object valueObject)
@@ -40,6 +44,8 @@ namespace HereticalSolutions.Persistence
             ProtobufInternalSerializer.NonGeneric.Serialize(
                 strategyWithStream.Stream,
                 valueObject);
+
+            return true;
         }
 
         protected override bool DeserializeWithStream<TValue>(

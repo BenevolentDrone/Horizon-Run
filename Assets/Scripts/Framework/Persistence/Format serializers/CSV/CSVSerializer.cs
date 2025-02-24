@@ -3,8 +3,11 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.IO;
 using System.Globalization;
+
+using HereticalSolutions.Asynchronous;
 
 using HereticalSolutions.Logging;
 
@@ -29,7 +32,9 @@ namespace HereticalSolutions.Persistence
 
         protected override bool CanSerializeWithTextWriter => true;
 
-        protected override void SerializeWithTextWriter<TValue>(
+        protected override bool CanDeserializeWithTextReader => true;
+
+        protected override bool SerializeWithTextWriter<TValue>(
             TextStreamStrategy textStreamStrategy,
             TValue value)
         {
@@ -55,9 +60,11 @@ namespace HereticalSolutions.Persistence
                 else
                     csvWriter.WriteRecord<TValue>(value);
             }
+
+            return true;
         }
 
-        protected override void SerializeWithTextWriter(
+        protected override bool SerializeWithTextWriter(
             TextStreamStrategy textStreamStrategy,
             Type valueType,
             object valueObject)
@@ -82,6 +89,8 @@ namespace HereticalSolutions.Persistence
                 else
                     csvWriter.WriteRecord(valueObject);
             }
+
+            return true;
         }
 
         protected override bool DeserializeWithTextReader<TValue>(
@@ -163,6 +172,156 @@ namespace HereticalSolutions.Persistence
             }
 
             return true;
+        }
+
+        protected virtual async Task<bool> SerializeWithTextWriterAsync<TValue>(
+            TextStreamStrategy textStreamStrategy,
+            TValue value,
+
+            //Async tail
+            AsyncExecutionContext asyncContext)
+        {
+            var valueType = typeof(TValue);
+
+            using (var csvWriter = new CsvWriter(
+                textStreamStrategy.StreamWriter,
+                CultureInfo.InvariantCulture))
+            {
+                if (includeHeader)
+                {
+                    csvWriter.WriteHeader<TValue>();
+
+                    await csvWriter.NextRecordAsync();
+                }
+
+                if (valueType.IsTypeGenericArray()
+                    || valueType.IsTypeEnumerable()
+                    || valueType.IsTypeGenericEnumerable())
+                {
+                    await csvWriter.WriteRecordsAsync((IEnumerable)value);
+                }
+                else
+                    csvWriter.WriteRecord<TValue>(value);
+            }
+
+            return true;
+        }
+
+        protected virtual async Task<bool> SerializeWithTextWriterAsync(
+            TextStreamStrategy textStreamStrategy,
+            Type valueType,
+            object valueObject,
+
+            //Async tail
+            AsyncExecutionContext asyncContext)
+        {
+            using (var csvWriter = new CsvWriter(
+                textStreamStrategy.StreamWriter,
+                CultureInfo.InvariantCulture))
+            {
+                if (includeHeader)
+                {
+                    csvWriter.WriteHeader(valueType);
+
+                    await csvWriter.NextRecordAsync();
+                }
+
+                if (valueType.IsTypeGenericArray()
+                    || valueType.IsTypeEnumerable()
+                    || valueType.IsTypeGenericEnumerable())
+                {
+                    await csvWriter.WriteRecordsAsync((IEnumerable)valueObject);
+                }
+                else
+                    csvWriter.WriteRecord(valueObject);
+            }
+
+            return true;
+        }
+
+        protected virtual async Task<(bool, TValue)> DeserializeWithTextReaderAsync<TValue>(
+            TextStreamStrategy textStreamStrategy,
+
+            //Async tail
+            AsyncExecutionContext asyncContext)
+        {
+            var value = default(TValue);
+
+            var valueType = typeof(TValue);
+
+            using (var csvReader = new CsvReader(
+                textStreamStrategy.StreamReader,
+                CultureInfo.InvariantCulture))
+            {
+                await csvReader.ReadAsync();
+
+                if (includeHeader)
+                    csvReader.ReadHeader();
+
+                if (valueType.IsTypeGenericArray()
+                    || valueType.IsTypeEnumerable()
+                    || valueType.IsTypeGenericEnumerable())
+                {
+                    var underlyingType = (valueType.IsTypeGenericArray() || valueType.IsTypeEnumerable())
+                        ? valueType.GetGenericArrayUnderlyingType()
+                        : valueType.GetGenericEnumerableUnderlyingType();
+
+                    var records = csvReader.GetRecords(underlyingType);
+
+                    value = records.CastFromTo<IEnumerable<object>, TValue>();
+                }
+                else
+                {
+                    if (includeHeader)
+                        await csvReader.ReadAsync();
+
+                    value = csvReader.GetRecord<TValue>();
+                }
+            }
+
+            return (true, value);
+        }
+
+        protected virtual async Task<(bool, object)> DeserializeWithTextReaderAsync(
+            TextStreamStrategy textStreamStrategy,
+            Type valueType,
+
+            //Async tail
+            AsyncExecutionContext asyncContext)
+        {
+            var valueObject = default(object);
+
+            using (var csvReader = new CsvReader(
+                textStreamStrategy.StreamReader,
+                CultureInfo.InvariantCulture))
+            {
+                await csvReader.ReadAsync();
+
+                if (includeHeader)
+                    csvReader.ReadHeader();
+
+                if (valueType.IsTypeGenericArray()
+                    || valueType.IsTypeEnumerable()
+                    || valueType.IsTypeGenericEnumerable())
+                {
+                    var underlyingType = (valueType.IsTypeGenericArray() || valueType.IsTypeEnumerable())
+                        ? valueType.GetGenericArrayUnderlyingType()
+                        : valueType.GetGenericEnumerableUnderlyingType();
+
+                    var records = csvReader.GetRecords(underlyingType);
+
+                    valueObject = records;
+                }
+                else
+                {
+                    if (includeHeader)
+                        await csvReader.ReadAsync();
+
+                    valueObject = csvReader.GetRecord(valueType);
+                }
+            }
+
+            return (true, valueObject);
         }
 
         protected override string SerializeToString<TValue>(

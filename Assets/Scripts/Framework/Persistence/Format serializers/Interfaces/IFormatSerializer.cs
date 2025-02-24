@@ -34,12 +34,12 @@ namespace HereticalSolutions.Persistence
 
 		bool Populate<TValue>(
 			ISerializationCommandContext context,
-			ref TValue value);
+			TValue value);
 
 		bool Populate(
 			Type valueType,
 			ISerializationCommandContext context,
-			ref object valueObject);
+			object valueObject);
 
 		#endregion
 	}

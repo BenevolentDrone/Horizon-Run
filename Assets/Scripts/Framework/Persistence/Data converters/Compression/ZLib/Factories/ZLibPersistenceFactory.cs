@@ -2,7 +2,7 @@
 
 using HereticalSolutions.Logging;
 
-using ZLibNet;
+using Ionic.Zlib;
 
 namespace HereticalSolutions.Persistence.Factories
 {
@@ -10,7 +10,6 @@ namespace HereticalSolutions.Persistence.Factories
 	{
 		public static ZLibCompressionConverter BuildZLibCompressionConverter(
 			IDataConverter innerDataConverter,
-			CompressionLevel compressionLevel,
 			ILoggerResolver loggerResolver)
 		{
 			var byteArrayConverter = PersistenceFactory.BuildByteArrayConverter(
@@ -21,7 +20,6 @@ namespace HereticalSolutions.Persistence.Factories
 			return new ZLibCompressionConverter(
 				innerDataConverter,
 				byteArrayConverter,
-				compressionLevel,
 				loggerResolver?.GetLogger<ZLibCompressionConverter>());
 		}
 	}

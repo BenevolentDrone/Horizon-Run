@@ -6,15 +6,14 @@ using HereticalSolutions.Persistence.Factories;
 
 using HereticalSolutions.Logging;
 
-using ZLibNet;
+using Ionic.Zlib;
 
 namespace HereticalSolutions.Persistence
 {
 	public static class SerializerBuilderExtensionsZLib
 	{
 		public static ISerializerBuilder WithZLibCompression(
-			this ISerializerBuilder builder,
-			CompressionLevel compressionLevel)
+			this ISerializerBuilder builder)
 		{
 			var builderCasted = builder as ISerializerBuilderInternal;
 
@@ -31,7 +30,6 @@ namespace HereticalSolutions.Persistence
 				builderCasted.SerializerContext.DataConverter =
 					ZLibPersistenceFactory.BuildZLibCompressionConverter(
 						builderCasted.SerializerContext.DataConverter,
-						compressionLevel,
 						builderCasted.LoggerResolver);
 			};
 

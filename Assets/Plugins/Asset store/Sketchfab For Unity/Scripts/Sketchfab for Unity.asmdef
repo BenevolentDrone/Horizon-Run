@@ -1,0 +1,18 @@
+{
+    "name": "SketchfabforUnity",
+    "rootNamespace": "",
+    "references": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "Ionic.Zip.Unity.dll",
+        "GLTFSerialization.dll",
+        "SketchfabPlugin.dll"
+    ],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

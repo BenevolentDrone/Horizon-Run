@@ -8,8 +8,11 @@ using HereticalSolutions.Asynchronous;
 
 using HereticalSolutions.Logging;
 
-// ZLib.Portable.Signed package
-using ZLibNet;
+using Ionic.Zlib;
+using ZlibCodec = Ionic.Zlib.ZlibCodec;
+using CompressionMode = Ionic.Zlib.CompressionMode;
+using FlushType = Ionic.Zlib.FlushType;
+using ZlibConstants = Ionic.Zlib.ZlibConstants;
 
 namespace HereticalSolutions.Persistence
 {
@@ -18,20 +21,15 @@ namespace HereticalSolutions.Persistence
 	{
 		private readonly IByteArrayConverter byteArrayConverter;
 
-		private readonly CompressionLevel compressionLevel;
-
 		public ZLibCompressionConverter(
 			IDataConverter innerDataConverter,
 			IByteArrayConverter byteArrayConverter,
-			CompressionLevel compressionLevel,
 			ILogger logger)
 			: base(
 				innerDataConverter,
 				logger)
 		{
 			this.byteArrayConverter = byteArrayConverter;
-
-			this.compressionLevel = compressionLevel;
 		}
 
 		#region IDataConverter
@@ -847,34 +845,83 @@ namespace HereticalSolutions.Persistence
 				// Get the original size (first 4 bytes)
 				var originalSize = BitConverter.ToInt32(compressedData, 0);
 
-				// Create a memory stream for the compressed data (skipping the first 4 bytes)
-				using (var compressedStream = new MemoryStream(compressedData, 4, compressedData.Length - 4))
+				// Create a memory stream for the decompressed data
+				using (var decompressedStream = new MemoryStream())
 				{
-					// Create a memory stream for the decompressed data
-					using (var decompressedStream = new MemoryStream(originalSize))
+					// Create a memory stream for the compressed data (skipping the first 4 bytes)
+					using (var compressedStream =
+						new MemoryStream(
+							compressedData,
+							4,
+							compressedData.Length - 4))
 					{
-						// Create a ZLib decompression stream
-						using (var decompressionStream = new ZLibStream(compressedStream, ZLibNet.CompressionMode.Decompress))
+						// Decompress using Ionic.Zlib
+						var buffer = new byte[4096];
+						int read;
+						
+						// Use ZlibCodec for decompression
+						var codec = new ZlibCodec(
+							CompressionMode.Decompress);
+						
+						codec.InputBuffer = compressedStream.GetBuffer();
+						codec.NextIn = 4;
+						codec.AvailableBytesIn = (int)compressedStream.Length - 4;
+						
+						codec.OutputBuffer = buffer;
+						
+						while (codec.AvailableBytesIn > 0)
 						{
-							// Copy the decompressed data to the output stream
-							decompressionStream.CopyTo(decompressedStream);
+							codec.NextOut = 0;
+							codec.AvailableBytesOut = buffer.Length;
+							
+							var inflateStatus = codec.Inflate(FlushType.None);
+							
+							if (inflateStatus != ZlibConstants.Z_OK && inflateStatus != ZlibConstants.Z_STREAM_END)
+							{
+								throw new Exception($"Decompression error: {inflateStatus}");
+							}
+							
+							decompressedStream.Write(buffer, 0, buffer.Length - codec.AvailableBytesOut);
+							
+							if (inflateStatus == ZlibConstants.Z_STREAM_END)
+								break;
 						}
-
-						// Get the decompressed data
-						decompressedData = decompressedStream.ToArray();
-
-						// Verify the size
-						if (decompressedData.Length != originalSize)
+						
+						// Finish decompression
+						do
 						{
-							logger?.LogError(
-								GetType(),
-								$"DECOMPRESSED DATA SIZE ({decompressedData.Length}) DOES NOT MATCH ORIGINAL SIZE ({originalSize})");
-
-							return false;
-						}
-
-						return true;
+							codec.NextOut = 0;
+							codec.AvailableBytesOut = buffer.Length;
+							
+							var inflateStatus = codec.Inflate(FlushType.Finish);
+							
+							if (inflateStatus != ZlibConstants.Z_OK && inflateStatus != ZlibConstants.Z_STREAM_END)
+							{
+								throw new Exception($"Decompression error: {inflateStatus}");
+							}
+							
+							decompressedStream.Write(buffer, 0, buffer.Length - codec.AvailableBytesOut);
+							
+							if (inflateStatus == ZlibConstants.Z_STREAM_END)
+								break;
+							
+						} while (true);
 					}
+					
+					// Get the decompressed data
+					decompressedData = decompressedStream.ToArray();
+					
+					// Verify the size
+					if (decompressedData.Length != originalSize)
+					{
+						logger?.LogError(
+							GetType(),
+							$"DECOMPRESSED DATA SIZE ({decompressedData.Length}) DOES NOT MATCH ORIGINAL SIZE ({originalSize})");
+						
+						return false;
+					}
+					
+					return true;
 				}
 			}
 			catch (Exception ex)
@@ -882,7 +929,7 @@ namespace HereticalSolutions.Persistence
 				logger?.LogError(
 					GetType(),
 					$"ERROR DECOMPRESSING DATA: {ex.Message}");
-
+				
 				decompressedData = null;
 				return false;
 			}
@@ -899,17 +946,40 @@ namespace HereticalSolutions.Persistence
 				{
 					// Write the original size as the first 4 bytes
 					compressedStream.Write(BitConverter.GetBytes(dataToCompress.Length), 0, 4);
-
-					// Create a ZLib compression stream
-					using (var compressionStream = new ZLibStream(compressedStream, ZLibNet.CompressionMode.Compress, (ZLibNet.CompressionLevel)compressionLevel))
+					
+					// Compress using Ionic.Zlib
+					var codec = new ZlibCodec(
+						CompressionMode.Compress);
+					
+					codec.InputBuffer = dataToCompress;
+					codec.NextIn = 0;
+					codec.AvailableBytesIn = dataToCompress.Length;
+					
+					var buffer = new byte[4096];
+					codec.OutputBuffer = buffer;
+					
+					do
 					{
-						// Write the data to compress
-						compressionStream.Write(dataToCompress, 0, dataToCompress.Length);
-					}
-
+						codec.NextOut = 0;
+						codec.AvailableBytesOut = buffer.Length;
+						
+						var deflateStatus = codec.Deflate(codec.AvailableBytesIn == 0 ? FlushType.Finish : FlushType.None);
+						
+						if (deflateStatus != ZlibConstants.Z_OK && deflateStatus != ZlibConstants.Z_STREAM_END)
+						{
+							throw new Exception($"Compression error: {deflateStatus}");
+						}
+						
+						compressedStream.Write(buffer, 0, buffer.Length - codec.AvailableBytesOut);
+						
+						if (deflateStatus == ZlibConstants.Z_STREAM_END)
+							break;
+						
+					} while (codec.AvailableBytesIn > 0 || codec.AvailableBytesOut == 0);
+					
 					// Get the compressed data
 					compressedData = compressedStream.ToArray();
-
+					
 					return true;
 				}
 			}
@@ -918,7 +988,7 @@ namespace HereticalSolutions.Persistence
 				logger?.LogError(
 					GetType(),
 					$"ERROR COMPRESSING DATA: {ex.Message}");
-
+				
 				compressedData = null;
 				return false;
 			}

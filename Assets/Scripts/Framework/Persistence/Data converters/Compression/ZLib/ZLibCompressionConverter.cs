@@ -1,27 +1,29 @@
-#if LZ4_SUPPORT
+#if ZLIB_SUPPORT
 
 using System;
+using System.IO;
 using System.Threading.Tasks;
 
 using HereticalSolutions.Asynchronous;
 
 using HereticalSolutions.Logging;
 
-using K4os.Compression.LZ4;
+// ZLib.Portable.Signed package
+using ZLibNet;
 
 namespace HereticalSolutions.Persistence
 {
-	public class LZ4CompressionConverter
+	public class ZLibCompressionConverter
 		: AWrapperConverter
 	{
 		private readonly IByteArrayConverter byteArrayConverter;
 
-		private readonly LZ4Level compressionLevel;
+		private readonly CompressionLevel compressionLevel;
 
-		public LZ4CompressionConverter(
+		public ZLibCompressionConverter(
 			IDataConverter innerDataConverter,
 			IByteArrayConverter byteArrayConverter,
-			LZ4Level compressionLevel,
+			CompressionLevel compressionLevel,
 			ILogger logger)
 			: base(
 				innerDataConverter,
@@ -418,7 +420,7 @@ namespace HereticalSolutions.Persistence
 
 		public override async Task<(bool, TValue)> ReadAsyncAndConvert<TValue>(
 			IDataConverterCommandContext context,
-
+			
 			//Async tail
 			AsyncExecutionContext asyncContext)
 		{
@@ -449,7 +451,7 @@ namespace HereticalSolutions.Persistence
 						GetType(),
 						$"COULD NOT CONVERT VALUE FROM BYTES FOR TYPE {typeof(TValue).Name}");
 
-					return (false, default(TValue));
+					return (false, default);
 				}
 			}
 
@@ -459,7 +461,7 @@ namespace HereticalSolutions.Persistence
 		public override async Task<(bool, object)> ReadAsyncAndConvert(
 			Type valueType,
 			IDataConverterCommandContext context,
-
+			
 			//Async tail
 			AsyncExecutionContext asyncContext)
 		{
@@ -505,7 +507,7 @@ namespace HereticalSolutions.Persistence
 		public override async Task<bool> ConvertAndWriteAsync<TValue>(
 			IDataConverterCommandContext context,
 			TValue value,
-
+			
 			//Async tail
 			AsyncExecutionContext asyncContext)
 		{
@@ -541,7 +543,7 @@ namespace HereticalSolutions.Persistence
 			Type valueType,
 			IDataConverterCommandContext context,
 			object value,
-
+			
 			//Async tail
 			AsyncExecutionContext asyncContext)
 		{
@@ -581,7 +583,7 @@ namespace HereticalSolutions.Persistence
 		public override async Task<bool> ConvertAndAppendAsync<TValue>(
 			IDataConverterCommandContext context,
 			TValue value,
-
+			
 			//Async tail
 			AsyncExecutionContext asyncContext)
 		{
@@ -617,7 +619,7 @@ namespace HereticalSolutions.Persistence
 			Type valueType,
 			IDataConverterCommandContext context,
 			object value,
-
+			
 			//Async tail
 			AsyncExecutionContext asyncContext)
 		{
@@ -662,7 +664,7 @@ namespace HereticalSolutions.Persistence
 			IDataConverterCommandContext context,
 			int blockOffset,
 			int blockSize,
-
+			
 			//Async tail
 			AsyncExecutionContext asyncContext)
 		{
@@ -695,7 +697,7 @@ namespace HereticalSolutions.Persistence
 						GetType(),
 						$"COULD NOT CONVERT VALUE FROM BYTES FOR TYPE {typeof(TValue).Name}");
 
-					return (false, default(TValue));
+					return (false, default);
 				}
 			}
 
@@ -707,7 +709,7 @@ namespace HereticalSolutions.Persistence
 			IDataConverterCommandContext context,
 			int blockOffset,
 			int blockSize,
-
+			
 			//Async tail
 			AsyncExecutionContext asyncContext)
 		{
@@ -840,68 +842,86 @@ namespace HereticalSolutions.Persistence
 			byte[] compressedData,
 			out byte[] decompressedData)
 		{
-			// Get the original size (first 4 bytes)
-			var originalSize = BitConverter.ToInt32(compressedData, 0);
+			try
+			{
+				// Get the original size (first 4 bytes)
+				var originalSize = BitConverter.ToInt32(compressedData, 0);
 
-			// Decompress the data
-			decompressedData = new byte[originalSize];
+				// Create a memory stream for the compressed data (skipping the first 4 bytes)
+				using (var compressedStream = new MemoryStream(compressedData, 4, compressedData.Length - 4))
+				{
+					// Create a memory stream for the decompressed data
+					using (var decompressedStream = new MemoryStream(originalSize))
+					{
+						// Create a ZLib decompression stream
+						using (var decompressionStream = new ZLibStream(compressedStream, ZLibNet.CompressionMode.Decompress))
+						{
+							// Copy the decompressed data to the output stream
+							decompressionStream.CopyTo(decompressedStream);
+						}
 
-			var actualSize = LZ4Codec.Decode(
-				compressedData,
-				4,
-				compressedData.Length - 4,
-				decompressedData,
-				0,
-				decompressedData.Length);
+						// Get the decompressed data
+						decompressedData = decompressedStream.ToArray();
 
-			if (actualSize != originalSize)
+						// Verify the size
+						if (decompressedData.Length != originalSize)
+						{
+							logger?.LogError(
+								GetType(),
+								$"DECOMPRESSED DATA SIZE ({decompressedData.Length}) DOES NOT MATCH ORIGINAL SIZE ({originalSize})");
+
+							return false;
+						}
+
+						return true;
+					}
+				}
+			}
+			catch (Exception ex)
 			{
 				logger?.LogError(
 					GetType(),
-					$"DECOMPRESSED DATA SIZE ({actualSize}) DOES NOT MATCH ORIGINAL SIZE ({originalSize})");
+					$"ERROR DECOMPRESSING DATA: {ex.Message}");
 
+				decompressedData = null;
 				return false;
 			}
-
-			return true;
 		}
 
 		private bool Compress(
 			byte[] dataToCompress,
 			out byte[] compressedData)
 		{
-			// Calculate the worst-case compression size
-			var maxCompressedLength = LZ4Codec.MaximumOutputSize(dataToCompress.Length);
+			try
+			{
+				// Create a memory stream for the compressed data (with 4 bytes at the beginning for original size)
+				using (var compressedStream = new MemoryStream())
+				{
+					// Write the original size as the first 4 bytes
+					compressedStream.Write(BitConverter.GetBytes(dataToCompress.Length), 0, 4);
 
-			// Create buffer for compressed data (4 bytes for original size + compressed data)
-			compressedData = new byte[4 + maxCompressedLength];
+					// Create a ZLib compression stream
+					using (var compressionStream = new ZLibStream(compressedStream, ZLibNet.CompressionMode.Compress, (ZLibNet.CompressionLevel)compressionLevel))
+					{
+						// Write the data to compress
+						compressionStream.Write(dataToCompress, 0, dataToCompress.Length);
+					}
 
-			// Store the original size in the first 4 bytes
-			BitConverter.GetBytes(dataToCompress.Length).CopyTo(compressedData, 0);
+					// Get the compressed data
+					compressedData = compressedStream.ToArray();
 
-			// Compress the data
-			var compressedSize = LZ4Codec.Encode(
-				dataToCompress,
-				0,
-				dataToCompress.Length,
-				compressedData,
-				4,
-				maxCompressedLength,
-				compressionLevel);
-
-			if (compressedSize <= 0)
+					return true;
+				}
+			}
+			catch (Exception ex)
 			{
 				logger?.LogError(
 					GetType(),
-					"COULD NOT COMPRESS DATA");
+					$"ERROR COMPRESSING DATA: {ex.Message}");
 
+				compressedData = null;
 				return false;
 			}
-
-			// Resize the array to actual size
-			Array.Resize(ref compressedData, 4 + compressedSize);
-
-			return true;
 		}
 	}
 }

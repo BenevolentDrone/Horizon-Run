@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 
 using HereticalSolutions.Metadata.Factories;
 
@@ -802,7 +803,7 @@ namespace HereticalSolutions.Persistence
 
 		#region Build
 
-		public ISerializer BuildSerializer()
+		public Serializer BuildSerializer()
 		{
 			AssembleContext();
 			
@@ -811,25 +812,15 @@ namespace HereticalSolutions.Persistence
 				loggerResolver?.GetLogger<Serializer>());
 		}
 
-		public IBlockSerializer BuildBlockSerializer()
+		public ConcurrentSerializer BuildConcurrentSerializer()
 		{
 			AssembleContext();
 
-			throw new NotImplementedException();
-		}
-
-		public IAsyncSerializer BuildAsyncSerializer()
-		{
-			AssembleContext();
-
-			throw new NotImplementedException();
-		}
-
-		public IAsyncBlockSerializer BuildAsyncBlockSerializer()
-		{
-			AssembleContext();
-
-			throw new NotImplementedException();
+			return new ConcurrentSerializer(
+				new Serializer(
+					serializerContext,
+					loggerResolver?.GetLogger<Serializer>()),
+				new SemaphoreSlim(1, 1));
 		}
 
 		#endregion

@@ -90,7 +90,9 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Editor
 				serializer = serializerBuilder
 					.NewSerializer()
 					.ToJSON()
-					.AsString()
+					.AsString(
+						() => ((EntitySettings)target).EntityJson,
+						(value) => ((EntitySettings)target).EntityJson = value)
 					.BuildSerializer();
 			}
 
@@ -1107,10 +1109,6 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Editor
 			serializer.Serialize<EntityPrototypeDTO>(
 				entityPrototypeDTO);
 
-			var stringStrategy = serializer.Context.SerializationStrategy as StringStrategy;
-
-			((EntitySettings)target).EntityJson = stringStrategy.Value;
-
 			if (DEBUG_OPERATION)
 			{
 				UnityEngine.Debug.Log($"[EntitySettingsEditor] New json: {((EntitySettings)target).EntityJson}");
@@ -1137,10 +1135,6 @@ namespace HereticalSolutions.Modules.Core_DefaultECS.Editor
 
 				return;
 			}
-
-			var stringStrategy = serializer.Context.SerializationStrategy as StringStrategy;
-
-			stringStrategy.Value = ((EntitySettings)target).EntityJson;
 
 			bool success = serializer.Deserialize(
 				typeof(EntityPrototypeDTO),

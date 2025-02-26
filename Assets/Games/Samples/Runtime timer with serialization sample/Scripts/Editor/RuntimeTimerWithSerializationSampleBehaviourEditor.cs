@@ -53,6 +53,8 @@ namespace HereticalSolutions.Samples.RuntimeTimerWithSerializationSample
 
 		private int selectedMediaTypeOptionIndex = 0;
 
+		private string serializationString = string.Empty;
+
 		void OnEnable()
 		{
 			UpdateSerializer();
@@ -299,7 +301,9 @@ namespace HereticalSolutions.Samples.RuntimeTimerWithSerializationSample
 			switch (selectedMediaTypeOptionIndex)
 			{
 				case 0:
-					serializerBuilder.AsString();
+					serializerBuilder.AsString(
+						() => serializationString,
+						(value) => serializationString = value);
 
 					break;
 
@@ -354,7 +358,7 @@ namespace HereticalSolutions.Samples.RuntimeTimerWithSerializationSample
 					break;
 			}
 
-			targetCasted.Serializer = serializerBuilder.Build();
+			targetCasted.Serializer = serializerBuilder.BuildSerializer();
 		}
 
 		private void DrawControls()
@@ -389,7 +393,7 @@ namespace HereticalSolutions.Samples.RuntimeTimerWithSerializationSample
 				RuntimeTimer runtimeTimer = (RuntimeTimer)targetCasted.RuntimeTimer;
 
 				bool result = targetCasted.Serializer.Populate<RuntimeTimer>(
-					ref runtimeTimer);
+					runtimeTimer);
 
 				if (targetCasted.Serializer.Context.SerializationStrategy is IStrategyWithStream strategyWithStream)
 				{

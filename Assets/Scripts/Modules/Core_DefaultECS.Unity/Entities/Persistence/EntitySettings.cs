@@ -36,13 +36,11 @@ namespace HereticalSolutions.Modules.Core_DefaultECS
 				serializer = serializerBuilder
 					.NewSerializer()
 					.ToJSON()
-					.AsString()
+					.AsString(
+						() => EntityJson,
+						(value) => EntityJson = value)
 					.BuildSerializer();
 			}
-
-			var stringStrategy = serializer.Context.SerializationStrategy as StringStrategy;
-
-			stringStrategy.Value = EntityJson;
 
 			bool success = serializer.Deserialize(
 				typeof(EntityPrototypeDTO),

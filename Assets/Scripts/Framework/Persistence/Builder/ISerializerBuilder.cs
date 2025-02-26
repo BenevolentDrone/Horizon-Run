@@ -118,13 +118,9 @@ namespace HereticalSolutions.Persistence
 
 		#region Build
 
-		ISerializer BuildSerializer();
+		Serializer BuildSerializer();
 
-		IBlockSerializer BuildBlockSerializer();
-
-		IAsyncSerializer BuildAsyncSerializer();
-
-		IAsyncBlockSerializer BuildAsyncBlockSerializer();
+		ConcurrentSerializer BuildConcurrentSerializer();
 
 		#endregion
 

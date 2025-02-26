@@ -54,25 +54,27 @@ namespace HereticalSolutions.StateMachines.Factories
             where TBaseState : IState
         {
             ILogger logger =
-                loggerResolver?.GetLogger<ConcurrentBaseStateMachine<TBaseState>>();
+                loggerResolver?.GetLogger<BaseStateMachine<TBaseState>>();
 
             return new ConcurrentBaseStateMachine<TBaseState>(
-                states,
-                events,
-
-                transitionController,
-                new Queue<ITransitionRequest>(),
-
-                BroadcasterFactory.BuildConcurrentNonAllocBroadcasterMultipleArgs(
-                    loggerResolver),
-                BroadcasterFactory.BuildConcurrentNonAllocBroadcasterMultipleArgs(
-                    loggerResolver),
-                BroadcasterFactory.BuildConcurrentNonAllocBroadcasterGeneric<ITransitionEvent<TBaseState>>(
-                    loggerResolver),
-
-                initialState,
-
-                logger);
+                new BaseStateMachine<TBaseState>(
+                    states,
+                    events,
+    
+                    transitionController,
+                    new Queue<ITransitionRequest>(),
+    
+                    BroadcasterFactory.BuildConcurrentNonAllocBroadcasterMultipleArgs(
+                        loggerResolver),
+                    BroadcasterFactory.BuildConcurrentNonAllocBroadcasterMultipleArgs(
+                        loggerResolver),
+                    BroadcasterFactory.BuildConcurrentNonAllocBroadcasterGeneric<ITransitionEvent<TBaseState>>(
+                        loggerResolver),
+    
+                    initialState,
+    
+                    logger),
+                new object());
         }
 
         public static BaseAsyncStateMachine<TBaseState> BuildBaseAsyncStateMachine<TBaseState>(
@@ -80,8 +82,6 @@ namespace HereticalSolutions.StateMachines.Factories
             IReadOnlyRepository<Type, IAsyncTransitionEvent<TBaseState>> events,
 
             IAsyncTransitionController<TBaseState> transitionController,
-
-            EAsyncTransitionRules asyncTransitionRules,
 
             TBaseState initialState,
             ILoggerResolver loggerResolver)

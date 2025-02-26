@@ -1,7 +1,7 @@
 using System;
 
 using System.Collections.Generic;
-
+using System.Threading;
 using HereticalSolutions.LifetimeManagement;
 
 using HereticalSolutions.Pools;
@@ -13,22 +13,17 @@ namespace HereticalSolutions.Bags
 		  ICleanuppable,
 		  IDisposable
 	{
-		private readonly LinkedList<T> bag;
+		private readonly NonAllocLinkedListBag<T> bag;
 
-		private readonly IPool<LinkedListNode<T>> nodePool;
-
-		private readonly object lockObject;
+		private readonly SemaphoreSlim semaphoreSlim;
 
 		public ConcurrentNonAllocLinkedListBag(
-			LinkedList<T> bag,
-			IPool<LinkedListNode<T>> nodePool)
+			NonAllocLinkedListBag<T> bag,
+			SemaphoreSlim semaphoreSlim)
 		{
 			this.bag = bag;
 
-			this.nodePool = nodePool;
-
-
-			lockObject = new object();
+			this.semaphoreSlim = semaphoreSlim;
 		}
 
 		#region IBag
@@ -36,35 +31,30 @@ namespace HereticalSolutions.Bags
 		public bool Push(
 			T instance)
 		{
-			lock (lockObject)
+			semaphoreSlim.Wait();
+
+			try
 			{
-				var node = nodePool.Pop();
-
-				node.Value = instance;
-
-				bag.AddLast(node);
-
-				return true;
+				return bag.Push(instance);
+			}
+			finally
+			{
+				semaphoreSlim.Release();
 			}
 		}
 
 		public bool Pop(
 			T instance)
 		{
-			lock (lockObject)
+			semaphoreSlim.Wait();
+
+			try
 			{
-				var node = bag.Find(instance);
-
-				if (node == null)
-					return false;
-
-				bag.Remove(node);
-
-				node.Value = default(T);
-
-				nodePool.Push(node);
-
-				return true;
+				return bag.Pop(instance);
+			}
+			finally
+			{
+				semaphoreSlim.Release();
 			}
 		}
 
@@ -72,9 +62,15 @@ namespace HereticalSolutions.Bags
 		{
 			get
 			{
-				lock (lockObject)
+				semaphoreSlim.Wait();
+
+				try
 				{
 					return bag.Count;
+				}
+				finally
+				{
+					semaphoreSlim.Release();
 				}
 			}
 		}
@@ -83,25 +79,30 @@ namespace HereticalSolutions.Bags
 		{
 			get
 			{
-				lock (lockObject)
+				semaphoreSlim.Wait();
+
+				try
 				{
-					var current = bag.First;
-	
-					while (current != null)
-					{
-						yield return current.Value;
-	
-						current = current.Next;
-					}
+					return bag.All;
+				}
+				finally
+				{
+					semaphoreSlim.Release();
 				}
 			}
 		}
 
 		public void Clear()
 		{
-			lock (lockObject)
+			semaphoreSlim.Wait();
+
+			try
 			{
 				bag.Clear();
+			}
+			finally
+			{
+				semaphoreSlim.Release();
 			}
 		}
 
@@ -111,11 +112,16 @@ namespace HereticalSolutions.Bags
 
 		public void Cleanup()
 		{
-			foreach (var item in bag)
-				if (item is ICleanuppable)
-					(item as ICleanuppable).Cleanup();
+			semaphoreSlim.Wait();
 
-			bag.Clear();
+			try
+			{
+				bag.Clear();
+			}
+			finally
+			{
+				semaphoreSlim.Release();
+			}
 		}
 
 		#endregion
@@ -124,11 +130,16 @@ namespace HereticalSolutions.Bags
 
 		public void Dispose()
 		{
-			foreach (var item in bag)
-				if (item is IDisposable)
-					(item as IDisposable).Dispose();
+			semaphoreSlim.Wait();
 
-			bag.Clear();
+			try
+			{
+				bag.Clear();
+			}
+			finally
+			{
+				semaphoreSlim.Release();
+			}
 		}
 
 		#endregion

@@ -1,6 +1,10 @@
 using System;
+using System.Threading;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
+
+using HereticalSolutions.Collections.Factories;
+using HereticalSolutions.Collections.Managed;
 
 using HereticalSolutions.Logging;
 
@@ -114,6 +118,33 @@ namespace HereticalSolutions.Repositories.Factories
                 new Dictionary<TValue2, TValue1>(
                     rightToLeftDatabase,
                     rightToLeftDatabase.Comparer),
+                logger);
+        }
+
+        #endregion
+
+        #region B+ tree repository
+
+        public static BPlusTreeRepository<TKey, TValue>
+            BuildBPlusTreeRepository<TKey, TValue>(
+            ILoggerResolver loggerResolver)
+        {
+            ILogger logger = loggerResolver?.GetLogger<BPlusTreeRepository<TKey, TValue>>();
+
+            return new BPlusTreeRepository<TKey, TValue>(
+                CollectionFactory.BuildBPlusTreeMap<TKey, TValue>(),
+                logger);
+        }
+
+        public static BPlusTreeRepository<TKey, TValue>
+            BuildBPlusTreeRepository<TKey, TValue>(
+                IBPlusTreeMap<TKey, TValue> database,
+                ILoggerResolver loggerResolver)
+        {
+            ILogger logger = loggerResolver?.GetLogger<BPlusTreeRepository<TKey, TValue>>();
+
+            return new BPlusTreeRepository<TKey, TValue>(
+                database,
                 logger);
         }
 
@@ -237,6 +268,30 @@ namespace HereticalSolutions.Repositories.Factories
                     rightToLeftDatabase,
                     rightToLeftDatabase.Comparer),
                 logger);
+        }
+
+        #endregion
+
+
+        #region Concurrent B+ tree repository
+
+        public static ConcurrentBPlusTreeRepository<TKey, TValue>
+            BuildConcurrentBPlusTreeRepository<TKey, TValue>(
+                ILoggerResolver loggerResolver)
+        {
+            return new ConcurrentBPlusTreeRepository<TKey, TValue>(
+                BuildBPlusTreeRepository<TKey, TValue>(
+                    loggerResolver),
+                new SemaphoreSlim(1, 1));
+        }
+
+        public static ConcurrentBPlusTreeRepository<TKey, TValue> 
+            BuildConcurrentBPlusTreeRepository<TKey, TValue>(
+                BPlusTreeRepository<TKey, TValue> database)
+        {
+            return new ConcurrentBPlusTreeRepository<TKey, TValue>(
+                database,
+                new SemaphoreSlim(1, 1));
         }
 
         #endregion

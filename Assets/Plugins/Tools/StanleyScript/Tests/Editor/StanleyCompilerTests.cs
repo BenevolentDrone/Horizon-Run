@@ -6,6 +6,7 @@ using UnityEngine;
 
 using HereticalSolutions.Asynchronous;
 
+
 namespace HereticalSolutions.StanleyScript.Tests
 {
     [TestFixture]

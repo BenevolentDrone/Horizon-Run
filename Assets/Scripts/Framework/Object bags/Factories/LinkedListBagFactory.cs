@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 
 using HereticalSolutions.Allocations;
 using HereticalSolutions.Allocations.Factories;
 
-using HereticalSolutions.Logging;
 using HereticalSolutions.Pools.Factories;
+
+using HereticalSolutions.Logging;
 
 namespace HereticalSolutions.Bags.Factories
 {
@@ -94,10 +96,9 @@ namespace HereticalSolutions.Bags.Factories
 
 		public static ConcurrentLinkedListBag<T> BuildConcurrentLinkedListBag<T>()
 		{
-			var linkedList = new LinkedList<T>();
-
 			return new ConcurrentLinkedListBag<T>(
-				linkedList);
+				BuildLinkedListBag<T>(),
+				new SemaphoreSlim(1, 1));
 		}
 
 		#endregion
@@ -118,27 +119,12 @@ namespace HereticalSolutions.Bags.Factories
 			AllocationCommandDescriptor additionalAllocationDescriptor,
 			ILoggerResolver loggerResolver)
 		{
-			var linkedList = new LinkedList<T>();
-
-			Func<LinkedListNode<T>> allocationDelegate = AllocationFactory
-				.ActivatorAllocationDelegate<LinkedListNode<T>>;
-
 			return new ConcurrentNonAllocLinkedListBag<T>(
-				linkedList,
-				StackPoolFactory.BuildStackPool<LinkedListNode<T>>(
-					new AllocationCommand<LinkedListNode<T>>
-					{
-						Descriptor = initialAllocationDescriptor,
-
-						AllocationDelegate = allocationDelegate
-					},
-					new AllocationCommand<LinkedListNode<T>>
-					{
-						Descriptor = additionalAllocationDescriptor,
-
-						AllocationDelegate = allocationDelegate
-					},
-					loggerResolver));
+				BuildNonAllocLinkedListBag<T>(
+					initialAllocationDescriptor,
+					additionalAllocationDescriptor,
+					loggerResolver),
+				new SemaphoreSlim(1, 1));
 		}
 
 		#endregion

@@ -1,32 +1,24 @@
 using System;
 using System.Collections.Generic;
-
-using HereticalSolutions.Collections.Managed;
-
-using HereticalSolutions.Logging;
+using System.Threading;
 
 namespace HereticalSolutions.Repositories
 {
 	public class ConcurrentBPlusTreeRepository<TKey, TValue>
 		: IRepository<TKey, TValue>
 	{
-		private readonly IBPlusTreeMap<TKey, TValue> treeMap;
+		private readonly BPlusTreeRepository<TKey, TValue> repository;
 
-		private readonly object lockObject;
+		private readonly SemaphoreSlim semaphoreSlim;
 
-		private readonly ILogger logger;
-		
 		public ConcurrentBPlusTreeRepository(
-			IBPlusTreeMap<TKey, TValue> treeMap,
-			ILogger logger)
+			BPlusTreeRepository<TKey, TValue> repository,
+			SemaphoreSlim semaphoreSlim)
 		{
 			//TODO: good idea, ChatGPT. Now I should add this to ALL consturctors
-			this.treeMap = treeMap ?? throw new ArgumentNullException(nameof(treeMap));
+			this.repository = repository ?? throw new ArgumentNullException(nameof(repository));
 
-			this.logger = logger;
-
-
-			lockObject = new object();
+			this.semaphoreSlim = semaphoreSlim ?? throw new ArgumentNullException(nameof(semaphoreSlim));
 		}
 
 		#region IRepository
@@ -36,29 +28,31 @@ namespace HereticalSolutions.Repositories
 		public bool Has(
 			TKey key)
 		{
-			lock (lockObject)
+			semaphoreSlim.Wait();
+
+			try
 			{
-				return treeMap.Search(
-					key,
-					out _);
+				return repository.Has(
+					key);
+			}
+			finally
+			{
+				semaphoreSlim.Release();
 			}
 		}
 
 		public TValue Get(TKey key)
 		{
-			lock (lockObject)
-			{
-				if (!treeMap.Search(
-					key,
-					out var value))
-				{
-					throw new KeyNotFoundException(
-						logger?.TryFormatException(
-							GetType(),
-							$"KEY NOT FOUND: {key}"));
-				}
+			semaphoreSlim.Wait();
 
-				return value;
+			try
+			{
+				return repository.Get(
+					key);
+			}
+			finally
+			{
+				semaphoreSlim.Release();
 			}
 		}
 
@@ -66,11 +60,17 @@ namespace HereticalSolutions.Repositories
 			TKey key,
 			out TValue value)
 		{
-			lock (lockObject)
+			semaphoreSlim.Wait();
+
+			try
 			{
-				return treeMap.Search(
+				return repository.TryGet(
 					key,
 					out value);
+			}
+			finally
+			{
+				semaphoreSlim.Release();
 			}
 		}
 
@@ -78,9 +78,15 @@ namespace HereticalSolutions.Repositories
 		{
 			get
 			{
-				lock (lockObject)
+				semaphoreSlim.Wait();
+
+				try
 				{
-					return treeMap.Count;
+					return repository.Count;
+				}
+				finally
+				{
+					semaphoreSlim.Release();
 				}
 			}
 		}
@@ -89,9 +95,15 @@ namespace HereticalSolutions.Repositories
 		{
 			get
 			{
-				lock (lockObject)
+				semaphoreSlim.Wait();
+
+				try
 				{
-					return treeMap.AllKeys;
+					return repository.Keys;
+				}
+				finally
+				{
+					semaphoreSlim.Release();
 				}
 			}
 		}
@@ -100,9 +112,15 @@ namespace HereticalSolutions.Repositories
 		{
 			get
 			{
-				lock (lockObject)
+				semaphoreSlim.Wait();
+
+				try
 				{
-					return treeMap.AllValues;
+					return repository.Values;
+				}
+				finally
+				{
+					semaphoreSlim.Release();
 				}
 			}
 		}
@@ -113,28 +131,28 @@ namespace HereticalSolutions.Repositories
 		{
 			get
 			{
-				lock (lockObject)
-				{
-					if (!treeMap.Search(
-						key,
-						out var value))
-					{
-						throw new KeyNotFoundException(
-							logger?.TryFormatException(
-								GetType(),
-								$"KEY NOT FOUND: {key}"));
-					}
+				semaphoreSlim.Wait();
 
-					return value;
+				try
+				{
+					return repository[key];
+				}
+				finally
+				{
+					semaphoreSlim.Release();
 				}
 			}
 			set
 			{
-				lock (lockObject)
+				semaphoreSlim.Wait();
+
+				try
 				{
-					treeMap.Insert(
-						key,
-						value);
+					repository[key] = value;
+				}
+				finally
+				{
+					semaphoreSlim.Release();
 				}
 			}
 		}
@@ -143,11 +161,17 @@ namespace HereticalSolutions.Repositories
 			TKey key,
 			TValue value)
 		{
-			lock (lockObject)
+			semaphoreSlim.Wait();
+
+			try
 			{
-				treeMap.Insert(
+				repository.Add(
 					key,
 					value);
+			}
+			finally
+			{
+				semaphoreSlim.Release();
 			}
 		}
 
@@ -155,20 +179,17 @@ namespace HereticalSolutions.Repositories
 			TKey key,
 			TValue value)
 		{
-			lock (lockObject)
+			semaphoreSlim.Wait();
+
+			try
 			{
-				if (!treeMap.Search(
+				return repository.TryAdd(
 					key,
-					out _))
-				{
-					treeMap.Insert(
-						key,
-						value);
-
-					return true;
-				}
-
-				return false;
+					value);
+			}
+			finally
+			{
+				semaphoreSlim.Release();
 			}
 		}
 
@@ -176,19 +197,17 @@ namespace HereticalSolutions.Repositories
 			TKey key,
 			TValue value)
 		{
-			lock (lockObject)
-			{
-				if (!treeMap.Remove(key))
-				{
-					throw new KeyNotFoundException(
-						logger?.TryFormatException(
-							GetType(),
-							$"KEY NOT FOUND: {key}"));
-				}
+			semaphoreSlim.Wait();
 
-				treeMap.Insert(
+			try
+			{
+				repository.Update(
 					key,
 					value);
+			}
+			finally
+			{
+				semaphoreSlim.Release();
 			}
 		}
 
@@ -196,18 +215,17 @@ namespace HereticalSolutions.Repositories
 			TKey key,
 			TValue value)
 		{
-			lock (lockObject)
+			semaphoreSlim.Wait();
+
+			try
 			{
-				if (treeMap.Remove(key))
-				{
-					treeMap.Insert(
-						key,
-						value);
-
-					return true;
-				}
-
-				return false;
+				return repository.TryUpdate(
+					key,
+					value);
+			}
+			finally
+			{
+				semaphoreSlim.Release();
 			}
 		}
 
@@ -215,41 +233,63 @@ namespace HereticalSolutions.Repositories
 			TKey key,
 			TValue value)
 		{
-			lock (lockObject)
+			semaphoreSlim.Wait();
+
+			try
 			{
-				treeMap.Insert(
+				repository.AddOrUpdate(
 					key,
 					value);
+			}
+			finally
+			{
+				semaphoreSlim.Release();
 			}
 		}
 
 		public void Remove(
 			TKey key)
 		{
-			lock (lockObject)
+			semaphoreSlim.Wait();
+
+			try
 			{
-				if (!treeMap.Remove(key))
-					throw new KeyNotFoundException(
-						logger?.TryFormatException(
-							GetType(),
-							$"KEY NOT FOUND: {key}"));
+				repository.Remove(
+					key);
+			}
+			finally
+			{
+				semaphoreSlim.Release();
 			}
 		}
 
 		public bool TryRemove(
 			TKey key)
 		{
-			lock (lockObject)
+			semaphoreSlim.Wait();
+
+			try
 			{
-				return treeMap.Remove(key);
+				return repository.TryRemove(
+					key);
+			}
+			finally
+			{
+				semaphoreSlim.Release();
 			}
 		}
 
 		public void Clear()
 		{
-			lock (lockObject)
+			semaphoreSlim.Wait();
+
+			try
 			{
-				treeMap.Clear();
+				repository.Clear();
+			}
+			finally
+			{
+				semaphoreSlim.Release();
 			}
 		}
 

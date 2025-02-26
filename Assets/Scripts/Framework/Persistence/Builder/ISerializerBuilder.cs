@@ -30,8 +30,6 @@ namespace HereticalSolutions.Persistence
 
 		#region Data converters
 
-		ISerializerBuilder WithLZ4Compression();
-
 		ISerializerBuilder WithByteArrayFallback();
 
 		ISerializerBuilder WithDataConverter<TDataConverter>(

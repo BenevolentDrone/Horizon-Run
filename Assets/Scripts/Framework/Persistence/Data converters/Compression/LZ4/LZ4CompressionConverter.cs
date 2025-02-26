@@ -1,3 +1,5 @@
+#if LZ4_SUPPORT
+
 using System;
 using System.Threading.Tasks;
 
@@ -5,22 +7,29 @@ using HereticalSolutions.Asynchronous;
 
 using HereticalSolutions.Logging;
 
+using K4os.Compression.LZ4;
+
 namespace HereticalSolutions.Persistence
 {
-	public class ByteArrayFallbackConverter
+	public class LZ4CompressionConverter
 		: AWrapperConverter
 	{
 		private readonly IByteArrayConverter byteArrayConverter;
 
-		public ByteArrayFallbackConverter(
-			IByteArrayConverter byteArrayConverter,
+		private readonly LZ4Level compressionLevel;
+
+		public LZ4CompressionConverter(
 			IDataConverter innerDataConverter,
+			IByteArrayConverter byteArrayConverter,
+			LZ4Level compressionLevel,
 			ILogger logger)
 			: base(
 				innerDataConverter,
 				logger)
 		{
 			this.byteArrayConverter = byteArrayConverter;
+
+			this.compressionLevel = compressionLevel;
 		}
 
 		#region IDataConverter
@@ -45,7 +54,7 @@ namespace HereticalSolutions.Persistence
 
 				return false;
 			}
-			
+
 			if (!useFallback)
 				return base.ReadAndConvert<TValue>(
 					context,
@@ -55,12 +64,23 @@ namespace HereticalSolutions.Persistence
 
 			var result = base.ReadAndConvert<byte[]>(
 				context,
-				out var byteArray);
+				out var compressedData);
 
 			if (result)
 			{
+				if (!Decompress(
+					compressedData,
+					out var decompressedData))
+				{
+					logger?.LogError(
+						GetType(),
+						$"COULD NOT DECOMPRESS DATA");
+
+					return false;
+				}
+
 				return byteArrayConverter.ConvertFromBytes<TValue>(
-					byteArray,
+					decompressedData,
 					out value);
 			}
 
@@ -102,13 +122,24 @@ namespace HereticalSolutions.Persistence
 
 			var result = base.ReadAndConvert<byte[]>(
 				context,
-				out var byteArray);
+				out var compressedData);
 
 			if (result)
 			{
+				if (!Decompress(
+					compressedData,
+					out var decompressedData))
+				{
+					logger?.LogError(
+						GetType(),
+						$"COULD NOT DECOMPRESS DATA");
+
+					return false;
+				}
+
 				return byteArrayConverter.ConvertFromBytes(
 					valueType,
-					byteArray,
+					decompressedData,
 					out value);
 			}
 
@@ -147,7 +178,7 @@ namespace HereticalSolutions.Persistence
 
 			if (!byteArrayConverter.ConvertToBytes<TValue>(
 				value,
-				out var byteArray))
+				out var dataToCompress))
 			{
 				logger?.LogError(
 					GetType(),
@@ -156,9 +187,20 @@ namespace HereticalSolutions.Persistence
 				return false;
 			}
 
+			if (!Compress(
+				dataToCompress,
+				out var compressedData))
+			{
+				logger?.LogError(
+					GetType(),
+					"COULD NOT COMPRESS DATA");
+
+				return false;
+			}
+
 			return base.ConvertAndWrite<byte[]>(
 				context,
-				byteArray);
+				compressedData);
 		}
 
 		public override bool ConvertAndWrite(
@@ -189,7 +231,7 @@ namespace HereticalSolutions.Persistence
 			if (!byteArrayConverter.ConvertToBytes(
 				valueType,
 				value,
-				out var byteArray))
+				out var dataToCompress))
 			{
 				logger?.LogError(
 					GetType(),
@@ -198,9 +240,20 @@ namespace HereticalSolutions.Persistence
 				return false;
 			}
 
+			if (!Compress(
+				dataToCompress,
+				out var compressedData))
+			{
+				logger?.LogError(
+					GetType(),
+					"COULD NOT COMPRESS DATA");
+
+				return false;
+			}
+
 			return base.ConvertAndWrite<byte[]>(
 				context,
-				byteArray);
+				compressedData);
 		}
 
 		#endregion
@@ -231,7 +284,7 @@ namespace HereticalSolutions.Persistence
 
 			if (!byteArrayConverter.ConvertToBytes<TValue>(
 				value,
-				out var byteArray))
+				out var dataToCompress))
 			{
 				logger?.LogError(
 					GetType(),
@@ -240,9 +293,20 @@ namespace HereticalSolutions.Persistence
 				return false;
 			}
 
+			if (!Compress(
+				dataToCompress,
+				out var compressedData))
+			{
+				logger?.LogError(
+					GetType(),
+					"COULD NOT COMPRESS DATA");
+
+				return false;
+			}
+
 			return base.ConvertAndAppend<byte[]>(
 				context,
-				byteArray);
+				compressedData);
 		}
 
 		public override bool ConvertAndAppend(
@@ -273,7 +337,7 @@ namespace HereticalSolutions.Persistence
 			if (!byteArrayConverter.ConvertToBytes(
 				valueType,
 				value,
-				out var byteArray))
+				out var dataToCompress))
 			{
 				logger?.LogError(
 					GetType(),
@@ -282,9 +346,20 @@ namespace HereticalSolutions.Persistence
 				return false;
 			}
 
+			if (!Compress(
+				dataToCompress,
+				out var compressedData))
+			{
+				logger?.LogError(
+					GetType(),
+					"COULD NOT COMPRESS DATA");
+
+				return false;
+			}
+
 			return base.ConvertAndAppend<byte[]>(
 				context,
-				byteArray);
+				compressedData);
 		}
 
 		#endregion
@@ -329,12 +404,23 @@ namespace HereticalSolutions.Persistence
 				context,
 				blockOffset,
 				blockSize,
-				out var byteArray);
+				out var compressedData);
 
 			if (result)
 			{
+				if (!Decompress(
+					compressedData,
+					out var decompressedData))
+				{
+					logger?.LogError(
+						GetType(),
+						$"COULD NOT DECOMPRESS DATA");
+
+					return false;
+				}
+
 				return byteArrayConverter.ConvertFromBytes<TValue>(
-					byteArray,
+					decompressedData,
 					out value);
 			}
 
@@ -382,13 +468,24 @@ namespace HereticalSolutions.Persistence
 				context,
 				blockOffset,
 				blockSize,
-				out var byteArray);
+				out var compressedData);
 
 			if (result)
 			{
+				if (!Decompress(
+					compressedData,
+					out var decompressedData))
+				{
+					logger?.LogError(
+						GetType(),
+						$"COULD NOT DECOMPRESS DATA");
+
+					return false;
+				}
+
 				return byteArrayConverter.ConvertFromBytes(
 					valueType,
-					byteArray,
+					decompressedData,
 					out value);
 			}
 
@@ -431,7 +528,7 @@ namespace HereticalSolutions.Persistence
 
 			if (!byteArrayConverter.ConvertToBytes<TValue>(
 				value,
-				out var byteArray))
+				out var dataToCompress))
 			{
 				logger?.LogError(
 					GetType(),
@@ -440,9 +537,20 @@ namespace HereticalSolutions.Persistence
 				return false;
 			}
 
+			if (!Compress(
+				dataToCompress,
+				out var compressedData))
+			{
+				logger?.LogError(
+					GetType(),
+					"COULD NOT COMPRESS DATA");
+
+				return false;
+			}
+
 			return base.ConvertAndWriteBlock<byte[]>(
 				context,
-				byteArray,
+				compressedData,
 				blockOffset,
 				blockSize);
 		}
@@ -479,7 +587,7 @@ namespace HereticalSolutions.Persistence
 			if (!byteArrayConverter.ConvertToBytes(
 				valueType,
 				value,
-				out var byteArray))
+				out var dataToCompress))
 			{
 				logger?.LogError(
 					GetType(),
@@ -488,9 +596,20 @@ namespace HereticalSolutions.Persistence
 				return false;
 			}
 
+			if (!Compress(
+				dataToCompress,
+				out var compressedData))
+			{
+				logger?.LogError(
+					GetType(),
+					"COULD NOT COMPRESS DATA");
+
+				return false;
+			}
+
 			return base.ConvertAndWriteBlock<byte[]>(
 				context,
-				byteArray,
+				compressedData,
 				blockOffset,
 				blockSize);
 		}
@@ -535,8 +654,19 @@ namespace HereticalSolutions.Persistence
 
 			if (result.Item1)
 			{
-				if (!byteArrayConverter.ConvertFromBytes<TValue>(
+				if (!Decompress(
 					result.Item2,
+					out var decompressedData))
+				{
+					logger?.LogError(
+						GetType(),
+						$"COULD NOT DECOMPRESS DATA");
+
+					return (false, default);
+				}
+
+				if (!byteArrayConverter.ConvertFromBytes<TValue>(
+					decompressedData,
 					out value))
 				{
 					logger?.LogError(
@@ -585,9 +715,20 @@ namespace HereticalSolutions.Persistence
 
 			if (result.Item1)
 			{
+				if (!Decompress(
+					result.Item2,
+					out var decompressedData))
+				{
+					logger?.LogError(
+						GetType(),
+						$"COULD NOT DECOMPRESS DATA");
+
+					return (false, default);
+				}
+
 				if (!byteArrayConverter.ConvertFromBytes(
 					valueType,
-					result.Item2,
+					decompressedData,
 					out value))
 				{
 					logger?.LogError(
@@ -633,7 +774,7 @@ namespace HereticalSolutions.Persistence
 
 			if (!byteArrayConverter.ConvertToBytes<TValue>(
 				value,
-				out var byteArray))
+				out var dataToCompress))
 			{
 				logger?.LogError(
 					GetType(),
@@ -642,9 +783,20 @@ namespace HereticalSolutions.Persistence
 				return false;
 			}
 
+			if (!Compress(
+				dataToCompress,
+				out var compressedData))
+			{
+				logger?.LogError(
+					GetType(),
+					"COULD NOT COMPRESS DATA");
+
+				return false;
+			}
+
 			return await base.ConvertAndWriteAsync<byte[]>(
 				context,
-				byteArray,
+				compressedData,
 				asyncContext);
 		}
 
@@ -680,7 +832,7 @@ namespace HereticalSolutions.Persistence
 			if (!byteArrayConverter.ConvertToBytes(
 				valueType,
 				value,
-				out var byteArray))
+				out var dataToCompress))
 			{
 				logger?.LogError(
 					GetType(),
@@ -689,9 +841,20 @@ namespace HereticalSolutions.Persistence
 				return false;
 			}
 
+			if (!Compress(
+				dataToCompress,
+				out var compressedData))
+			{
+				logger?.LogError(
+					GetType(),
+					"COULD NOT COMPRESS DATA");
+
+				return false;
+			}
+
 			return await base.ConvertAndWriteAsync<byte[]>(
 				context,
-				byteArray,
+				compressedData,
 				asyncContext);
 		}
 
@@ -727,7 +890,7 @@ namespace HereticalSolutions.Persistence
 
 			if (!byteArrayConverter.ConvertToBytes<TValue>(
 				value,
-				out var byteArray))
+				out var dataToCompress))
 			{
 				logger?.LogError(
 					GetType(),
@@ -736,9 +899,20 @@ namespace HereticalSolutions.Persistence
 				return false;
 			}
 
+			if (!Compress(
+				dataToCompress,
+				out var compressedData))
+			{
+				logger?.LogError(
+					GetType(),
+					"COULD NOT COMPRESS DATA");
+
+				return false;
+			}
+
 			return await base.ConvertAndAppendAsync<byte[]>(
 				context,
-				byteArray,
+				compressedData,
 				asyncContext);
 		}
 
@@ -774,7 +948,7 @@ namespace HereticalSolutions.Persistence
 			if (!byteArrayConverter.ConvertToBytes(
 				valueType,
 				value,
-				out var byteArray))
+				out var dataToCompress))
 			{
 				logger?.LogError(
 					GetType(),
@@ -783,9 +957,20 @@ namespace HereticalSolutions.Persistence
 				return false;
 			}
 
+			if (!Compress(
+				dataToCompress,
+				out var compressedData))
+			{
+				logger?.LogError(
+					GetType(),
+					"COULD NOT COMPRESS DATA");
+
+				return false;
+			}
+
 			return await base.ConvertAndAppendAsync<byte[]>(
 				context,
-				byteArray,
+				compressedData,
 				asyncContext);
 		}
 
@@ -835,8 +1020,19 @@ namespace HereticalSolutions.Persistence
 
 			if (result.Item1)
 			{
-				if (!byteArrayConverter.ConvertFromBytes<TValue>(
+				if (!Decompress(
 					result.Item2,
+					out var decompressedData))
+				{
+					logger?.LogError(
+						GetType(),
+						$"COULD NOT DECOMPRESS DATA");
+
+					return (false, default);
+				}
+
+				if (!byteArrayConverter.ConvertFromBytes<TValue>(
+					decompressedData,
 					out value))
 				{
 					logger?.LogError(
@@ -891,9 +1087,20 @@ namespace HereticalSolutions.Persistence
 
 			if (result.Item1)
 			{
+				if (!Decompress(
+					result.Item2,
+					out var decompressedData))
+				{
+					logger?.LogError(
+						GetType(),
+						$"COULD NOT DECOMPRESS DATA");
+
+					return (false, default);
+				}
+
 				if (!byteArrayConverter.ConvertFromBytes(
 					valueType,
-					result.Item2,
+					decompressedData,
 					out value))
 				{
 					logger?.LogError(
@@ -943,7 +1150,7 @@ namespace HereticalSolutions.Persistence
 
 			if (!byteArrayConverter.ConvertToBytes<TValue>(
 				value,
-				out var byteArray))
+				out var dataToCompress))
 			{
 				logger?.LogError(
 					GetType(),
@@ -952,9 +1159,20 @@ namespace HereticalSolutions.Persistence
 				return false;
 			}
 
+			if (!Compress(
+				dataToCompress,
+				out var compressedData))
+			{
+				logger?.LogError(
+					GetType(),
+					"COULD NOT COMPRESS DATA");
+
+				return false;
+			}
+
 			return await base.ConvertAndWriteBlockAsync<byte[]>(
 				context,
-				byteArray,
+				compressedData,
 				blockOffset,
 				blockSize,
 				asyncContext);
@@ -996,7 +1214,7 @@ namespace HereticalSolutions.Persistence
 			if (!byteArrayConverter.ConvertToBytes(
 				valueType,
 				value,
-				out var byteArray))
+				out var dataToCompress))
 			{
 				logger?.LogError(
 					GetType(),
@@ -1005,9 +1223,20 @@ namespace HereticalSolutions.Persistence
 				return false;
 			}
 
+			if (!Compress(
+				dataToCompress,
+				out var compressedData))
+			{
+				logger?.LogError(
+					GetType(),
+					"COULD NOT COMPRESS DATA");
+
+				return false;
+			}
+
 			return await base.ConvertAndWriteBlockAsync<byte[]>(
 				context,
-				byteArray,
+				compressedData,
 				blockOffset,
 				blockSize,
 				asyncContext);
@@ -1078,5 +1307,75 @@ namespace HereticalSolutions.Persistence
 
 			return false;
 		}
+
+		private bool Decompress(
+			byte[] compressedData,
+			out byte[] decompressedData)
+		{
+			// Get the original size (first 4 bytes)
+			var originalSize = BitConverter.ToInt32(compressedData, 0);
+
+			// Decompress the data
+			decompressedData = new byte[originalSize];
+
+			var actualSize = LZ4Codec.Decode(
+				compressedData,
+				4,
+				compressedData.Length - 4,
+				decompressedData,
+				0,
+				decompressedData.Length);
+
+			if (actualSize != originalSize)
+			{
+				logger?.LogError(
+					GetType(),
+					$"DECOMPRESSED DATA SIZE ({actualSize}) DOES NOT MATCH ORIGINAL SIZE ({originalSize})");
+
+				return false;
+			}
+
+			return true;
+		}
+
+		private bool Compress(
+			byte[] dataToCompress,
+			out byte[] compressedData)
+		{
+			// Calculate the worst-case compression size
+			var maxCompressedLength = LZ4Codec.MaximumOutputSize(dataToCompress.Length);
+
+			// Create buffer for compressed data (4 bytes for original size + compressed data)
+			compressedData = new byte[4 + maxCompressedLength];
+
+			// Store the original size in the first 4 bytes
+			BitConverter.GetBytes(dataToCompress.Length).CopyTo(compressedData, 0);
+
+			// Compress the data
+			var compressedSize = LZ4Codec.Encode(
+				dataToCompress,
+				0,
+				dataToCompress.Length,
+				compressedData,
+				4,
+				maxCompressedLength,
+				compressionLevel);
+
+			if (compressedSize <= 0)
+			{
+				logger?.LogError(
+					GetType(),
+					"COULD NOT COMPRESS DATA");
+
+				return false;
+			}
+
+			// Resize the array to actual size
+			Array.Resize(ref compressedData, 4 + compressedSize);
+
+			return true;
+		}
 	}
 }
+
+#endif

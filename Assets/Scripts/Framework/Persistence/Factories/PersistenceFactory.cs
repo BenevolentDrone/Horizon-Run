@@ -255,35 +255,11 @@ namespace HereticalSolutions.Persistence.Factories
         {
             ILogger logger = loggerResolver?.GetLogger<ByteArrayFallbackConverter>();
 
-            IRepository<Type, Delegate> convertFromBytesDelegateRepository =
-                RepositoryFactory.BuildDictionaryRepository<Type, Delegate>();
-
-            IRepository< Type, Delegate > convertToBytesDelegateRepository =
-                RepositoryFactory.BuildDictionaryRepository<Type, Delegate>();
-
-            AddDefaultDelegates(
-                convertFromBytesDelegateRepository,
-                convertToBytesDelegateRepository);
-
-            if (convertFromBytesDelegates != null)
-                foreach (TypeDelegatePair pair in convertFromBytesDelegates)
-                {
-                    convertFromBytesDelegateRepository.Add(
-                        pair.Type,
-                        pair.Delegate);
-                }
-
-            if (convertToBytesDelegates != null)
-                foreach (TypeDelegatePair pair in convertToBytesDelegates)
-                {
-                    convertToBytesDelegateRepository.Add(
-                        pair.Type,
-                        pair.Delegate);
-                }
-
             return new ByteArrayFallbackConverter(
-                convertFromBytesDelegateRepository,
-                convertToBytesDelegateRepository,
+                BuildByteArrayConverter(
+                    convertFromBytesDelegates,
+                    convertToBytesDelegates,
+                    loggerResolver),
                 innerConverter,
                 logger);
         }
@@ -508,6 +484,45 @@ namespace HereticalSolutions.Persistence.Factories
                 innerDataConverter);
 
             return argumentList.ToArray();
+        }
+
+        public static ByteArrayConverter BuildByteArrayConverter(
+            TypeDelegatePair[] convertFromBytesDelegates,
+            TypeDelegatePair[] convertToBytesDelegates,
+            ILoggerResolver loggerResolver)
+        {
+            ILogger logger = loggerResolver?.GetLogger<ByteArrayConverter>();
+
+            IRepository<Type, Delegate> convertFromBytesDelegateRepository =
+                RepositoryFactory.BuildDictionaryRepository<Type, Delegate>();
+
+            IRepository<Type, Delegate> convertToBytesDelegateRepository =
+                RepositoryFactory.BuildDictionaryRepository<Type, Delegate>();
+
+            AddDefaultDelegates(
+                convertFromBytesDelegateRepository,
+                convertToBytesDelegateRepository);
+
+            if (convertFromBytesDelegates != null)
+                foreach (TypeDelegatePair pair in convertFromBytesDelegates)
+                {
+                    convertFromBytesDelegateRepository.Add(
+                        pair.Type,
+                        pair.Delegate);
+                }
+
+            if (convertToBytesDelegates != null)
+                foreach (TypeDelegatePair pair in convertToBytesDelegates)
+                {
+                    convertToBytesDelegateRepository.Add(
+                        pair.Type,
+                        pair.Delegate);
+                }
+
+            return new ByteArrayConverter(
+                convertFromBytesDelegateRepository,
+                convertToBytesDelegateRepository,
+                logger);
         }
 
         private static void AddDefaultDelegates(

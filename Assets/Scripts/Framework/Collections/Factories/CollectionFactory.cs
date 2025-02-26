@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Runtime.InteropServices;
 
 using HereticalSolutions.Allocations;
@@ -146,14 +147,16 @@ namespace HereticalSolutions.Collections.Factories
         public static ConcurrentBPlusTree<T> BuildConcurrentBPlusTree<T>()
         {
             return new ConcurrentBPlusTree<T>(
-                BPlusTreeDegree);
+                BuildBPlusTree<T>(BPlusTreeDegree),
+                new SemaphoreSlim(1, 1));
         }
 
         public static ConcurrentBPlusTree<T> BuildConcurrentBPlusTree<T>(
             int degree)
         {
             return new ConcurrentBPlusTree<T>(
-                degree);
+                BuildBPlusTree<T>(degree),
+                new SemaphoreSlim(1, 1));
         }
 
         public static ConcurrentNonAllocBPlusTree<T> BuildConcurrentNonAllocBPlusTree<T>(
@@ -163,8 +166,10 @@ namespace HereticalSolutions.Collections.Factories
                 loggerResolver);
 
             return new ConcurrentNonAllocBPlusTree<T>(
-                nodePool,
-                BPlusTreeDegree);
+                BuildNonAllocBPlusTree<T>(
+                    nodePool,
+                    BPlusTreeDegree),
+                new SemaphoreSlim(1, 1));
         }
 
         public static ConcurrentNonAllocBPlusTree<T> BuildConcurrentNonAllocBPlusTree<T>(
@@ -172,8 +177,10 @@ namespace HereticalSolutions.Collections.Factories
             int degree)
         {
             return new ConcurrentNonAllocBPlusTree<T>(
-                nodePool,
-                degree);
+                BuildNonAllocBPlusTree<T>(
+                    nodePool,
+                    degree),
+                new SemaphoreSlim(1, 1));
         }
 
         public static BPlusTreeMap<TKey, TValue> BuildBPlusTreeMap<TKey, TValue>()
@@ -245,14 +252,18 @@ namespace HereticalSolutions.Collections.Factories
         public static ConcurrentBPlusTreeMap<TKey, TValue> BuildConcurrentBPlusTreeMap<TKey, TValue>()
         {
             return new ConcurrentBPlusTreeMap<TKey, TValue>(
-                BPlusTreeDegree);
+                BuildBPlusTreeMap<TKey, TValue>(
+                    BPlusTreeDegree),
+                new SemaphoreSlim(1, 1));
         }
 
         public static ConcurrentBPlusTreeMap<TKey, TValue> BuildConcurrentBPlusTreeMap<TKey, TValue>(
             int degree)
         {
             return new ConcurrentBPlusTreeMap<TKey, TValue>(
-                degree);
+                BuildBPlusTreeMap<TKey, TValue>(
+                    degree),
+                new SemaphoreSlim(1, 1));
         }
 
         public static ConcurrentNonAllocBPlusTreeMap<TKey, TValue> BuildConcurrentNonAllocBPlusTreeMap<TKey, TValue>(
@@ -262,8 +273,10 @@ namespace HereticalSolutions.Collections.Factories
                     loggerResolver);
 
             return new ConcurrentNonAllocBPlusTreeMap<TKey, TValue>(
-                nodePool,
-                BPlusTreeDegree);
+                BuildNonAllocBPlusTreeMap<TKey, TValue>(
+                    nodePool,
+                    BPlusTreeDegree),
+                new SemaphoreSlim(1, 1));
         }
 
         public static ConcurrentNonAllocBPlusTreeMap<TKey, TValue> BuildConcurrentNonAllocBPlusTreeMap<TKey, TValue>(
@@ -271,8 +284,10 @@ namespace HereticalSolutions.Collections.Factories
             int degree)
         {
             return new ConcurrentNonAllocBPlusTreeMap<TKey, TValue>(
-                nodePool,
-                degree);
+                BuildNonAllocBPlusTreeMap<TKey, TValue>(
+                    nodePool,
+                    degree),
+                new SemaphoreSlim(1, 1));
         }
 
         #endregion

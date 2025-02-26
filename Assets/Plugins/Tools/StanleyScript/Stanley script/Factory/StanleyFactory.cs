@@ -598,7 +598,6 @@ namespace HereticalSolutions.StanleyScript
 			
 			while (IOHelpers.FileExists(
 				pathSettings.FullPath,
-				null,
 				null))
 			{
 				pathSettings = new FileAtApplicationDataPathSettings()

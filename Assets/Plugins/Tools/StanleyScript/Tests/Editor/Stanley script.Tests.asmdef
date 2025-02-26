@@ -4,7 +4,8 @@
     "references": [
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
-        "Stanley script"
+        "Stanley script",
+        "Core"
     ],
     "includePlatforms": [
         "Editor"

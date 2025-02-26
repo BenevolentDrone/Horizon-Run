@@ -289,11 +289,6 @@ namespace HereticalSolutions.Persistence
 
 		#region Data converters
 
-		public ISerializerBuilder WithLZ4Compression()
-		{
-			throw new NotImplementedException();
-		}
-
 		public ISerializerBuilder WithByteArrayFallback()
 		{
 			deferredBuildDataConverterDelegate += () =>
